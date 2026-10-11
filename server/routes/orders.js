@@ -875,11 +875,18 @@ router.post('/:id/refund', protect, authorizeRoles('owner', 'manager'), async (r
     // Keep the claim pending to prevent duplicate refunds; the signed webhook
     // resolves the final state.
     const tenant = await Tenant.findById(req.tenantId).select('+paymentCredentialsEncrypted').lean();
-    const credentials = decryptTenantCredentials(tenant?.paymentCredentialsEncrypted);
-    if (!credentials.keyId || !credentials.keySecret) return res.status(503).json({ error: 'Razorpay credentials are not configured for this café.' });
+    let credentials;
+    try {
+      credentials = decryptTenantCredentials(tenant?.paymentCredentialsEncrypted);
+    } catch {
+      credentials = { keyId: '', keySecret: '' };
+    }
+    const keyId = credentials?.keyId || (process.env.RAZORPAY_KEY_ID && !process.env.RAZORPAY_KEY_ID.includes('xxxx') ? process.env.RAZORPAY_KEY_ID : '');
+    const keySecret = credentials?.keySecret || (process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_KEY_SECRET !== 'your_razorpay_secret' ? process.env.RAZORPAY_KEY_SECRET : '');
+    if (!keyId || !keySecret) return res.status(503).json({ error: 'Razorpay credentials are not configured for this café.' });
     const razorpay = typeof req.app.locals.razorpayFactory === 'function'
       ? req.app.locals.razorpayFactory()
-      : new Razorpay({ key_id: credentials.keyId, key_secret: credentials.keySecret });
+      : new Razorpay({ key_id: keyId, key_secret: keySecret });
     const refund = await razorpay.payments.refund(order.razorpayPaymentId, {
       amount: Math.round(order.total * (10 ** new Intl.NumberFormat('en', { style: 'currency', currency: paymentRecord.currency || order.currency || 'INR' }).resolvedOptions().maximumFractionDigits)),
       notes: { orderNumber: order.orderNumber, reason: String(req.body?.reason || 'Customer refund').slice(0, 200) },

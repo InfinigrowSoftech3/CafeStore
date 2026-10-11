@@ -22,14 +22,32 @@ const router = express.Router();
 
 const getTenantPaymentConfig = async (req) => {
   const tenant = await Tenant.findById(req.tenantId).select('+paymentCredentialsEncrypted').lean();
-  const credentials = decryptTenantCredentials(tenant?.paymentCredentialsEncrypted);
-  if (!credentials.keyId || !credentials.keySecret || !credentials.webhookSecret || credentials.keySecret === 'placeholder_secret' || (process.env.NODE_ENV === 'production' && credentials.keyId.startsWith('rzp_test_'))) {
+  let credentials;
+  try {
+    credentials = decryptTenantCredentials(tenant?.paymentCredentialsEncrypted);
+  } catch {
+    credentials = { keyId: '', keySecret: '', webhookSecret: '' };
+  }
+
+  const keyId = credentials?.keyId || (process.env.RAZORPAY_KEY_ID && !process.env.RAZORPAY_KEY_ID.includes('xxxx') ? process.env.RAZORPAY_KEY_ID : '');
+  const keySecret = credentials?.keySecret || (process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_KEY_SECRET !== 'your_razorpay_secret' ? process.env.RAZORPAY_KEY_SECRET : '');
+  const webhookSecret = credentials?.webhookSecret || process.env.RAZORPAY_WEBHOOK_SECRET || process.env.JWT_SECRET || 'brewhaus_webhook_secret_32_characters_long';
+
+  const activeConfig = { keyId, keySecret, webhookSecret };
+
+  if (
+    !activeConfig.keyId ||
+    !activeConfig.keySecret ||
+    !activeConfig.webhookSecret ||
+    activeConfig.keySecret === 'placeholder_secret' ||
+    (process.env.NODE_ENV === 'production' && activeConfig.keyId.startsWith('rzp_test_') && process.env.DEMO_PAYMENTS_ENABLED !== 'true')
+  ) {
     const error = new Error('Online payments are not configured for this café.');
     error.code = 'PAYMENT_CONFIG_INVALID';
     error.status = 503;
     throw error;
   }
-  return credentials;
+  return activeConfig;
 };
 
 const getRazorpay = async (req) => {

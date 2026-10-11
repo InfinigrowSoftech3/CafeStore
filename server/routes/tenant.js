@@ -73,10 +73,20 @@ router.get('/public', async (req, res, next) => {
 router.get('/settings', protect, authorizeRoles('owner'), async (req, res, next) => {
   try {
     const tenant = await Tenant.findById(req.tenantId).select('+paymentCredentialsEncrypted').lean();
-    const credentials = decryptTenantCredentials(tenant.paymentCredentialsEncrypted);
+    let credentials;
+    try {
+      credentials = decryptTenantCredentials(tenant.paymentCredentialsEncrypted);
+    } catch {
+      credentials = { keyId: '', keySecret: '', webhookSecret: '' };
+    }
+    const keyId = credentials.keyId || (process.env.RAZORPAY_KEY_ID && !process.env.RAZORPAY_KEY_ID.includes('xxxx') ? process.env.RAZORPAY_KEY_ID : '');
+    const configured = Boolean(
+      (credentials.keyId && credentials.keySecret && credentials.webhookSecret) ||
+      (process.env.RAZORPAY_KEY_ID && !process.env.RAZORPAY_KEY_ID.includes('xxxx') && process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_KEY_SECRET !== 'your_razorpay_secret')
+    );
     res.json({
       tenant: publicTenantSettings(tenant),
-      payment: { keyId: credentials.keyId, configured: Boolean(credentials.keyId && credentials.keySecret && credentials.webhookSecret) },
+      payment: { keyId, configured },
     });
   } catch (error) { next(error); }
 });
