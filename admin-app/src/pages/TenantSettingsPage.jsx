@@ -147,7 +147,8 @@ export default function TenantSettingsPage() {
         }));
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error || error.message || 'Could not load café settings.');
+        const msg = (typeof error.response?.data?.error === 'string' ? error.response.data.error : error.response?.data?.error?.message) || error.message || 'Could not load café settings.';
+        toast.error(msg);
       })
       .finally(() => {
         if (isMounted) setLoading(false);
@@ -265,7 +266,8 @@ export default function TenantSettingsPage() {
       setIsDirty(false);
       toast.success('Café settings saved successfully!');
     } catch (error) {
-      toast.error(error.response?.data?.error || error.message || 'Could not save settings.');
+      const msg = (typeof error.response?.data?.error === 'string' ? error.response.data.error : error.response?.data?.error?.message) || error.message || 'Could not save settings.';
+      toast.error(msg);
     } finally {
       setSaving(false);
     }

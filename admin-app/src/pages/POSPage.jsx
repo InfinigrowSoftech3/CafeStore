@@ -441,7 +441,8 @@ export default function POSPage() {
       setShowReceiptModal(true);
       clearCart();
     } catch (err) {
-      toast.error(err.response?.data?.error || err.message || 'Checkout failed');
+      const msg = (typeof err.response?.data?.error === 'string' ? err.response.data.error : err.response?.data?.error?.message) || err.message || 'Checkout failed';
+      toast.error(msg);
     } finally {
       setProcessingOrder(false);
     }

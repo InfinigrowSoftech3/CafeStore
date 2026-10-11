@@ -83,9 +83,17 @@ api.interceptors.response.use(
       }
     }
 
-    const message = error.response?.data?.error || error.message || 'Request failed';
-    const normalized = new Error(message);
-    normalized.code = error.response?.data?.code;
+    const rawError = error.response?.data?.error;
+    const rawMsg = error.response?.data?.message;
+    const message = (typeof rawError === 'string' ? rawError : rawError?.message) || (typeof rawMsg === 'string' ? rawMsg : null) || error.message || 'Request failed';
+
+    // Normalize error.response.data.error to string so callers accessing error.response?.data?.error never receive an object {code, message}
+    if (error.response?.data && typeof error.response.data.error === 'object' && error.response.data.error !== null) {
+      error.response.data.error = error.response.data.error.message || error.response.data.error.code || 'Request failed';
+    }
+
+    const normalized = new Error(typeof message === 'string' ? message : 'Request failed');
+    normalized.code = error.response?.data?.code || (typeof rawError === 'object' ? rawError?.code : undefined);
     normalized.status = error.response?.status;
     normalized.response = error.response;
     return Promise.reject(normalized);

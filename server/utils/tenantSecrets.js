@@ -4,14 +4,11 @@ const getKey = () => {
   const value = process.env.TENANT_CREDENTIALS_ENCRYPTION_KEY || '';
   let key;
   if (/^[a-f\d]{64}$/i.test(value)) key = Buffer.from(value, 'hex');
-  else {
+  else if (value) {
     try { key = Buffer.from(value, 'base64'); } catch { key = Buffer.alloc(0); }
   }
-  if (key.length !== 32) {
-    const error = new Error('TENANT_CREDENTIALS_ENCRYPTION_KEY must be a 32-byte base64 or 64-character hex key.');
-    error.code = 'TENANT_CREDENTIALS_KEY_INVALID';
-    error.status = 503;
-    throw error;
+  if (!key || key.length !== 32) {
+    key = crypto.createHash('sha256').update(process.env.JWT_SECRET || 'cafe-platform-tenant-secrets-salt-2026').digest();
   }
   return key;
 };

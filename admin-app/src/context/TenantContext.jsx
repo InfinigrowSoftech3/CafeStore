@@ -38,10 +38,10 @@ export function TenantProvider({ children }) {
     }).catch((error) => {
       if (!active) return;
       const status = error.response?.status || error.status;
-      const message = error.response?.data?.error || error.message || 'Café not found.';
+      const message = (typeof error.response?.data?.error === 'string' ? error.response.data.error : error.response?.data?.error?.message) || error.message || 'Café not found.';
       if (status === 423) {
         setTenantError({ status: 423, title: 'Café Account Suspended', message });
-      } else if (status === 404) {
+      } else if (status === 404 || status >= 500) {
         setTenant(fallback);
         setTenantError(null);
         applyTenantThemeVariables(fallback.primaryColor, fallback.accentColor);

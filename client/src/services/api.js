@@ -72,13 +72,19 @@ api.interceptors.response.use(
 
     // Normalize error message
     const data = error.response?.data;
-    let msg = data?.error || error.message || 'Network error. Please try again.';
+    const rawError = data?.error;
+    const rawMsg = data?.message;
+    let msg = (typeof rawError === 'string' ? rawError : rawError?.message) || (typeof rawMsg === 'string' ? rawMsg : null) || error.message || 'Network error. Please try again.';
     if (error.code === 'ECONNABORTED' || error.message?.toLowerCase().includes('timeout')) {
       msg = 'The server took too long to respond. Please check your connection or try again.';
     }
 
-    const err = new Error(msg);
-    if (data?.code) err.code = data.code;
+    if (data && typeof data.error === 'object' && data.error !== null) {
+      data.error = data.error.message || data.error.code || 'Request failed';
+    }
+
+    const err = new Error(typeof msg === 'string' ? msg : 'Network error. Please try again.');
+    if (data?.code || (typeof rawError === 'object' && rawError?.code)) err.code = data?.code || rawError?.code;
     err.status = status;
     err.response = error.response;
     return Promise.reject(err);

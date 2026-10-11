@@ -49,7 +49,8 @@ export default function SuperAdminLoginPage() {
 
       navigate('/super-admin', { replace: true });
     } catch (err) {
-      setError(err.response?.data?.error || err.message || 'Invalid platform admin credentials.');
+      const msg = (typeof err.response?.data?.error === 'string' ? err.response.data.error : err.response?.data?.error?.message) || err.message || 'Invalid platform admin credentials.';
+      setError(msg);
       setShake(true);
       setTimeout(() => setShake(false), 500);
     } finally {
