@@ -15,6 +15,7 @@ import StatusPill from '../components/common/StatusPill';
 import EmptyState from '../components/common/EmptyState';
 import Drawer from '../components/common/Drawer';
 import ConfirmDialog from '../components/common/ConfirmDialog';
+import { subscribeToLiveStream } from '../utils/liveStream';
 
 const STATUS_CONFIG = {
   AVAILABLE: {
@@ -120,8 +121,16 @@ export default function TablesPage() {
 
   useEffect(() => {
     fetchFloorPlan();
+    const unsubscribe = subscribeToLiveStream('/tables/events', {
+      onEvent: () => {
+        fetchFloorPlan();
+      },
+    });
     const interval = setInterval(fetchFloorPlan, 15000);
-    return () => clearInterval(interval);
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   const filteredTables = useMemo(() => {
@@ -201,7 +210,21 @@ export default function TablesPage() {
       toast.success(`Table marked as ${STATUS_CONFIG[newStatus]?.label || newStatus}`);
       fetchFloorPlan();
     } catch (error) {
-      toast.error(error.message || 'Failed to change status');
+      toast.error(error.response?.data?.error || error.message || 'Failed to change status');
+    }
+  };
+
+  const handleMarkAvailable = async (tableId, e) => {
+    if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+    try {
+      const { data } = await api.post(`/tables/${tableId}/mark-available`);
+      toast.success(data.message || 'Table is clean and available');
+      fetchFloorPlan();
+      if (activeDrawerTable && activeDrawerTable._id === tableId) {
+        setActiveDrawerTable((prev) => prev ? { ...prev, effectiveStatus: 'AVAILABLE', status: 'AVAILABLE', currentBillAmount: 0, activeOrdersCount: 0 } : null);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || error.message || 'Failed to mark table available');
     }
   };
 
@@ -565,9 +588,14 @@ export default function TablesPage() {
                   )}
 
                   {table.effectiveStatus === 'CLEANING' && (
-                    <span className="mt-1 rounded-md bg-orange-50 px-1.5 py-0.5 text-[9px] font-bold text-orange-700">
-                      Clean Me
-                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => handleMarkAvailable(table._id, e)}
+                      title="Click to mark clean and available"
+                      className="mt-1 inline-flex items-center gap-1 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-0.5 text-[9px] font-bold shadow-xs transition z-10"
+                    >
+                      <CheckCircle2 size={10} /> Mark Clean
+                    </button>
                   )}
                 </div>
               );
@@ -692,10 +720,10 @@ export default function TablesPage() {
                     {table.effectiveStatus === 'CLEANING' && (
                       <button
                         type="button"
-                        onClick={() => handleStatusChange(table._id, 'AVAILABLE')}
-                        className="text-emerald-600 hover:text-emerald-800 font-semibold"
+                        onClick={(e) => handleMarkAvailable(table._id, e)}
+                        className="text-emerald-700 hover:text-emerald-900 font-bold flex items-center gap-0.5 bg-emerald-100/80 px-2 py-0.5 rounded-md"
                       >
-                        Mark Clean
+                        <CheckCircle2 size={11} /> Mark Clean
                       </button>
                     )}
                     {table.effectiveStatus === 'OCCUPIED' && (
@@ -838,6 +866,18 @@ export default function TablesPage() {
                   </button>
                 ))}
               </div>
+
+              {activeDrawerTable.effectiveStatus === 'CLEANING' && (
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => handleMarkAvailable(activeDrawerTable._id)}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-2 text-xs font-semibold shadow-xs transition"
+                  >
+                    <CheckCircle2 size={14} /> Mark Available & Cleaned
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Current Tab / Bill */}

@@ -131,6 +131,12 @@ router.put('/settings', protect, authorizeRoles('owner'), async (req, res, next)
       'settings.contactPhone': String(input.contactPhone || '').trim().slice(0, 32),
       'settings.openingHours': openingHours,
     };
+    if (input.tableSettings && typeof input.tableSettings === 'object') {
+      const cleaningStepEnabled = input.tableSettings.cleaningStepEnabled !== false;
+      const rawMins = Number(input.tableSettings.autoReleaseMinutes);
+      const autoReleaseMinutes = Number.isFinite(rawMins) ? Math.max(0, Math.min(120, rawMins)) : 5;
+      patch['settings.tableSettings'] = { cleaningStepEnabled, autoReleaseMinutes };
+    }
     const payment = req.body?.payment;
     if (payment && Object.keys(payment).length) {
       const keyId = String(payment.keyId || '').trim();

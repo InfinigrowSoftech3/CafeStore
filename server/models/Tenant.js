@@ -44,6 +44,10 @@ const tenantSchema = new mongoose.Schema({
       printReceiptOnOrder: { type: Boolean, default: true },
       defaultStation: { type: String, default: 'KITCHEN' },
     },
+    tableSettings: {
+      cleaningStepEnabled: { type: Boolean, default: true },
+      autoReleaseMinutes: { type: Number, min: 0, max: 120, default: 5 },
+    },
   },
   paymentCredentialsEncrypted: { type: String, select: false, default: '' },
   razorpayWebhookSecret: { type: String, select: false, default: '' },

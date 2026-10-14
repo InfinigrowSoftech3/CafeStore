@@ -49,5 +49,9 @@ export const publicTenantSettings = (tenant) => {
     contactEmail: tenant.settings?.contactEmail || '',
     contactPhone: tenant.settings?.contactPhone || '',
     openingHours: tenant.settings?.openingHours || {},
+    tableSettings: {
+      cleaningStepEnabled: tenant.settings?.tableSettings?.cleaningStepEnabled !== false,
+      autoReleaseMinutes: Number(tenant.settings?.tableSettings?.autoReleaseMinutes ?? 5),
+    },
   };
 };

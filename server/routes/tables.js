@@ -10,8 +10,17 @@ import { createTableQrToken, verifyTableQrToken } from '../utils/tableQr.js';
 import { getTenantContext } from '../utils/tenantContext.js';
 import { writeAuditLog } from '../services/auditLog.js';
 import { parsePagination, formatPagination } from '../utils/pagination.js';
+import {
+  markTableCleanedAndAvailable,
+  checkAutoRelease,
+  syncTableStatusForOrder,
+} from '../services/tableLifecycle.js';
+import { openLiveStream, publishTableStatus } from '../services/liveUpdates.js';
 
 const router = express.Router();
+
+// SSE Live Stream for Table & Floor Plan updates
+router.get('/events', protect, ownerOrManager, (req, res) => openLiveStream(req, res, 'admin'));
 
 const getTrustedClientUrl = () => {
   const configured = String(process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafe.infinigrowsoftech.com').trim();
@@ -130,53 +139,101 @@ router.get('/floor-plan', protect, ownerOrManager, async (req, res) => {
     if (branchId) filter.branchId = branchId;
     if (floor && floor !== 'ALL') filter.floor = floor;
 
-    const [tables, total] = await Promise.all([
+    const [tables, total, tenantDoc] = await Promise.all([
       Table.find(filter)
         .populate('assignedWaiter', 'name email')
         .sort({ floor: 1, tableNumber: 1, _id: 1 })
         .skip(skip)
-        .limit(limit)
-        .lean(),
+        .limit(limit),
       Table.countDocuments(filter),
+      Tenant.findById(req.tenantId).select('settings.tableSettings').lean(),
     ]);
 
-    // Query active orders across these tables
+    const tableSettings = tenantDoc?.settings?.tableSettings || {};
+    const cleaningStepEnabled = tableSettings.cleaningStepEnabled !== false;
+    const autoReleaseMinutes = Number(tableSettings.autoReleaseMinutes ?? 5);
+
+    // Query non-cancelled orders across these tables
     const tableNumbers = tables.map(t => t.tableNumber);
-    const activeOrders = await Order.find({
+    const nonCancelledOrders = await Order.find({
+      tenantId: req.tenantId,
       tableNumber: { $in: tableNumbers },
-      orderStatus: { $in: ['pending', 'confirmed', 'preparing', 'ready', 'served'] },
+      orderStatus: { $ne: 'cancelled' },
     }).sort({ createdAt: 1 }).lean();
 
-    // Group active orders by tableNumber
+    // Group non-cancelled orders by tableNumber
     const ordersByTable = {};
-    for (const ord of activeOrders) {
+    for (const ord of nonCancelledOrders) {
       if (!ordersByTable[ord.tableNumber]) {
         ordersByTable[ord.tableNumber] = [];
       }
       ordersByTable[ord.tableNumber].push(ord);
     }
 
-    const enrichedTables = tables.map(table => {
-      const openOrders = ordersByTable[table.tableNumber] || [];
-      const totalBill = openOrders.reduce((sum, o) => sum + (o.total || 0), 0);
-      const totalItemsCount = openOrders.reduce((sum, o) => sum + (o.items ? o.items.length : 0), 0);
-      const earliestOrder = openOrders[0];
+    const enrichedTables = await Promise.all(tables.map(async (tableDoc) => {
+      const table = tableDoc.toObject();
+      const tableOrders = ordersByTable[table.tableNumber] || [];
+
+      // Open, unpaid orders that keep a table occupied and accrue a balance
+      const unpaidOrders = tableOrders.filter(
+        (o) => o.paymentStatus !== 'paid' && o.orderStatus !== 'completed'
+      );
+      const totalUnpaidBill = unpaidOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+      const totalItemsCount = unpaidOrders.reduce((sum, o) => sum + (o.items ? o.items.length : 0), 0);
+      const earliestOrder = unpaidOrders[0];
 
       let effectiveStatus = table.status || 'AVAILABLE';
-      if (['CLEANING', 'DISABLED', 'RESERVED'].includes(table.status)) {
+
+      // 1. Check auto-release for CLEANING tables
+      if (table.status === 'CLEANING') {
+        const released = await checkAutoRelease(tableDoc, autoReleaseMinutes);
+        if (released) {
+          effectiveStatus = 'AVAILABLE';
+          table.status = 'AVAILABLE';
+          table.currentSessionId = null;
+          table.paidAt = null;
+        } else {
+          effectiveStatus = 'CLEANING';
+        }
+      } else if (['DISABLED', 'RESERVED'].includes(table.status)) {
         effectiveStatus = table.status;
-      } else if (openOrders.length > 0) {
+      } else if (unpaidOrders.length > 0) {
+        // Active orders with open balance
         effectiveStatus = table.status === 'WAITING_PAYMENT' ? 'WAITING_PAYMENT' : 'OCCUPIED';
+        if (tableDoc.status !== effectiveStatus) {
+          tableDoc.status = effectiveStatus;
+          await tableDoc.save();
+        }
+      } else {
+        // All orders on table are settled/paid/completed or no orders at all!
+        if (['OCCUPIED', 'WAITING_PAYMENT'].includes(table.status)) {
+          // Heal stuck table immediately
+          if (cleaningStepEnabled) {
+            effectiveStatus = 'CLEANING';
+            tableDoc.status = 'CLEANING';
+            tableDoc.paidAt = tableDoc.paidAt || new Date();
+          } else {
+            effectiveStatus = 'AVAILABLE';
+            tableDoc.status = 'AVAILABLE';
+            tableDoc.currentSessionId = null;
+            tableDoc.paidAt = null;
+          }
+          await tableDoc.save();
+          publishTableStatus(tableDoc);
+        } else {
+          effectiveStatus = table.status || 'AVAILABLE';
+        }
       }
 
       return {
         ...table,
+        status: effectiveStatus,
         effectiveStatus,
-        activeOrdersCount: openOrders.length,
-        currentBillAmount: Number(totalBill.toFixed(2)),
+        activeOrdersCount: unpaidOrders.length,
+        currentBillAmount: Number(totalUnpaidBill.toFixed(2)),
         totalItemsCount,
         occupiedSince: earliestOrder ? earliestOrder.createdAt : null,
-        activeOrders: openOrders.map(o => ({
+        activeOrders: unpaidOrders.map(o => ({
           _id: o._id,
           orderNumber: o.orderNumber,
           orderStatus: o.orderStatus,
@@ -186,7 +243,7 @@ router.get('/floor-plan', protect, ownerOrManager, async (req, res) => {
           createdAt: o.createdAt,
         })),
       };
-    });
+    }));
 
     const floors = [...new Set(tables.map(t => t.floor || 'Ground Floor'))];
 
@@ -321,6 +378,17 @@ router.put('/:id', protect, ownerOrManager, async (req, res) => {
   }
 });
 
+// POST /api/tables/:id/mark-available — admin/staff (One-click Cleaned & Mark Available)
+router.post('/:id/mark-available', protect, ownerOrManager, async (req, res) => {
+  try {
+    const table = await markTableCleanedAndAvailable(req.params.id, req.tenantId, req.user?._id);
+    res.json({ success: true, table, message: `Table ${table.tableNumber} is now clean and available.` });
+  } catch (error) {
+    const status = error.status || 400;
+    res.status(status).json({ error: error.message, code: error.code || 'MARK_AVAILABLE_FAILED' });
+  }
+});
+
 // PATCH /api/tables/:id/status — admin/staff (Change table status)
 router.patch('/:id/status', protect, ownerOrManager, async (req, res) => {
   try {
@@ -330,15 +398,25 @@ router.patch('/:id/status', protect, ownerOrManager, async (req, res) => {
       return res.status(400).json({ error: `Invalid status. Must be one of: ${allowed.join(', ')}` });
     }
 
-    const table = await Table.findById(req.params.id);
+    if (status === 'AVAILABLE') {
+      const table = await markTableCleanedAndAvailable(req.params.id, req.tenantId, req.user?._id);
+      return res.json({ success: true, table });
+    }
+
+    const table = await Table.findOne({ _id: req.params.id, tenantId: req.tenantId });
     if (!table) return res.status(404).json({ error: 'Table not found.' });
 
     table.status = status;
+    if (status === 'CLEANING') {
+      table.paidAt = new Date();
+    }
     await table.save();
+    publishTableStatus(table);
 
     res.json({ success: true, table });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    const statusCode = error.status || 400;
+    res.status(statusCode).json({ error: error.message, code: error.code });
   }
 });
 

@@ -21,7 +21,8 @@ import {
   Smartphone,
   QrCode,
   Save,
-  CheckCircle2
+  CheckCircle2,
+  Layers
 } from 'lucide-react';
 import api from '../services/api';
 import { useTenant } from '../context/TenantContext';
@@ -83,6 +84,10 @@ const initial = {
   contactEmail: '',
   contactPhone: '',
   openingHours: {},
+  tableSettings: {
+    cleaningStepEnabled: true,
+    autoReleaseMinutes: 5,
+  },
 };
 
 export default function TenantSettingsPage() {
@@ -297,6 +302,7 @@ export default function TenantSettingsPage() {
     { id: 'brand', label: 'Brand & Appearance', icon: Palette },
     { id: 'tax', label: 'Tax, Currency & Contact', icon: Percent },
     { id: 'hours', label: 'Opening Hours', icon: Clock },
+    { id: 'tables', label: 'Tables & Floor Plan', icon: Layers },
     { id: 'payments', label: 'Payment Gateway', icon: CreditCard },
     { id: 'qr', label: 'QR & Digital Ordering', icon: QrCode },
   ];
@@ -645,6 +651,77 @@ export default function TenantSettingsPage() {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: TABLES & FLOOR PLAN */}
+          {activeTab === 'tables' && (
+            <div className="rounded-3xl border border-stone-200/90 bg-white p-6 shadow-xs space-y-6">
+              <div>
+                <h3 className="font-display text-lg font-bold text-espresso-950">
+                  Tables & Floor Plan Lifecycle
+                </h3>
+                <p className="text-xs text-stone-500">
+                  Control how tables transition between Occupied, Cleaning, and Available states after customer checkout.
+                </p>
+              </div>
+
+              <div className="space-y-5">
+                <div className="rounded-2xl border border-stone-200 bg-stone-50/50 p-4 flex items-start justify-between gap-4">
+                  <div className="space-y-0.5">
+                    <label className="text-xs font-bold text-stone-900 block">
+                      Enable Cleaning Step
+                    </label>
+                    <p className="text-xs text-stone-500">
+                      When enabled, tables move to &quot;Cleaning&quot; after payment so staff can sanitize before new guests arrive.
+                      If disabled, paid tables move immediately to &quot;Available&quot;.
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.tableSettings?.cleaningStepEnabled !== false}
+                      onChange={(e) => {
+                        updateSetting('tableSettings', {
+                          ...(settings.tableSettings || {}),
+                          cleaningStepEnabled: e.target.checked,
+                        });
+                      }}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                  </label>
+                </div>
+
+                <div className="rounded-2xl border border-stone-200 bg-stone-50/50 p-4 space-y-2">
+                  <div>
+                    <label className="text-xs font-bold text-stone-900 block">
+                      Auto-Release Table (Minutes)
+                    </label>
+                    <p className="text-xs text-stone-500">
+                      Automatically free a table from &quot;Cleaning&quot; to &quot;Available&quot; N minutes after payment.
+                      Set to 0 to disable auto-release and require manual staff clearance.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 pt-1">
+                    <input
+                      type="number"
+                      min="0"
+                      max="120"
+                      value={settings.tableSettings?.autoReleaseMinutes ?? 5}
+                      onChange={(e) => {
+                        const val = Math.max(0, Math.min(120, Number(e.target.value) || 0));
+                        updateSetting('tableSettings', {
+                          ...(settings.tableSettings || {}),
+                          autoReleaseMinutes: val,
+                        });
+                      }}
+                      className="w-28 rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-semibold focus:border-amber-500 focus:outline-none"
+                    />
+                    <span className="text-xs font-medium text-stone-500">minutes after payment (default: 5 min)</span>
+                  </div>
+                </div>
               </div>
             </div>
           )}

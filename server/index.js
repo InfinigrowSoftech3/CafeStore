@@ -594,6 +594,15 @@ export const startServer = async () => {
   validateEnv();
   const port = process.env.PORT || 5000;
   await connectDB();
+  try {
+    const { resetStuckTables } = await import('./services/tableLifecycle.js');
+    const healed = await resetStuckTables();
+    if (healed.length > 0) {
+      console.log(`[Startup] Self-healed ${healed.length} stuck tables:`, healed.join(', '));
+    }
+  } catch (err) {
+    console.error('[Startup] Notice: could not run stuck table healing:', err.message);
+  }
   if (process.env.RUN_SCHEDULER !== 'false') {
     startCampaignScheduler();
   }

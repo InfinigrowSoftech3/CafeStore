@@ -24,11 +24,12 @@ import { confirmOrderAndDeduct, restoreForOrder, validateInventoryForOrder } fro
 import { requireActiveDiningSession } from '../utils/diningSession.js';
 import { verifyTableQrToken } from '../utils/tableQr.js';
 import { withMongoTransaction } from '../utils/mongoTransaction.js';
-import { openLiveStream, publishLiveUpdate, publishNewOrder, publishOrderUpdate } from '../services/liveUpdates.js';
+import { openLiveStream, publishLiveUpdate, publishNewOrder, publishOrderUpdate, publishTableStatus } from '../services/liveUpdates.js';
 import { writeAuditLog } from '../services/auditLog.js';
 import Coupon from '../models/Coupon.js';
 import { calculateCouponDiscount, claimCoupon, findAvailableCoupon, normalizeCouponCode } from '../services/couponService.js';
 import { awardLoyaltyPoints, reverseLoyaltyPoints } from '../services/loyaltyService.js';
+import { syncTableStatusForOrder } from '../services/tableLifecycle.js';
 
 const router = express.Router();
 
@@ -333,6 +334,10 @@ router.post('/', async (req, res) => {
           currency: String(req.tenant.settings?.currency || 'INR'),
           status: 'pending',
         }], { session });
+
+        table.status = 'OCCUPIED';
+        if (diningSessionId) table.currentSessionId = diningSessionId;
+        await table.save({ session });
         } catch (error) {
           if (!session && couponClaimed) {
             await Coupon.updateOne({ _id: coupon._id, usageCount: { $gt: 0 } }, { $inc: { usageCount: -1 } });
@@ -346,6 +351,7 @@ router.post('/', async (req, res) => {
     await withMongoTransaction(createOrderAndPayment, () => createOrderAndPayment(undefined));
 
     publishNewOrder(order);
+    publishTableStatus(table);
 
     // Return order with access token (only on creation)
     res.status(201).json({
@@ -662,6 +668,9 @@ const updateOrderStatusHandler = async (req, res) => {
     );
 
     publishOrderUpdate(order);
+    if (['completed', 'cancelled'].includes(orderStatus) && order.tableNumber > 0) {
+      await syncTableStatusForOrder(order.tableNumber, req.tenantId);
+    }
 
     res.json({ order });
   } catch (error) {
@@ -740,6 +749,9 @@ router.put('/:id/cash-payment', protect, cashiers, async (req, res) => {
     );
 
     publishOrderUpdate(result.order);
+    if (result.order.tableNumber > 0) {
+      await syncTableStatusForOrder(result.order.tableNumber, req.tenantId);
+    }
 
     return res.json({ order: result.order });
   } catch (error) {

@@ -17,6 +17,7 @@ import { withMongoTransaction } from '../utils/mongoTransaction.js';
 import { publishLiveUpdate, publishOrderUpdate } from '../services/liveUpdates.js';
 import { writeAuditLog } from '../services/auditLog.js';
 import { awardLoyaltyPoints, reverseLoyaltyPoints } from '../services/loyaltyService.js';
+import { syncTableStatusForOrder } from '../services/tableLifecycle.js';
 
 const router = express.Router();
 
@@ -460,6 +461,9 @@ router.post('/webhook', async (req, res) => {
         await awardLoyaltyPoints(settledOrder._id);
         publishOrderUpdate(settledOrder);
       }
+      if (settledOrders.length > 0 && settledOrders[0].tableNumber > 0) {
+        await syncTableStatusForOrder(settledOrders[0].tableNumber, req.tenantId);
+      }
       publishLiveUpdate('admin', 'bill-updated', { bill: updatedBill });
       return res.json({ received: true, bill: { _id: updatedBill._id, status: updatedBill.status, dueAmount: updatedBill.dueAmount } });
     }
@@ -488,6 +492,9 @@ router.post('/webhook', async (req, res) => {
     });
     await awardLoyaltyPoints(result.order._id);
     publishOrderUpdate(result.order);
+    if (result.order.tableNumber > 0) {
+      await syncTableStatusForOrder(result.order.tableNumber, req.tenantId);
+    }
 
     await recordLedgerEntry({
       payment: paymentRecord,

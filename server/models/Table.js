@@ -17,6 +17,8 @@ const tableSchema = new mongoose.Schema({
   assignedWaiter: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   floor: { type: String, default: 'Ground Floor', trim: true },
   shape: { type: String, enum: ['square', 'round', 'rectangle'], default: 'square' },
+  currentSessionId: { type: mongoose.Schema.Types.ObjectId, ref: 'DiningSession', default: null },
+  paidAt: { type: Date, default: null },
 }, { timestamps: true });
 
 tableSchema.plugin(tenantIsolationPlugin);

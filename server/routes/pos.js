@@ -18,6 +18,7 @@ import { findAvailableCoupon, calculateCouponDiscount, normalizeCouponCode } fro
 import { ensureMainBranch } from './branches.js';
 import { withMongoTransaction } from '../utils/mongoTransaction.js';
 import { parsePagination, formatPagination } from '../utils/pagination.js';
+import { syncTableStatusForOrder } from '../services/tableLifecycle.js';
 
 const router = express.Router();
 
@@ -322,6 +323,10 @@ router.post('/orders', protect, orderReaders, async (req, res, next) => {
       }
     }
 
+    if (orderType === 'dine_in' && resolvedTableNumber) {
+      await syncTableStatusForOrder(resolvedTableNumber, req.tenantId);
+    }
+
     // Publish SSE update
     try {
       publishNewOrder(order);
@@ -482,7 +487,7 @@ router.post('/orders/:id/pay', protect, orderReaders, async (req, res, next) => 
         );
 
         if (order.tableNumber > 0) {
-          await Table.updateOne({ tableNumber: order.tableNumber }, { $set: { status: 'AVAILABLE' } }, { session });
+          await syncTableStatusForOrder(order.tableNumber, req.tenantId, { session });
         }
       },
       async () => {
@@ -504,7 +509,7 @@ router.post('/orders/:id/pay', protect, orderReaders, async (req, res, next) => 
         });
         await order.save();
         if (order.tableNumber > 0) {
-          await Table.updateOne({ tableNumber: order.tableNumber }, { $set: { status: 'AVAILABLE' } });
+          await syncTableStatusForOrder(order.tableNumber, req.tenantId);
         }
       }
     );

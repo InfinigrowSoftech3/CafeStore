@@ -19,9 +19,10 @@ import {
 import { verifyTableQrToken } from '../utils/tableQr.js';
 import { withMongoTransaction } from '../utils/mongoTransaction.js';
 import TableServiceRequest from '../models/TableServiceRequest.js';
-import { publishLiveUpdate } from '../services/liveUpdates.js';
+import { publishLiveUpdate, publishTableStatus } from '../services/liveUpdates.js';
 import { awardLoyaltyPoints } from '../services/loyaltyService.js';
 import { parsePagination, formatPagination } from '../utils/pagination.js';
+import { syncTableStatusForOrder } from '../services/tableLifecycle.js';
 
 const router = express.Router();
 
@@ -106,14 +107,18 @@ router.post('/', async (req, res) => {
     const claims = verifyTableQrToken(req.body.tableToken);
     if (!claims) return res.status(400).json({ error: 'A valid, unexpired table QR token is required.' });
     if (String(claims.tenantId) !== String(req.tenantId)) return res.status(404).json({ error: 'Invalid table QR code.' });
-    const table = await Table.findOne({ _id: claims.tableId, active: true }).select('tableNumber');
+    const table = await Table.findOne({ _id: claims.tableId, active: true }).select('tableNumber status currentSessionId');
     if (!table) return res.status(404).json({ error: 'Invalid or inactive table.' });
     if (Number.isInteger(tableNumber) && tableNumber !== table.tableNumber) return res.status(400).json({ error: 'Table number does not match the signed table QR token.' });
 
-    if (req.body.diningSessionToken) {
+    // Table lifecycle rule: If a table is AVAILABLE or CLEANING, a new scan starts a completely clean session.
+    // Never reuse an old session token for an available table.
+    const isFree = ['AVAILABLE', 'CLEANING'].includes(table.status);
+
+    if (!isFree && req.body.diningSessionToken) {
       try {
         const existing = await requireActiveDiningSession(req.body.diningSessionToken);
-        if (existing.tableNumber === tableNumber) {
+        if (existing.tableNumber === tableNumber && (!table.currentSessionId || String(table.currentSessionId) === String(existing._id))) {
           return res.status(200).json({
             session: { id: existing._id, tableNumber, status: existing.status, expiresAt: existing.expiresAt },
             diningSessionToken: req.body.diningSessionToken,
@@ -130,6 +135,10 @@ router.post('/', async (req, res) => {
       tableNumber,
       expiresAt: sessionExpiresAt(),
     });
+
+    table.currentSessionId = session._id;
+    await table.save();
+
     return res.status(201).json({
       session: { id: session._id, tableNumber, status: session.status, expiresAt: session.expiresAt },
       diningSessionToken: token,
@@ -160,6 +169,15 @@ router.post('/request', async (req, res) => {
     const created = !request;
     if (!request) request = await TableServiceRequest.create({ diningSessionId: session._id, tableNumber: session.tableNumber, type });
     if (created) publishLiveUpdate('admin', 'service-request', { request: request.toObject() });
+
+    if (type === 'bill') {
+      const tableDoc = await Table.findOne({ tableNumber: session.tableNumber, tenantId: req.tenantId });
+      if (tableDoc && tableDoc.status === 'OCCUPIED') {
+        tableDoc.status = 'WAITING_PAYMENT';
+        await tableDoc.save();
+        publishTableStatus(tableDoc);
+      }
+    }
     return res.status(created ? 201 : 200).json({ request, alreadyOpen: !created });
   } catch (error) {
     return res.status(403).json({ error: error.message || 'Unable to submit table request.', code: error.code });
@@ -223,6 +241,13 @@ router.post('/bill/cash', async (req, res) => {
     bill.status = 'CASH_PENDING';
     bill.cashRequestedAt = new Date();
     await bill.save();
+
+    const tableDoc = await Table.findOne({ tableNumber: session.tableNumber, tenantId: req.tenantId });
+    if (tableDoc && tableDoc.status === 'OCCUPIED') {
+      tableDoc.status = 'WAITING_PAYMENT';
+      await tableDoc.save();
+      publishTableStatus(tableDoc);
+    }
     return res.json({ bill });
   } catch (error) {
     return res.status(403).json({ error: error.message, code: error.code });
@@ -316,6 +341,12 @@ router.put('/bill/:billId/confirm-cash', protect, cashiers, async (req, res) => 
       { $set: { status: 'captured', capturedAt: new Date() } },
     );
     await DiningSession.findOneAndUpdate({ _id: bill.diningSessionId, status: { $ne: 'CLOSED' } }, { $set: { status: 'CLOSED', closedAt: new Date(), closedBy: req.user._id } });
+
+    const sessionDoc = await DiningSession.findById(bill.diningSessionId).lean();
+    if (sessionDoc?.tableNumber) {
+      await syncTableStatusForOrder(sessionDoc.tableNumber, req.tenantId);
+    }
+
     return res.json({ bill });
   } catch (error) {
     return res.status(400).json({ error: error.message });
