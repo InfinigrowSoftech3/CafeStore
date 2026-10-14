@@ -226,14 +226,14 @@ export default function AdminLayout({ children, title }) {
               {tenant.logoUrl ? (
                 <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
               ) : (
-                tenant.name?.charAt(0)?.toUpperCase() || 'B'
+                ((tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'V').charAt(0).toUpperCase()
               )}
             </div>
 
             {!isCollapsed && (
               <div className="min-w-0 truncate">
                 <div className="truncate font-display text-sm font-bold text-[var(--sidebar-text)] tracking-wide">
-                  {tenant.name || 'Brewhaus Café'}
+                  {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'Café'}
                 </div>
                 <div className="flex items-center gap-1.5 text-[11px] font-medium text-amber-200">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -380,11 +380,13 @@ export default function AdminLayout({ children, title }) {
                     {tenant.logoUrl ? (
                       <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
-                      tenant.name?.charAt(0)?.toUpperCase() || 'B'
+                      ((tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'V').charAt(0).toUpperCase()
                     )}
                   </div>
                   <div>
-                    <div className="font-bold text-sm text-[var(--sidebar-text)]">{tenant.name || 'Brewhaus Café'}</div>
+                    <div className="font-bold text-sm text-[var(--sidebar-text)]">
+                      {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'Café'}
+                    </div>
                     <div className="text-[10px] text-amber-300">Admin Console</div>
                   </div>
                 </div>
@@ -531,7 +533,7 @@ export default function AdminLayout({ children, title }) {
 
             <div className="min-w-0">
               <div className="hidden items-center gap-2 truncate text-[11px] font-semibold text-[var(--header-text-muted)] uppercase tracking-wider sm:flex">
-                <span>{tenant.name || 'Café'}</span>
+                <span>{(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'Café'}</span>
                 <span>/</span>
                 <span className="text-[var(--header-text)]">{title}</span>
               </div>

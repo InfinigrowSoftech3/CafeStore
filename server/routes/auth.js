@@ -21,6 +21,7 @@ import {
 import { sendPasswordResetEmail } from '../services/emailService.js';
 import { sendSms } from '../services/smsService.js';
 import { getRedisClient } from '../config/redis.js';
+import { publicTenantSettings } from '../utils/tenantSecrets.js';
 
 const router = express.Router();
 
@@ -55,7 +56,16 @@ const issueSession = async (user, res) => {
   return accessToken;
 };
 
-const publicUser = (user) => ({ id: user._id, name: user.name, email: user.email, role: user.role, tenantId: user.tenantId });
+const publicUser = (user, tenant = null) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  tenantId: user.tenantId,
+  tenantName: tenant ? (tenant.settings?.cafeName || tenant.name) : undefined,
+  tenantSlug: tenant?.slug,
+  tenant: tenant ? publicTenantSettings(tenant) : undefined,
+});
 
 const recordLoginFailure = async (user) => {
   await runWithSystemTenantAccess(async () => {
@@ -192,6 +202,8 @@ router.post('/login', async (req, res) => {
           id: String(user._id),
           email: user.email,
           role: userRole,
+          tenantName: tenant ? (tenant.settings?.cafeName || tenant.name) : undefined,
+          tenantSlug: tenant?.slug,
         },
         cafes,
         accessToken: token,
@@ -199,7 +211,7 @@ router.post('/login', async (req, res) => {
       token,
       accessToken: token,
       user: {
-        ...publicUser(user),
+        ...publicUser(user, tenant),
       },
     });
   } catch (error) {
@@ -259,7 +271,10 @@ router.post('/refresh', async (req, res) => {
     await user.save();
 
     const token = await issueSession(user, res);
-    return res.json({ token, user: publicUser(user) });
+    const tenant = user.tenantId
+      ? await runWithSystemTenantAccess(async () => Tenant.findById(user.tenantId).lean())
+      : null;
+    return res.json({ token, user: publicUser(user, tenant) });
   } catch (error) {
     return res.status(500).json({ error: 'Unable to refresh the admin session.' });
   }
@@ -267,9 +282,12 @@ router.post('/refresh', async (req, res) => {
 
 // GET /api/auth/me
 router.get('/me', protect, async (req, res) => {
+  const tenant = req.user?.tenantId
+    ? await runWithSystemTenantAccess(async () => Tenant.findById(req.user.tenantId).lean())
+    : null;
   res.json({
     user: {
-      ...publicUser(req.user),
+      ...publicUser(req.user, tenant),
       impersonatedBy: req.impersonatedBy || null,
     },
   });

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import api, { getOnce } from '../services/api';
+import { useAuth } from './AuthContext';
 
 const Context = createContext(null);
 const fallback = { name: 'Café', logoUrl: '', primaryColor: '#c96b18', accentColor: '#1a0f08' };
@@ -14,6 +15,7 @@ export const applyTenantThemeVariables = (primaryColor = '#c96b18', accentColor 
 };
 
 export function TenantProvider({ children }) {
+  const { user } = useAuth();
   const [tenant, setTenant] = useState(fallback);
   const [tenantError, setTenantError] = useState(null);
 
@@ -25,18 +27,40 @@ export function TenantProvider({ children }) {
     });
   };
 
+  // 1. Immediately reflect tenant branding from authenticated user session
+  useEffect(() => {
+    if (user?.tenant) {
+      setTenant(prev => ({
+        ...prev,
+        ...user.tenant,
+        name: user.tenant.name || user.tenantName || prev.name,
+      }));
+      applyTenantThemeVariables(user.tenant.primaryColor, user.tenant.accentColor);
+      document.title = `${user.tenant.name || user.tenantName} · Admin`;
+    } else if (user?.tenantName && user.tenantName !== 'Café') {
+      setTenant(prev => ({ ...prev, name: user.tenantName }));
+      document.title = `${user.tenantName} · Admin`;
+    }
+  }, [user?.tenant, user?.tenantName]);
+
+  // 2. Fetch /tenant/public - scoped to user tenant if authenticated
   useEffect(() => {
     let active = true;
-    // Cache tenant public branding for at least 5 minutes to prevent duplicate bootstrap requests
-    getOnce('/tenant/public', 5 * 60 * 1000).then(({ data }) => {
+    const queryParam = user?.tenantId ? `?tenant=${encodeURIComponent(user.tenantId)}` : '';
+    api.get(`/tenant/public${queryParam}`).then(({ data }) => {
       if (!active) return;
       const t = data.tenant || fallback;
-      setTenant(t);
+      setTenant(prev => ({ ...prev, ...t }));
       setTenantError(null);
-      document.title = `${t.name} · Admin`;
+      const displayName = t.name || user?.tenantName || 'Café';
+      document.title = `${displayName} · Admin`;
       applyTenantThemeVariables(t.primaryColor || '#c96b18', t.accentColor || '#1a0f08');
     }).catch((error) => {
       if (!active) return;
+      // If user is already logged in with tenant data, don't overwrite with generic 'Café'
+      if (user?.tenant || (user?.tenantName && user.tenantName !== 'Café')) {
+        return;
+      }
       const status = error.response?.status || error.status;
       const message = (typeof error.response?.data?.error === 'string' ? error.response.data.error : error.response?.data?.error?.message) || error.message || 'Café not found.';
       if (status === 423) {
@@ -48,7 +72,7 @@ export function TenantProvider({ children }) {
       }
     });
     return () => { active = false; };
-  }, []);
+  }, [user?.tenantId]);
 
   if (tenantError) {
     return (

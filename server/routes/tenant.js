@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 import Tenant from '../models/Tenant.js';
 import { protect, authorizeRoles } from '../middleware/auth.js';
 import { decryptTenantCredentials, encryptTenantCredentials, publicTenantSettings } from '../utils/tenantSecrets.js';
@@ -42,7 +43,25 @@ router.get('/public', async (req, res, next) => {
       }
     }
 
-    // 3. Fall back to req.tenant (resolved from subdomain / host by tenantResolver)
+    // 3. Check authenticated session token if available
+    if (!tenant) {
+      const authHeader = req.headers?.authorization;
+      const token = (authHeader && authHeader.startsWith('Bearer '))
+        ? authHeader.split(' ')[1]
+        : req.cookies?.brewhaus_access_token;
+      if (token && process.env.JWT_SECRET) {
+        try {
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          if (decoded?.tenantId && mongoose.isValidObjectId(decoded.tenantId)) {
+            tenant = await Tenant.findById(decoded.tenantId).lean();
+          }
+        } catch {
+          // ignore invalid/expired token in public endpoint
+        }
+      }
+    }
+
+    // 4. Fall back to req.tenant (resolved from subdomain / host by tenantResolver)
     if (!tenant && req.tenant) {
       tenant = req.tenant;
     }

@@ -14,6 +14,8 @@ import {
   markTableCleanedAndAvailable,
   checkAutoRelease,
   syncTableStatusForOrder,
+  clearTableTab,
+  resetStuckTables,
 } from '../services/tableLifecycle.js';
 import { openLiveStream, publishTableStatus } from '../services/liveUpdates.js';
 
@@ -153,12 +155,13 @@ router.get('/floor-plan', protect, ownerOrManager, async (req, res) => {
     const cleaningStepEnabled = tableSettings.cleaningStepEnabled !== false;
     const autoReleaseMinutes = Number(tableSettings.autoReleaseMinutes ?? 5);
 
-    // Query non-cancelled orders across these tables
+    // Query non-cancelled orders across these tables within the active 18h operational window
     const tableNumbers = tables.map(t => t.tableNumber);
     const nonCancelledOrders = await Order.find({
       tenantId: req.tenantId,
       tableNumber: { $in: tableNumbers },
       orderStatus: { $ne: 'cancelled' },
+      createdAt: { $gt: new Date(Date.now() - 18 * 60 * 60 * 1000) },
     }).sort({ createdAt: 1 }).lean();
 
     // Group non-cancelled orders by tableNumber
@@ -381,7 +384,8 @@ router.put('/:id', protect, ownerOrManager, async (req, res) => {
 // POST /api/tables/:id/mark-available — admin/staff (One-click Cleaned & Mark Available)
 router.post('/:id/mark-available', protect, ownerOrManager, async (req, res) => {
   try {
-    const table = await markTableCleanedAndAvailable(req.params.id, req.tenantId, req.user?._id);
+    const force = Boolean(req.body?.force || req.query?.force === 'true');
+    const table = await markTableCleanedAndAvailable(req.params.id, req.tenantId, req.user?._id, { force });
     res.json({ success: true, table, message: `Table ${table.tableNumber} is now clean and available.` });
   } catch (error) {
     const status = error.status || 400;
@@ -389,17 +393,49 @@ router.post('/:id/mark-available', protect, ownerOrManager, async (req, res) => 
   }
 });
 
+// POST /api/tables/:id/clear-tab — admin/staff (Clear/settle/cancel an active table tab)
+router.post('/:id/clear-tab', protect, ownerOrManager, async (req, res) => {
+  try {
+    const action = req.body?.action === 'cancel' ? 'cancel' : 'settle';
+    const result = await clearTableTab(req.params.id, req.tenantId, action, req.user?._id);
+    res.json({
+      success: true,
+      table: result.table,
+      message: `Table ${result.table.tableNumber} tab has been ${action === 'cancel' ? 'cancelled' : 'settled'} and table marked available.`,
+      clearedCount: result.clearedCount,
+    });
+  } catch (error) {
+    const status = error.status || 400;
+    res.status(status).json({ error: error.message, code: error.code || 'CLEAR_TAB_FAILED' });
+  }
+});
+
+// POST /api/tables/reconcile — admin/staff (Auto-heal out-of-sync or stuck tables)
+router.post('/reconcile', protect, ownerOrManager, async (req, res) => {
+  try {
+    const healed = await resetStuckTables(req.tenantId);
+    res.json({
+      success: true,
+      healed,
+      message: healed.length > 0 ? `Reconciled tables: ${healed.map(n => 'T' + n).join(', ')}` : 'All tables are in sync.',
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // PATCH /api/tables/:id/status — admin/staff (Change table status)
 router.patch('/:id/status', protect, ownerOrManager, async (req, res) => {
   try {
     const { status } = req.body;
+    const force = Boolean(req.body?.force);
     const allowed = ['AVAILABLE', 'OCCUPIED', 'RESERVED', 'WAITING_PAYMENT', 'CLEANING', 'DISABLED'];
     if (!allowed.includes(status)) {
       return res.status(400).json({ error: `Invalid status. Must be one of: ${allowed.join(', ')}` });
     }
 
     if (status === 'AVAILABLE') {
-      const table = await markTableCleanedAndAvailable(req.params.id, req.tenantId, req.user?._id);
+      const table = await markTableCleanedAndAvailable(req.params.id, req.tenantId, req.user?._id, { force });
       return res.json({ success: true, table });
     }
 

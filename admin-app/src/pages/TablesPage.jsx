@@ -204,13 +204,44 @@ export default function TablesPage() {
     setShowAddModal(true);
   };
 
+  const handleClearTab = async (tableId, action) => {
+    try {
+      const { data } = await api.post(`/tables/${tableId}/clear-tab`, { action });
+      toast.success(data.message || `Table tab ${action === 'cancel' ? 'cancelled' : 'settled'}`);
+      await fetchFloorPlan();
+      if (activeDrawerTable && activeDrawerTable._id === tableId) {
+        setActiveDrawerTable((prev) => prev ? { ...prev, effectiveStatus: 'AVAILABLE', status: 'AVAILABLE', currentBillAmount: 0, activeOrdersCount: 0 } : null);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || error.message || `Failed to ${action} table tab`);
+    }
+  };
+
+  const handleReconcileTables = async () => {
+    try {
+      const { data } = await api.post('/tables/reconcile');
+      toast.success(data.message || 'Tables synchronized');
+      fetchFloorPlan();
+    } catch (error) {
+      toast.error(error.response?.data?.error || error.message || 'Failed to reconcile tables');
+    }
+  };
+
   const handleStatusChange = async (tableId, newStatus) => {
     try {
       await api.patch(`/tables/${tableId}/status`, { status: newStatus });
       toast.success(`Table marked as ${STATUS_CONFIG[newStatus]?.label || newStatus}`);
       fetchFloorPlan();
+      if (activeDrawerTable && activeDrawerTable._id === tableId) {
+        setActiveDrawerTable((prev) => prev ? { ...prev, effectiveStatus: newStatus, status: newStatus } : null);
+      }
     } catch (error) {
-      toast.error(error.response?.data?.error || error.message || 'Failed to change status');
+      const errCode = error.response?.data?.code || error.code;
+      if (errCode === 'UNPAID_ORDERS_EXIST') {
+        toast.error('Table has open orders. Please use "Settle & Free" or "Cancel & Free" in tab summary.');
+      } else {
+        toast.error(error.response?.data?.error || error.message || 'Failed to change status');
+      }
     }
   };
 
@@ -319,6 +350,16 @@ export default function TablesPage() {
             >
               <Plus size={15} />
               <span>Add Table</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleReconcileTables}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-xs transition"
+              title="Auto-heal and sync stuck tables"
+            >
+              <Sparkles size={14} className="text-amber-500" />
+              <span>Sync & Reconcile</span>
             </button>
 
             <button
@@ -881,7 +922,7 @@ export default function TablesPage() {
             </div>
 
             {/* Current Tab / Bill */}
-            <div className="rounded-2xl border border-stone-200 p-4 space-y-3">
+            <div className="rounded-2xl border border-stone-200 p-4 space-y-3 bg-white shadow-xs">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider">Live Tab Summary</h4>
                 <span className="font-display text-lg font-bold text-espresso-950 tabular-nums">
@@ -889,8 +930,34 @@ export default function TablesPage() {
                 </span>
               </div>
               <p className="text-xs text-stone-500">
-                {activeDrawerTable.activeOrdersCount || 0} active orders currently assigned to this table.
+                {activeDrawerTable.activeOrdersCount || 0} active order{activeDrawerTable.activeOrdersCount === 1 ? '' : 's'} currently assigned to this table.
               </p>
+
+              {(activeDrawerTable.currentBillAmount > 0 || activeDrawerTable.activeOrdersCount > 0 || ['OCCUPIED', 'WAITING_PAYMENT'].includes(activeDrawerTable.effectiveStatus)) && (
+                <div className="pt-2 border-t border-stone-100 space-y-2">
+                  <div className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+                    Tab Actions
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleClearTab(activeDrawerTable._id, 'settle')}
+                      className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-2 text-xs font-semibold shadow-xs transition"
+                      title="Mark all orders paid and free table"
+                    >
+                      <CheckCircle2 size={13} /> Settle & Free
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleClearTab(activeDrawerTable._id, 'cancel')}
+                      className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 py-2 text-xs font-semibold transition"
+                      title="Cancel remaining orders and free table"
+                    >
+                      <X size={13} /> Cancel & Free
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Acrylic Standee QR Code Preview */}

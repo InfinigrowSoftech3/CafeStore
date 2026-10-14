@@ -70,7 +70,7 @@ export const syncTableStatusForOrder = async (tableNumber, tenantId, { session =
 /**
  * Staff manual action: One-click "Cleaned / Mark Available"
  */
-export const markTableCleanedAndAvailable = async (tableId, tenantId, userId = null) => {
+export const markTableCleanedAndAvailable = async (tableId, tenantId, userId = null, { force = false } = {}) => {
   const table = await Table.findOne({ _id: tableId, tenantId });
   if (!table) {
     const error = new Error('Table not found.');
@@ -78,19 +78,27 @@ export const markTableCleanedAndAvailable = async (tableId, tenantId, userId = n
     throw error;
   }
 
-  // Guard: Never free a table that still has open unpaid orders
+  // Guard: Never free a table that still has open unpaid orders unless force is requested
   const activeUnpaidOrders = await Order.find({
     tenantId,
     tableNumber: table.tableNumber,
     orderStatus: { $in: ['pending', 'confirmed', 'preparing', 'ready', 'served'] },
     paymentStatus: { $ne: 'paid' },
-  }).lean();
+  });
 
   if (activeUnpaidOrders.length > 0) {
-    const error = new Error('Cannot mark table as Available while an active unpaid order exists.');
-    error.code = 'UNPAID_ORDERS_EXIST';
-    error.status = 400;
-    throw error;
+    if (!force) {
+      const error = new Error('Cannot mark table as Available while an active unpaid order exists.');
+      error.code = 'UNPAID_ORDERS_EXIST';
+      error.status = 400;
+      throw error;
+    }
+    // Force: automatically settle active unpaid orders on table
+    for (const ord of activeUnpaidOrders) {
+      ord.orderStatus = 'completed';
+      ord.paymentStatus = 'paid';
+      await ord.save();
+    }
   }
 
   // Reset table to Available and clear session
@@ -107,6 +115,48 @@ export const markTableCleanedAndAvailable = async (tableId, tenantId, userId = n
 
   publishTableStatus(table);
   return table;
+};
+
+/**
+ * Staff manual action: Clear, settle, or cancel an active table tab and free table
+ */
+export const clearTableTab = async (tableId, tenantId, action = 'settle', userId = null) => {
+  const table = await Table.findOne({ _id: tableId, tenantId });
+  if (!table) {
+    const error = new Error('Table not found.');
+    error.status = 404;
+    throw error;
+  }
+
+  const activeOrders = await Order.find({
+    tenantId,
+    tableNumber: table.tableNumber,
+    orderStatus: { $ne: 'cancelled' },
+    paymentStatus: { $ne: 'paid' },
+  });
+
+  for (const ord of activeOrders) {
+    if (action === 'cancel') {
+      ord.orderStatus = 'cancelled';
+    } else {
+      ord.orderStatus = 'completed';
+      ord.paymentStatus = 'paid';
+    }
+    await ord.save();
+  }
+
+  table.status = 'AVAILABLE';
+  table.currentSessionId = null;
+  table.paidAt = null;
+  await table.save();
+
+  await DiningSession.updateMany(
+    { tableNumber: table.tableNumber, tenantId, status: { $ne: 'CLOSED' } },
+    { $set: { status: 'CLOSED', closedAt: new Date(), closedBy: userId } }
+  );
+
+  publishTableStatus(table);
+  return { table, clearedCount: activeOrders.length, action };
 };
 
 /**
@@ -150,14 +200,28 @@ export const resetStuckTables = async (tenantId = null) => {
   const healed = [];
 
   for (const table of tables) {
+    // Only orders within last 18 hours or active session
     const activeUnpaidOrders = await Order.find({
       tenantId: table.tenantId,
       tableNumber: table.tableNumber,
       orderStatus: { $nin: ['completed', 'cancelled'] },
       paymentStatus: { $ne: 'paid' },
+      createdAt: { $gt: new Date(Date.now() - 18 * 60 * 60 * 1000) },
     }).lean();
 
     if (activeUnpaidOrders.length === 0) {
+      // Also settle any ancient orders (> 18h)
+      await Order.updateMany(
+        {
+          tenantId: table.tenantId,
+          tableNumber: table.tableNumber,
+          orderStatus: { $nin: ['completed', 'cancelled'] },
+          paymentStatus: { $ne: 'paid' },
+          createdAt: { $lte: new Date(Date.now() - 18 * 60 * 60 * 1000) },
+        },
+        { $set: { orderStatus: 'completed', paymentStatus: 'paid' } }
+      );
+
       table.status = 'AVAILABLE';
       table.currentSessionId = null;
       table.paidAt = null;

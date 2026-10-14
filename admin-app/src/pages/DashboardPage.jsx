@@ -187,7 +187,7 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-espresso-950 tracking-tight">
-            {greeting}, {tenant.name || 'Café Owner'}! ☕
+            {greeting}, {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'Café'}! ☕
           </h2>
           <p className="text-xs sm:text-sm text-stone-500 mt-1">
             Here's what's happening at your café today. All orders, kitchen flow and revenue are synced.
