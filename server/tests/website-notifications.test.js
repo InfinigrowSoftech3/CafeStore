@@ -256,7 +256,7 @@ test('Brewhaus Café Website Notification System Suite (Phase 1 to 28)', async (
       actionUrl: '/menu?offer=BREW20',
       offerCode: 'BREW20',
       audienceType: 'all_enabled',
-      scheduleType: 'now',
+      scheduleType: 'draft',
     };
 
     const res = await json('/api/notifications', campaignPayload, { token: adminToken });
