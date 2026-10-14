@@ -51,7 +51,7 @@ export default function ConfirmDialog({
       return {
         iconBg: 'bg-[var(--warning-bg)] border-[var(--warning-border)] text-[var(--warning-text)]',
         icon: <AlertTriangle size={22} />,
-        confirmBtn: 'bg-amber-500 text-stone-950 hover:bg-amber-400',
+        confirmBtn: 'bg-[#EA580C] text-white hover:bg-[#c2410c]',
       };
     }
     return {
@@ -128,7 +128,7 @@ export default function ConfirmDialog({
                         setReason(sug);
                         setError('');
                       }}
-                      className="rounded-md border border-[var(--border-primary)] bg-[var(--hover-bg)] px-2 py-1 text-[11px] text-[var(--text-secondary)] hover:border-amber-500/40 hover:text-amber-600 dark:hover:text-amber-300 transition"
+                      className="rounded-md border border-[var(--border-primary)] bg-[var(--hover-bg)] px-2 py-1 text-[11px] text-[var(--text-secondary)] hover:border-[#1E3FAE]/40 hover:text-[#1E3FAE] dark:hover:text-[#688bf7] transition"
                     >
                       {sug}
                     </button>

@@ -1,4 +1,5 @@
 import api from '../services/api';
+import { getResolvedTenantSlug, getResolvedTenantId } from './tenantHelper';
 
 /**
  * Converts a base64 string to a Uint8Array for PushManager applicationServerKey
@@ -39,6 +40,12 @@ export const subscribeToWebPush = async ({ customerId, phone } = {}) => {
     throw new Error('Notifications are not supported on this browser.');
   }
 
+  const tenantSlug = getResolvedTenantSlug();
+  const tenantId = getResolvedTenantId();
+  if (!tenantSlug && !tenantId) {
+    throw new Error('Please select or scan a valid café before enabling notifications.');
+  }
+
   // 1. Request user permission (only after explicit user click upstream)
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') {
@@ -53,11 +60,12 @@ export const subscribeToWebPush = async ({ customerId, phone } = {}) => {
   await navigator.serviceWorker.ready;
 
   // 3. Fetch VAPID public key (never the private key)
+  const reqConfig = tenantSlug ? { params: { cafe: tenantSlug } } : {};
   let keyResponse;
   try {
-    keyResponse = await api.get('/notifications/vapid-public-key');
+    keyResponse = await api.get('/notifications/vapid-public-key', reqConfig);
   } catch {
-    keyResponse = await api.get('/push/vapid-public-key');
+    keyResponse = await api.get('/push/vapid-public-key', reqConfig);
   }
   const publicKey = keyResponse.data?.publicKey;
 
@@ -87,9 +95,9 @@ export const subscribeToWebPush = async ({ customerId, phone } = {}) => {
   };
 
   try {
-    await api.post('/notifications/subscribe', payload);
+    await api.post('/notifications/subscribe', payload, reqConfig);
   } catch {
-    await api.post('/push/subscribe', payload);
+    await api.post('/push/subscribe', payload, reqConfig);
   }
 
   localStorage.setItem('brewhaus_push_enabled', 'true');
@@ -109,6 +117,12 @@ export const ensureWebPushSubscription = async ({ customerId, phone } = {}) => {
   if (!isPushSupported()) return false;
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
 
+  const tenantSlug = getResolvedTenantSlug();
+  const tenantId = getResolvedTenantId();
+  if (!tenantSlug && !tenantId) {
+    return false;
+  }
+
   try {
     let registration = await navigator.serviceWorker.getRegistration();
     if (!registration) {
@@ -116,13 +130,18 @@ export const ensureWebPushSubscription = async ({ customerId, phone } = {}) => {
     }
     await navigator.serviceWorker.ready;
 
+    const reqConfig = tenantSlug ? { params: { cafe: tenantSlug } } : {};
     let publicKey = null;
     try {
-      const res = await api.get('/notifications/vapid-public-key');
+      const res = await api.get('/notifications/vapid-public-key', reqConfig);
       publicKey = res.data?.publicKey;
     } catch {
-      const res = await api.get('/push/vapid-public-key');
-      publicKey = res.data?.publicKey;
+      try {
+        const res = await api.get('/push/vapid-public-key', reqConfig);
+        publicKey = res.data?.publicKey;
+      } catch {
+        return false;
+      }
     }
     if (!publicKey) return false;
 
@@ -142,15 +161,17 @@ export const ensureWebPushSubscription = async ({ customerId, phone } = {}) => {
     };
 
     try {
-      await api.post('/notifications/subscribe', payload);
+      await api.post('/notifications/subscribe', payload, reqConfig);
     } catch {
-      await api.post('/push/subscribe', payload);
+      await api.post('/push/subscribe', payload, reqConfig);
     }
 
     localStorage.setItem('brewhaus_push_enabled', 'true');
     return true;
   } catch (err) {
-    console.error('Background web push sync failed:', err.message);
+    if (!err.message?.includes('Café not found')) {
+      console.warn('Background web push sync notice:', err.message);
+    }
     return false;
   }
 };

@@ -231,7 +231,7 @@ export default function CheckoutPage() {
         description: `Order ${order.orderNumber} · Table ${tableNumber}`,
         order_id: razorpayOrderId,
         prefill: { name: name.trim(), contact: phone.trim(), email: email.trim() },
-        theme: { color: tenant.primaryColor || '#1a0f08' },
+        theme: { color: tenant.primaryColor || '#C8963E' },
         modal: {
           ondismiss: () => {
             setLoading(false);

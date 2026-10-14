@@ -277,13 +277,15 @@ export const sendVerificationCodeEmail = async ({ to, cafeName, code }) => {
     </html>
   `;
 
-  console.log(`[EmailService] Verification Code (OTP) for ${to} (${cafeName}): >>> ${code} <<<`);
+  if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV === 'development' && process.env.ALLOW_DEV_OTP === 'true') {
+    console.log(`[EmailService] Dev verification code for ${to} (${cafeName}): >>> ${code} <<<`);
+  }
 
   const dispatchResult = await dispatchEmail({ to, subject, html, text, cafeName });
   if (dispatchResult?.success) {
     return dispatchResult;
   }
-  return { success: false, reason: dispatchResult?.reason || 'delivery_failed', code };
+  return { success: false, reason: dispatchResult?.reason || 'delivery_failed' };
 };
 
 /**
@@ -302,7 +304,7 @@ export const sendWelcomeEmail = async ({ to, cafeName, adminUrl }) => {
     <body style="font-family: sans-serif; background-color: #f7f5f0; padding: 24px;">
       <div style="max-width: 500px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 32px; border: 1px solid #e7e5e4;">
         <h2 style="color: #1c1917; margin-top: 0;">🎉 Welcome to BrewHaus, ${cafeName}!</h2>
-        <p style="color: #57534e; font-size: 14px; line-height: 1.5;">Your café has been created with demo menu categories and QR codes ready for your tables.</p>
+        <p style="color: #57534e; font-size: 14px; line-height: 1.5;">Your café has been created with starter menu categories and QR codes ready for your tables.</p>
         <div style="text-align: center; margin: 28px 0;">
           <a href="${adminUrl}" style="background-color: #d97706; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: bold; font-size: 14px; display: inline-block;">Open Café Dashboard</a>
         </div>

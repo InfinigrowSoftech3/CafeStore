@@ -287,7 +287,10 @@ const executeNotificationCampaign = async (campaign) => {
     throw err;
   }
 
-  campaign.status = 'sending';
+  campaign.status = 'running';
+  if (!campaign.leaseExpiresAt) {
+    campaign.leaseExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
+  }
   await campaign.save();
 
   try {
@@ -298,6 +301,7 @@ const executeNotificationCampaign = async (campaign) => {
 
     if (eligibleRecipients.length === 0) {
       campaign.status = 'sent';
+      campaign.leaseExpiresAt = null;
       campaign.totalSent = 0;
       campaign.totalFailed = 0;
       await campaign.save();
@@ -318,13 +322,25 @@ const executeNotificationCampaign = async (campaign) => {
           const customer = recipient.customerId || null;
           const personalizedMessage = formatMessage(campaign.message, customer, campaign);
 
-          const delivery = await NotificationDelivery.create({
+          // Verify delivery sending is idempotent per (campaign, recipient)
+          const existingDelivery = await NotificationDelivery.findOne({
+            campaignId: campaign._id,
+            subscriptionId: recipient._id,
+          });
+          if (existingDelivery && ['delivered', 'sent', 'sending'].includes(existingDelivery.status)) {
+            return;
+          }
+
+          const delivery = existingDelivery || await NotificationDelivery.create({
             campaignId: campaign._id,
             customerId: customer ? (customer._id || customer) : null,
             subscriptionId: recipient._id,
             status: 'sending',
             sentAt: new Date(),
           });
+          delivery.status = 'sending';
+          delivery.sentAt = new Date();
+          await delivery.save();
 
           try {
             await notificationService.sendPushNotification({
@@ -363,6 +379,7 @@ const executeNotificationCampaign = async (campaign) => {
 
     campaign.totalSent = sentCount;
     campaign.totalFailed = failedCount;
+    campaign.leaseExpiresAt = null;
     campaign.status = failedCount === 0 ? 'sent' : (sentCount > 0 ? 'partially_failed' : 'failed');
     await campaign.save();
 
@@ -375,6 +392,7 @@ const executeNotificationCampaign = async (campaign) => {
   } catch (error) {
     console.error(`Notification campaign execution failed for ${campaign._id}:`, error);
     campaign.status = 'failed';
+    campaign.leaseExpiresAt = null;
     await campaign.save();
     throw error;
   }
@@ -384,7 +402,10 @@ const executeNotificationCampaign = async (campaign) => {
  * Executes a legacy Marketing Campaign (WhatsApp / SMS / Push).
  */
 const executeLegacyCampaign = async (campaign) => {
-  campaign.status = 'sending';
+  campaign.status = 'running';
+  if (!campaign.leaseExpiresAt) {
+    campaign.leaseExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
+  }
   await campaign.save();
 
   try {
@@ -396,6 +417,7 @@ const executeLegacyCampaign = async (campaign) => {
 
     if (eligibleCustomers.length === 0) {
       campaign.status = 'sent';
+      campaign.leaseExpiresAt = null;
       campaign.totalSent = 0;
       campaign.totalDelivered = 0;
       campaign.totalFailed = 0;
@@ -426,7 +448,16 @@ const executeLegacyCampaign = async (campaign) => {
           const personalizedMessage = formatMessage(campaign.message, customer, campaign);
           const channel = campaign.channel === 'all' ? 'whatsapp' : campaign.channel;
 
-          const delivery = await CampaignDelivery.create({
+          // Verify delivery sending is idempotent per (campaign, recipient)
+          const existingDelivery = await CampaignDelivery.findOne({
+            campaignId: campaign._id,
+            customerId: customer._id,
+          });
+          if (existingDelivery && ['delivered', 'sent', 'sending'].includes(existingDelivery.status)) {
+            return;
+          }
+
+          const delivery = existingDelivery || await CampaignDelivery.create({
             campaignId: campaign._id,
             customerId: customer._id,
             channel,
@@ -434,11 +465,12 @@ const executeLegacyCampaign = async (campaign) => {
             recipientEmail: customer.email || '',
             status: 'queued',
           });
+          delivery.status = 'queued';
+          await delivery.save();
 
           try {
             let result;
             if (channel === 'whatsapp') {
-              // Legacy marketing simulator — zero network calls, no paid provider.
               result = await notificationService.sendLegacyMarketing({
                 channel: 'WHATSAPP',
                 phone: customer.phone,
@@ -446,7 +478,6 @@ const executeLegacyCampaign = async (campaign) => {
                 offerCode: campaign.offerCode,
               });
             } else if (channel === 'sms') {
-              // Legacy marketing simulator — zero network calls, no paid provider.
               result = await notificationService.sendLegacyMarketing({
                 channel: 'SMS',
                 phone: customer.phone,
@@ -471,10 +502,15 @@ const executeLegacyCampaign = async (campaign) => {
             delivery.providerMessageId = result?.providerMessageId || '';
             delivery.sentAt = new Date();
             delivery.deliveredAt = result?.status === 'delivered' ? new Date() : null;
+            if (result?.status === 'failed') {
+              delivery.errorMessage = result?.reason || 'provider_not_configured';
+              delivery.failedAt = new Date();
+              failedCount += 1;
+            } else if (result?.status === 'delivered') {
+              deliveredCount += 1;
+            }
             await delivery.save();
-
             sentCount += 1;
-            if (result?.status === 'delivered') deliveredCount += 1;
           } catch (err) {
             console.error(`Legacy delivery failed for customer ${customer._id}:`, err.message);
             delivery.status = 'failed';
@@ -496,6 +532,7 @@ const executeLegacyCampaign = async (campaign) => {
     campaign.totalSent = sentCount;
     campaign.totalDelivered = deliveredCount;
     campaign.totalFailed = failedCount;
+    campaign.leaseExpiresAt = null;
     campaign.status = failedCount === 0 ? 'sent' : (deliveredCount > 0 ? 'partially_failed' : 'failed');
     await campaign.save();
 
@@ -509,6 +546,7 @@ const executeLegacyCampaign = async (campaign) => {
   } catch (error) {
     console.error(`Legacy campaign execution failed for ${campaign._id}:`, error);
     campaign.status = 'failed';
+    campaign.leaseExpiresAt = null;
     await campaign.save();
     throw error;
   }
@@ -632,12 +670,13 @@ export const retryFailedDeliveries = async (campaignId) => {
           });
         }
 
-        delivery.status = result?.status || 'delivered';
+        delivery.status = result?.status || 'failed';
         delivery.providerMessageId = result?.providerMessageId || '';
-        delivery.deliveredAt = new Date();
-        delivery.errorMessage = '';
+        delivery.deliveredAt = result?.status === 'delivered' ? new Date() : null;
+        delivery.errorMessage = result?.status === 'failed' ? (result?.reason || 'provider_not_configured') : '';
+        if (result?.status === 'failed') delivery.failedAt = new Date();
         await delivery.save();
-        recovered += 1;
+        if (result?.status === 'delivered') recovered += 1;
       } catch (err) {
         delivery.status = 'failed';
         delivery.errorMessage = `Retry ${delivery.retryCount} failed: ${err.message}`;
@@ -663,10 +702,34 @@ export const retryFailedDeliveries = async (campaignId) => {
 
 /**
  * Background Scheduler: checks both NotificationCampaign and Campaign.
+ * Atomically claims due campaigns using findOneAndUpdate (scheduled/crashed -> running)
+ * with a lease timeout to recover from worker crashes.
  */
 let schedulerInterval = null;
+export const LEASE_TIMEOUT_MS = Number(process.env.CAMPAIGN_LEASE_MS) || 5 * 60 * 1000; // 5 mins
+
+export const claimNextDueCampaign = async (Model, now = new Date()) => {
+  const leaseExpiresAt = new Date(now.getTime() + LEASE_TIMEOUT_MS);
+  const claimQuery = {
+    $or: [
+      { status: 'scheduled', scheduledAt: { $lte: now } },
+      { status: 'running', leaseExpiresAt: { $lte: now } }, // Recover crashed runs
+    ],
+  };
+  const claimUpdate = {
+    $set: {
+      status: 'running',
+      leaseExpiresAt,
+    },
+  };
+  return Model.findOneAndUpdate(claimQuery, claimUpdate, { new: true });
+};
 
 export const startCampaignScheduler = (intervalMs = 30000) => {
+  if (process.env.RUN_SCHEDULER === 'false') {
+    console.log('[SCHEDULER] Scheduler disabled via RUN_SCHEDULER=false');
+    return;
+  }
   if (schedulerInterval) return;
 
   const checkScheduled = async () => {
@@ -674,12 +737,29 @@ export const startCampaignScheduler = (intervalMs = 30000) => {
       const now = new Date();
 
       const tenants = await Tenant.find({ status: 'active' }).select('_id').lean();
-      for (const tenant of tenants) await runWithTenant(tenant._id, async () => {
-        const dueNotifs = await NotificationCampaign.find({ status: 'scheduled', scheduledAt: { $lte: now } });
-        for (const camp of dueNotifs) executeCampaign(camp._id).catch((err) => console.error(`Error executing scheduled notification ${camp._id}:`, err));
-        const dueMarketing = await Campaign.find({ status: 'scheduled', scheduledAt: { $lte: now } });
-        for (const camp of dueMarketing) executeCampaign(camp._id).catch((err) => console.error(`Error executing scheduled marketing campaign ${camp._id}:`, err));
-      });
+      for (const tenant of tenants) {
+        await runWithTenant(tenant._id, async () => {
+          let claimedNotif;
+          do {
+            claimedNotif = await claimNextDueCampaign(NotificationCampaign, now);
+            if (claimedNotif) {
+              await executeCampaign(claimedNotif._id).catch((err) =>
+                console.error(`Error executing scheduled notification ${claimedNotif._id}:`, err)
+              );
+            }
+          } while (claimedNotif);
+
+          let claimedMarketing;
+          do {
+            claimedMarketing = await claimNextDueCampaign(Campaign, now);
+            if (claimedMarketing) {
+              await executeCampaign(claimedMarketing._id).catch((err) =>
+                console.error(`Error executing scheduled marketing campaign ${claimedMarketing._id}:`, err)
+              );
+            }
+          } while (claimedMarketing);
+        });
+      }
     } catch (err) {
       console.error('[SCHEDULER] Periodic poll error:', err.message);
     }

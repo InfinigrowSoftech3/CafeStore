@@ -81,7 +81,7 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
           </button>
 
           <div className="mb-6">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#1E3FAE] dark:text-[#D4AF37]">
               Subscription Management
             </span>
             <h2 className="text-xl font-bold text-[var(--text-primary)] mt-1">
@@ -103,12 +103,12 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
                   onClick={() => setSelectedPlan(plan.id)}
                   className={`relative flex flex-col justify-between rounded-2xl border p-5 cursor-pointer transition ${
                     isSelected
-                      ? 'border-amber-500 ring-2 ring-amber-500/20 bg-[var(--brand-primary-subtle)] shadow-sm'
+                      ? 'border-[#D4AF37] ring-2 ring-[#D4AF37]/30 bg-[#FBF3D5]/40 dark:bg-[#0B1B4D]/30 shadow-sm'
                       : 'border-[var(--border-primary)] bg-[var(--hover-bg)] hover:border-[var(--border-primary)]'
                   }`}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-2.5 right-4 rounded-full bg-amber-500 px-2.5 py-0.5 text-[9px] font-black uppercase text-stone-950">
+                    <div className="absolute -top-2.5 right-4 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[9px] font-black uppercase text-[#0B1B4D]">
                       Most Popular
                     </div>
                   )}
@@ -124,7 +124,7 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
                     </div>
 
                     <div className="mt-3 flex items-baseline gap-1">
-                      <span className="text-2xl font-black text-amber-600 dark:text-amber-400 tabular-nums">{plan.price}</span>
+                      <span className="text-2xl font-black text-[#1E3FAE] dark:text-[#D4AF37] tabular-nums">{plan.price}</span>
                       <span className="text-[11px] text-[var(--text-muted)]">{plan.period}</span>
                     </div>
 
@@ -150,7 +150,7 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
                       type="button"
                       className={`w-full rounded-xl py-2 text-xs font-bold transition ${
                         isSelected
-                          ? 'bg-amber-500 text-stone-950 shadow-xs'
+                          ? 'bg-[#D4AF37] text-[#0B1B4D] shadow-xs'
                           : 'bg-[var(--hover-bg)] text-[var(--text-secondary)] hover:bg-[var(--border-primary)]'
                       }`}
                     >
@@ -175,7 +175,7 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
               type="button"
               onClick={() => onSave(selectedPlan)}
               disabled={loading || selectedPlan === tenant.plan}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-5 py-2 text-xs font-bold text-stone-950 transition hover:bg-amber-400 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[#1E3FAE] px-5 py-2 text-xs font-bold text-white transition hover:bg-[#17318A] disabled:opacity-50 shadow-xs"
             >
               {loading && <Loader2 size={13} className="animate-spin" />}
               Save Plan Update

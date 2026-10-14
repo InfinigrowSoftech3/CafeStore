@@ -13,9 +13,9 @@ import {
 import { AlertTriangle, Store, ArrowUpRight, ShieldAlert, CheckCircle2, CreditCard } from 'lucide-react';
 
 const PLAN_COLORS = {
-  starter: '#9a6f46',
-  pro: '#f59e0b',
-  enterprise: '#06b6d4',
+  starter: '#3B5BDB',
+  pro: '#D4AF37',
+  enterprise: '#0B1F5C',
 };
 
 export default function ChartsSection({
@@ -81,7 +81,7 @@ export default function ChartsSection({
               onClick={() => setTimeRange('7d')}
               className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
                 timeRange === '7d'
-                  ? 'bg-amber-500 text-stone-950 font-bold shadow'
+                  ? 'bg-[#D4AF37] text-[#0B1B4D] font-bold shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -91,7 +91,7 @@ export default function ChartsSection({
               onClick={() => setTimeRange('30d')}
               className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
                 timeRange === '30d'
-                  ? 'bg-amber-500 text-stone-950 font-bold shadow'
+                  ? 'bg-[#D4AF37] text-[#0B1B4D] font-bold shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -105,12 +105,12 @@ export default function ChartsSection({
             <AreaChart data={activeTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="gmvGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.35} />
+                  <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.0} />
                 </linearGradient>
                 <linearGradient id="orderGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor="#1E3FAE" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#1E3FAE" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
               <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={11} tickLine={false} axisLine={false} />
@@ -125,8 +125,8 @@ export default function ChartsSection({
                   boxShadow: 'var(--popover-shadow)',
                 }}
               />
-              <Area type="monotone" dataKey="gmv" stroke="#f59e0b" strokeWidth={2.5} fillOpacity={1} fill="url(#gmvGradient)" name="GMV (₹)" />
-              <Area type="monotone" dataKey="orders" stroke="#06b6d4" strokeWidth={2} fillOpacity={1} fill="url(#orderGradient)" name="Orders" />
+              <Area type="monotone" dataKey="gmv" stroke="#D4AF37" strokeWidth={2.5} fillOpacity={1} fill="url(#gmvGradient)" name="GMV (₹)" />
+              <Area type="monotone" dataKey="orders" stroke="#1E3FAE" strokeWidth={2} fillOpacity={1} fill="url(#orderGradient)" name="Orders" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -134,10 +134,10 @@ export default function ChartsSection({
         <div className="mt-4 flex items-center justify-between border-t border-[var(--border-primary)]/80 pt-3 text-xs text-[var(--text-muted)]">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 font-medium text-[var(--text-secondary)]">
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-500" /> Gross Volume (GMV)
+              <span className="h-2.5 w-2.5 rounded-full bg-[#D4AF37]" /> Gross Volume (GMV)
             </span>
             <span className="flex items-center gap-1.5 font-medium text-[var(--text-secondary)]">
-              <span className="h-2.5 w-2.5 rounded-full bg-cyan-500" /> Completed Orders
+              <span className="h-2.5 w-2.5 rounded-full bg-[#1E3FAE]" /> Completed Orders
             </span>
           </div>
           <span className="text-[11px] text-[var(--text-muted)]">Live platform aggregate</span>
@@ -188,19 +188,19 @@ export default function ChartsSection({
         <div className="space-y-2 border-t border-[var(--border-primary)]/80 pt-3 text-xs">
           <div className="flex items-center justify-between text-[var(--text-secondary)]">
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#9a6f46]" /> Starter Tier
+              <span className="h-2.5 w-2.5 rounded-full bg-[#3B5BDB]" /> Starter Tier
             </span>
             <span className="font-bold text-[var(--text-primary)]">{starterCount} cafés</span>
           </div>
           <div className="flex items-center justify-between text-[var(--text-secondary)]">
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-500" /> Pro Tier
+              <span className="h-2.5 w-2.5 rounded-full bg-[#D4AF37]" /> Pro Tier
             </span>
             <span className="font-bold text-[var(--text-primary)]">{proCount} cafés</span>
           </div>
           <div className="flex items-center justify-between text-[var(--text-secondary)]">
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-cyan-500" /> Enterprise Tier
+              <span className="h-2.5 w-2.5 rounded-full bg-[#0B1F5C]" /> Enterprise Tier
             </span>
             <span className="font-bold text-[var(--text-primary)]">{enterpriseCount} cafés</span>
           </div>
@@ -211,7 +211,7 @@ export default function ChartsSection({
       <div className="lg:col-span-3 kpi-card">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#1E3FAE]/10 border border-[#1E3FAE]/20 text-[#1E3FAE]">
               <AlertTriangle size={16} />
             </div>
             <div>
@@ -229,13 +229,13 @@ export default function ChartsSection({
           {/* Alert 1: Suspended Cafés */}
           <div className="kpi-card">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-red-600 dark:text-red-400 flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-[#DC2626] flex items-center gap-1.5">
                 <ShieldAlert size={14} /> Suspended Cafés ({suspendedCafes.length})
               </span>
               {suspendedCafes.length > 0 && (
                 <button
                   onClick={() => onNavigateTab && onNavigateTab('tenants', { filterStatus: 'suspended' })}
-                  className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 hover:underline inline-flex items-center gap-0.5"
+                  className="text-[11px] font-semibold text-[#1E3FAE] hover:text-[#17318A] hover:underline inline-flex items-center gap-0.5"
                 >
                   View <ArrowUpRight size={11} />
                 </button>
@@ -251,7 +251,7 @@ export default function ChartsSection({
                 <span className="text-[var(--text-primary)] font-medium truncate max-w-[140px]">{c.name}</span>
                 <button
                   onClick={() => onOpenTenant && onOpenTenant(c)}
-                  className="text-amber-600 dark:text-amber-400 font-semibold hover:underline"
+                  className="text-[#1E3FAE] hover:text-[#17318A] font-semibold hover:underline"
                 >
                   Manage
                 </button>
@@ -262,13 +262,13 @@ export default function ChartsSection({
           {/* Alert 2: Incomplete Onboarding / 0 items or tables */}
           <div className="kpi-card">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-[#EA580C] flex items-center gap-1.5">
                 <Store size={14} /> Incomplete Setup ({emptySetupCafes.length})
               </span>
               {emptySetupCafes.length > 0 && (
                 <button
                   onClick={() => onNavigateTab && onNavigateTab('tenants')}
-                  className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 hover:underline inline-flex items-center gap-0.5"
+                  className="text-[11px] font-semibold text-[#1E3FAE] hover:text-[#17318A] hover:underline inline-flex items-center gap-0.5"
                 >
                   View <ArrowUpRight size={11} />
                 </button>
@@ -284,7 +284,7 @@ export default function ChartsSection({
                 <span className="text-[var(--text-primary)] font-medium truncate max-w-[140px]">{c.name}</span>
                 <button
                   onClick={() => onOpenTenant && onOpenTenant(c)}
-                  className="text-amber-600 dark:text-amber-400 font-semibold hover:underline"
+                  className="text-[#1E3FAE] hover:text-[#17318A] font-semibold hover:underline"
                 >
                   Inspect
                 </button>
@@ -295,12 +295,12 @@ export default function ChartsSection({
           {/* Alert 3: Platform Security & Billing Checks */}
           <div className="kpi-card">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-cyan-700 dark:text-cyan-400 flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-[#0EA5E9] flex items-center gap-1.5">
                 <CreditCard size={14} /> Security & Audits
               </span>
               <button
                 onClick={() => onNavigateTab && onNavigateTab('audit')}
-                className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 hover:underline inline-flex items-center gap-0.5"
+                className="text-[11px] font-semibold text-[#1E3FAE] hover:text-[#17318A] hover:underline inline-flex items-center gap-0.5"
               >
                 Audit Log <ArrowUpRight size={11} />
               </button>
@@ -310,7 +310,7 @@ export default function ChartsSection({
                 ? `${failedPayments} security or audit warning event(s) detected in the last cycle.`
                 : 'Zero security lockouts or anomaly alerts recorded in active trail.'}
             </p>
-            <div className="mt-3 flex items-center gap-2 text-[11px] text-emerald-700 dark:text-emerald-400 bg-[var(--success-bg)] border border-[var(--success-border)] px-2.5 py-1.5 rounded-lg">
+            <div className="mt-3 flex items-center gap-2 text-[11px] text-[#0E7D5D] bg-[var(--success-bg)] border border-[var(--success-border)] px-2.5 py-1.5 rounded-lg">
               <CheckCircle2 size={13} className="shrink-0" />
               <span>Multi-tenant database isolation: 100% verified</span>
             </div>

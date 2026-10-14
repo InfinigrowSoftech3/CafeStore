@@ -21,6 +21,7 @@ const { default: Category } = await import('../models/Category.js');
 const { default: SuperAdmin } = await import('../models/SuperAdmin.js');
 const { default: PlatformAuditEvent } = await import('../models/PlatformAuditEvent.js');
 const { default: BillingWebhookEvent } = await import('../models/BillingWebhookEvent.js');
+const { default: PendingSignup } = await import('../models/PendingSignup.js');
 const { runWithTenant } = await import('../utils/tenantContext.js');
 
 const app = createApp();
@@ -114,15 +115,16 @@ test('SaaS Platform: Self-Signup, Setup Auto-provisioning, Plan Limits, Billing 
       },
     });
     assert.equal(resValid.status, 200);
-    assert.ok(resValid.body.demoCode);
-    const demoCode = resValid.body.demoCode;
+    const pending = await PendingSignup.findOne({ email: 'owner@artisanroast.test' });
+    assert.ok(pending?.verificationCode);
+    const verificationCode = pending.verificationCode;
 
     // Verify email and auto-provision café assets
     const resVerify = await request('/api/platform/auth/verify-email', {
       method: 'POST',
       body: {
         email: 'owner@artisanroast.test',
-        code: demoCode,
+        code: verificationCode,
       },
     });
 
@@ -137,10 +139,10 @@ test('SaaS Platform: Self-Signup, Setup Auto-provisioning, Plan Limits, Billing 
     // Verify starter resources were auto-created for the new tenant
     await runWithTenant(newTenantId, async () => {
       const categories = await Category.find({ tenantId: newTenantId });
-      assert.equal(categories.length, 3);
+      assert.equal(categories.length, 5);
 
       const products = await Product.find({ tenantId: newTenantId });
-      assert.equal(products.length, 3);
+      assert.equal(products.length, 7);
 
       const tables = await Table.find({ tenantId: newTenantId });
       assert.equal(tables.length, 3);

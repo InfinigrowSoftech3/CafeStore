@@ -20,15 +20,15 @@ export default function ImpersonationBanner({ cafeName, onExit }) {
   };
 
   return (
-    <div className="sticky top-0 z-50 flex items-center justify-between border-b border-amber-300 bg-amber-50 px-4 py-2.5 text-xs font-medium text-amber-900 backdrop-blur-md">
+    <div className="sticky top-0 z-50 flex items-center justify-between border-b border-[#E6CF7A]/40 bg-[#0B1B4D] px-4 py-2.5 text-xs font-medium text-slate-200 backdrop-blur-md shadow-md">
       <div className="flex items-center gap-2">
-        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/20 text-amber-700">
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D4AF37]/20 text-[#D4AF37]">
           <AlertTriangle size={13} />
         </span>
         <span>
-          <strong className="font-bold text-amber-950">Impersonation Mode Active:</strong>{' '}
+          <strong className="font-bold text-white">Impersonation Mode Active:</strong>{' '}
           You are currently viewing the platform as{' '}
-          <span className="underline decoration-amber-600/50 underline-offset-2 font-bold text-amber-950">
+          <span className="underline decoration-[#D4AF37]/50 underline-offset-2 font-bold text-[#D4AF37]">
             {cafeName || 'Selected Café'}
           </span>
           . All actions are attributed in the platform audit log.
@@ -38,7 +38,7 @@ export default function ImpersonationBanner({ cafeName, onExit }) {
       <button
         onClick={handleExit}
         disabled={loading}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1 font-semibold text-stone-950 transition hover:bg-amber-600 disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-[#D4AF37] px-3 py-1 font-bold text-[#0B1B4D] transition hover:bg-[#C29B22] disabled:opacity-50 shadow-xs"
       >
         {loading ? <Loader2 size={12} className="animate-spin" /> : <LogOut size={12} />}
         Exit Impersonation

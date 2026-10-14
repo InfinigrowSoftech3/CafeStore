@@ -5,7 +5,7 @@ import { getResolvedTenantSlug, setResolvedTenantSlug, setResolvedTenantId } fro
 import { clearClientCache } from '../utils/menuCache';
 
 const TenantContext = createContext(null);
-const fallback = { name: 'Café', currency: 'INR', taxRate: 5, primaryColor: '#c96b18', accentColor: '#1a0f08' };
+const fallback = { name: 'Café', currency: 'INR', taxRate: 5, primaryColor: '#C8963E', accentColor: '#17110C' };
 
 export function TenantProvider({ children }) {
   const [tenant, setTenant] = useState(fallback);
@@ -30,21 +30,43 @@ export function TenantProvider({ children }) {
       }
       const cachedSlug = getResolvedTenantSlug();
       if (cachedSlug) {
-        return api.get(`/public/cafes/${encodeURIComponent(cachedSlug)}`);
+        return api.get(`/public/cafes/${encodeURIComponent(cachedSlug)}`).catch(() => {
+          try {
+            sessionStorage.removeItem('cafe_tenant_slug');
+            sessionStorage.removeItem('cafe_tenant_id');
+            localStorage.removeItem('cafe_tenant_slug');
+            localStorage.removeItem('cafe_tenant_id');
+          } catch {
+            /* ignore storage errors */
+          }
+          return api.get('/cafes').then(({ data }) => {
+            const list = data?.data?.cafes || data?.cafes || [];
+            const activeCafe = list.find((c) => c.status === 'active' && c.productCount > 0) || list.find((c) => c.status === 'active') || list[0];
+            return activeCafe ? { data: { cafe: activeCafe } } : { data: { cafe: fallback } };
+          });
+        });
       }
-      // Direct URL manipulation with no params or invalid params: do NOT load default cafe!
-      return Promise.reject({
-        response: {
-          status: 404,
+
+      // Direct navigation without params (e.g. http://localhost:5173/menu):
+      // Automatically load the active café so customer menu displays properly
+      return api.get('/cafes')
+        .then(({ data }) => {
+          const list = data?.data?.cafes || data?.cafes || [];
+          const activeCafe = list.find((c) => c.status === 'active' && c.productCount > 0) || list.find((c) => c.status === 'active') || list[0];
+          if (activeCafe) {
+            return {
+              data: {
+                cafe: activeCafe,
+              },
+            };
+          }
+          return { data: { cafe: fallback } };
+        })
+        .catch(() => ({
           data: {
-            success: false,
-            error: {
-              code: 'QR_NOT_FOUND',
-              message: 'QR code was not found or is no longer valid.',
-            },
+            cafe: fallback,
           },
-        },
-      });
+        }));
     };
 
     resolveEndpoint()
@@ -64,6 +86,11 @@ export function TenantProvider({ children }) {
           clearClientCache();
         }
 
+        const rawPrimary = cafeData.branding?.primaryColor || cafeData.settings?.primaryColor;
+        const rawAccent = cafeData.branding?.secondaryColor || cafeData.settings?.accentColor;
+        const primaryColor = rawPrimary && rawPrimary !== '#c96b18' && rawPrimary !== '#2563eb' ? rawPrimary : '#C8963E';
+        const accentColor = rawAccent && rawAccent !== '#1a0f08' && rawAccent !== '#0f172a' ? rawAccent : '#17110C';
+
         const normalizedTenant = {
           id: cafeData.id || cafeData._id,
           name: cafeData.name,
@@ -71,8 +98,8 @@ export function TenantProvider({ children }) {
           logo: cafeData.logo || cafeData.settings?.logoUrl || '',
           logoUrl: cafeData.logoUrl || cafeData.logo || cafeData.settings?.logoUrl || '',
           tagline: cafeData.description || cafeData.settings?.tagline || '',
-          primaryColor: cafeData.branding?.primaryColor || cafeData.settings?.primaryColor || '#c96b18',
-          accentColor: cafeData.branding?.secondaryColor || cafeData.settings?.accentColor || '#1a0f08',
+          primaryColor,
+          accentColor,
           currency: cafeData.settings?.currency || 'INR',
           taxRate: cafeData.settings?.taxRate ?? 5,
           address: cafeData.settings?.address || '',
@@ -101,6 +128,7 @@ export function TenantProvider({ children }) {
         document.title = `${normalizedTenant.name} | Order Online`;
         if (normalizedTenant.primaryColor) {
           document.documentElement.style.setProperty('--tenant-primary', normalizedTenant.primaryColor);
+          document.documentElement.style.setProperty('--brand', normalizedTenant.primaryColor);
         }
         if (normalizedTenant.accentColor) {
           document.documentElement.style.setProperty('--tenant-accent', normalizedTenant.accentColor);
@@ -139,6 +167,20 @@ export function TenantProvider({ children }) {
 
   if (tenantState.status === 'not_found') {
     return <TenantNotFoundScreen message={tenantState.message} />;
+  }
+
+  if (tenantState.status === 'loading') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAF8F5] text-[#17110C] font-sans">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#C8963E] to-[#9E6E24] flex items-center justify-center text-white shadow-lg shadow-[#C8963E]/20 animate-pulse mb-4">
+          <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+        </div>
+        <p className="text-sm font-medium text-[#7D6E63] tracking-wide">Loading menu...</p>
+      </div>
+    );
   }
 
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>;

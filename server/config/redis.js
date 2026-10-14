@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 import Redis from 'ioredis';
-import RedisMock from 'ioredis-mock';
 import { RedisStore } from 'rate-limit-redis';
 
 let redisClient = null;
@@ -21,12 +20,6 @@ export const getRedisClient = () => {
   if (redisClient) return redisClient;
   if (isClosing) return null;
 
-  // Use ioredis-mock when explicitly requested in test suites
-  if (process.env.NODE_ENV === 'test' && process.env.USE_REDIS_MOCK === 'true') {
-    redisClient = new RedisMock();
-    return redisClient;
-  }
-
   const redisUrl = process.env.REDIS_URL;
   if (!redisUrl) {
     return null;
@@ -34,16 +27,24 @@ export const getRedisClient = () => {
 
   try {
     const isTls = redisUrl.startsWith('rediss://') || process.env.REDIS_TLS === 'true';
+    const rejectUnauthorized =
+      process.env.NODE_ENV === 'production'
+        ? true
+        : process.env.REDIS_TLS_INSECURE === 'true'
+          ? false
+          : true;
+
     redisClient = new Redis(redisUrl, {
-      tls: isTls ? { rejectUnauthorized: false } : undefined,
+      tls: isTls ? { rejectUnauthorized } : undefined,
       connectTimeout: Number(process.env.REDIS_CONNECT_TIMEOUT_MS) || 5000,
       commandTimeout: Number(process.env.REDIS_COMMAND_TIMEOUT_MS) || 3000,
       maxRetriesPerRequest: 1,
       enableOfflineQueue: false, // Fail fast when disconnected
       retryStrategy: (times) => {
-        if (times > 10) {
-          console.warn('[Redis] Connection retry threshold reached, backing off to 5s');
-          return 5000;
+        if (process.env.NODE_ENV === 'test') return null;
+        if (times > 5) {
+          console.warn('[Redis] Connection retry threshold reached, stopping retries');
+          return null;
         }
         return Math.min(times * 200, 3000);
       },

@@ -505,7 +505,7 @@ router.get(['/', '/list/all'], protect, orderReaders, async (req, res) => {
     }
 
     const [orders, total, todayRows, previousRows] = await Promise.all([
-      Order.find(query).sort({ createdAt: -1 }).skip((pageNumber - 1) * limitNumber).limit(limitNumber),
+      Order.find(query).sort({ createdAt: -1, _id: -1 }).skip((pageNumber - 1) * limitNumber).limit(limitNumber).lean(),
       Order.countDocuments(query),
       Order.aggregate([
         { $match: { createdAt: { $gte: today } } },
@@ -558,9 +558,9 @@ router.post('/:id/rating', async (req, res) => {
   }
 });
 
-// PUT /api/orders/:id/status — Update order status (admin/staff only)
+// PUT, PATCH & GET /api/orders/:id/status — Order status management (admin/staff only)
 // SECURITY: Only allows updating orderStatus, NOT paymentStatus
-router.put('/:id/status', protect, kitchenStaff, async (req, res) => {
+const updateOrderStatusHandler = async (req, res) => {
   try {
     const { orderStatus } = req.body;
 
@@ -586,7 +586,7 @@ router.put('/:id/status', protect, kitchenStaff, async (req, res) => {
 
     // Enforce strict order status state machine transitions
     const VALID_STATUS_TRANSITIONS = {
-      pending: ['confirmed', 'cancelled'],
+      pending: ['confirmed', 'preparing', 'cancelled'],
       confirmed: ['preparing', 'cancelled'],
       preparing: ['ready', 'cancelled'],
       ready: ['completed', 'cancelled'],
@@ -606,24 +606,32 @@ router.put('/:id/status', protect, kitchenStaff, async (req, res) => {
       });
     }
 
-    // SINGLE SOURCE TRIGGER: ANY NON-CONFIRMED STATUS -> CONFIRMED
-    if (orderStatus === 'confirmed') {
-      const result = await confirmOrderAndDeduct(req.params.id, {
+    // SINGLE SOURCE TRIGGER: ANY NON-CONFIRMED STATUS -> CONFIRMED (or PREPARING directly from pending)
+    if (orderStatus === 'confirmed' || (!previousOrder.inventoryProcessed && orderStatus === 'preparing')) {
+      await confirmOrderAndDeduct(req.params.id, {
         performedBy: req.user?._id,
         additionalUpdates: {
+          orderStatus,
+        },
+      });
+      const order = await Order.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: { orderStatus },
           $push: {
             statusHistory: {
-              status: 'confirmed',
+              status: orderStatus,
               previousStatus: previousOrder.orderStatus,
               changedAt: new Date(),
               changedBy: req.user?._id || null,
-              reason: req.body.reason || 'Order confirmed by staff',
+              reason: req.body.reason || `Order ${orderStatus} by staff`,
             },
           },
         },
-      });
-      publishOrderUpdate(result.order);
-      return res.json({ order: result.order });
+        { new: true }
+      );
+      publishOrderUpdate(order);
+      return res.json({ order });
     }
 
     // If order is being cancelled, restore inventory if previously processed
@@ -664,6 +672,33 @@ router.put('/:id/status', protect, kitchenStaff, async (req, res) => {
       code: error.code || 'STATUS_UPDATE_ERROR',
       details: error.details,
     });
+  }
+};
+
+router.put('/:id/status', protect, kitchenStaff, updateOrderStatusHandler);
+router.patch('/:id/status', protect, kitchenStaff, updateOrderStatusHandler);
+
+// GET /api/orders/:id/status — Quick status lookup for staff
+router.get('/:id/status', protect, kitchenStaff, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: 'Invalid order ID.' });
+    }
+    const order = await Order.findById(req.params.id).select('_id orderNumber orderStatus paymentStatus cashVerificationStatus tableNumber updatedAt');
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found.' });
+    }
+    return res.json({
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      orderStatus: order.orderStatus,
+      paymentStatus: order.paymentStatus,
+      cashVerificationStatus: order.cashVerificationStatus,
+      tableNumber: order.tableNumber,
+      updatedAt: order.updatedAt,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 

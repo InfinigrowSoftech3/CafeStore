@@ -100,7 +100,7 @@ export default function CartPage() {
               <h1 className="font-display text-lg sm:text-xl font-bold text-espresso-950 leading-none">
                 Your Order
               </h1>
-              <span className="flex h-5 items-center justify-center rounded-full bg-brew-500 px-2 text-[11px] font-bold text-white">
+              <span className="flex h-5 items-center justify-center rounded-full bg-brew-500 px-2 text-[11px] font-bold text-espresso-950">
                 {itemCount}
               </span>
             </div>
@@ -313,7 +313,7 @@ export default function CartPage() {
                   <ShoppingBag size={18} />
                   <span>Proceed to Checkout</span>
                 </div>
-                <span className="price-tag text-base text-brew-200">{formatMoney(total, tenant.currency)}</span>
+                <span className="price-tag text-base font-bold text-espresso-950">{formatMoney(total, tenant.currency)}</span>
               </motion.button>
             </div>
           </div>

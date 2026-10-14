@@ -40,7 +40,7 @@ const getTenantPaymentConfig = async (req) => {
     !activeConfig.keySecret ||
     !activeConfig.webhookSecret ||
     activeConfig.keySecret === 'placeholder_secret' ||
-    (process.env.NODE_ENV === 'production' && activeConfig.keyId.startsWith('rzp_test_') && process.env.DEMO_PAYMENTS_ENABLED !== 'true')
+    (process.env.NODE_ENV === 'production' && activeConfig.keyId.startsWith('rzp_test_'))
   ) {
     const error = new Error('Online payments are not configured for this café.');
     error.code = 'PAYMENT_CONFIG_INVALID';
@@ -154,11 +154,6 @@ const verifyWebhookSignature = (rawBody, signature, secret) => {
   return suppliedBytes.length === expectedBytes.length && crypto.timingSafeEqual(suppliedBytes, expectedBytes);
 };
 
-// Kept as a 404 compatibility route: payment state can only be completed by
-// the verified provider webhook.
-router.post('/demo-complete', async (req, res) => {
-  return res.status(404).json({ error: 'Demo payments are disabled. Payment completion requires the provider webhook.' });
-});
 
 // POST /api/payment/create-order
 router.post('/create-order', async (req, res) => {
@@ -390,7 +385,7 @@ router.post('/webhook', async (req, res) => {
           );
         }
       }
-      return res.json({ received: true });
+      return res.json({ received: true, ignored: true });
     }
 
     if (event !== 'payment.captured' || !payment?.order_id || !payment?.id) {
@@ -468,6 +463,17 @@ router.post('/webhook', async (req, res) => {
     if (!order) return res.status(404).json({ error: 'Order for this Razorpay payment was not found.' });
     if (order.paymentMethod !== 'razorpay' || order.razorpayOrderId !== payment.order_id) return res.status(400).json({ error: 'Payment method or gateway order mismatch.' });
 
+    const eventId = String(req.get('x-razorpay-event-id') || '').slice(0, 150);
+    const updatedPayment = await Payment.findOneAndUpdate(
+      { _id: paymentRecord._id, status: { $ne: 'captured' } },
+      { $set: { status: 'captured', razorpayPaymentId: payment.id, webhookEventId: eventId, capturedAt: new Date() } },
+      { new: true, runValidators: true }
+    );
+    if (!updatedPayment) {
+      const completedOrder = await Order.findById(paymentRecord.orderId);
+      return res.json({ received: true, duplicate: true, ...(completedOrder && { order: publicPaymentState(completedOrder) }) });
+    }
+
     const result = await confirmOrderAndDeduct(order._id, {
       additionalUpdates: {
         paymentStatus: 'paid',
@@ -477,12 +483,6 @@ router.post('/webhook', async (req, res) => {
     });
     await awardLoyaltyPoints(result.order._id);
     publishOrderUpdate(result.order);
-    const eventId = String(req.get('x-razorpay-event-id') || '').slice(0, 150);
-    await Payment.findOneAndUpdate(
-      { _id: paymentRecord._id, status: { $ne: 'captured' } },
-      { $set: { status: 'captured', razorpayPaymentId: payment.id, webhookEventId: eventId, capturedAt: new Date() } },
-      { new: true, runValidators: true }
-    );
 
     await recordLedgerEntry({
       payment: paymentRecord,

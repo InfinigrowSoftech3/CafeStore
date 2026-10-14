@@ -3,6 +3,7 @@ import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Download, UtensilsCrossed, CheckCircle2, Clock, Loader2, Sparkles, Receipt, ArrowRight, ShieldCheck } from 'lucide-react';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
 import { downloadPdf } from '../../utils/download';
 import NotificationPermissionPrompt from '../../components/ui/NotificationPermissionPrompt';
 import { subscribeToLiveStream } from '../../utils/liveStream';
@@ -12,7 +13,7 @@ import usePageMeta from '../../hooks/usePageMeta';
 
 const STATUS_CONFIG = {
   pending:   { label: 'Order Received',    color: 'text-amber-800', bg: 'bg-amber-50/80', border: 'border-amber-200', icon: '📋' },
-  confirmed: { label: 'Order Confirmed',   color: 'text-blue-800',   bg: 'bg-blue-50/80',   border: 'border-blue-200',   icon: '✅' },
+  confirmed: { label: 'Order Confirmed',   color: 'text-brew-800',   bg: 'bg-brew-50/80',   border: 'border-brew-200',   icon: '✅' },
   preparing: { label: 'Being Prepared',    color: 'text-orange-800', bg: 'bg-orange-50/80', border: 'border-orange-200', icon: '👨‍🍳' },
   ready:     { label: 'Ready to Serve!',   color: 'text-emerald-800',  bg: 'bg-emerald-50/80',  border: 'border-emerald-200',  icon: '🔔' },
   completed: { label: 'Served & Enjoyed',  color: 'text-gray-800',   bg: 'bg-gray-50/80',   border: 'border-gray-200',   icon: '🎉' },

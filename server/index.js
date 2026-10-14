@@ -43,17 +43,23 @@ import billingRoutes from './routes/billing.js';
 import publicCafesRoutes from './routes/publicCafes.js';
 import cafesRoutes from './routes/cafes.js';
 import adminCafesRoutes from './routes/adminCafes.js';
-import { startCampaignScheduler } from './services/campaignRunner.js';
+import { startCampaignScheduler, stopCampaignScheduler } from './services/campaignRunner.js';
+import { closeAllLiveStreams, closeLiveUpdatesRedis } from './services/liveUpdates.js';
 import { isEmailConfigured } from './services/emailService.js';
 import { requestContext } from './middleware/requestContext.js';
 import { validateRequestEnvelope } from './middleware/requestValidation.js';
 import { tenantResolver } from './middleware/tenant.js';
+import { validateEnv } from './config/env.js';
 
 dotenv.config();
+
+// Enforce environment security check on startup in production
+validateEnv();
 
 const normalizeOrigin = (value) => String(value || '').trim().replace(/\/+$/, '');
 
 export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
+  validateEnv();
   const app = express();
   if (razorpayFactory) app.locals.razorpayFactory = razorpayFactory;
   // Trust proxy configuration
@@ -165,7 +171,7 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
   }));
 
   app.use((req, res, next) => {
-    const isLocalhost = req.hostname === 'localhost' || req.hostname === '127.0.0.1' || req.hostname.endsWith('.localhost');
+    const isLocalhost = (req.hostname === 'localhost' || req.hostname === '127.0.0.1' || req.hostname.endsWith('.localhost')) && process.env.NODE_ENV !== 'production';
     if (!isLocalhost && ['production', 'staging'].includes(process.env.NODE_ENV) && !req.secure) {
       return res.status(426).json({ error: 'HTTPS is required.', code: 'HTTPS_REQUIRED' });
     }
@@ -392,10 +398,18 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     });
   });
 
-  // Readiness probe for orchestrators & Render: verifies both MongoDB and Redis connectivity
+  // Liveness probe: process is running
+  app.get(['/livez', '/api/livez'], (req, res) => {
+    return res.status(200).json({
+      status: 'ok',
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  // Readiness probe for orchestrators & Render: fails only when MongoDB is down; when Redis is down returns 200 with redis: "degraded"
   app.get(['/readyz', '/api/readyz'], async (req, res) => {
     const mongoReady = mongoose.connection.readyState === 1;
-    let redisReady = true;
     let redisStatus = 'disabled';
     const redis = getRedisClient();
     if (redis) {
@@ -403,17 +417,25 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
         const pingPromise = redis.ping();
         const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000));
         const pong = await Promise.race([pingPromise, timeoutPromise]);
-        redisReady = pong === 'PONG';
-        redisStatus = redisReady ? 'connected' : 'error';
+        redisStatus = pong === 'PONG' ? 'connected' : 'degraded';
       } catch {
-        redisReady = false;
-        redisStatus = 'disconnected';
+        redisStatus = 'degraded';
       }
     }
-    const isReady = mongoReady && redisReady;
-    return res.status(isReady ? 200 : 503).json({
-      status: isReady ? 'ok' : 'unavailable',
-      database: mongoReady ? 'connected' : 'disconnected',
+
+    if (!mongoReady) {
+      return res.status(503).json({
+        status: 'unavailable',
+        database: 'disconnected',
+        redis: redisStatus,
+        version: '1.0.0',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    return res.status(200).json({
+      status: 'ok',
+      database: 'connected',
       redis: redisStatus,
       version: '1.0.0',
       timestamp: new Date().toISOString(),
@@ -534,9 +556,20 @@ export const setupGracefulShutdown = (server) => {
     forceTimeout.unref();
 
     try {
+      // 1. Stop background campaign scheduler
+      stopCampaignScheduler();
+      console.log('[Shutdown] Campaign scheduler stopped.');
+
+      // 2. End SSE streams cleanly and close Redis pub/sub
+      closeAllLiveStreams();
+      await closeLiveUpdatesRedis();
+      console.log('[Shutdown] SSE streams and live updates closed.');
+
+      // 3. Stop accepting new HTTP requests
       await new Promise((resolve) => server.close(resolve));
       console.log('[Shutdown] HTTP server closed to new connections.');
 
+      // 4. Close Mongo and Redis connections
       if (mongoose.connection.readyState !== 0) {
         await mongoose.connection.close(false);
         console.log('[Shutdown] MongoDB connection closed.');
@@ -558,9 +591,12 @@ export const setupGracefulShutdown = (server) => {
 };
 
 export const startServer = async () => {
+  validateEnv();
   const port = process.env.PORT || 5000;
   await connectDB();
-  startCampaignScheduler();
+  if (process.env.RUN_SCHEDULER !== 'false') {
+    startCampaignScheduler();
+  }
   const server = app.listen(port, () => {
     console.log(`Server running on port ${port}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);

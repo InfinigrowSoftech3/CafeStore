@@ -3,25 +3,26 @@ import Review from '../models/Review.js';
 import Order from '../models/Order.js';
 import { protect, ownerOrManager } from '../middleware/auth.js';
 import { writeAuditLog } from '../services/auditLog.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
 // GET /api/reviews — List reviews & rating breakdown
 router.get('/', async (req, res, next) => {
   try {
-    const { status = 'published', minRating, page = 1, limit = 50 } = req.query;
+    const { status = 'published', minRating } = req.query;
+    const { page, limit, skip } = parsePagination(req, 20, 100);
 
     const query = {};
     if (status && status !== 'ALL') query.status = status;
     if (minRating) query.overallRating = { $gte: Number(minRating) };
 
-    const skip = (Number(page) - 1) * Number(limit);
     const [reviews, totalCount, statsData] = await Promise.all([
       Review.find(query)
         .populate('reply.repliedBy', 'name')
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1, _id: -1 })
         .skip(skip)
-        .limit(Number(limit))
+        .limit(limit)
         .lean(),
       Review.countDocuments(query),
       Review.aggregate([
@@ -58,8 +59,9 @@ router.get('/', async (req, res, next) => {
       reviews,
       stats,
       totalCount,
-      page: Number(page),
-      totalPages: Math.ceil(totalCount / Number(limit)),
+      page,
+      totalPages: Math.ceil(totalCount / limit) || 1,
+      pagination: formatPagination(page, limit, totalCount),
     });
   } catch (error) {
     next(error);

@@ -9,6 +9,7 @@ import { createTableQrToken, verifyTableQrTokenDetailed } from '../utils/tableQr
 import { generateOrderAccessToken, hashAccessToken } from '../utils/orderSecurity.js';
 import { runWithTenant, runWithSystemTenantAccess } from '../utils/tenantContext.js';
 import { sendApiSuccess, sendApiError } from '../utils/apiResponse.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
@@ -350,8 +351,19 @@ router.get('/cafes/:cafeId/tables', async (req, res, next) => {
       return sendApiError(res, 404, 'CAFE_NOT_FOUND', 'Cafe not found.');
     }
 
-    const tables = await runWithTenant(cafe._id, async () => {
-      return Table.find({ active: true }).sort({ tableNumber: 1 }).lean();
+    const { page, limit, skip } = parsePagination(req);
+    const filter = { active: true };
+
+    const { tables, total } = await runWithTenant(cafe._id, async () => {
+      const [list, count] = await Promise.all([
+        Table.find(filter)
+          .sort({ tableNumber: 1, _id: 1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+        Table.countDocuments(filter),
+      ]);
+      return { tables: list, total: count };
     });
 
     return sendApiSuccess(res, 200, {
@@ -363,6 +375,7 @@ router.get('/cafes/:cafeId/tables', async (req, res, next) => {
         number: t.tableNumber,
         status: t.active ? 'available' : 'occupied',
       })),
+      pagination: formatPagination(page, limit, total),
     });
   } catch (error) {
     next(error);
@@ -376,9 +389,7 @@ router.post('/orders', async (req, res, next) => {
     const cafeIdHeader =
       req.headers['x-cafe-id'] ||
       req.headers['x-cafe-id'.toLowerCase()] ||
-      req.headers['x-tenant-id'] ||
-      req.body.cafeId ||
-      req.query.cafeId;
+      req.headers['x-tenant-id'];
 
     const qrTokenHeader =
       req.headers['x-qr-token'] ||

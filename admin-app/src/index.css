@@ -516,8 +516,171 @@ html.light {
   --tenant-primary-hover: var(--brand-primary-hover);
 }
 
-.sa-light, html.sa-light, html[data-theme="light"] {
-  /* Legacy Super Admin tokens mapped to new semantic tokens */
+/* ============================================================
+   SUPER ADMIN DESIGN TOKENS (ROYAL BLUE & GOLD THEME)
+   Scoped strictly to .super-admin-theme
+   ============================================================ */
+.super-admin-theme {
+  /* Royal Blue Primary Palette */
+  --sa-primary: #1E3FAE;
+  --sa-primary-hover: #17318A;
+  --sa-primary-pressed: #12276E;
+  --sa-primary-subtle: rgba(30, 63, 174, 0.08);
+  --sa-primary-border: rgba(30, 63, 174, 0.25);
+
+  /* Deep Navy Palette */
+  --sa-navy: #0B1B4D;
+  --sa-navy-dark: #07123A;
+  --sa-navy-subtle: rgba(11, 27, 77, 0.05);
+
+  /* Gold Accent Palette */
+  --sa-gold: #D4AF37;
+  --sa-gold-hover: #C29B22;
+  --sa-gold-tint: #FBF3D5;
+  --sa-gold-border: #E6CF7A;
+  --sa-gold-subtle: rgba(212, 175, 55, 0.12);
+
+  /* Surfaces & Cards */
+  --sa-bg-page: #F5F7FC;
+  --sa-card-bg: #FFFFFF;
+  --sa-card-border: #E3E8F5;
+  --sa-card-shadow: 0 4px 20px -2px rgba(11, 27, 77, 0.06);
+
+  /* Typography */
+  --sa-text-body: #1B2559;
+  --sa-text-secondary: #3B4874;
+  --sa-text-muted: #5B6585;
+  --sa-text-white: #FFFFFF;
+
+  /* Semantic Colours (Distinct from Gold) */
+  --sa-success: #12A37A;
+  --sa-success-bg: rgba(18, 163, 122, 0.10);
+  --sa-success-border: rgba(18, 163, 122, 0.25);
+  --sa-success-text: #0E7D5D;
+
+  --sa-danger: #DC2626;
+  --sa-danger-bg: rgba(220, 38, 38, 0.10);
+  --sa-danger-border: rgba(220, 38, 38, 0.25);
+  --sa-danger-text: #B91C1C;
+
+  --sa-warning: #EA580C;
+  --sa-warning-bg: rgba(234, 88, 12, 0.10);
+  --sa-warning-border: rgba(234, 88, 12, 0.25);
+  --sa-warning-text: #C2410C;
+
+  --sa-info: #0EA5E9;
+  --sa-info-bg: rgba(14, 165, 233, 0.10);
+  --sa-info-border: rgba(14, 165, 233, 0.25);
+  --sa-info-text: #0369A1;
+
+  /* Map standard variables to Super Admin tokens when inside .super-admin-theme */
+  --bg-canvas: var(--sa-bg-page);
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F5F7FC;
+  --bg-card: var(--sa-card-bg);
+  --bg-overlay: rgba(7, 18, 58, 0.65);
+
+  --sidebar-bg: var(--sa-navy);
+  --sidebar-border: rgba(227, 232, 245, 0.12);
+  --sidebar-text: #FFFFFF;
+  --sidebar-text-muted: #8E9BBF;
+  --sidebar-active-bg: rgba(212, 175, 55, 0.14);
+  --sidebar-active-border: var(--sa-gold);
+  --sidebar-active-text: #FFFFFF;
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+
+  --header-bg: #FFFFFF;
+  --header-border: var(--sa-card-border);
+  --header-text: var(--sa-navy);
+  --header-text-muted: var(--sa-text-muted);
+
+  --text-primary: var(--sa-text-body);
+  --text-secondary: var(--sa-text-secondary);
+  --text-muted: var(--sa-text-muted);
+  --text-inverse: #FFFFFF;
+
+  --border-primary: var(--sa-card-border);
+  --border-subtle: rgba(227, 232, 245, 0.7);
+  --border-focus: var(--sa-primary);
+
+  --input-bg: #FFFFFF;
+  --input-border: var(--sa-card-border);
+  --input-text: var(--sa-text-body);
+  --input-placeholder: #8E9BBF;
+  --input-focus-border: var(--sa-primary);
+  --input-focus-ring: rgba(30, 63, 174, 0.2);
+
+  --brand-primary: var(--sa-primary);
+  --brand-primary-hover: var(--sa-primary-hover);
+  --brand-primary-subtle: var(--sa-primary-subtle);
+  --brand-primary-border: var(--sa-primary-border);
+  --brand-accent: var(--sa-gold);
+  --brand-accent-hover: var(--sa-gold-hover);
+  --brand-accent-subtle: var(--sa-gold-subtle);
+
+  --success: var(--sa-success);
+  --success-bg: var(--sa-success-bg);
+  --success-border: var(--sa-success-border);
+  --success-text: var(--sa-success-text);
+
+  --warning: var(--sa-warning);
+  --warning-bg: var(--sa-warning-bg);
+  --warning-border: var(--sa-warning-border);
+  --warning-text: var(--sa-warning-text);
+
+  --danger: var(--sa-danger);
+  --danger-bg: var(--sa-danger-bg);
+  --danger-border: var(--sa-danger-border);
+  --danger-text: var(--sa-danger-text);
+
+  --info: var(--sa-info);
+  --info-bg: var(--sa-info-bg);
+  --info-border: var(--sa-info-border);
+  --info-text: var(--sa-info-text);
+
+  --hover-bg: #EEF2FA;
+  --selected-bg: var(--sa-gold-tint);
+  --active-bg: rgba(212, 175, 55, 0.18);
+  --focus-ring: rgba(30, 63, 174, 0.25);
+
+  --table-header-bg: #F0F4FC;
+  --table-row-bg: #FFFFFF;
+  --table-row-hover: #F8FAFD;
+  --table-row-selected: var(--sa-gold-tint);
+  --table-border: var(--sa-card-border);
+
+  --popover-bg: #FFFFFF;
+  --popover-border: var(--sa-card-border);
+  --popover-shadow: var(--sa-card-shadow);
+  --tooltip-bg: var(--sa-navy);
+  --tooltip-text: #FFFFFF;
+  --modal-backdrop: rgba(7, 18, 58, 0.65);
+  --drawer-backdrop: rgba(7, 18, 58, 0.5);
+
+  --status-active-bg: var(--sa-success-bg);
+  --status-active-text: var(--sa-success-text);
+  --status-active-border: var(--sa-success-border);
+  --status-active-dot: var(--sa-success);
+
+  --status-suspended-bg: var(--sa-danger-bg);
+  --status-suspended-text: var(--sa-danger-text);
+  --status-suspended-border: var(--sa-danger-border);
+  --status-suspended-dot: var(--sa-danger);
+
+  /* Legacy aliases inside super admin */
+  --sa-bg-canvas: var(--sa-bg-page);
+  --sa-bg-surface: #FFFFFF;
+  --sa-bg-elevated: #F5F7FC;
+  --sa-bg-card: var(--sa-card-bg);
+  --sa-border: var(--sa-card-border);
+  --sa-border-subtle: rgba(227, 232, 245, 0.7);
+  --sa-text-primary: var(--sa-text-body);
+  --sa-accent: var(--sa-gold);
+  --sa-accent-hover: var(--sa-gold-hover);
+  --sa-accent-subtle: var(--sa-gold-subtle);
+}
+
+.sa-light, html.sa-light {
   --sa-bg-canvas: var(--bg-canvas);
   --sa-bg-surface: var(--bg-surface);
   --sa-bg-elevated: var(--bg-elevated);

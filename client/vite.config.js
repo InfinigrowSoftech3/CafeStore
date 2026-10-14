@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { imagetools } from 'vite-imagetools'
 
+// Warm luxury gold & espresso theme configuration
 export default defineConfig({
   plugins: [react(), imagetools()],
   server: {

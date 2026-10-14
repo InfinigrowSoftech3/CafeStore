@@ -44,9 +44,13 @@ const inventoryTransactionSchema = new mongoose.Schema({
 // sparse:true allows multiple docs with orderId=null
 inventoryTransactionSchema.index(
   { tenantId: 1, orderId: 1, inventoryItem: 1, type: 1 },
-  { unique: true, sparse: true, partialFilterExpression: { orderId: { $ne: null }, type: 'order_consumption' } }
+  { unique: true, partialFilterExpression: { orderId: { $type: 'objectId' }, type: 'order_consumption' } }
 );
 
+inventoryTransactionSchema.index({ tenantId: 1, inventoryItem: 1, createdAt: -1 });
+inventoryTransactionSchema.index({ tenantId: 1, type: 1, createdAt: -1 });
+inventoryTransactionSchema.index({ tenantId: 1, createdAt: -1 });
+inventoryTransactionSchema.index({ tenantId: 1, orderId: 1 });
 inventoryTransactionSchema.index({ inventoryItem: 1, createdAt: -1 });
 inventoryTransactionSchema.index({ orderId: 1 });
 inventoryTransactionSchema.index({ type: 1, createdAt: -1 });

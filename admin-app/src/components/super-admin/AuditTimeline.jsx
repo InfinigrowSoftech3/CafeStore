@@ -183,7 +183,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
               return (
                 <div key={log._id || Math.random()} className="relative group">
                   {/* Timeline dot */}
-                  <div className="absolute -left-6 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--bg-surface)] border border-[var(--border-primary)] text-[var(--text-muted)] group-hover:border-amber-500 group-hover:text-amber-500 transition">
+                  <div className="absolute -left-6 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--bg-surface)] border border-[var(--border-primary)] text-[var(--text-muted)] group-hover:border-[#1E3FAE] group-hover:text-[#1E3FAE] transition">
                     <div className="h-1.5 w-1.5 rounded-full bg-current" />
                   </div>
 
@@ -223,7 +223,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
                       {log.targetTenantSlug && (
                         <span className="flex items-center gap-1.5">
                           <Store size={12} className="text-[var(--text-muted)]" />
-                          Target: <strong className="text-amber-600 dark:text-amber-400">{log.targetTenantSlug}</strong>
+                          Target: <strong className="text-[#1E3FAE] dark:text-[#688bf7]">{log.targetTenantSlug}</strong>
                         </span>
                       )}
 

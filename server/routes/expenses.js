@@ -2,13 +2,15 @@ import express from 'express';
 import Expense, { EXPENSE_CATEGORIES } from '../models/Expense.js';
 import { protect, ownerOrManager } from '../middleware/auth.js';
 import { writeAuditLog } from '../services/auditLog.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
 // GET /api/expenses — List categorized expenses
 router.get('/', protect, ownerOrManager, async (req, res, next) => {
   try {
-    const { branchId, category, startDate, endDate, search, page = 1, limit = 50 } = req.query;
+    const { branchId, category, startDate, endDate, search } = req.query;
+    const { page, limit, skip } = parsePagination(req.query, { defaultLimit: 20, maxLimit: 100 });
 
     const query = {};
     if (branchId) query.branchId = branchId;
@@ -22,14 +24,13 @@ router.get('/', protect, ownerOrManager, async (req, res, next) => {
       query.description = { $regex: search.trim(), $options: 'i' };
     }
 
-    const skip = (Number(page) - 1) * Number(limit);
     const [expenses, totalCount, aggregateData] = await Promise.all([
       Expense.find(query)
         .populate('branchId', 'name code')
         .populate('createdBy', 'name email')
-        .sort({ date: -1, createdAt: -1 })
+        .sort({ date: -1, createdAt: -1, _id: -1 })
         .skip(skip)
-        .limit(Number(limit))
+        .limit(limit)
         .lean(),
       Expense.countDocuments(query),
       Expense.aggregate([
@@ -51,8 +52,9 @@ router.get('/', protect, ownerOrManager, async (req, res, next) => {
       totalCount,
       totalSpend: Number(totalSpend.toFixed(2)),
       categories: EXPENSE_CATEGORIES,
-      page: Number(page),
-      totalPages: Math.ceil(totalCount / Number(limit)),
+      page,
+      totalPages: Math.ceil(totalCount / limit) || 1,
+      pagination: formatPagination({ page, limit, total: totalCount }),
     });
   } catch (error) {
     next(error);

@@ -5,6 +5,7 @@ import Product from '../models/Product.js';
 import { ownerOrManager, protect } from '../middleware/auth.js';
 import { calculateCouponDiscount, findAvailableCoupon, normalizeCouponCode } from '../services/couponService.js';
 import { calculateServerTotals, validateAndFetchProductPrices } from '../utils/orderSecurity.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 const dateOrNull = (value) => value ? new Date(value) : null;
@@ -29,8 +30,20 @@ router.post('/validate', async (req, res) => {
 
 router.get('/', protect, ownerOrManager, async (req, res) => {
   try {
-    const coupons = await Coupon.find().sort({ createdAt: -1 }).lean();
-    res.json({ coupons });
+    const { page, limit, skip } = parsePagination(req);
+    const [coupons, total] = await Promise.all([
+      Coupon.find()
+        .sort({ createdAt: -1, _id: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select('code description discountType value minimumSubtotal maximumDiscount startsAt endsAt maxUses usedCount active createdAt updatedAt')
+        .lean(),
+      Coupon.countDocuments(),
+    ]);
+    res.json({
+      coupons,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch {
     res.status(500).json({ error: 'Unable to load coupons.' });
   }

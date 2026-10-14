@@ -51,10 +51,10 @@ export default function DashboardPage() {
       const [ordersRes, analyticsRes, tablesRes, inventoryRes, menuRes, teamRes] = await Promise.all([
         api.get(`/orders?date=${dateRange}&limit=20`).catch(() => ({ data: { orders: [], stats: {} } })),
         api.get('/analytics/summary').catch(() => ({ data: null })),
-        api.get('/tables/all').catch(() => ({ data: { tables: [] } })),
+        api.get('/tables/all?limit=100').catch(() => ({ data: { tables: [] } })),
         api.get('/inventory/dashboard').catch(() => ({ data: null })),
-        api.get('/menu').catch(() => ({ data: { products: [] } })),
-        api.get('/tenant/users').catch(() => ({ data: { users: [] } })),
+        api.get('/menu?limit=100').catch(() => ({ data: { products: [] } })),
+        api.get('/tenant/users?limit=100').catch(() => ({ data: { users: [] } })),
       ]);
 
       const ordList = ordersRes.data.orders || [];

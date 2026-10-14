@@ -51,9 +51,9 @@ export default function SetupWizardPage() {
       try {
         const [settingsRes, productsRes, categoriesRes, tablesRes] = await Promise.all([
           api.get('/tenant/settings').catch(() => ({ data: { tenant: {} } })),
-          api.get('/menu').catch(() => ({ data: { products: [] } })),
-          api.get('/categories').catch(() => ({ data: { categories: [] } })),
-          api.get('/tables').catch(() => ({ data: { tables: [] } })),
+          api.get('/menu?limit=100').catch(() => ({ data: { products: [] } })),
+          api.get('/categories?limit=100').catch(() => ({ data: { categories: [] } })),
+          api.get('/tables?limit=100').catch(() => ({ data: { tables: [] } })),
         ]);
 
         const settings = settingsRes.data?.tenant?.settings || {};

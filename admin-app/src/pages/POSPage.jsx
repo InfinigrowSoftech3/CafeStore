@@ -142,10 +142,10 @@ export default function POSPage() {
     setLoadingCatalog(true);
     try {
       const [catsRes, prodsRes, tablesRes, heldRes] = await Promise.all([
-        api.get('/categories/all').catch(() => api.get('/categories')).catch(() => ({ data: { categories: [] } })),
-        api.get('/menu').catch(() => ({ data: { products: [] } })),
-        api.get('/tables/all').catch(() => ({ data: { tables: [] } })),
-        api.get('/pos/held-orders').catch(() => ({ data: { orders: [] } })),
+        api.get('/categories/all?limit=100').catch(() => api.get('/categories?limit=100')).catch(() => ({ data: { categories: [] } })),
+        api.get('/menu?limit=100').catch(() => ({ data: { products: [] } })),
+        api.get('/tables/all?limit=100').catch(() => ({ data: { tables: [] } })),
+        api.get('/pos/held-orders?limit=100').catch(() => ({ data: { orders: [] } })),
       ]);
 
       const catList = catsRes.data?.categories || (Array.isArray(catsRes.data) ? catsRes.data : []);

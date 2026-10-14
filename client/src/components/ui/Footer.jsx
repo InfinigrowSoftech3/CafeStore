@@ -19,7 +19,7 @@ export default function Footer() {
   const address = tenant.address || '12 Connaught Circle, Heritage Block, New Delhi';
 
   return (
-    <footer className="border-t border-espresso-800 bg-[#0e0704] text-cream/70" aria-label="Site Footer">
+    <footer className="border-t border-espresso-800 bg-[#0a1128] text-cream/70" aria-label="Site Footer">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand Info */}
@@ -38,7 +38,7 @@ export default function Footer() {
                   height={40}
                 />
               ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brew-500 text-espresso-950 shadow-xs">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brew-500 text-white shadow-xs">
                   <Coffee size={22} className="stroke-[2.2]" />
                 </div>
               )}
@@ -146,7 +146,7 @@ export default function Footer() {
             <div className="mt-4">
               <Link
                 to="/menu"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-brew-500 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-espresso-950 transition hover:bg-brew-400 active:scale-95"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-brew-500 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-brew-400 active:scale-95"
               >
                 <span>Browse Menu</span>
                 <ArrowRight size={14} />

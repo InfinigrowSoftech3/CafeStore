@@ -52,7 +52,7 @@ export default function Navbar() {
   }, [location.pathname]);
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl border-b border-foam/90 shadow-2xs transition-all duration-200">
+    <header className="sticky top-0 z-40 w-full bg-[#FAF6EF]/95 backdrop-blur-xl border-b border-[#E9E0D2] shadow-[0_2px_12px_-2px_rgba(28,22,18,0.04)] transition-all duration-200">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-3.5 py-2.5 sm:px-6 sm:py-3 lg:px-8">
         {/* Brand Logo & Name */}
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -70,7 +70,7 @@ export default function Navbar() {
                 height={36}
               />
             ) : (
-              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-brew-500 to-brew-600 text-white shadow-sm shadow-brew-500/20 flex-shrink-0">
+              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-2xl btn-hero-cta text-espresso-950 shadow-sm flex-shrink-0">
                 <Coffee size={20} className="stroke-[2.2]" />
               </div>
             )}
@@ -95,8 +95,8 @@ export default function Navbar() {
                 to={link.to}
                 className={`relative px-4 py-2 text-xs font-bold tracking-wide rounded-full transition-all duration-200 ${
                   isActive
-                    ? 'text-espresso-950 bg-foam shadow-xs font-bold'
-                    : 'text-espresso-700 hover:text-espresso-950 hover:bg-espresso-50/90 font-medium'
+                    ? 'text-espresso-950 bg-foam border border-sand-200 shadow-2xs font-bold'
+                    : 'text-espresso-700 hover:text-espresso-950 hover:bg-sand-100/70 font-medium'
                 }`}
               >
                 {link.label}
@@ -126,7 +126,7 @@ export default function Navbar() {
               type="button"
               onClick={openScanner}
               aria-label="Scan Table QR Code"
-              className="min-h-[40px] inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border border-espresso-200/90 bg-white text-espresso-900 hover:bg-espresso-50 transition-all active:scale-95 shadow-2xs"
+              className="min-h-[40px] inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border border-sand-200 bg-white text-espresso-900 hover:bg-foam hover:border-brew-400 transition-all active:scale-95 shadow-2xs"
             >
               <ScanLine size={15} className="text-brew-600" />
               <span className="hidden sm:inline">Scan Table</span>
@@ -137,7 +137,7 @@ export default function Navbar() {
           <Link
             to="/cart"
             aria-label={`Open Cart (${itemCount} items)`}
-            className="relative min-h-[40px] min-w-[40px] flex items-center justify-center rounded-full border border-espresso-200/90 bg-white text-espresso-950 hover:bg-espresso-50/90 shadow-2xs transition-all active:scale-95"
+            className="relative min-h-[40px] min-w-[40px] flex items-center justify-center rounded-full border border-sand-200 bg-white text-espresso-950 hover:bg-foam shadow-2xs transition-all active:scale-95"
           >
             <ShoppingBag size={18} className="stroke-[2.2]" />
             <AnimatePresence>
@@ -148,7 +148,7 @@ export default function Navbar() {
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.4, opacity: 0 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                  className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brew-500 text-[11px] font-bold text-white shadow-sm ring-2 ring-white"
+                  className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brew-500 text-[11px] font-bold text-espresso-950 shadow-sm ring-2 ring-white"
                 >
                   {itemCount}
                 </motion.span>
@@ -164,7 +164,7 @@ export default function Navbar() {
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-nav-drawer"
-            className="lg:hidden min-h-[40px] min-w-[40px] flex items-center justify-center rounded-full border border-espresso-200/90 bg-white text-espresso-950 hover:bg-espresso-50/90 shadow-2xs transition-all active:scale-95"
+            className="lg:hidden min-h-[40px] min-w-[40px] flex items-center justify-center rounded-full border border-sand-200 bg-white text-espresso-950 hover:bg-foam shadow-2xs transition-all active:scale-95"
           >
             {mobileMenuOpen ? <X size={19} /> : <Menu size={19} />}
           </button>
@@ -181,7 +181,7 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 top-[61px] z-40 bg-black/50 backdrop-blur-xs lg:hidden"
+              className="fixed inset-0 top-[61px] z-40 bg-espresso-950/60 backdrop-blur-xs lg:hidden"
               aria-hidden="true"
             />
 
@@ -196,10 +196,10 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-x-0 top-[61px] z-50 border-b border-foam bg-white px-5 py-6 text-espresso-950 shadow-2xl lg:hidden max-h-[calc(100vh-61px)] overflow-y-auto"
+              className="fixed inset-x-0 top-[61px] z-50 border-b border-sand-200 bg-cream px-5 py-6 text-espresso-950 shadow-2xl lg:hidden max-h-[calc(100vh-61px)] overflow-y-auto"
             >
               {/* Table Info or QR Scan button in drawer */}
-              <div className="mb-5 rounded-2xl border border-foam bg-cream/70 p-3.5">
+              <div className="mb-5 rounded-2xl border border-sand-200 bg-white p-3.5 shadow-2xs">
                 {tableNumber ? (
                   <div className="flex items-center justify-between">
                     <div>
@@ -209,7 +209,7 @@ export default function Navbar() {
                     <button
                       type="button"
                       onClick={() => { setMobileMenuOpen(false); openScanner(); }}
-                      className="rounded-full border border-espresso-200 bg-white px-3 py-1.5 text-xs font-bold text-espresso-800 hover:bg-espresso-50 transition min-h-[40px] flex items-center justify-center shadow-2xs"
+                      className="rounded-full border border-sand-200 bg-cream px-3 py-1.5 text-xs font-bold text-espresso-800 hover:bg-foam transition min-h-[40px] flex items-center justify-center shadow-2xs"
                     >
                       Change Table
                     </button>
@@ -218,7 +218,7 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={() => { setMobileMenuOpen(false); openScanner(); }}
-                    className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-xl bg-brew-500 py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-brew-600 transition shadow-xs"
+                    className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-xl bg-brew-500 py-2.5 text-xs font-bold uppercase tracking-wider text-espresso-950 hover:bg-brew-400 transition shadow-xs"
                   >
                     <ScanLine size={16} />
                     <span>Scan Table QR to Order</span>
@@ -238,8 +238,8 @@ export default function Navbar() {
                       onClick={() => setMobileMenuOpen(false)}
                       className={`min-h-[44px] flex items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold transition ${
                         isActive
-                          ? 'bg-foam text-espresso-950 font-bold border border-espresso-200/60'
-                          : 'text-espresso-700 hover:bg-cream hover:text-espresso-950'
+                          ? 'bg-foam text-espresso-950 font-bold border border-sand-200'
+                          : 'text-espresso-700 hover:bg-white hover:text-espresso-950'
                       }`}
                     >
                       <Icon size={18} className={isActive ? 'text-brew-600' : 'text-espresso-400'} />
@@ -250,7 +250,7 @@ export default function Navbar() {
               </nav>
 
               {/* Legal and quick contact in drawer */}
-              <div className="mt-6 border-t border-foam pt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-espresso-500">
+              <div className="mt-6 border-t border-sand-200 pt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-espresso-500">
                 <Link to="/privacy" onClick={() => setMobileMenuOpen(false)} className="hover:text-espresso-900">
                   Privacy
                 </Link>

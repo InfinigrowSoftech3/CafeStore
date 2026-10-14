@@ -5,6 +5,7 @@ import AuditEvent from '../models/AuditEvent.js';
 import { authorizeRoles, protect } from '../middleware/auth.js';
 import { checkStaffUserLimit } from '../middleware/planLimits.js';
 import { writeAuditLog } from '../services/auditLog.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 const ownerOnly = [protect, authorizeRoles('owner')];
@@ -12,8 +13,21 @@ const VALID_ROLES = ['owner', 'manager', 'cashier', 'kitchen'];
 const publicUser = (user) => ({ _id: user._id, name: user.name, email: user.email, role: user.role, createdAt: user.createdAt });
 
 router.get('/', ...ownerOnly, async (req, res) => {
-  const users = await User.find({ role: { $in: VALID_ROLES.concat(['admin', 'staff']) } }).sort({ createdAt: 1 }).select('name email role createdAt').lean();
-  return res.json({ users });
+  const { page, limit, skip } = parsePagination(req, 20, 100);
+  const filter = { role: { $in: VALID_ROLES.concat(['admin', 'staff']) } };
+  const [users, total] = await Promise.all([
+    User.find(filter)
+      .sort({ createdAt: 1, _id: 1 })
+      .skip(skip)
+      .limit(limit)
+      .select('name email role createdAt')
+      .lean(),
+    User.countDocuments(filter),
+  ]);
+  return res.json({
+    users,
+    pagination: formatPagination(page, limit, total),
+  });
 });
 
 router.post('/', ...ownerOnly, checkStaffUserLimit, async (req, res) => {
@@ -50,9 +64,8 @@ router.put('/:id/role', ...ownerOnly, async (req, res) => {
 
 router.get('/audit', ...ownerOnly, async (req, res) => {
   try {
-    const { page = '1', limit = '50', action, actorEmail, targetType, startDate, endDate } = req.query;
-    const pageNum = Math.max(1, parseInt(page));
-    const limitNum = Math.min(200, Math.max(1, parseInt(limit)));
+    const { page, limit, skip } = parsePagination(req, 50, 100);
+    const { action, actorEmail, targetType, startDate, endDate } = req.query;
 
     const query = {};
     if (action) query.action = { $regex: action, $options: 'i' };
@@ -65,11 +78,11 @@ router.get('/audit', ...ownerOnly, async (req, res) => {
     }
 
     const [events, total] = await Promise.all([
-      AuditEvent.find(query).sort({ createdAt: -1 }).skip((pageNum - 1) * limitNum).limit(limitNum).lean(),
+      AuditEvent.find(query).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit).lean(),
       AuditEvent.countDocuments(query),
     ]);
 
-    return res.json({ events, pagination: { page: pageNum, limit: limitNum, total, pages: Math.ceil(total / limitNum) } });
+    return res.json({ events, pagination: formatPagination(page, limit, total) });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to fetch audit events.' });
   }

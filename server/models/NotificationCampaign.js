@@ -65,8 +65,13 @@ const notificationCampaignSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['draft', 'processing', 'completed', 'partial', 'scheduled', 'sending', 'sent', 'partially_failed', 'failed', 'cancelled'],
+    enum: ['draft', 'processing', 'completed', 'partial', 'scheduled', 'running', 'sending', 'sent', 'partially_failed', 'failed', 'cancelled'],
     default: 'draft',
+    index: true,
+  },
+  leaseExpiresAt: {
+    type: Date,
+    default: null,
     index: true,
   },
   totalRecipients: {

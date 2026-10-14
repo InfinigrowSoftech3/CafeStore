@@ -23,6 +23,7 @@ import {
   verifyTotpCode,
 } from '../utils/authTokens.js';
 import { setSessionCookies } from './auth.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
@@ -543,8 +544,17 @@ router.get('/metrics', superAdminProtect, async (req, res, next) => {
 // GET /api/platform/admin/tenants
 router.get('/tenants', superAdminProtect, async (req, res, next) => {
   try {
-    const tenants = await runWithSystemTenantAccess(async () => {
-      const list = await Tenant.find().sort({ createdAt: -1 }).lean();
+    const { page, limit, skip } = parsePagination(req);
+    const { tenants, total } = await runWithSystemTenantAccess(async () => {
+      const [list, count] = await Promise.all([
+        Tenant.find()
+          .sort({ createdAt: -1, _id: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+        Tenant.countDocuments(),
+      ]);
+
       const enriched = await Promise.all(
         list.map(async (t) => {
           const [owner, tableCount, productCount] = await Promise.all([
@@ -581,10 +591,13 @@ router.get('/tenants', superAdminProtect, async (req, res, next) => {
           };
         })
       );
-      return enriched;
+      return { tenants: enriched, total: count };
     });
 
-    res.json({ tenants });
+    res.json({
+      tenants,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     next(error);
   }
@@ -960,16 +973,14 @@ router.put('/settings', superAdminProtect, async (req, res, next) => {
 // GET /api/platform/admin/audit-logs
 router.get('/audit-logs', superAdminProtect, async (req, res, next) => {
   try {
-    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 50));
-    const skip = (page - 1) * limit;
+    const { page, limit, skip } = parsePagination(req, 50, 100);
 
     const [logs, total] = await Promise.all([
-      PlatformAuditEvent.find().sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      PlatformAuditEvent.find().sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit).lean(),
       PlatformAuditEvent.countDocuments(),
     ]);
 
-    res.json({ logs, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+    res.json({ logs, pagination: formatPagination(page, limit, total) });
   } catch (error) {
     next(error);
   }

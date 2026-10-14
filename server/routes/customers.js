@@ -217,7 +217,7 @@ router.get('/', protect, ownerOrManager, async (req, res) => {
 
     const [customers, total] = await Promise.all([
       Customer.find(query)
-        .sort({ [sortField]: sortDirection })
+        .sort({ [sortField]: sortDirection, _id: sortDirection })
         .skip(skip)
         .limit(limitNum)
         .lean(),
@@ -253,6 +253,11 @@ router.get('/', protect, ownerOrManager, async (req, res) => {
       page: pageNum,
       totalPages: Math.ceil(total / limitNum) || 1,
       limit: limitNum,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+      },
     });
   } catch (err) {
     console.error('List customers error:', err);

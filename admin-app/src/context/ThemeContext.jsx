@@ -26,7 +26,9 @@ export function ThemeProvider({ children }) {
     // Clear any previously saved dark theme preference
     try {
       localStorage.removeItem(STORAGE_KEY);
-    } catch (_) {}
+    } catch (_) {
+      /* ignore storage errors */
+    }
 
     // Ensure system dark mode preference does not switch to dark
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');

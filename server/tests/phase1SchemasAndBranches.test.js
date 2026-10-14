@@ -15,8 +15,11 @@ import { calculateGstBreakdown, formatGstInvoiceNumber } from '../services/gstSe
 import { runWithTenant, runWithSystemTenantAccess } from '../utils/tenantContext.js';
 import { runPhase1Migration } from '../scripts/migrate-phase1-schemas.js';
 
+process.env.NODE_ENV = 'test';
+process.env.MONGO_URI = process.env.MONGO_TEST_URI || `mongodb://127.0.0.1:27017/cafe_phase1_${process.pid}`;
+
 test('PHASE 1: Models, Multi-Branch & GST Services Verification', async (t) => {
-  const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/cafe-app-test';
+  const uri = process.env.MONGO_URI;
   if (mongoose.connection.readyState !== 1) {
     try {
       await mongoose.connect(uri);
@@ -90,6 +93,7 @@ test('PHASE 1: Models, Multi-Branch & GST Services Verification', async (t) => {
       }
     });
     if (mongoose.connection.readyState === 1) {
+      await mongoose.connection.dropDatabase();
       await mongoose.disconnect();
     }
   });

@@ -112,7 +112,7 @@ export default function ReceiptPage() {
   }
 
   return (
-    <div className="receipt-page min-h-screen bg-[#eee8e2] px-3 py-6 sm:px-6 sm:py-8">
+    <div className="receipt-page min-h-screen bg-cream/90 px-3 py-6 sm:px-6 sm:py-8">
       <div className="receipt-actions mx-auto mb-5 flex max-w-md flex-wrap items-center justify-between gap-2.5">
         <Link
           to="/orders"

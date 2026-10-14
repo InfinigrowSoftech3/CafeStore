@@ -12,6 +12,8 @@ const { createApp } = await import('../index.js');
 const { default: Category } = await import('../models/Category.js');
 const { default: Product } = await import('../models/Product.js');
 const { default: Table } = await import('../models/Table.js');
+const { default: User } = await import('../models/User.js');
+const { default: jwt } = await import('jsonwebtoken');
 const { default: Order } = await import('../models/Order.js');
 const { default: InventoryItem } = await import('../models/InventoryItem.js');
 const { default: InventoryCategory } = await import('../models/InventoryCategory.js');
@@ -23,7 +25,7 @@ const { createTableQrToken } = await import('../utils/tableQr.js');
 test('order lifecycle, idempotency, and inventory restoration suite', async (t) => {
   await mongoose.connect(process.env.MONGO_URI);
   await mongoose.connection.dropDatabase();
-  await setupTestTenant();
+  const tenant = await setupTestTenant();
 
   const app = createApp();
   const httpServer = app.listen(0);
@@ -141,6 +143,88 @@ test('order lifecycle, idempotency, and inventory restoration suite', async (t) 
 
       const stockFinal = await InventoryItem.findById(invItem._id);
       assert.equal(stockFinal.currentQuantity, 20);
+    });
+
+    await t.test('PUT, PATCH, and GET /api/orders/:id/status seamlessly update and inspect status without 404', async () => {
+      const staffUser = await User.create({
+        name: 'Chef Kitchen',
+        email: `chef_${Date.now()}@example.com`,
+        password: 'Password123!',
+        role: 'kitchen',
+        tenantId: tenant._id,
+      });
+
+      const staffToken = jwt.sign(
+        { id: staffUser._id, role: 'kitchen', tokenUse: 'access', tenantId: tenant._id },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      const testOrder = await Order.create({
+        tenantId: tenant._id,
+        orderNumber: `KDS-${Date.now()}`,
+        tableNumber: 3,
+        customer: { name: 'Charlie', phone: '9123456789' },
+        items: [{
+          product: product._id,
+          name: product.name,
+          price: product.price,
+          quantity: 1,
+          itemTotal: 150,
+        }],
+        subtotal: 150,
+        tax: 7.5,
+        total: 157.5,
+        paymentMethod: 'cash',
+        paymentStatus: 'pending',
+        orderStatus: 'pending',
+        accessTokenHash: 'dummyhash-status-test',
+      });
+
+      const authHeaders = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${staffToken}`,
+        'X-Tenant-Slug': tenant.slug,
+      };
+
+      // 1. PATCH /api/orders/:id/status (used by KitchenDisplayPage)
+      const patchRes = await fetch(`${baseUrl}/api/orders/${testOrder._id}/status`, {
+        method: 'PATCH',
+        headers: authHeaders,
+        body: JSON.stringify({ orderStatus: 'preparing' }),
+      });
+      assert.equal(patchRes.status, 200, `PATCH returned ${patchRes.status}`);
+      const patchData = await patchRes.json();
+      assert.equal(patchData.order.orderStatus, 'preparing');
+
+      // 2. GET /api/orders/:id/status
+      const getRes = await fetch(`${baseUrl}/api/orders/${testOrder._id}/status`, {
+        method: 'GET',
+        headers: authHeaders,
+      });
+      assert.equal(getRes.status, 200, `GET returned ${getRes.status}`);
+      const getData = await getRes.json();
+      assert.equal(getData.orderStatus, 'preparing');
+
+      // 3. PUT /api/orders/:id/status (used by OrdersPage)
+      const putRes = await fetch(`${baseUrl}/api/orders/${testOrder._id}/status`, {
+        method: 'PUT',
+        headers: authHeaders,
+        body: JSON.stringify({ orderStatus: 'ready' }),
+      });
+      assert.equal(putRes.status, 200, `PUT returned ${putRes.status}`);
+      const putData = await putRes.json();
+      assert.equal(putData.order.orderStatus, 'ready');
+
+      // 4. Advance to completed via PATCH
+      const completeRes = await fetch(`${baseUrl}/api/orders/${testOrder._id}/status`, {
+        method: 'PATCH',
+        headers: authHeaders,
+        body: JSON.stringify({ orderStatus: 'completed' }),
+      });
+      assert.equal(completeRes.status, 200);
+      const completeData = await completeRes.json();
+      assert.equal(completeData.order.orderStatus, 'completed');
     });
   } finally {
     await new Promise((resolve) => httpServer.close(resolve));

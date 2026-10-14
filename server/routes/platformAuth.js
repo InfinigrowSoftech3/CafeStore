@@ -29,8 +29,11 @@ const router = express.Router();
 const SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Only expose OTP in automated test runs (never in production or live environments)
-const canExposeOtp = (req) => process.env.NODE_ENV === 'test';
+// Dev verification code logging permitted strictly outside production when ALLOW_DEV_OTP=true
+const canLogDevCode = () =>
+  process.env.NODE_ENV !== 'production' &&
+  process.env.NODE_ENV === 'development' &&
+  process.env.ALLOW_DEV_OTP === 'true';
 
 const EMAIL_FAILED_MESSAGE =
   'We could not send the verification email right now. Please try again in a moment or contact support.';
@@ -117,9 +120,12 @@ router.post('/signup', async (req, res, next) => {
       console.error('[platformAuth] Failed to dispatch verification email:', emailErr.message);
     }
 
-    const showDemoCode = canExposeOtp(req);
+    const devAllowed = canLogDevCode();
+    if (devAllowed) {
+      console.log(`[platformAuth] Dev verification code for ${cleanEmail}: ${verificationCode}`);
+    }
 
-    if (!emailDispatched && !showDemoCode) {
+    if (!emailDispatched && !devAllowed) {
       console.error(`[platformAuth] Email to ${cleanEmail} failed: ${dispatchReason}`);
       return res.status(400).json({
         error: `Could not send verification email to ${cleanEmail}: ${dispatchReason || 'Delivery failed'}. Check email settings on Render.`,
@@ -130,7 +136,6 @@ router.post('/signup', async (req, res, next) => {
       message: 'Verification code sent to your email.',
       email: cleanEmail,
       slug: cleanSlug,
-      demoCode: showDemoCode ? verificationCode : undefined,
       emailDelivered: emailDispatched,
     });
   } catch (error) {
@@ -175,9 +180,12 @@ router.post('/resend-code', async (req, res, next) => {
       console.error('[platformAuth] Failed to resend verification email:', emailErr.message);
     }
 
-    const showDemoCode = canExposeOtp(req);
+    const devAllowed = canLogDevCode();
+    if (devAllowed) {
+      console.log(`[platformAuth] Dev verification code for ${pending.email}: ${verificationCode}`);
+    }
 
-    if (!emailDispatched && !showDemoCode) {
+    if (!emailDispatched && !devAllowed) {
       console.error(`[platformAuth] Resend email to ${pending.email} failed: ${dispatchReason}`);
       return res.status(400).json({
         error: `Could not resend verification email to ${pending.email}: ${dispatchReason || 'Delivery failed'}. Check email settings on Render.`,
@@ -187,7 +195,6 @@ router.post('/resend-code', async (req, res, next) => {
     res.status(200).json({
       message: 'A fresh verification code has been sent to your email.',
       email: pending.email,
-      demoCode: showDemoCode ? verificationCode : undefined,
       emailDelivered: emailDispatched,
     });
   } catch (error) {

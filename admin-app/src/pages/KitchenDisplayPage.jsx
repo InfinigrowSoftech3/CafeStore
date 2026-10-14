@@ -133,7 +133,7 @@ export default function KitchenDisplayPage() {
 
   const updateStatus = async (orderId, newStatus) => {
     try {
-      const { data } = await api.patch(`/orders/${orderId}/status`, { orderStatus: newStatus });
+      const { data } = await api.put(`/orders/${orderId}/status`, { orderStatus: newStatus });
       mergeOrder(data.order);
       if (audioEnabled) {
         if (newStatus === 'ready') playSound('ready');

@@ -2,9 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg: #FAF6EF;
+  --surface: #FFFFFF;
+  --ink: #1C1612;
+  --muted: #7A6F64;
+  --border: #E9E0D2;
+  --hero: #17110C;
+  --brand: #C8963E;
+  --brand-strong: #A87420;
+  --brand-soft: #F6EBD5;
+  --tenant-primary: #C8963E;
+  --tenant-accent: #17110C;
+}
+
 :focus-visible {
-  outline: 3px solid #b45309;
-  outline-offset: 3px;
+  outline: 2px solid var(--brand, #C8963E);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -36,18 +50,22 @@
   }
 
   body {
-    @apply bg-cream font-body text-espresso-900 antialiased;
+    background-color: var(--bg, #FAF6EF);
+    color: var(--ink, #1C1612);
+    @apply font-body antialiased;
     overscroll-behavior: none;
   }
 
   ::-webkit-scrollbar {
-    width: 4px;
+    width: 5px;
+    height: 5px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-foam;
+    background-color: var(--brand-soft, #F6EBD5);
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-brew-400 rounded-full;
+    background-color: var(--brand, #C8963E);
+    border-radius: 9999px;
   }
 
   .bottom-safe {
@@ -57,28 +75,42 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-espresso-900 text-cream font-body font-bold px-6 py-3 rounded-2xl
-           hover:bg-espresso-800 active:scale-[0.98] transition-all duration-200
+    background-color: var(--tenant-primary, var(--brand, #C8963E));
+    color: #1C1612;
+    @apply font-body font-bold px-6 py-3 rounded-2xl
+           hover:brightness-95 active:scale-[0.98] transition-all duration-200
            disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] inline-flex items-center justify-center gap-2 shadow-sm;
   }
 
   .btn-secondary {
-    @apply border-2 border-espresso-300 bg-white text-espresso-950 font-body font-bold px-5 py-2.5 rounded-2xl
-           hover:bg-espresso-50 hover:border-espresso-900 active:scale-[0.98] transition-all duration-200 min-h-[44px] inline-flex items-center justify-center gap-2 shadow-xs;
+    @apply border border-sand-200 bg-white text-espresso-950 font-body font-bold px-5 py-2.5 rounded-2xl
+           hover:bg-foam hover:border-brew-400 active:scale-[0.98] transition-all duration-200 min-h-[44px] inline-flex items-center justify-center gap-2 shadow-xs;
   }
 
   .btn-accent {
-    @apply bg-brew-500 text-white font-body font-bold px-6 py-3 rounded-2xl
-           hover:bg-brew-600 active:scale-[0.98] transition-all duration-200
+    background-color: var(--tenant-primary, var(--brand, #C8963E));
+    color: #1C1612;
+    @apply font-body font-bold px-6 py-3 rounded-2xl
+           hover:brightness-95 active:scale-[0.98] transition-all duration-200
            disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] inline-flex items-center justify-center gap-2 shadow-md;
   }
 
   .card {
-    @apply bg-white rounded-2xl shadow-[0_2px_12px_-2px_rgba(26,15,8,0.06),0_1px_3px_rgba(26,15,8,0.04)] border border-foam/90 overflow-hidden transition-all duration-200;
+    background-color: #FFFFFF;
+    border-radius: 1.125rem;
+    box-shadow: 0 4px 20px -2px rgba(28, 22, 18, 0.05), 0 1px 4px rgba(28, 22, 18, 0.03);
+    border: 1px solid var(--border, #E9E0D2);
+    overflow: hidden;
+    transition: all 200ms ease-out;
   }
 
   .card-interactive {
-    @apply card hover:shadow-[0_8px_24px_-4px_rgba(26,15,8,0.09),0_2px_6px_rgba(26,15,8,0.05)] hover:border-espresso-200/80;
+    @apply card;
+    transition: all 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .card-interactive:hover {
+    box-shadow: 0 14px 30px -4px rgba(28, 22, 18, 0.09), 0 3px 8px rgba(28, 22, 18, 0.04);
+    border-color: var(--brand, #C8963E);
   }
 
   .glass {
@@ -86,13 +118,37 @@
   }
 
   .glass-dark {
-    @apply bg-espresso-950/85 backdrop-blur-md border border-white/10 text-cream shadow-xl;
+    background-color: rgba(23, 17, 12, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #FAF6EF;
+    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.4);
   }
 
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl border border-espresso-200/70 bg-white
-           focus:outline-none focus:ring-2 focus:ring-brew-400/50 focus:border-brew-500
-           placeholder:text-espresso-400 text-espresso-900 text-base sm:text-sm transition-all min-h-[44px];
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.875rem;
+    border: 1px solid var(--border, #E9E0D2);
+    background-color: #FFFFFF;
+    color: var(--ink, #1C1612);
+    min-height: 44px;
+    font-size: 16px;
+    transition: all 180ms ease;
+  }
+  .input-field:focus {
+    outline: none;
+    border-color: var(--brand, #C8963E);
+    box-shadow: 0 0 0 3px rgba(200, 150, 62, 0.2);
+  }
+  .input-field::placeholder {
+    color: var(--muted, #7A6F64);
+  }
+  @media (min-width: 640px) {
+    .input-field {
+      font-size: 0.875rem;
+    }
   }
 }
 
@@ -114,7 +170,7 @@ canvas {
 
 .about-page,
 .contact-page {
-  background: linear-gradient(180deg, #faf6f0 0%, #f7f0e7 52%, #faf6f0 100%);
+  background: linear-gradient(180deg, #FAF6EF 0%, #F6EBD5 52%, #FAF6EF 100%);
 }
 
 .about-hero::after,
@@ -240,14 +296,14 @@ canvas {
   }
 }
 
-/* Skeleton shimmer */
+/* Skeleton shimmer in warm tones */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #f0e8d8 25%, #faf6f0 50%, #f0e8d8 75%);
+  background: linear-gradient(90deg, #F6EBD5 25%, #FAF6EF 50%, #F6EBD5 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -259,52 +315,117 @@ canvas {
 
 /* Quantity controls */
 .qty-btn {
-  @apply w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl border border-espresso-300 bg-white flex items-center justify-center
-         text-espresso-900 hover:bg-espresso-900 hover:text-cream hover:border-espresso-900
+  @apply w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl border border-sand-200 bg-white flex items-center justify-center
+         text-espresso-900 hover:bg-espresso-950 hover:text-cream hover:border-espresso-950
          transition-all duration-150 text-sm font-bold active:scale-90 focus:outline-none focus:ring-2 focus:ring-brew-500
          disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none;
 }
 
-/* ─── Unified price / number style ─────────────────────────────────────────
-   Use .price-tag on explicit price spans.
-   .num is a lightweight helper for inline numbers anywhere.
-   The global rule targets every ₹ character so even un-classed spots are
-   rendered consistently.
-────────────────────────────────────────────────────────────────────────── */
+/* ─── Unified price / number style in gold ─────────────────────────────────── */
 .price-tag,
 .num {
   font-family: 'JetBrains Mono', monospace;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  @apply leading-none text-espresso-900;
+  color: var(--brand, #C8963E);
+  line-height: 1;
 }
 
 /* Status badges */
-.status-pending    { @apply bg-yellow-100 text-yellow-800 border border-yellow-200; }
-.status-confirmed  { @apply bg-blue-100 text-blue-800 border border-blue-200; }
-.status-preparing  { @apply bg-orange-100 text-orange-800 border border-orange-200; }
-.status-ready      { @apply bg-green-100 text-green-800 border border-green-200; }
-.status-completed  { @apply bg-gray-100 text-gray-600 border border-gray-200; }
-.status-cancelled  { @apply bg-red-100 text-red-700 border border-red-200; }
+.status-pending    { @apply bg-amber-100 text-amber-900 border border-amber-200; }
+.status-confirmed  { @apply bg-emerald-100 text-emerald-900 border border-emerald-200; }
+.status-preparing  { @apply bg-orange-100 text-orange-900 border border-orange-200; }
+.status-ready      { @apply bg-emerald-100 text-emerald-900 border border-emerald-200; }
+.status-completed  { @apply bg-sand-200 text-espresso-700 border border-sand-300; }
+.status-cancelled  { @apply bg-rose-100 text-rose-800 border border-rose-200; }
 
-/* Tenant-configurable brand accents with guaranteed high contrast */
+/* Dynamic tenant-configurable brand accents & typography */
+.font-display {
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif !important;
+}
+
+.font-body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
 .btn-primary {
-  background-color: var(--tenant-accent, #1a0f08) !important;
-  color: #FAF6F0 !important;
+  background-color: var(--tenant-primary, var(--brand, #C8963E)) !important;
+  color: #1C1612 !important;
 }
 .btn-primary:hover {
-  background-color: color-mix(in srgb, var(--tenant-accent, #1a0f08) 82%, white) !important;
-  color: #FAF6F0 !important;
+  filter: brightness(0.94);
+  color: #1C1612 !important;
 }
-.btn-accent, .bg-brew-500 {
-  background-color: var(--tenant-primary, #c96b18) !important;
-  color: #FFFFFF !important;
+.btn-accent, .bg-brew-500, .bg-brand {
+  background-color: var(--tenant-primary, var(--brand, #C8963E)) !important;
+  color: #1C1612 !important;
 }
-.text-brew-500, .text-brew-600 {
-  color: var(--tenant-primary, #c96b18) !important;
+.text-brew-500, .text-brand {
+  color: var(--tenant-primary, var(--brand, #C8963E)) !important;
 }
-.bg-brew-600 {
-  background-color: var(--tenant-primary, #c96b18) !important;
-  color: #FFFFFF !important;
+.text-brew-600, .text-brand-strong {
+  color: var(--brand-strong, #A87420) !important;
+}
+.text-brew-700 {
+  color: #885B17 !important;
+}
+.text-brew-400 {
+  color: #D6AB5E !important;
+}
+.bg-brew-600, .bg-brand-strong {
+  background-color: var(--brand-strong, #A87420) !important;
+  color: #1C1612 !important;
+}
+.bg-brew-400 {
+  background-color: #D6AB5E !important;
+}
+.bg-brew-100, .bg-brand-soft {
+  background-color: var(--brand-soft, #F6EBD5) !important;
+}
+.bg-brew-50 {
+  background-color: #FDF9F2 !important;
+}
+.border-brew-500, .border-brand {
+  border-color: var(--brand, #C8963E) !important;
+}
+.border-brew-400 {
+  border-color: #D6AB5E !important;
+}
+.border-brew-300 {
+  border-color: #E3C182 !important;
+}
+.border-brew-200 {
+  border-color: #EDD7AC !important;
+}
+
+/* Gradient stops override for brew/brand */
+.from-brew-500 {
+  --tw-gradient-from: var(--brand, #C8963E) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(200 150 62 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+.via-brew-400 {
+  --tw-gradient-to: rgb(214 171 94 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #D6AB5E var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+.to-brew-500 {
+  --tw-gradient-to: var(--brand, #C8963E) var(--tw-gradient-to-position) !important;
+}
+.to-brew-600 {
+  --tw-gradient-to: var(--brand-strong, #A87420) var(--tw-gradient-to-position) !important;
+}
+
+.badge-popular {
+  background: linear-gradient(135deg, var(--brand, #C8963E) 0%, var(--brand-strong, #A87420) 100%) !important;
+  color: #1C1612 !important;
+  border: 1px solid rgba(233, 224, 210, 0.4) !important;
+  box-shadow: 0 2px 8px rgba(200, 150, 62, 0.25) !important;
+}
+
+.btn-hero-cta {
+  background: linear-gradient(135deg, var(--brand, #C8963E) 0%, var(--brand-strong, #A87420) 100%) !important;
+  color: #1C1612 !important;
+  border: 1px solid rgba(246, 235, 213, 0.5) !important;
+  box-shadow: 0 4px 20px rgba(200, 150, 62, 0.35) !important;
 }

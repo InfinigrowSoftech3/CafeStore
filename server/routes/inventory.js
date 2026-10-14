@@ -11,6 +11,8 @@ import {
   getInventoryStats,
   syncProductAvailability,
 } from '../services/inventoryService.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
+import { withMongoTransaction } from '../utils/mongoTransaction.js';
 
 const router = express.Router();
 
@@ -98,8 +100,12 @@ router.get('/dashboard', async (req, res) => {
 
 router.get('/categories', async (req, res) => {
   try {
-    let categories = await InventoryCategory.find().sort({ sortOrder: 1, name: 1 }).lean();
-    if (categories.length === 0) {
+    const { page, limit, skip } = parsePagination(req);
+    let [categories, total] = await Promise.all([
+      InventoryCategory.find().sort({ sortOrder: 1, name: 1, _id: 1 }).skip(skip).limit(limit).lean(),
+      InventoryCategory.countDocuments(),
+    ]);
+    if (total === 0) {
       const defaults = [
         { name: 'Beverage', icon: '🥤', sortOrder: 1 },
         { name: 'Disposable', icon: '📦', sortOrder: 2 },
@@ -111,9 +117,15 @@ router.get('/categories', async (req, res) => {
       try {
         await InventoryCategory.insertMany(defaults, { ordered: false });
       } catch (_) { /* Another request may have inserted the same default categories. */ }
-      categories = await InventoryCategory.find().sort({ sortOrder: 1, name: 1 }).lean();
+      [categories, total] = await Promise.all([
+        InventoryCategory.find().sort({ sortOrder: 1, name: 1, _id: 1 }).skip(skip).limit(limit).lean(),
+        InventoryCategory.countDocuments(),
+      ]);
     }
-    return res.json({ categories });
+    return res.json({
+      categories,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -155,7 +167,8 @@ router.put('/categories/:id', ownerOrManager, async (req, res) => {
  */
 router.get('/items', async (req, res) => {
   try {
-    const { category, status, search, page = 1, limit = 100 } = req.query;
+    const { page, limit, skip } = parsePagination(req);
+    const { category, status, search } = req.query;
     const query = { active: true };
 
     if (category && mongoose.isValidObjectId(category)) query.category = category;
@@ -179,18 +192,23 @@ router.get('/items', async (req, res) => {
       query.$text = { $search: search };
     }
 
-    const skip = (Number(page) - 1) * Number(limit);
     const [items, total] = await Promise.all([
       InventoryItem.find(query)
         .populate('category', 'name icon')
-        .sort({ currentQuantity: 1, name: 1 })
+        .sort({ currentQuantity: 1, name: 1, _id: 1 })
         .skip(skip)
-        .limit(Number(limit))
+        .limit(limit)
         .lean({ virtuals: true }),
       InventoryItem.countDocuments(query),
     ]);
 
-    return res.json({ items, total, page: Number(page), limit: Number(limit) });
+    return res.json({
+      items,
+      total,
+      page,
+      limit,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -359,33 +377,59 @@ router.post('/stock/add', async (req, res) => {
     const qty = Number(quantity);
     if (!qty || qty <= 0) return res.status(400).json({ error: 'Quantity must be positive.' });
 
-    const item = await InventoryItem.findOneAndUpdate(
-      { _id: itemId, active: true },
-      { $inc: { currentQuantity: qty } },
-      { new: true }
-    ).lean({ virtuals: true });
-    if (!item) return res.status(404).json({ error: 'Inventory item not found.' });
+    let item;
+    let txn;
+    const addWork = async (session) => {
+      item = await InventoryItem.findOneAndUpdate(
+        { _id: itemId, active: true },
+        { $inc: { currentQuantity: qty } },
+        { new: true, ...(session ? { session } : {}) }
+      ).lean({ virtuals: true });
+      if (!item) {
+        const err = new Error('Inventory item not found.');
+        err.status = 404;
+        throw err;
+      }
 
-    const balanceBefore = Number((item.currentQuantity - qty).toFixed(6));
+      const balanceBefore = Number((item.currentQuantity - qty).toFixed(6));
 
-    if (costPerUnit != null && !isNaN(Number(costPerUnit))) {
-      await InventoryItem.findByIdAndUpdate(itemId, { costPerUnit: Number(costPerUnit) });
-    }
-    if (supplier?.trim()) {
-      await InventoryItem.findByIdAndUpdate(itemId, { supplier: supplier.trim() });
-    }
+      if (costPerUnit != null && !isNaN(Number(costPerUnit))) {
+        await InventoryItem.findByIdAndUpdate(
+          itemId,
+          { costPerUnit: Number(costPerUnit) },
+          session ? { session } : undefined
+        );
+      }
+      if (supplier?.trim()) {
+        await InventoryItem.findByIdAndUpdate(
+          itemId,
+          { supplier: supplier.trim() },
+          session ? { session } : undefined
+        );
+      }
 
-    const txn = await InventoryTransaction.create({
-      inventoryItem: itemId,
-      type: 'stock_added',
-      quantity: qty,
-      balanceBefore,
-      balanceAfter: item.currentQuantity,
-      reference: 'Stock Added',
-      reason: reason?.trim() || 'Manual stock addition',
-      notes: notes?.trim() || '',
-      performedBy: req.user._id,
-    });
+      const txnData = {
+        tenantId: req.tenantId,
+        inventoryItem: itemId,
+        type: 'stock_added',
+        quantity: qty,
+        balanceBefore,
+        balanceAfter: item.currentQuantity,
+        reference: 'Stock Added',
+        reason: reason?.trim() || 'Manual stock addition',
+        notes: notes?.trim() || '',
+        performedBy: req.user._id,
+      };
+
+      if (session) {
+        const created = await InventoryTransaction.create([txnData], { session });
+        txn = created[0];
+      } else {
+        txn = await InventoryTransaction.create(txnData);
+      }
+    };
+
+    await withMongoTransaction(addWork, () => addWork(undefined));
 
     // Recheck product availability (automatically marks product available again)
     const mappings = await MenuInventoryMapping.find({ inventoryItem: itemId }).distinct('product');
@@ -393,7 +437,7 @@ router.post('/stock/add', async (req, res) => {
 
     return res.json({ item, transaction: txn });
   } catch (error) {
-    return res.status(400).json({ error: error.message });
+    return res.status(error.status || 400).json({ error: error.message });
   }
 });
 
@@ -409,39 +453,61 @@ router.post('/stock/remove', async (req, res) => {
     if (!qty || qty <= 0) return res.status(400).json({ error: 'Quantity must be a positive number.' });
     if (!reason?.trim()) return res.status(400).json({ error: 'Reason is required (e.g. Damaged, Lost, Expired, Manual correction).' });
 
-    const currentItem = await InventoryItem.findById(itemId);
-    if (!currentItem || !currentItem.active) return res.status(404).json({ error: 'Inventory item not found.' });
+    let updated;
+    let txn;
+    const removeWork = async (session) => {
+      const query = InventoryItem.findById(itemId);
+      if (session) query.session(session);
+      const currentItem = await query;
+      if (!currentItem || !currentItem.active) {
+        const err = new Error('Inventory item not found.');
+        err.status = 404;
+        throw err;
+      }
 
-    const balanceBefore = currentItem.currentQuantity;
-    if (balanceBefore < qty) {
-      return res.status(400).json({ error: `Cannot remove ${qty}. Current stock is only ${balanceBefore}.` });
-    }
+      const balanceBefore = currentItem.currentQuantity;
+      if (balanceBefore < qty) {
+        const err = new Error(`Cannot remove ${qty}. Current stock is only ${balanceBefore}.`);
+        err.status = 400;
+        throw err;
+      }
 
-    const newQty = Math.max(0, balanceBefore - qty);
-    const updated = await InventoryItem.findByIdAndUpdate(
-      itemId,
-      { currentQuantity: newQty },
-      { new: true }
-    ).populate('category', 'name icon').lean({ virtuals: true });
+      const newQty = Math.max(0, balanceBefore - qty);
+      updated = await InventoryItem.findByIdAndUpdate(
+        itemId,
+        { currentQuantity: newQty },
+        { new: true, ...(session ? { session } : {}) }
+      ).populate('category', 'name icon').lean({ virtuals: true });
 
-    const cleanReason = reason.trim().toLowerCase();
-    let txnType = 'manual_removal';
-    if (cleanReason.includes('damage')) txnType = 'damaged';
-    else if (cleanReason.includes('lost')) txnType = 'lost';
-    else if (cleanReason.includes('expire')) txnType = 'expired';
-    else if (cleanReason.includes('waste')) txnType = 'waste';
+      const cleanReason = reason.trim().toLowerCase();
+      let txnType = 'manual_removal';
+      if (cleanReason.includes('damage')) txnType = 'damaged';
+      else if (cleanReason.includes('lost')) txnType = 'lost';
+      else if (cleanReason.includes('expire')) txnType = 'expired';
+      else if (cleanReason.includes('waste')) txnType = 'waste';
 
-    const txn = await InventoryTransaction.create({
-      inventoryItem: itemId,
-      type: txnType,
-      quantity: -qty,
-      balanceBefore,
-      balanceAfter: newQty,
-      reference: 'Manual Removal',
-      reason: reason.trim(),
-      notes: notes?.trim() || '',
-      performedBy: req.user._id,
-    });
+      const txnData = {
+        tenantId: req.tenantId,
+        inventoryItem: itemId,
+        type: txnType,
+        quantity: -qty,
+        balanceBefore,
+        balanceAfter: newQty,
+        reference: 'Manual Removal',
+        reason: reason.trim(),
+        notes: notes?.trim() || '',
+        performedBy: req.user._id,
+      };
+
+      if (session) {
+        const created = await InventoryTransaction.create([txnData], { session });
+        txn = created[0];
+      } else {
+        txn = await InventoryTransaction.create(txnData);
+      }
+    };
+
+    await withMongoTransaction(removeWork, () => removeWork(undefined));
 
     // Recheck product availability (if stock hit 0, product becomes out of stock automatically)
     const mappings = await MenuInventoryMapping.find({ inventoryItem: itemId }).distinct('product');
@@ -449,7 +515,7 @@ router.post('/stock/remove', async (req, res) => {
 
     return res.json({ item: updated, transaction: txn });
   } catch (error) {
-    return res.status(400).json({ error: error.message });
+    return res.status(error.status || 400).json({ error: error.message });
   }
 });
 
@@ -541,12 +607,21 @@ router.post('/stock/waste', async (req, res) => {
  */
 router.get('/mappings', async (req, res) => {
   try {
-    const mappings = await MenuInventoryMapping.find()
-      .populate('product', 'name image')
-      .populate('inventoryItem', 'name unit currentQuantity')
-      .sort({ createdAt: -1 })
-      .lean();
-    return res.json({ mappings });
+    const { page, limit, skip } = parsePagination(req);
+    const [mappings, total] = await Promise.all([
+      MenuInventoryMapping.find()
+        .populate('product', 'name image')
+        .populate('inventoryItem', 'name unit currentQuantity')
+        .sort({ createdAt: -1, _id: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      MenuInventoryMapping.countDocuments(),
+    ]);
+    return res.json({
+      mappings,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -652,7 +727,8 @@ router.delete('/mappings/:id', ownerOrManager, async (req, res) => {
  */
 router.get('/transactions', async (req, res) => {
   try {
-    const { itemId, type, page = 1, limit = 50, from, to } = req.query;
+    const { page, limit, skip } = parsePagination(req);
+    const { itemId, type, from, to } = req.query;
     const query = {};
 
     if (itemId && mongoose.isValidObjectId(itemId)) query.inventoryItem = itemId;
@@ -663,19 +739,24 @@ router.get('/transactions', async (req, res) => {
       if (to) { const end = new Date(to); end.setHours(23, 59, 59, 999); query.createdAt.$lte = end; }
     }
 
-    const skip = (Number(page) - 1) * Number(limit);
     const [transactions, total] = await Promise.all([
       InventoryTransaction.find(query)
         .populate('inventoryItem', 'name unit')
         .populate('performedBy', 'name')
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1, _id: -1 })
         .skip(skip)
-        .limit(Number(limit))
+        .limit(limit)
         .lean(),
       InventoryTransaction.countDocuments(query),
     ]);
 
-    return res.json({ transactions, total, page: Number(page), limit: Number(limit) });
+    return res.json({
+      transactions,
+      total,
+      page,
+      limit,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

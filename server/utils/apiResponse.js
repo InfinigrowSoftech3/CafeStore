@@ -8,6 +8,7 @@ export const sendApiSuccess = (res, statusCode, data) => {
 export const sendApiError = (res, statusCode, code, message, details = null) => {
   const payload = {
     success: false,
+    code,
     error: {
       code,
       message,

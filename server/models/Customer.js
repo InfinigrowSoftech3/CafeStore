@@ -88,10 +88,17 @@ const customerSchema = new mongoose.Schema({
   otpVerified: { type: Boolean, default: false },
 }, { timestamps: true });
 
-customerSchema.index({ createdAt: -1 });
-customerSchema.index({ marketingConsent: 1, status: 1 });
 customerSchema.index({ tenantId: 1, phone: 1 }, { unique: true });
 customerSchema.index({ tenantId: 1, loyaltyPoints: -1 });
+customerSchema.index({ tenantId: 1, status: 1, createdAt: -1 });
+customerSchema.index({ tenantId: 1, marketingConsent: 1, status: 1 });
+customerSchema.index({ tenantId: 1, notificationPermission: 1, status: 1 });
+customerSchema.index({ tenantId: 1, createdAt: -1 });
+customerSchema.index({ tenantId: 1, totalSpent: -1 });
+customerSchema.index({ tenantId: 1, totalOrders: -1 });
+customerSchema.index({ tenantId: 1, lastOrderAt: -1 });
+customerSchema.index({ createdAt: -1 });
+customerSchema.index({ marketingConsent: 1, status: 1 });
 
 customerSchema.plugin(tenantIsolationPlugin);
 export default mongoose.model('Customer', customerSchema);

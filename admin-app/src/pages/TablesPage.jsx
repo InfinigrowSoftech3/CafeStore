@@ -101,7 +101,7 @@ export default function TablesPage() {
   const fetchFloorPlan = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/tables/floor-plan');
+      const { data } = await api.get('/tables/floor-plan?limit=100');
       setTables(data.tables || []);
       if (data.floors && data.floors.length > 0) {
         setFloors(data.floors);

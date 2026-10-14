@@ -120,9 +120,9 @@ export default function InventoryDashboardPage() {
       const [dashRes, itemsRes, catRes, mapRes, prodRes, txnRes] = await Promise.all([
         api.get('/inventory/dashboard').catch(() => ({ data: {} })),
         api.get('/inventory/items?limit=200'),
-        api.get('/inventory/categories'),
-        api.get('/inventory/mappings'),
-        api.get('/menu'),
+        api.get('/inventory/categories?limit=100'),
+        api.get('/inventory/mappings?limit=100'),
+        api.get('/menu?limit=100'),
         api.get('/inventory/transactions?limit=100'),
       ]);
 

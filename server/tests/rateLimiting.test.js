@@ -8,6 +8,7 @@ dotenv.config();
 
 // Configure test environment variables
 process.env.NODE_ENV = 'test';
+process.env.MONGO_URI = process.env.MONGO_TEST_URI || `mongodb://127.0.0.1:27017/cafe_rate_limiting_${process.pid}`;
 process.env.ENABLE_RATE_LIMITING = 'true';
 process.env.RATE_LIMIT_WINDOW_MS = '60000'; // 1 minute window
 process.env.AUTH_RATE_LIMIT_MAX = '5';       // 5 attempts allowed
@@ -15,8 +16,8 @@ process.env.PUBLIC_RATE_LIMIT_MAX = '50';
 process.env.RATE_LIMIT_MAX = '50';
 process.env.TRUST_PROXY_HOPS = '1';
 
-import { setRedisClient, getRedisClient } from '../config/redis.js';
-import { createApp } from '../index.js';
+const { setRedisClient, getRedisClient } = await import('../config/redis.js');
+const { createApp } = await import('../index.js');
 
 test('PRODUCTION HARDENING & RATE LIMITING VERIFICATION TEST SUITE', async (t) => {
   if (mongoose.connection.readyState !== 1) {
@@ -46,6 +47,7 @@ test('PRODUCTION HARDENING & RATE LIMITING VERIFICATION TEST SUITE', async (t) =
   t.after(async () => {
     if (server1) server1.close();
     setRedisClient(null);
+    await mongoose.disconnect();
   });
 
   const request = async (baseUrl, path, options = {}) => {
@@ -230,4 +232,9 @@ test('PRODUCTION HARDENING & RATE LIMITING VERIFICATION TEST SUITE', async (t) =
     assert.ok(cc.includes('no-store'), 'Sensitive route must include no-store');
     assert.ok(cc.includes('private'), 'Sensitive route must include private');
   });
+
+  if (mongoose.connection.readyState === 1) {
+    await mongoose.connection.dropDatabase();
+    await mongoose.disconnect();
+  }
 });

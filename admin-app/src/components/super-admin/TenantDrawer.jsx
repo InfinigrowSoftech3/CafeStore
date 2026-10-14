@@ -79,7 +79,7 @@ export default function TenantDrawer({
             <div className="p-6 border-b border-[var(--border-primary)] bg-[var(--hover-bg)]/80">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-300 font-bold text-base shadow-inner">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1E3FAE]/15 to-[#D4AF37]/20 border border-[#E6CF7A]/60 text-[#0B1B4D] dark:text-[#D4AF37] font-bold text-base shadow-inner">
                     {tenant.settings?.logoUrl ? (
                       <img src={tenant.settings.logoUrl} alt="" className="h-full w-full rounded-2xl object-cover" />
                     ) : (
@@ -107,13 +107,13 @@ export default function TenantDrawer({
                         href={`http://${tenant.slug}.localhost:5173`}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-mono text-xs text-amber-600 dark:text-amber-400 hover:underline inline-flex items-center gap-1"
+                        className="font-mono text-xs text-[#1E3FAE] dark:text-[#688bf7] hover:underline inline-flex items-center gap-1 font-semibold"
                       >
                         {tenant.slug}.localhost:5173 <ExternalLink size={10} />
                       </a>
                       <button
                         onClick={handleCopyLink}
-                        className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition"
+                        className="text-[var(--text-muted)] hover:text-[#1E3FAE] dark:hover:text-[#688bf7] transition"
                         title="Copy link"
                       >
                         {copied ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
@@ -134,21 +134,21 @@ export default function TenantDrawer({
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-5">
                 <button
                   onClick={() => onOpenPanel && onOpenPanel(tenant)}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-[var(--brand-primary-subtle)] py-2 px-2.5 text-xs font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition"
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[#1E3FAE]/30 bg-[#1E3FAE]/10 py-2 px-2.5 text-xs font-semibold text-[#1E3FAE] dark:text-[#688bf7] hover:bg-[#1E3FAE]/20 transition"
                 >
                   <Eye size={12} /> User Panel
                 </button>
 
                 <button
                   onClick={() => onImpersonate && onImpersonate(tenant)}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] py-2 px-2.5 text-xs font-semibold text-[var(--text-secondary)] hover:border-amber-500/50 hover:text-amber-600 dark:hover:text-amber-300 transition"
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] py-2 px-2.5 text-xs font-semibold text-[var(--text-secondary)] hover:border-[#1E3FAE]/50 hover:text-[#1E3FAE] dark:hover:text-[#688bf7] transition"
                 >
                   <ArrowUpRight size={12} /> Impersonate
                 </button>
 
                 <button
                   onClick={() => onChangePlan && onChangePlan(tenant)}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] py-2 px-2.5 text-xs font-semibold text-[var(--text-secondary)] hover:border-amber-500/50 hover:text-amber-600 dark:hover:text-amber-300 transition"
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] py-2 px-2.5 text-xs font-semibold text-[var(--text-secondary)] hover:border-[#1E3FAE]/50 hover:text-[#1E3FAE] dark:hover:text-[#688bf7] transition"
                 >
                   <Layers size={12} /> Plan ({tenant.plan})
                 </button>
@@ -178,7 +178,7 @@ export default function TenantDrawer({
                     onClick={() => setActiveTab(tab.id)}
                     className={`pb-3 text-xs font-semibold tracking-wide transition border-b-2 -mb-px ${
                       activeTab === tab.id
-                        ? 'border-amber-500 text-amber-600 dark:text-amber-400 font-bold'
+                        ? 'border-[#D4AF37] text-[#1E3FAE] dark:text-[#D4AF37] font-bold'
                         : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}
                   >
@@ -327,7 +327,7 @@ export default function TenantDrawer({
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-black text-amber-600 dark:text-amber-400 tabular-nums">{ord.total}</div>
+                        <div className="font-black text-[#1E3FAE] dark:text-[#D4AF37] tabular-nums">{ord.total}</div>
                         <div className="text-[10px] text-[var(--text-muted)]">Paid online</div>
                       </div>
                     </div>
@@ -349,7 +349,7 @@ export default function TenantDrawer({
                         className="p-3.5 rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] text-xs space-y-1"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-amber-600 dark:text-amber-400">{log.action}</span>
+                          <span className="font-bold text-[#1E3FAE] dark:text-[#688bf7]">{log.action}</span>
                           <span className="text-[10px] text-[var(--text-muted)]">
                             {new Date(log.createdAt).toLocaleString()}
                           </span>

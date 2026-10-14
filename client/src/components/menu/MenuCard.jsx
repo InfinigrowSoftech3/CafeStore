@@ -96,17 +96,17 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={isAvailable ? { y: -4 } : {}}
+      whileHover={isAvailable ? { y: -3 } : {}}
       transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
       onClick={isAvailable ? onSelect : undefined}
-      className={`card group flex flex-col justify-between transition-all duration-300 ${
+      className={`group flex flex-col justify-between rounded-[18px] bg-white border border-[#E9E0D2] overflow-hidden transition-all duration-300 ${
         isAvailable
-          ? 'cursor-pointer hover:shadow-[0_12px_28px_-4px_rgba(26,15,8,0.12),0_4px_8px_rgba(26,15,8,0.04)] hover:border-espresso-300 active:scale-[0.985]'
-          : 'cursor-default opacity-85'
+          ? 'cursor-pointer shadow-[0_4px_20px_-2px_rgba(28,22,18,0.06),0_1px_4px_rgba(28,22,18,0.03)] hover:shadow-[0_12px_28px_-4px_rgba(28,22,18,0.11),0_2px_8px_rgba(28,22,18,0.04)] hover:border-brew-400/80 active:scale-[0.985]'
+          : 'cursor-default opacity-85 shadow-2xs'
       }`}
     >
       {/* Top Image Section */}
-      <div className="relative aspect-square w-full overflow-hidden bg-foam/90">
+      <div className="relative aspect-square w-full overflow-hidden bg-sand-100">
         {!imgLoaded && (
           <div className="absolute inset-0 skeleton" />
         )}
@@ -127,12 +127,12 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
             setImgLoaded(true);
           }}
           className={`h-full w-full object-cover transition-transform duration-500 will-change-transform ${
-            isAvailable ? 'group-hover:scale-106' : 'grayscale opacity-50'
+            isAvailable ? 'md:group-hover:scale-[1.03]' : 'grayscale opacity-50'
           } ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
         />
 
         {/* Ambient Dark Gradient on bottom of image for legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
 
         {/* Top Badges (Veg/Non-Veg & Popular) */}
         <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1 pointer-events-none">
@@ -147,17 +147,17 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
             </span>
           ) : (
             <span
-              className="inline-flex items-center justify-center w-4 h-4 rounded-[4px] border-[1.5px] border-amber-800 bg-white/95 p-[2px] shadow-xs"
+              className="inline-flex items-center justify-center w-4 h-4 rounded-[4px] border-[1.5px] border-rose-600 bg-white/95 p-[2px] shadow-xs"
               title="Non-Vegetarian"
               aria-label="Non-Vegetarian"
             >
-              <span className="w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-b-[7px] border-b-amber-800" />
+              <span className="w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-b-[7px] border-b-rose-600" />
             </span>
           )}
 
-          {/* Popular / Hot Badge */}
+          {/* Refined Gold POPULAR Ribbon */}
           {product.popular && isAvailable && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-brew-500/95 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
+            <span className="badge-popular inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold text-espresso-950">
               <Star size={9} fill="currentColor" />
               <span>POPULAR</span>
             </span>
@@ -182,8 +182,8 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
             </span>
           )}
           {product.prepTime && (
-            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-black/60 backdrop-blur-md px-1.5 py-0.5 text-[10px] font-medium text-cream/90">
-              <Clock size={10} />
+            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-black/60 backdrop-blur-md px-2 py-0.5 text-[10px] font-medium text-[#FAF6EF]">
+              <Clock size={10} className="text-brew-400" />
               <span>{product.prepTime}m</span>
             </span>
           )}
@@ -214,10 +214,10 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
         </div>
 
         {/* Price & Action Row */}
-        <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-foam/70">
+        <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-[#E9E0D2]/70">
           <div className="flex flex-col">
             <div className="flex items-baseline gap-1.5">
-              <span className="price-tag text-base sm:text-lg font-bold text-espresso-950">
+              <span className="price-tag text-base sm:text-lg font-bold text-brew-500">
                 {formatMoney(product.price, tenant.currency)}
               </span>
               {product.originalPrice && product.originalPrice > product.price && (
@@ -228,7 +228,7 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
             </div>
           </div>
 
-          {/* Interactive Add / Stepper Control */}
+          {/* Interactive Add / Circular + Stepper Control */}
           <div className="flex items-center">
             {!isAvailable ? (
               <span className="text-[11px] font-semibold text-espresso-400 uppercase tracking-wider px-2 py-1">
@@ -238,24 +238,24 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
               /* Inline Quantity Stepper for Simple Products */
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex min-h-[36px] items-center rounded-xl bg-espresso-900 text-cream p-0.5 shadow-sm"
+                className="inline-flex min-h-[36px] items-center rounded-full bg-espresso-950 text-cream p-0.5 shadow-sm border border-brew-500/30"
               >
                 <button
                   type="button"
                   onClick={handleDecrement}
                   aria-label={`Decrease quantity of ${product.name}`}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-espresso-800 transition active:scale-90"
+                  className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-espresso-800 text-brew-300 hover:text-white transition active:scale-90"
                 >
                   <Minus size={13} strokeWidth={2.5} />
                 </button>
-                <span className="w-6 text-center text-xs font-bold font-mono">
+                <span className="w-6 text-center text-xs font-bold font-mono text-white">
                   {totalQtyInCart}
                 </span>
                 <button
                   type="button"
                   onClick={handleIncrement}
                   aria-label={`Increase quantity of ${product.name}`}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-espresso-800 transition active:scale-90"
+                  className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-espresso-800 text-brew-300 hover:text-white transition active:scale-90"
                 >
                   <Plus size={13} strokeWidth={2.5} />
                 </button>
@@ -270,22 +270,21 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
                   onSelect();
                 }}
                 aria-label={`Item in cart, tap to customize ${product.name}`}
-                className="min-h-[36px] inline-flex items-center gap-1.5 rounded-xl bg-brew-600 text-white px-3 py-1.5 text-xs font-bold shadow-xs transition hover:bg-brew-700 focus:outline-none focus:ring-2 focus:ring-brew-400"
+                className="min-h-[36px] inline-flex items-center gap-1.5 rounded-full bg-espresso-950 text-cream px-3 py-1.5 text-xs font-bold shadow-xs border border-brew-500/30 transition hover:bg-espresso-900 focus:outline-none focus:ring-2 focus:ring-brew-400"
               >
-                <span>{totalQtyInCart} in Cart</span>
-                <Plus size={12} strokeWidth={3} />
+                <span className="text-brew-400">{totalQtyInCart} in Cart</span>
+                <Plus size={12} strokeWidth={3} className="text-brew-400" />
               </motion.button>
             ) : (
-              /* Prominent, high-contrast Add Button */
+              /* Circular + Add Button */
               <motion.button
                 type="button"
-                whileTap={{ scale: 0.92 }}
+                whileTap={{ scale: 0.90 }}
                 onClick={handleQuickAdd}
                 aria-label={`Add ${product.name} to cart`}
-                className="min-h-[36px] inline-flex items-center gap-1 rounded-xl bg-espresso-900 text-cream px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all hover:bg-espresso-800 active:scale-95 shadow-xs focus:outline-none focus:ring-2 focus:ring-brew-500"
+                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full flex items-center justify-center bg-brew-500 text-espresso-950 shadow-sm hover:bg-brew-400 active:scale-90 transition-all focus:outline-none focus:ring-2 focus:ring-brew-400"
               >
-                <span>ADD</span>
-                <Plus size={13} strokeWidth={2.6} />
+                <Plus size={18} strokeWidth={2.8} />
               </motion.button>
             )}
           </div>

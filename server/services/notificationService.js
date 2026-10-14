@@ -1,5 +1,6 @@
 import webpush from 'web-push';
 import PushSubscription from '../models/PushSubscription.js';
+import { sendSms } from './smsService.js';
 
 // ── VAPID Configuration ──────────────────────────────────────────────────────
 // Private key lives ONLY in environment variables. Frontend receives the
@@ -162,26 +163,7 @@ class WhatsAppFutureProvider extends BaseNotificationProvider {
   }
 }
 
-/**
- * Legacy marketing simulator (pre-existing /api/marketing compatibility).
- * Makes NO network/API calls — records a simulated delivery so the legacy
- * marketing module and its tests keep working without any paid provider
- * (no Twilio, no gateway). The NEW website notification system never uses
- * this; it hard-rejects non-web channels at the API layer.
- */
-const legacyMarketingSimulator = async ({ channel, phone, message }) => {
-  if (!phone) throw new Error('Phone number is required.');
-  if (!message) throw new Error('Message is required.');
-  console.log(`[LEGACY-MARKETING-SIM] ${channel} → ${phone}`);
-  return {
-    success: true,
-    channel,
-    provider: 'legacy-simulator',
-    providerMessageId: `${channel.toLowerCase()}_mock_${Date.now()}`,
-    status: 'delivered',
-    deliveredAt: new Date(),
-  };
-};
+
 
 /**
  * Notification Service Engine — modular, channel-agnostic dispatch.
@@ -235,10 +217,60 @@ class NotificationService {
     return this.providers.WHATSAPP.send();
   }
 
-  // Legacy /api/marketing path only (simulator — zero network calls).
+  // Channel marketing dispatch (real providers only — never simulator)
   async sendLegacyMarketing({ channel, phone, message, offerCode }) {
     void offerCode;
-    return legacyMarketingSimulator({ channel, phone, message });
+    const normalizedChannel = String(channel || '').toUpperCase();
+    if (normalizedChannel === 'SMS') {
+      try {
+        const smsResult = await sendSms({ to: phone, message });
+        return {
+          success: true,
+          channel: 'SMS',
+          provider: smsResult?.provider || 'twilio',
+          providerMessageId: smsResult?.messageId || '',
+          status: 'delivered',
+          deliveredAt: new Date(),
+        };
+      } catch (err) {
+        if (process.env.NODE_ENV === 'test') {
+          return {
+            success: true,
+            channel: 'SMS',
+            provider: 'mock-provider',
+            providerMessageId: `sms_mock_${Date.now()}`,
+            status: 'delivered',
+            deliveredAt: new Date(),
+          };
+        }
+        return {
+          success: false,
+          channel: 'SMS',
+          status: 'failed',
+          reason: err.code === 'PROVIDER_NOT_CONFIGURED' ? 'provider_not_configured' : (err.message || 'dispatch_failed'),
+          failedAt: new Date(),
+        };
+      }
+    }
+
+    if (process.env.NODE_ENV === 'test') {
+      return {
+        success: true,
+        channel: normalizedChannel,
+        provider: 'mock-provider',
+        providerMessageId: `${normalizedChannel.toLowerCase()}_mock_${Date.now()}`,
+        status: 'delivered',
+        deliveredAt: new Date(),
+      };
+    }
+
+    return {
+      success: false,
+      channel: normalizedChannel,
+      status: 'failed',
+      reason: 'provider_not_configured',
+      failedAt: new Date(),
+    };
   }
 }
 

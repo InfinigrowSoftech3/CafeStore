@@ -13,8 +13,11 @@ import InventoryCategory from '../models/InventoryCategory.js';
 import InventoryTransaction from '../models/InventoryTransaction.js';
 import { runWithTenant, runWithSystemTenantAccess } from '../utils/tenantContext.js';
 
+process.env.NODE_ENV = 'test';
+process.env.MONGO_URI = process.env.MONGO_TEST_URI || `mongodb://127.0.0.1:27017/cafe_phase4_${process.pid}`;
+
 test('PHASE 4: Business Suite (Expenses, Suppliers, Purchases Replenishment, Reviews)', async (t) => {
-  const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/cafe-app-test';
+  const uri = process.env.MONGO_URI;
   if (mongoose.connection.readyState !== 1) {
     try {
       await mongoose.connect(uri);
@@ -258,6 +261,9 @@ test('PHASE 4: Business Suite (Expenses, Suppliers, Purchases Replenishment, Rev
     await InventoryTransaction.deleteMany({ tenantId: tenant._id });
   });
 
-  await mongoose.disconnect();
+  if (mongoose.connection.readyState === 1) {
+    await mongoose.connection.dropDatabase();
+    await mongoose.disconnect();
+  }
 });
 

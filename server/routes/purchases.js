@@ -5,13 +5,16 @@ import InventoryTransaction from '../models/InventoryTransaction.js';
 import Supplier from '../models/Supplier.js';
 import { protect, ownerOrManager } from '../middleware/auth.js';
 import { writeAuditLog } from '../services/auditLog.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
+import { withMongoTransaction } from '../utils/mongoTransaction.js';
 
 const router = express.Router();
 
 // GET /api/purchases — List purchase orders
 router.get('/', protect, ownerOrManager, async (req, res, next) => {
   try {
-    const { supplierId, status, paidStatus, branchId, search, page = 1, limit = 50 } = req.query;
+    const { supplierId, status, paidStatus, branchId, search } = req.query;
+    const { page, limit, skip } = parsePagination(req, 20, 100);
 
     const query = {};
     if (supplierId) query.supplier = supplierId;
@@ -23,16 +26,15 @@ router.get('/', protect, ownerOrManager, async (req, res, next) => {
       query.$or = [{ poNumber: regex }, { invoiceNumber: regex }];
     }
 
-    const skip = (Number(page) - 1) * Number(limit);
     const [purchases, totalCount] = await Promise.all([
       Purchase.find(query)
         .populate('supplier', 'name contactPerson phone gstin')
         .populate('branchId', 'name code')
         .populate('receivedBy', 'name email')
         .populate('items.inventoryItem', 'name unit currentQuantity')
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1, _id: -1 })
         .skip(skip)
-        .limit(Number(limit))
+        .limit(limit)
         .lean(),
       Purchase.countDocuments(query),
     ]);
@@ -41,8 +43,9 @@ router.get('/', protect, ownerOrManager, async (req, res, next) => {
       success: true,
       purchases,
       totalCount,
-      page: Number(page),
-      totalPages: Math.ceil(totalCount / Number(limit)),
+      page,
+      totalPages: Math.ceil(totalCount / limit) || 1,
+      pagination: formatPagination(page, limit, totalCount),
     });
   } catch (error) {
     next(error);
@@ -158,38 +161,51 @@ router.patch('/:id/status', protect, ownerOrManager, async (req, res, next) => {
 
     // Handle stock replenishment if transitioning to 'received' for the first time
     if (status === 'received' && purchase.status !== 'received') {
-      for (const lineItem of purchase.items) {
-        const invItem = await InventoryItem.findById(lineItem.inventoryItem);
-        if (invItem) {
-          const balanceBefore = invItem.currentQuantity || 0;
-          const balanceAfter = Number((balanceBefore + lineItem.quantity).toFixed(3));
+      const receiveStock = async (session) => {
+        for (const lineItem of purchase.items) {
+          const query = InventoryItem.findById(lineItem.inventoryItem);
+          if (session) query.session(session);
+          const invItem = await query;
+          if (invItem) {
+            const balanceBefore = invItem.currentQuantity || 0;
+            const balanceAfter = Number((balanceBefore + lineItem.quantity).toFixed(3));
 
-          invItem.currentQuantity = balanceAfter;
-          if (lineItem.unitCost > 0) {
-            invItem.costPerUnit = lineItem.unitCost;
+            invItem.currentQuantity = balanceAfter;
+            if (lineItem.unitCost > 0) {
+              invItem.costPerUnit = lineItem.unitCost;
+            }
+            await invItem.save(session ? { session } : undefined);
+
+            const txnData = {
+              tenantId: req.tenantId,
+              inventoryItem: invItem._id,
+              type: 'purchase',
+              quantity: lineItem.quantity,
+              balanceBefore,
+              balanceAfter,
+              reference: purchase.poNumber,
+              reason: `Stock received via PO ${purchase.poNumber}`,
+              performedBy: req.user?._id || null,
+            };
+            if (session) {
+              await InventoryTransaction.create([txnData], { session });
+            } else {
+              await InventoryTransaction.create(txnData);
+            }
           }
-          await invItem.save();
-
-          await InventoryTransaction.create({
-            tenantId: req.tenantId,
-            inventoryItem: invItem._id,
-            type: 'purchase',
-            quantity: lineItem.quantity,
-            balanceBefore,
-            balanceAfter,
-            reference: purchase.poNumber,
-            reason: `Stock received via PO ${purchase.poNumber}`,
-            performedBy: req.user?._id || null,
-          });
         }
-      }
 
-      purchase.receivedAt = new Date();
-      purchase.receivedBy = req.user?._id || null;
+        purchase.receivedAt = new Date();
+        purchase.receivedBy = req.user?._id || null;
+        purchase.status = status;
+        await purchase.save(session ? { session } : undefined);
+      };
+
+      await withMongoTransaction(receiveStock, () => receiveStock(undefined));
+    } else {
+      purchase.status = status;
+      await purchase.save();
     }
-
-    purchase.status = status;
-    await purchase.save();
 
     await writeAuditLog({
       actor: req.user,

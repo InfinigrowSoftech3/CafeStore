@@ -41,24 +41,33 @@ export default function KpiCard({
     .join(' ');
 
   const getSemanticColor = () => {
-    if (semantic === 'healthy') {
+    const isGmv = title?.toLowerCase().includes('gmv') || title?.toLowerCase().includes('revenue');
+    const isSuspended = title?.toLowerCase().includes('suspended') || semantic === 'problem';
+
+    if (isGmv) {
       return {
-        badge: 'bg-[var(--success-bg)] text-[var(--success-text)] border-[var(--success-border)]',
-        stroke: 'stroke-[var(--success)]',
-        icon: 'text-[var(--success)]',
+        badge: 'bg-[#FBF3D5] text-[#0B1B4D] border-[#E6CF7A]',
+        stroke: 'stroke-[#D4AF37]',
+        icon: 'text-[#0B1B4D]',
+        chip: 'bg-[#FBF3D5] text-[#0B1B4D] border-[#E6CF7A]',
       };
     }
-    if (semantic === 'problem') {
+
+    if (isSuspended) {
       return {
         badge: 'bg-[var(--danger-bg)] text-[var(--danger-text)] border-[var(--danger-border)]',
-        stroke: 'stroke-[var(--danger)]',
-        icon: 'text-[var(--danger)]',
+        stroke: 'stroke-[#DC2626]',
+        icon: 'text-[#DC2626]',
+        chip: 'bg-[var(--danger-bg)] text-[var(--danger-text)] border-[var(--danger-border)]',
       };
     }
+
+    // Default / Positive / Active cards -> Royal blue sparkline, soft blue chip
     return {
-      badge: 'bg-[var(--warning-bg)] text-[var(--warning-text)] border-[var(--warning-border)]',
-      stroke: 'stroke-amber-600 dark:stroke-amber-400',
-      icon: 'text-amber-600 dark:text-amber-400',
+      badge: 'bg-[#1E3FAE]/10 text-[#1E3FAE] border-[#1E3FAE]/20',
+      stroke: 'stroke-[#1E3FAE]',
+      icon: 'text-[#1E3FAE]',
+      chip: 'bg-[#1E3FAE]/10 text-[#1E3FAE] border-[#1E3FAE]/20',
     };
   };
 
@@ -75,7 +84,7 @@ export default function KpiCard({
           {title}
         </span>
         {Icon && (
-          <div className={`flex h-8 w-8 items-center justify-center rounded-xl border ${colors.badge}`}>
+          <div className={`flex h-8 w-8 items-center justify-center rounded-xl border ${colors.chip}`}>
             <Icon size={16} className={colors.icon} />
           </div>
         )}

@@ -13,3 +13,12 @@ server/backups/
 *.key
 *.cert
 .vercel/
+coverage/
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+test-results/
+.turbo/
+server/candidate_check/

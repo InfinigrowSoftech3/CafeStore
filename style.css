@@ -1,0 +1,299 @@
+/* ==========================================================================
+   Brewhaus Café — Mobile-First Link Hub Styles
+   ========================================================================== */
+
+:root {
+  --bg-gradient: radial-gradient(circle at center, #556b2f 0%, #1d2410 100%);
+  --bg-overlay: rgba(20, 26, 10, 0.55);
+  --btn-base-color: #788c32;
+  --btn-opacity: 0.82;
+  --text-white: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.65);
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --pill-radius: 9999px;
+  --focus-ring: 2px solid #ffffff;
+}
+
+/* Reset & Box Sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  font-family: var(--font-sans);
+  color: var(--text-white);
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  min-height: 100dvh;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  background-color: #1d2410;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Full-viewport Background & Dark Olive Overlay */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: var(--bg-gradient);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.overlay-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--bg-overlay);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+
+/* Page Container with Safe Area Insets */
+.page-container {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: max(16px, env(safe-area-inset-top, 16px)) 20px max(14px, env(safe-area-inset-bottom, 14px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Header Section */
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  margin-top: 2px;
+}
+
+/* 112px Circular Logo with 2px rgba(255,255,255,.25) border */
+.logo-wrapper {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.logo-fallback {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 58px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+  user-select: none;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Café Name: 40px italic serif (Playfair Display, fallback Georgia) */
+.cafe-name {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text-white);
+  margin-top: 10px;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  word-break: break-word;
+}
+
+/* Tagline: 20px */
+.tagline {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 4px;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Down-chevron with gentle bobbing animation */
+.chevron-wrapper {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.chevron-icon {
+  animation: gentleBob 2s ease-in-out infinite;
+  display: block;
+}
+
+@keyframes gentleBob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+/* Buttons Navigation Container */
+.links-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 480px;
+  margin: 14px 0;
+}
+
+/* Stacked Pill Button: 60px tall, fully rounded, max-width 480px, #788c32 at 82% */
+.btn {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 60px;
+  border-radius: var(--pill-radius);
+  background-color: rgba(120, 140, 50, var(--btn-opacity));
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tap feedback: scale(.97) over 150ms */
+.btn:active, .btn.is-active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.btn:hover {
+  background-color: rgba(132, 154, 55, var(--btn-opacity));
+}
+
+/* Visible Focus Ring */
+.btn:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* 48px Circular Icon Chip on the Left */
+.icon-chip {
+  position: absolute;
+  left: 6px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.icon-chip svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+/* Centered Button Label: White, Bold, Uppercase, 15px */
+.btn-label {
+  width: 100%;
+  text-align: center;
+  padding: 0 54px; /* balances the 48px chip + 6px offset so text is dead-center */
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-white);
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+/* Footer Section */
+.page-footer {
+  text-align: center;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  width: 100%;
+}
+
+.page-footer p {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* Disable Chevron Bobbing & Instant Transitions under prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .chevron-icon {
+    animation: none !important;
+  }
+  .btn {
+    transition: none !important;
+  }
+}
+
+/* Responsive fine-tuning for very small viewports */
+@media (max-height: 650px) {
+  .logo-wrapper {
+    width: 96px;
+    height: 96px;
+  }
+  .cafe-name {
+    font-size: 34px;
+    margin-top: 6px;
+  }
+  .tagline {
+    font-size: 17px;
+  }
+  .links-nav {
+    gap: 10px;
+    margin: 10px 0;
+  }
+  .btn {
+    height: 54px;
+  }
+  .icon-chip {
+    width: 42px;
+    height: 42px;
+  }
+}

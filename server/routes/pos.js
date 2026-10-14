@@ -16,6 +16,8 @@ import { publishNewOrder, publishOrderUpdate } from '../services/liveUpdates.js'
 import { awardLoyaltyPoints } from '../services/loyaltyService.js';
 import { findAvailableCoupon, calculateCouponDiscount, normalizeCouponCode } from '../services/couponService.js';
 import { ensureMainBranch } from './branches.js';
+import { withMongoTransaction } from '../utils/mongoTransaction.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
@@ -56,9 +58,15 @@ router.post('/orders', protect, orderReaders, async (req, res, next) => {
       return res.status(400).json({ error: 'At least one item is required.' });
     }
 
-    // Idempotency check for offline sync or retry
-    if (syncId) {
-      const existing = await Order.findOne({ 'posMetadata.offlineSyncId': syncId });
+    // Idempotency check for offline sync, retry, or idempotency-key header
+    const idempotencyKey = req.headers['idempotency-key'] || req.body?.idempotencyKey || syncId;
+    if (idempotencyKey) {
+      const existing = await Order.findOne({
+        $or: [
+          { 'posMetadata.offlineSyncId': idempotencyKey },
+          { 'posMetadata.idempotencyKey': idempotencyKey },
+        ],
+      });
       if (existing) {
         return res.status(200).json({ success: true, order: existing, duplicate: true });
       }
@@ -149,85 +157,166 @@ router.post('/orders', protect, orderReaders, async (req, res, next) => {
     const accessToken = generateOrderAccessToken();
     const accessTokenHash = hashAccessToken(accessToken);
 
-    // Create Order
-    const order = await Order.create({
-      tenantId: req.tenantId,
-      branchId: effectiveBranchId,
-      orderType,
-      tableNumber: resolvedTableNumber,
-      customer: {
-        name: customerName,
-        phone: customerPhone,
-        email: customerEmail,
-        marketingConsent: Boolean(rawCustomer.marketingConsent),
-      },
-      items: validatedItems.map(item => ({
-        product: item.product,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        image: item.image || '',
-        addons: item.addons || [],
-        variant: item.variant || null,
-        specialInstructions: item.specialInstructions || '',
-        itemTotal: item.itemTotal,
-      })),
-      subtotal,
-      discount,
-      couponCode: cleanCoupon || '',
-      tax,
-      total,
-      taxRate,
-      currency: req.tenant?.settings?.currency || 'INR',
-      gstDetails: {
-        invoiceNumber,
-        invoiceDate,
-        customerGstin,
-        cgst: gstBreakdown.cgst,
-        sgst: gstBreakdown.sgst,
-        igst: gstBreakdown.igst,
-        taxableAmount,
-      },
-      paymentMethod,
-      splitPayments: Array.isArray(splitPayments) ? splitPayments : [],
-      paymentStatus,
-      cashVerificationStatus: paymentMethod === 'cash' && isPaid ? 'confirmed' : 'not_required',
-      orderStatus,
-      statusHistory: [{
-        status: orderStatus,
-        changedAt: new Date(),
-        changedBy: req.user?._id,
-        reason: 'POS Counter Creation',
-      }],
-      notes,
-      posMetadata: {
-        cashierId: req.user?._id,
-        station: req.body?.station || 'POS-01',
-        offlineSynced: Boolean(syncId),
-        offlineSyncId: syncId || '',
-        isHeld: false,
-      },
-      accessTokenHash,
-    });
+    // Create Order inside transaction
+    let order;
+    await withMongoTransaction(
+      async (session) => {
+        const created = await Order.create([{
+          tenantId: req.tenantId,
+          branchId: effectiveBranchId,
+          orderType,
+          tableNumber: resolvedTableNumber,
+          customer: {
+            name: customerName,
+            phone: customerPhone,
+            email: customerEmail,
+            marketingConsent: Boolean(rawCustomer.marketingConsent),
+          },
+          items: validatedItems.map(item => ({
+            product: item.product,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image || '',
+            addons: item.addons || [],
+            variant: item.variant || null,
+            specialInstructions: item.specialInstructions || '',
+            itemTotal: item.itemTotal,
+          })),
+          subtotal,
+          discount,
+          couponCode: cleanCoupon || '',
+          tax,
+          total,
+          taxRate,
+          currency: req.tenant?.settings?.currency || 'INR',
+          gstDetails: {
+            invoiceNumber,
+            invoiceDate,
+            customerGstin,
+            cgst: gstBreakdown.cgst,
+            sgst: gstBreakdown.sgst,
+            igst: gstBreakdown.igst,
+            taxableAmount,
+          },
+          paymentMethod,
+          splitPayments: Array.isArray(splitPayments) ? splitPayments : [],
+          paymentStatus,
+          cashVerificationStatus: paymentMethod === 'cash' && isPaid ? 'confirmed' : 'not_required',
+          orderStatus,
+          statusHistory: [{
+            status: orderStatus,
+            changedAt: new Date(),
+            changedBy: req.user?._id,
+            reason: 'POS Counter Creation',
+          }],
+          notes,
+          posMetadata: {
+            cashierId: req.user?._id,
+            station: req.body?.station || 'POS-01',
+            offlineSynced: Boolean(syncId),
+            offlineSyncId: syncId || '',
+            idempotencyKey: idempotencyKey || '',
+            isHeld: false,
+          },
+          accessTokenHash,
+        }], { session });
+        order = created[0];
 
-    // Update Customer profile
-    if (customerPhone && customerPhone !== '9999999999') {
-      await Customer.findOneAndUpdate(
-        { phone: customerPhone },
-        {
-          $setOnInsert: { firstOrderAt: new Date(), status: 'active' },
-          $set: { name: customerName, email: customerEmail, lastOrderAt: new Date() },
-          $inc: { totalOrders: 1, totalSpent: isPaid ? total : 0 },
-        },
-        { upsert: true }
-      );
-    }
+        // Update Customer profile
+        if (customerPhone && customerPhone !== '9999999999') {
+          await Customer.findOneAndUpdate(
+            { phone: customerPhone },
+            {
+              $setOnInsert: { firstOrderAt: new Date(), status: 'active' },
+              $set: { name: customerName, email: customerEmail, lastOrderAt: new Date() },
+              $inc: { totalOrders: 1, totalSpent: isPaid ? total : 0 },
+            },
+            { upsert: true, session }
+          );
+        }
+      },
+      async () => {
+        order = await Order.create({
+          tenantId: req.tenantId,
+          branchId: effectiveBranchId,
+          orderType,
+          tableNumber: resolvedTableNumber,
+          customer: {
+            name: customerName,
+            phone: customerPhone,
+            email: customerEmail,
+            marketingConsent: Boolean(rawCustomer.marketingConsent),
+          },
+          items: validatedItems.map(item => ({
+            product: item.product,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image || '',
+            addons: item.addons || [],
+            variant: item.variant || null,
+            specialInstructions: item.specialInstructions || '',
+            itemTotal: item.itemTotal,
+          })),
+          subtotal,
+          discount,
+          couponCode: cleanCoupon || '',
+          tax,
+          total,
+          taxRate,
+          currency: req.tenant?.settings?.currency || 'INR',
+          gstDetails: {
+            invoiceNumber,
+            invoiceDate,
+            customerGstin,
+            cgst: gstBreakdown.cgst,
+            sgst: gstBreakdown.sgst,
+            igst: gstBreakdown.igst,
+            taxableAmount,
+          },
+          paymentMethod,
+          splitPayments: Array.isArray(splitPayments) ? splitPayments : [],
+          paymentStatus,
+          cashVerificationStatus: paymentMethod === 'cash' && isPaid ? 'confirmed' : 'not_required',
+          orderStatus,
+          statusHistory: [{
+            status: orderStatus,
+            changedAt: new Date(),
+            changedBy: req.user?._id,
+            reason: 'POS Counter Creation',
+          }],
+          notes,
+          posMetadata: {
+            cashierId: req.user?._id,
+            station: req.body?.station || 'POS-01',
+            offlineSynced: Boolean(syncId),
+            offlineSyncId: syncId || '',
+            idempotencyKey: idempotencyKey || '',
+            isHeld: false,
+          },
+          accessTokenHash,
+        });
+
+        if (customerPhone && customerPhone !== '9999999999') {
+          await Customer.findOneAndUpdate(
+            { phone: customerPhone },
+            {
+              $setOnInsert: { firstOrderAt: new Date(), status: 'active' },
+              $set: { name: customerName, email: customerEmail, lastOrderAt: new Date() },
+              $inc: { totalOrders: 1, totalSpent: isPaid ? total : 0 },
+            },
+            { upsert: true }
+          );
+        }
+      }
+    );
 
     // If paid at checkout, deduct inventory & award loyalty
     if (isPaid) {
       try {
-        await confirmOrderAndDeduct(order, req.tenantId);
-        await awardLoyaltyPoints(order, req.tenantId);
+        await confirmOrderAndDeduct(order._id, { performedBy: req.user?._id });
+        await awardLoyaltyPoints(order._id);
       } catch (stockErr) {
         console.warn('[POS] Stock deduction notice:', stockErr.message);
       }
@@ -311,8 +400,21 @@ router.post('/orders/hold', protect, orderReaders, async (req, res, next) => {
 // GET /api/pos/held-orders — Retrieve all held orders
 router.get('/held-orders', protect, orderReaders, async (req, res, next) => {
   try {
-    const heldOrders = await Order.find({ orderStatus: 'held' }).sort({ createdAt: -1 }).lean();
-    return res.json({ success: true, orders: heldOrders });
+    const { page, limit, skip } = parsePagination(req);
+    const filter = { orderStatus: 'held' };
+    const [heldOrders, total] = await Promise.all([
+      Order.find(filter)
+        .sort({ createdAt: -1, _id: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Order.countDocuments(filter),
+    ]);
+    return res.json({
+      success: true,
+      orders: heldOrders,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     next(error);
   }
@@ -341,56 +443,95 @@ router.post('/orders/:id/pay', protect, orderReaders, async (req, res, next) => 
       return res.status(404).json({ error: 'Order not found.' });
     }
 
-    order.paymentMethod = paymentMethod;
-    if (Array.isArray(splitPayments) && splitPayments.length > 0) {
-      order.splitPayments = splitPayments;
+    if (order.paymentStatus === 'paid') {
+      return res.json({ success: true, order, alreadyPaid: true });
     }
-    order.paymentStatus = 'paid';
-    order.orderStatus = 'completed';
-    order.cashVerificationStatus = paymentMethod === 'cash' ? 'confirmed' : 'not_required';
 
-    if (!order.gstDetails?.invoiceNumber) {
+    let invoiceNumber = order.gstDetails?.invoiceNumber;
+    let invoiceDate = order.gstDetails?.invoiceDate;
+    if (!invoiceNumber) {
       const prefix = req.tenant?.settings?.gstSettings?.invoicePrefix || 'INV';
-      order.gstDetails = order.gstDetails || {};
-      order.gstDetails.invoiceNumber = await getNextInvoiceNumber(req.tenantId, prefix);
-      order.gstDetails.invoiceDate = new Date();
+      invoiceNumber = await getNextInvoiceNumber(req.tenantId, prefix);
+      invoiceDate = new Date();
     }
 
-    order.statusHistory.push({
-      status: 'completed',
-      changedAt: new Date(),
-      changedBy: req.user?._id,
-      reason: `POS payment completed via ${paymentMethod.toUpperCase()}`,
-    });
+    await withMongoTransaction(
+      async (session) => {
+        await Order.updateOne(
+          { _id: order._id },
+          {
+            $set: {
+              paymentMethod,
+              splitPayments: Array.isArray(splitPayments) && splitPayments.length > 0 ? splitPayments : order.splitPayments,
+              paymentStatus: 'paid',
+              orderStatus: 'completed',
+              cashVerificationStatus: paymentMethod === 'cash' ? 'confirmed' : 'not_required',
+              'gstDetails.invoiceNumber': invoiceNumber,
+              'gstDetails.invoiceDate': invoiceDate,
+            },
+            $push: {
+              statusHistory: {
+                status: 'completed',
+                changedAt: new Date(),
+                changedBy: req.user?._id,
+                reason: `POS payment completed via ${paymentMethod.toUpperCase()}`,
+              },
+            },
+          },
+          { session }
+        );
 
-    await order.save();
+        if (order.tableNumber > 0) {
+          await Table.updateOne({ tableNumber: order.tableNumber }, { $set: { status: 'AVAILABLE' } }, { session });
+        }
+      },
+      async () => {
+        order.paymentMethod = paymentMethod;
+        if (Array.isArray(splitPayments) && splitPayments.length > 0) {
+          order.splitPayments = splitPayments;
+        }
+        order.paymentStatus = 'paid';
+        order.orderStatus = 'completed';
+        order.cashVerificationStatus = paymentMethod === 'cash' ? 'confirmed' : 'not_required';
+        order.gstDetails = order.gstDetails || {};
+        order.gstDetails.invoiceNumber = invoiceNumber;
+        order.gstDetails.invoiceDate = invoiceDate;
+        order.statusHistory.push({
+          status: 'completed',
+          changedAt: new Date(),
+          changedBy: req.user?._id,
+          reason: `POS payment completed via ${paymentMethod.toUpperCase()}`,
+        });
+        await order.save();
+        if (order.tableNumber > 0) {
+          await Table.updateOne({ tableNumber: order.tableNumber }, { $set: { status: 'AVAILABLE' } });
+        }
+      }
+    );
 
-    // Release table if Dine-in
-    if (order.tableNumber > 0) {
-      await Table.updateOne({ tableNumber: order.tableNumber }, { $set: { status: 'AVAILABLE' } });
-    }
+    const updatedOrder = await Order.findById(order._id);
 
     // Deduct inventory & award loyalty
     try {
-      await confirmOrderAndDeduct(order, req.tenantId);
-      await awardLoyaltyPoints(order, req.tenantId);
+      await confirmOrderAndDeduct(updatedOrder._id, { performedBy: req.user?._id });
+      await awardLoyaltyPoints(updatedOrder._id);
     } catch (_err) {
       // Stock deduction/loyalty failure on payment does not block receipt
     }
 
     try {
-      publishOrderUpdate(order);
+      publishOrderUpdate(updatedOrder);
     } catch (_err) {
       // SSE broadcast failure ignored
     }
 
     const receipt = await createReceiptData({
-      orders: [order],
-      tableNumber: order.tableNumber,
+      orders: [updatedOrder],
+      tableNumber: updatedOrder.tableNumber,
       tenantSettings: req.tenant?.settings,
     });
 
-    return res.json({ success: true, order, receipt });
+    return res.json({ success: true, order: updatedOrder, receipt });
   } catch (error) {
     next(error);
   }
@@ -479,14 +620,23 @@ router.post('/sync', protect, orderReaders, async (req, res, next) => {
   }
 });
 
-// GET /api/pos/recent — Recent 20 POS Orders
+// GET /api/pos/recent — Recent POS Orders
 router.get('/recent', protect, orderReaders, async (req, res, next) => {
   try {
-    const orders = await Order.find()
-      .sort({ createdAt: -1 })
-      .limit(20)
-      .lean();
-    return res.json({ success: true, orders });
+    const { page, limit, skip } = parsePagination(req, 20, 100);
+    const [orders, total] = await Promise.all([
+      Order.find()
+        .sort({ createdAt: -1, _id: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Order.countDocuments(),
+    ]);
+    return res.json({
+      success: true,
+      orders,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     next(error);
   }

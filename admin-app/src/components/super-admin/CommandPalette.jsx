@@ -126,7 +126,7 @@ export default function CommandPalette({
         >
           {/* Search bar */}
           <div className="flex items-center gap-3 border-b border-[var(--border-primary)] px-4 py-3.5 bg-[var(--hover-bg)]/70">
-            <Search size={18} className="text-amber-500 shrink-0" />
+            <Search size={18} className="text-[#1E3FAE] dark:text-[#D4AF37] shrink-0" />
             <input
               ref={inputRef}
               type="text"
@@ -167,7 +167,7 @@ export default function CommandPalette({
                     onMouseEnter={() => setSelectedIndex(idx)}
                     className={`flex items-center justify-between rounded-xl px-3.5 py-2.5 cursor-pointer text-xs transition ${
                       isSelected
-                        ? 'bg-[var(--brand-primary-subtle)] border border-amber-300 dark:border-amber-500/30 text-[var(--text-primary)] font-semibold'
+                        ? 'bg-[#1E3FAE]/10 border border-[#1E3FAE]/30 text-[var(--text-primary)] font-semibold'
                         : 'hover:bg-[var(--hover-bg)] text-[var(--text-secondary)]'
                     }`}
                   >
@@ -175,7 +175,7 @@ export default function CommandPalette({
                       <div
                         className={`flex h-7 w-7 items-center justify-center rounded-lg border ${
                           isSelected
-                            ? 'border-amber-400/50 bg-amber-100 dark:bg-amber-400/20 text-amber-700 dark:text-amber-300'
+                            ? 'border-[#1E3FAE]/30 bg-[#1E3FAE]/15 text-[#1E3FAE] dark:text-[#688bf7]'
                             : 'border-[var(--border-primary)] bg-[var(--hover-bg)] text-[var(--text-muted)]'
                         }`}
                       >
@@ -205,7 +205,7 @@ export default function CommandPalette({
                       <span className="rounded bg-[var(--hover-bg)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
                         {item.type}
                       </span>
-                      {isSelected && <CornerDownLeft size={13} className="text-amber-500" />}
+                      {isSelected && <CornerDownLeft size={13} className="text-[#D4AF37]" />}
                     </div>
                   </div>
                 );
@@ -239,7 +239,7 @@ export default function CommandPalette({
               </span>
             </div>
 
-            <span className="text-amber-600 dark:text-amber-500/80 font-mono font-bold">⌘K / Ctrl+K</span>
+            <span className="text-[#1E3FAE] dark:text-[#D4AF37] font-mono font-bold">⌘K / Ctrl+K</span>
           </div>
         </motion.div>
       </div>

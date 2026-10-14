@@ -2,6 +2,7 @@ import express from 'express';
 import Supplier from '../models/Supplier.js';
 import { protect, ownerOrManager } from '../middleware/auth.js';
 import { writeAuditLog } from '../services/auditLog.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
@@ -9,6 +10,7 @@ const router = express.Router();
 router.get('/', protect, ownerOrManager, async (req, res, next) => {
   try {
     const { search, active } = req.query;
+    const { page, limit, skip } = parsePagination(req, 20, 100);
     const query = {};
 
     if (active !== undefined) {
@@ -19,8 +21,16 @@ router.get('/', protect, ownerOrManager, async (req, res, next) => {
       query.$or = [{ name: regex }, { contactPerson: regex }, { phone: regex }, { email: regex }];
     }
 
-    const suppliers = await Supplier.find(query).sort({ name: 1 }).lean();
-    return res.json({ success: true, suppliers, count: suppliers.length });
+    const [suppliers, total] = await Promise.all([
+      Supplier.find(query).sort({ name: 1, _id: 1 }).skip(skip).limit(limit).lean(),
+      Supplier.countDocuments(query),
+    ]);
+    return res.json({
+      success: true,
+      suppliers,
+      count: suppliers.length,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     next(error);
   }

@@ -3,6 +3,7 @@ import Category from '../models/Category.js';
 import Product from '../models/Product.js';
 import { adminOnly, ownerOrManager, protect } from '../middleware/auth.js';
 import { writeAuditLog } from '../services/auditLog.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
@@ -11,8 +12,21 @@ router.get('/', async (req, res) => {
   try {
     res.set('Cache-Control', 'private, no-cache');
     res.set('Vary', 'X-Tenant-Slug, X-Tenant-Id, X-Table-Token, Origin');
-    const categories = await Category.find({ active: true }).sort({ sortOrder: 1, name: 1 });
-    res.json({ categories });
+    const { page, limit, skip } = parsePagination(req);
+    const filter = { active: true };
+    const [categories, total] = await Promise.all([
+      Category.find(filter)
+        .sort({ sortOrder: 1, name: 1, _id: 1 })
+        .skip(skip)
+        .limit(limit)
+        .select('name description icon active sortOrder createdAt updatedAt tenantId')
+        .lean(),
+      Category.countDocuments(filter),
+    ]);
+    res.json({
+      categories,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -21,8 +35,21 @@ router.get('/', async (req, res) => {
 // GET all (admin/staff)
 router.get('/all', protect, ownerOrManager, async (req, res) => {
   try {
-    const categories = await Category.find().sort({ sortOrder: 1, name: 1 });
-    res.json({ categories });
+    const { page, limit, skip } = parsePagination(req);
+    const filter = {};
+    const [categories, total] = await Promise.all([
+      Category.find(filter)
+        .sort({ sortOrder: 1, name: 1, _id: 1 })
+        .skip(skip)
+        .limit(limit)
+        .select('name description icon active sortOrder createdAt updatedAt tenantId')
+        .lean(),
+      Category.countDocuments(filter),
+    ]);
+    res.json({
+      categories,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

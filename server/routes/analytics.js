@@ -9,6 +9,7 @@ import InventoryItem from '../models/InventoryItem.js';
 import Branch from '../models/Branch.js';
 import User from '../models/User.js';
 import { ownerOrManager, protect } from '../middleware/auth.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
@@ -83,6 +84,7 @@ router.get('/reports/gst', protect, ownerOrManager, async (req, res) => {
   try {
     const range = resolveReportRange(req.query);
     if (!range) return res.status(400).json({ error: 'Provide a valid date range of at most 366 days.' });
+    const { page, limit, skip } = parsePagination(req.query, { defaultLimit: 20, maxLimit: 100 });
     const orders = await loadPaidOrders(range, req.query.branchId);
     const totals = orders.reduce((report, order) => {
       const tax = Number(order.tax || 0);
@@ -99,11 +101,13 @@ router.get('/reports/gst', protect, ownerOrManager, async (req, res) => {
       if (key !== 'orders') totals[key] = Number(totals[key].toFixed(2));
     });
 
+    const paginatedOrders = orders.slice(skip, skip + limit);
+
     return res.json({
       range,
       gstRate: 5,
       totals,
-      orders: orders.map((order) => ({
+      orders: paginatedOrders.map((order) => ({
         orderNumber: order.orderNumber,
         date: order.createdAt,
         taxableValue: Number((order.subtotal - (order.discount || 0)).toFixed(2)),
@@ -113,6 +117,7 @@ router.get('/reports/gst', protect, ownerOrManager, async (req, res) => {
         tax: order.tax,
         invoiceValue: order.total,
       })),
+      pagination: formatPagination({ page, limit, total: orders.length }),
     });
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.status ? error.message : 'Failed to generate GST report.' });

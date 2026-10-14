@@ -1,14 +1,12 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
 import crypto from 'crypto';
 import GalleryItem from '../models/GalleryItem.js';
-import { detectImageType } from './upload.js';
+import { detectImageType, uploadBufferToCloudinary } from './upload.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
-const uploadDir = path.resolve(process.cwd(), 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const allowedMimeTypes = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp']);
 const allowedExtensions = new Set(['.jpg', '.jpeg', '.png', '.webp']);
@@ -33,10 +31,22 @@ const parseUpload = (req, res, next) => {
 };
 
 // GET /api/gallery — public customer gallery
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const items = await GalleryItem.find().sort({ createdAt: -1 }).limit(60).lean();
-    res.json({ items });
+    const { page, limit, skip } = parsePagination(req);
+    const [items, total] = await Promise.all([
+      GalleryItem.find()
+        .sort({ createdAt: -1, _id: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select('customerName review rating imageUrl createdAt')
+        .lean(),
+      GalleryItem.countDocuments(),
+    ]);
+    res.json({
+      items,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     res.status(500).json({ error: 'Unable to load the gallery.' });
   }
@@ -69,16 +79,18 @@ router.post('/', parseUpload, async (req, res) => {
       return res.status(400).json({ error: 'Uploaded file is not a valid supported image.' });
     }
 
-    const safeExtension = detectedType === 'jpeg' ? '.jpg' : `.${detectedType}`;
-    const filename = `gallery-${crypto.randomBytes(18).toString('hex')}${safeExtension}`;
-    await fs.promises.writeFile(path.join(uploadDir, filename), req.file.buffer, { flag: 'wx' });
+    const tenantFolder = req.tenant?.slug || req.tenantId || 'public';
+    const folder = `brewhaus/tenants/${tenantFolder}/gallery`;
+    const result = await uploadBufferToCloudinary(req.file.buffer, {
+      folder,
+      resource_type: 'image',
+    });
 
-    const serverUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 5000}`;
     const item = await GalleryItem.create({
       customerName,
       review,
       rating,
-      imageUrl: `${serverUrl.replace(/\/$/, '')}/uploads/${filename}`,
+      imageUrl: result.secure_url,
     });
 
     res.status(201).json({ item });

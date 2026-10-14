@@ -325,12 +325,12 @@ export default function ContactPage() {
             className="absolute inset-0 z-0 h-full w-full object-cover"
           />
         ) : (
-          <div className="absolute inset-0 z-0 bg-gradient-to-br from-espresso-950 via-espresso-900 to-[#1b0d06]" />
+          <div className="absolute inset-0 z-0 bg-gradient-to-br from-espresso-950 via-espresso-900 to-[#0a1128]" />
         )}
 
         {/* Ambient Gradient Overlays for Luxury Contrast */}
-        <div className="absolute inset-0 z-10 bg-[linear-gradient(90deg,rgba(13,8,4,0.96)_0%,rgba(13,8,4,0.80)_48%,rgba(13,8,4,0.35)_100%)]" />
-        <div className="absolute inset-0 z-10 bg-[linear-gradient(0deg,rgba(13,8,4,0.88)_0%,transparent_50%)]" />
+        <div className="absolute inset-0 z-10 bg-[linear-gradient(90deg,rgba(15,23,42,0.96)_0%,rgba(15,23,42,0.80)_48%,rgba(15,23,42,0.35)_100%)]" />
+        <div className="absolute inset-0 z-10 bg-[linear-gradient(0deg,rgba(15,23,42,0.88)_0%,transparent_50%)]" />
 
         {/* Hero Content */}
         <div className="relative z-20 mx-auto flex min-h-[720px] max-w-7xl items-center px-4 pb-20 pt-28 sm:min-h-[780px] sm:px-6 lg:px-8">
@@ -495,7 +495,7 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* 3. CONTACT FORM & EDITORIAL DETAILS */}
       {/* ========================================================================= */}
-      <section className="border-t border-espresso-100 bg-[#f7f1e8] px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+      <section className="border-t border-espresso-100 bg-cream/70 px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
             {/* Left Context Column */}

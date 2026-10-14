@@ -23,10 +23,7 @@ export default function OtpLoginModal({ isOpen, onClose, onLogin }) {
     setLoading(true);
     setError('');
     try {
-      const { data } = await api.post('/auth/send-otp', { phone: normalized });
-      if (data?.devOtp) {
-        setOtp(data.devOtp);
-      }
+      await api.post('/auth/send-otp', { phone: normalized });
       setStep('otp');
       setError('');
     } catch (err) {

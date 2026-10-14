@@ -150,7 +150,7 @@ router.get('/campaigns', protect, ownerOrManager, async (req, res) => {
 
     const [campaigns, total] = await Promise.all([
       Campaign.find(query)
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1, _id: -1 })
         .skip(skip)
         .limit(limitNum)
         .populate('createdBy', 'name email')
@@ -164,6 +164,11 @@ router.get('/campaigns', protect, ownerOrManager, async (req, res) => {
       page: pageNum,
       totalPages: Math.ceil(total / limitNum) || 1,
       limit: limitNum,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+      },
     });
   } catch (err) {
     console.error('List campaigns error:', err);
@@ -481,11 +486,12 @@ router.post('/test-dispatch', protect, ownerOrManager, async (req, res) => {
       });
     }
 
+    const isSuccess = result?.status === 'delivered';
     res.json({
-      success: true,
-      message: result?.requiresDirectOpen
-        ? `Direct WhatsApp link ready for ${phone}. Click to open WhatsApp!`
-        : `Message dispatched successfully via ${result?.provider || channel}!`,
+      success: isSuccess,
+      message: isSuccess
+        ? `Message dispatched successfully via ${result?.provider || channel}!`
+        : `Message delivery failed: ${result?.reason || 'provider_not_configured'}`,
       directWhatsAppUrl,
       result,
     });

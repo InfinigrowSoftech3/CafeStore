@@ -76,7 +76,7 @@ router.get('/orders', requireAdminCafeAuth, async (req, res, next) => {
     const [orders, total] = await runWithTenant(req.cafeId, async () => {
       return Promise.all([
         Order.find(queryFilter)
-          .sort({ createdAt: -1 })
+          .sort({ createdAt: -1, _id: -1 })
           .skip(skip)
           .limit(limit)
           .lean(),

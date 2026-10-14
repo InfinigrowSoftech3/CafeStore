@@ -40,7 +40,7 @@ export default function CategoriesPage() {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/categories/all').catch(() => api.get('/categories'));
+      const { data } = await api.get('/categories/all?limit=100').catch(() => api.get('/categories?limit=100'));
       const list = data.categories || [];
       // Sort by sortOrder
       list.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));

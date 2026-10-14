@@ -71,6 +71,7 @@ export function getResolvedTenantSlug() {
       }
 
       sessionStorage.setItem('cafe_tenant_slug', normalized);
+      try { localStorage.setItem('cafe_tenant_slug', normalized); } catch { /* ignore */ }
       return normalized;
     }
 
@@ -79,6 +80,7 @@ export function getResolvedTenantSlug() {
       const prefix = host.slice(0, -'.localhost'.length);
       if (prefix && prefix !== 'admin' && prefix !== 'www' && prefix !== 'cafe' && !prefix.includes('.')) {
         sessionStorage.setItem('cafe_tenant_slug', prefix);
+        try { localStorage.setItem('cafe_tenant_slug', prefix); } catch { /* ignore */ }
         return prefix;
       }
     }
@@ -88,11 +90,12 @@ export function getResolvedTenantSlug() {
     if (parts.length > 2 && parts[0] !== 'www' && parts[0] !== 'admin' && parts[0] !== 'cafe') {
       const sub = parts[0];
       sessionStorage.setItem('cafe_tenant_slug', sub);
+      try { localStorage.setItem('cafe_tenant_slug', sub); } catch { /* ignore */ }
       return sub;
     }
 
-    // Retain tenant context across page navigation within the same tab session only
-    const cached = sessionStorage.getItem('cafe_tenant_slug');
+    // Retain tenant context across page navigation and new tabs
+    const cached = sessionStorage.getItem('cafe_tenant_slug') || localStorage.getItem('cafe_tenant_slug');
     if (cached) return cached;
   } catch {
     // ignore
@@ -104,7 +107,9 @@ export function getResolvedTenantSlug() {
 export function setResolvedTenantSlug(slug) {
   if (!slug || typeof window === 'undefined') return;
   try {
-    sessionStorage.setItem('cafe_tenant_slug', String(slug).toLowerCase().trim());
+    const normalized = String(slug).toLowerCase().trim();
+    sessionStorage.setItem('cafe_tenant_slug', normalized);
+    localStorage.setItem('cafe_tenant_slug', normalized);
   } catch {
     // ignore
   }
@@ -113,7 +118,7 @@ export function setResolvedTenantSlug(slug) {
 export function getResolvedTenantId() {
   if (typeof window === 'undefined') return '';
   try {
-    return sessionStorage.getItem('cafe_tenant_id') || '';
+    return sessionStorage.getItem('cafe_tenant_id') || localStorage.getItem('cafe_tenant_id') || '';
   } catch {
     return '';
   }
@@ -122,7 +127,9 @@ export function getResolvedTenantId() {
 export function setResolvedTenantId(id) {
   if (!id || typeof window === 'undefined') return;
   try {
-    sessionStorage.setItem('cafe_tenant_id', String(id).trim());
+    const trimmed = String(id).trim();
+    sessionStorage.setItem('cafe_tenant_id', trimmed);
+    localStorage.setItem('cafe_tenant_id', trimmed);
   } catch {
     // ignore
   }

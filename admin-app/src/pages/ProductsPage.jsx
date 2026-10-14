@@ -73,8 +73,8 @@ export default function ProductsPage() {
     setLoading(true);
     try {
       const [productResponse, categoryResponse] = await Promise.all([
-        api.get('/menu'),
-        api.get('/categories/all').catch(() => api.get('/categories')),
+        api.get('/menu?limit=100'),
+        api.get('/categories/all?limit=100').catch(() => api.get('/categories?limit=100')),
       ]);
       setProducts(productResponse.data.products || []);
       setCategories(categoryResponse.data.categories || []);

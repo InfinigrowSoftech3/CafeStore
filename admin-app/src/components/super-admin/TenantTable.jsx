@@ -271,9 +271,9 @@ export default function TenantTable({
 
       {/* ── Bulk Actions Floating Bar ────────────────────────────── */}
       {selectedIds.size > 0 && (
-        <div className="flex items-center justify-between rounded-2xl border border-amber-500/40 bg-[var(--warning-bg)] px-4 py-2.5 text-xs text-[var(--warning-text)] shadow-md animate-in fade-in duration-150">
+        <div className="flex items-center justify-between rounded-2xl border border-[#E6CF7A] bg-[#FBF3D5] dark:bg-[#0B1B4D] px-4 py-2.5 text-xs text-[#0B1B4D] dark:text-slate-200 shadow-md animate-in fade-in duration-150">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-[var(--warning-text)]">{selectedIds.size}</span>
+            <span className="font-bold text-[#0B1B4D] dark:text-[#D4AF37]">{selectedIds.size}</span>
             <span>café(s) selected across current filter</span>
           </div>
 
@@ -304,7 +304,7 @@ export default function TenantTable({
       <div className="table-container">
         {loading ? (
           <div className="p-12 text-center text-[var(--text-muted)] space-y-3">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-[#D4AF37] border-t-transparent" />
             <p className="text-xs">Loading registered platform cafés...</p>
           </div>
         ) : filteredTenants.length === 0 ? (
@@ -340,7 +340,7 @@ export default function TenantTable({
                         selectedIds.size === filteredTenants.length
                       }
                       onChange={handleSelectAll}
-                      className="rounded border-[var(--border-primary)] bg-[var(--input-bg)] text-amber-500 focus:ring-0"
+                      className="rounded border-[var(--border-primary)] bg-[var(--input-bg)] text-[#1E3FAE] focus:ring-[#1E3FAE]"
                     />
                   </th>
                   <th className="py-3 px-4 font-bold text-[var(--text-secondary)]">Café & Subdomain</th>
@@ -379,7 +379,7 @@ export default function TenantTable({
                           type="checkbox"
                           checked={isSelected}
                           onChange={(e) => handleToggleSelect(e, t.id)}
-                          className="rounded border-[var(--border-primary)] bg-[var(--input-bg)] text-amber-500 focus:ring-0"
+                          className="rounded border-[var(--border-primary)] bg-[var(--input-bg)] text-[#1E3FAE] focus:ring-[#1E3FAE]"
                         />
                       </td>
 
@@ -387,7 +387,7 @@ export default function TenantTable({
                       <td className={`${density === 'compact' ? 'py-2.5' : 'py-3.5'} px-4`}>
                         <div className="flex items-center gap-3">
                           {/* Logo / Initial Avatar */}
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-300 font-bold text-xs shadow-inner">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#1E3FAE]/15 to-[#D4AF37]/20 border border-[#E6CF7A]/60 text-[#0B1B4D] dark:text-[#D4AF37] font-bold text-xs shadow-inner">
                             {t.settings?.logoUrl ? (
                               <img src={t.settings.logoUrl} alt="" className="h-full w-full rounded-xl object-cover" />
                             ) : (
@@ -396,7 +396,7 @@ export default function TenantTable({
                           </div>
 
                           <div>
-                            <div className="font-bold text-[var(--text-primary)] group-hover:text-amber-600 dark:group-hover:text-amber-300 transition flex items-center gap-1.5">
+                            <div className="font-bold text-[var(--text-primary)] group-hover:text-[#1E3FAE] dark:group-hover:text-[#688bf7] transition flex items-center gap-1.5">
                               <span>{t.name}</span>
                             </div>
 
@@ -407,7 +407,7 @@ export default function TenantTable({
                               </span>
                               <button
                                 onClick={(e) => handleCopySubdomain(e, t.slug)}
-                                className="p-0.5 text-[var(--text-muted)] hover:text-amber-600 dark:hover:text-amber-400 transition"
+                                className="p-0.5 text-[var(--text-muted)] hover:text-[#1E3FAE] dark:hover:text-[#688bf7] transition"
                                 title="Copy subdomain link"
                               >
                                 {copiedSlug === t.slug ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
@@ -427,7 +427,7 @@ export default function TenantTable({
                               </span>
                               <button
                                 onClick={() => onInviteOwner && onInviteOwner(t)}
-                                className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400 hover:underline"
+                                className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#1E3FAE] dark:text-[#688bf7] hover:underline"
                               >
                                 <UserPlus size={11} /> Invite
                               </button>
@@ -471,7 +471,7 @@ export default function TenantTable({
                               e.stopPropagation();
                               onChangePlan && onChangePlan(t);
                             }}
-                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-primary)] bg-[var(--hover-bg)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)] hover:border-amber-500/50 hover:text-amber-600 dark:hover:text-amber-300 transition"
+                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-primary)] bg-[var(--hover-bg)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)] hover:border-[#1E3FAE]/50 hover:text-[#1E3FAE] dark:hover:text-[#688bf7] transition"
                             title="Click to change plan"
                           >
                             <span className="capitalize">{t.plan || 'Starter'}</span>
@@ -494,7 +494,7 @@ export default function TenantTable({
                             <div className="h-1.5 w-full rounded-full bg-[var(--border-primary)] overflow-hidden">
                               <div
                                 className={`h-full rounded-full transition-all duration-300 ${
-                                  tablePercent > 85 ? 'bg-amber-500' : 'bg-cyan-500'
+                                  tablePercent > 85 ? 'bg-[#EA580C]' : 'bg-[#1E3FAE]'
                                 }`}
                                 style={{ width: `${tablePercent}%` }}
                               />
@@ -510,7 +510,7 @@ export default function TenantTable({
                             <div className="h-1.5 w-full rounded-full bg-[var(--border-primary)] overflow-hidden">
                               <div
                                 className={`h-full rounded-full transition-all duration-300 ${
-                                  productPercent > 85 ? 'bg-amber-500' : 'bg-emerald-500'
+                                  productPercent > 85 ? 'bg-[#EA580C]' : 'bg-[#12A37A]'
                                 }`}
                                 style={{ width: `${productPercent}%` }}
                               />
@@ -540,7 +540,7 @@ export default function TenantTable({
                           {/* Primary: Open User Panel */}
                           <button
                             onClick={() => onOpenPanel && onOpenPanel(t)}
-                            className="inline-flex items-center gap-1 rounded-xl border border-amber-500/30 bg-[var(--brand-primary-subtle)] px-3 py-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition"
+                            className="inline-flex items-center gap-1 rounded-xl border border-[#1E3FAE]/30 bg-[#1E3FAE]/10 px-3 py-1.5 text-xs font-semibold text-[#1E3FAE] dark:text-[#688bf7] hover:bg-[#1E3FAE]/20 transition"
                             title="Open Customer QR Ordering Panel"
                           >
                             <Eye size={13} />

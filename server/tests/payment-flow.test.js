@@ -83,7 +83,7 @@ let baseUrl;
 
 /** Low-level fetch helper returning { status, data, response }. */
 const httpReq = async (path, { method = 'GET', body, headers = {} } = {}) => {
-  const h = { ...headers };
+  const h = { ...(path.startsWith('/api/payment/webhook') ? {} : { 'x-tenant-slug': 'brewhaus' }), ...headers };
   let b;
   if (body !== undefined && !(body instanceof Buffer) && typeof body !== 'string') {
     h['Content-Type'] = 'application/json';

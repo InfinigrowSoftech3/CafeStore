@@ -9,6 +9,7 @@ import { checkTableLimit } from '../middleware/planLimits.js';
 import { createTableQrToken, verifyTableQrToken } from '../utils/tableQr.js';
 import { getTenantContext } from '../utils/tenantContext.js';
 import { writeAuditLog } from '../services/auditLog.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
@@ -86,8 +87,20 @@ const refreshStaleQrCodes = async (tables, tenantId = null, tenantSlug = null) =
 // GET /api/tables — public
 router.get('/', async (req, res) => {
   try {
-    const tables = await Table.find({ active: true }).sort({ tableNumber: 1 });
-    res.json({ tables });
+    const { page, limit, skip } = parsePagination(req);
+    const filter = { active: true };
+    const [tables, total] = await Promise.all([
+      Table.find(filter)
+        .sort({ tableNumber: 1, _id: 1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Table.countDocuments(filter),
+    ]);
+    res.json({
+      tables,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -112,14 +125,20 @@ router.get('/qr/validate', async (req, res) => {
 router.get('/floor-plan', protect, ownerOrManager, async (req, res) => {
   try {
     const { branchId, floor } = req.query;
+    const { page, limit, skip } = parsePagination(req, 50, 100);
     const filter = { active: true };
     if (branchId) filter.branchId = branchId;
     if (floor && floor !== 'ALL') filter.floor = floor;
 
-    const tables = await Table.find(filter)
-      .populate('assignedWaiter', 'name email')
-      .sort({ floor: 1, tableNumber: 1 })
-      .lean();
+    const [tables, total] = await Promise.all([
+      Table.find(filter)
+        .populate('assignedWaiter', 'name email')
+        .sort({ floor: 1, tableNumber: 1, _id: 1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Table.countDocuments(filter),
+    ]);
 
     // Query active orders across these tables
     const tableNumbers = tables.map(t => t.tableNumber);
@@ -175,6 +194,7 @@ router.get('/floor-plan', protect, ownerOrManager, async (req, res) => {
       success: true,
       tables: enrichedTables,
       floors,
+      pagination: formatPagination(page, limit, total),
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -184,12 +204,20 @@ router.get('/floor-plan', protect, ownerOrManager, async (req, res) => {
 // GET all tables — admin/staff
 router.get('/all', protect, ownerOrManager, async (req, res) => {
   try {
+    const { page, limit, skip } = parsePagination(req, 50, 100);
+    const [rawTables, total] = await Promise.all([
+      Table.find().sort({ tableNumber: 1, _id: 1 }).skip(skip).limit(limit),
+      Table.countDocuments(),
+    ]);
     const tables = await refreshStaleQrCodes(
-      await Table.find().sort({ tableNumber: 1 }),
+      rawTables,
       req.tenantId,
       req.tenant?.slug
     );
-    res.json({ tables });
+    res.json({
+      tables,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

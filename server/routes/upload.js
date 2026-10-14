@@ -1,13 +1,15 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
 import crypto from 'crypto';
+import { v2 as cloudinary } from 'cloudinary';
 import { ownerOrManager, protect } from '../middleware/auth.js';
 
 const router = express.Router();
-const uploadDir = path.resolve(process.cwd(), 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+if (process.env.CLOUDINARY_URL) {
+  cloudinary.config();
+}
 
 const allowedMimeTypes = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp']);
 const allowedExtensions = new Set(['.jpg', '.jpeg', '.png', '.webp']);
@@ -111,6 +113,28 @@ const runUpload = (req, res, next) => {
   });
 };
 
+export const uploadBufferToCloudinary = (buffer, options = {}) => {
+  if (!process.env.CLOUDINARY_URL) {
+    if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV !== 'production') {
+      const mockId = `mock_${crypto.randomBytes(12).toString('hex')}`;
+      const folder = options.folder ? `${options.folder}/` : '';
+      return Promise.resolve({
+        secure_url: `https://res.cloudinary.com/brewhaus/image/upload/v1/${folder}${mockId}.jpg`,
+        public_id: `${folder}${mockId}`,
+      });
+    }
+    return Promise.reject(new Error('Cloudinary is not configured. Set CLOUDINARY_URL in environment.'));
+  }
+
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(options, (error, result) => {
+      if (error) return reject(error);
+      resolve(result);
+    });
+    stream.end(buffer);
+  });
+};
+
 // POST /api/upload/image — admin
 router.post('/image', protect, ownerOrManager, runUpload, async (req, res) => {
   try {
@@ -123,14 +147,20 @@ router.post('/image', protect, ownerOrManager, runUpload, async (req, res) => {
       return res.status(400).json({ error: 'Uploaded file is not a valid supported image.' });
     }
 
-    const safeExtension = detectedType === 'jpeg' ? '.jpg' : `.${detectedType}`;
-    const filename = `${crypto.randomBytes(18).toString('hex')}${safeExtension}`;
-    await fs.promises.writeFile(path.join(uploadDir, filename), req.file.buffer, { flag: 'wx' });
+    const tenantFolder = req.tenant?.slug || req.tenantId || req.user?.tenantId || 'global';
+    const folder = `brewhaus/tenants/${tenantFolder}`;
 
-    const serverUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 5000}`;
-    const url = `${serverUrl.replace(/\/$/, '')}/uploads/${filename}`;
-    return res.json({ url, filename });
+    const result = await uploadBufferToCloudinary(req.file.buffer, {
+      folder,
+      resource_type: 'image',
+    });
+
+    return res.json({
+      url: result.secure_url,
+      filename: result.public_id || `${crypto.randomBytes(18).toString('hex')}.${detectedType === 'jpeg' ? 'jpg' : detectedType}`,
+    });
   } catch (error) {
+    console.error('[Upload] Cloudinary upload error:', error.message);
     return res.status(500).json({ error: 'Image upload failed.' });
   }
 });

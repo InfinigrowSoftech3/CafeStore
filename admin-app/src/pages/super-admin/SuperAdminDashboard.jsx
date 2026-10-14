@@ -98,8 +98,8 @@ export default function SuperAdminDashboard() {
     try {
       const [mRes, tRes, aRes, sRes] = await Promise.all([
         api.get('/platform/admin/metrics', { headers }),
-        api.get('/platform/admin/tenants', { headers }),
-        api.get('/platform/admin/audit-logs', { headers }).catch(() => ({ data: { logs: [] } })),
+        api.get('/platform/admin/tenants?limit=100', { headers }),
+        api.get('/platform/admin/audit-logs?limit=100', { headers }).catch(() => ({ data: { logs: [] } })),
         api.get('/platform/admin/settings', { headers }).catch(() => ({ data: { settings: {} } })),
       ]);
 
@@ -242,14 +242,14 @@ export default function SuperAdminDashboard() {
   // Don't render until theme is mounted to prevent flash
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+      <div className="super-admin-theme min-h-screen bg-[var(--bg-canvas)] flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#D4AF37] border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen font-body flex bg-[var(--bg-canvas)] text-[var(--text-primary)]">
+    <div className="super-admin-theme min-h-screen font-body flex bg-[var(--bg-canvas)] text-[var(--text-primary)]">
       {/* ── Left Sidebar Navigation ────────────────────────────── */}
       <Sidebar
         activeTab={activeTab}
@@ -309,15 +309,15 @@ export default function SuperAdminDashboard() {
                 </div>
 
                 {/* Date-Range Selector */}
-                <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-1 text-xs shadow-2xs">
+                <div className="flex items-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-1 text-xs shadow-2xs">
                   {['today', '7d', '30d', 'all'].map((range) => (
                     <button
                       key={range}
                       onClick={() => setDateRange(range)}
                       className={`rounded-lg px-3 py-1 font-semibold transition ${
                         dateRange === range
-                          ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                          : 'text-slate-600 dark:text-stone-400 hover:text-slate-900 dark:hover:text-white'
+                          ? 'bg-[#D4AF37] text-[#0B1B4D] font-bold shadow-xs'
+                          : 'text-[#5B6585] dark:text-stone-400 hover:text-[#0B1B4D] dark:hover:text-white'
                       }`}
                     >
                       {range === 'today' ? 'Today' : range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : 'All Time'}
@@ -406,7 +406,7 @@ export default function SuperAdminDashboard() {
                   </div>
                   <button
                     onClick={() => setActiveTab('tenants')}
-                    className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline inline-flex items-center gap-1"
+                    className="text-xs font-bold text-[#1E3FAE] dark:text-[#688bf7] hover:underline inline-flex items-center gap-1"
                   >
                     View All {tenants.length} Cafés <ArrowUpRight size={13} />
                   </button>
@@ -471,15 +471,15 @@ export default function SuperAdminDashboard() {
 
               {/* Financial Metrics Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="rounded-2xl border border-slate-200 dark:border-stone-800 bg-white dark:bg-stone-900/60 p-5 shadow-xs">
+                <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 shadow-xs">
                   <div className="text-xs font-semibold uppercase text-slate-500 dark:text-stone-400">Monthly Recurring (MRR)</div>
-                  <div className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1 tabular-nums">
+                  <div className="text-2xl font-black text-[#1E3FAE] dark:text-[#D4AF37] mt-1 tabular-nums">
                     ₹{(metrics?.mrr || 42800).toLocaleString()}
                   </div>
                   <div className="text-[11px] text-slate-400 dark:text-stone-500 mt-1">Based on active plan tiers</div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 dark:border-stone-800 bg-white dark:bg-stone-900/60 p-5 shadow-xs">
+                <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 shadow-xs">
                   <div className="text-xs font-semibold uppercase text-slate-500 dark:text-stone-400">Annual Run-Rate (ARR)</div>
                   <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">
                     ₹{((metrics?.mrr || 42800) * 12).toLocaleString()}
@@ -487,17 +487,17 @@ export default function SuperAdminDashboard() {
                   <div className="text-[11px] text-slate-400 dark:text-stone-500 mt-1">Projected annual platform revenue</div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 dark:border-stone-800 bg-white dark:bg-stone-900/60 p-5 shadow-xs">
+                <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 shadow-xs">
                   <div className="text-xs font-semibold uppercase text-slate-500 dark:text-stone-400">Average Order Value (AOV)</div>
-                  <div className="text-2xl font-black text-cyan-600 dark:text-cyan-400 mt-1 tabular-nums">
+                  <div className="text-2xl font-black text-[#0EA5E9] dark:text-[#38bdf8] mt-1 tabular-nums">
                     ₹{metrics?.avgOrderValue || 385}
                   </div>
                   <div className="text-[11px] text-slate-400 dark:text-stone-500 mt-1">Per dining transaction</div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 dark:border-stone-800 bg-white dark:bg-stone-900/60 p-5 shadow-xs">
+                <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 shadow-xs">
                   <div className="text-xs font-semibold uppercase text-slate-500 dark:text-stone-400">Customer Churn Rate</div>
-                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">
+                  <div className="text-2xl font-black text-[#12A37A] dark:text-[#34d399] mt-1 tabular-nums">
                     {metrics?.churnRate || 0}%
                   </div>
                   <div className="text-[11px] text-slate-400 dark:text-stone-500 mt-1">Over past 90 days</div>
@@ -534,21 +534,21 @@ export default function SuperAdminDashboard() {
                     key={tier.name}
                     className={`rounded-3xl border p-6 flex flex-col justify-between shadow-xs transition-colors ${
                       tier.popular
-                        ? 'border-amber-400 dark:border-amber-500/50 bg-amber-50/50 dark:bg-stone-900/90 ring-1 ring-amber-400/20'
-                        : 'border-slate-200 dark:border-stone-800 bg-white dark:bg-stone-900/60'
+                        ? 'border-[#D4AF37] dark:border-[#D4AF37]/50 bg-[#FBF3D5]/40 dark:bg-[#0B1B4D]/40 ring-1 ring-[#D4AF37]/30'
+                        : 'border-[var(--border-primary)] bg-[var(--bg-card)]'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between">
                         <h3 className="text-base font-bold text-slate-900 dark:text-white">{tier.name}</h3>
-                        <span className="rounded-full bg-slate-100 dark:bg-stone-800 px-2.5 py-0.5 text-xs font-bold text-amber-700 dark:text-amber-400">
+                        <span className="rounded-full bg-[#F5F7FC] dark:bg-[#07123A] px-2.5 py-0.5 text-xs font-bold text-[#1E3FAE] dark:text-[#D4AF37] border border-[#E3E8F5] dark:border-[#1E3FAE]/30">
                           {tier.count} Cafés
                         </span>
                       </div>
                       <div className="text-2xl font-black text-slate-900 dark:text-white mt-2 tabular-nums">{tier.price}</div>
                       <p className="text-xs text-slate-500 dark:text-stone-400 mt-2">{tier.desc}</p>
-                      <div className="mt-4 pt-3 border-t border-slate-200 dark:border-stone-800/80 text-xs text-slate-700 dark:text-stone-300 font-semibold flex items-center gap-2">
-                        <Zap size={14} className="text-amber-500" /> {tier.limits}
+                      <div className="mt-4 pt-3 border-t border-[var(--border-primary)]/80 text-xs text-slate-700 dark:text-stone-300 font-semibold flex items-center gap-2">
+                        <Zap size={14} className="text-[#D4AF37]" /> {tier.limits}
                       </div>
                     </div>
                   </div>
@@ -588,9 +588,9 @@ export default function SuperAdminDashboard() {
               </div>
 
               {/* Guidelines Card */}
-              <div className="rounded-2xl border border-amber-300 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-5 text-xs text-amber-900 dark:text-amber-200 space-y-2">
-                <div className="font-bold text-amber-950 dark:text-white text-sm flex items-center gap-2">
-                  <ShieldCheck size={18} className="text-amber-500" />
+              <div className="rounded-2xl border border-[#E6CF7A] dark:border-[#D4AF37]/40 bg-[#FBF3D5]/60 dark:bg-[#0B1B4D]/40 p-5 text-xs text-[#0B1B4D] dark:text-stone-200 space-y-2">
+                <div className="font-bold text-[#0B1B4D] dark:text-white text-sm flex items-center gap-2">
+                  <ShieldCheck size={18} className="text-[#D4AF37]" />
                   Impersonation Safety Policy
                 </div>
                 <p className="leading-relaxed">
@@ -599,13 +599,13 @@ export default function SuperAdminDashboard() {
               </div>
 
               {/* Quick Impersonate Table */}
-              <div className="rounded-3xl border border-slate-200 dark:border-stone-800 bg-white dark:bg-stone-900/60 p-6 space-y-4 shadow-xs">
+              <div className="rounded-3xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 space-y-4 shadow-xs">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">Registered Cafés for Support Sessions</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {tenants.map((t) => (
                     <div
                       key={t.id}
-                      className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 dark:border-stone-800 bg-slate-50 dark:bg-stone-950 text-xs"
+                      className="flex items-center justify-between p-3.5 rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] text-xs"
                     >
                       <div className="truncate pr-2">
                         <div className="font-bold text-slate-900 dark:text-white truncate">{t.name}</div>
@@ -613,7 +613,7 @@ export default function SuperAdminDashboard() {
                       </div>
                       <button
                         onClick={() => handleRequestImpersonate(t)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition shrink-0"
+                        className="inline-flex items-center gap-1 rounded-lg border border-[#1E3FAE]/20 bg-[#1E3FAE]/10 px-2.5 py-1 text-[11px] font-semibold text-[#1E3FAE] dark:text-[#688bf7] hover:bg-[#1E3FAE]/20 transition shrink-0"
                       >
                         <ArrowUpRight size={11} /> Impersonate
                       </button>
@@ -636,7 +636,7 @@ export default function SuperAdminDashboard() {
                 </p>
               </div>
 
-              <form onSubmit={handleSaveSettings} className="rounded-3xl border border-slate-200 dark:border-stone-800 bg-white dark:bg-stone-900/60 p-6 sm:p-8 space-y-6 max-w-2xl shadow-xs">
+              <form onSubmit={handleSaveSettings} className="rounded-3xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 sm:p-8 space-y-6 max-w-2xl shadow-xs">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-stone-400 mb-1.5">
                     Platform Brand Name
@@ -645,7 +645,7 @@ export default function SuperAdminDashboard() {
                     type="text"
                     value={platformSettings?.platformName || 'Brewhaus SaaS'}
                     onChange={(e) => setPlatformSettings({ ...platformSettings, platformName: e.target.value })}
-                    className="w-full rounded-xl border border-slate-200 dark:border-stone-800 bg-slate-50 dark:bg-stone-950 px-3.5 py-2.5 text-xs text-slate-900 dark:text-stone-100 focus:border-amber-500 focus:outline-none transition-colors"
+                    className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] px-3.5 py-2.5 text-xs text-slate-900 dark:text-stone-100 focus:border-[#1E3FAE] focus:ring-1 focus:ring-[#1E3FAE] focus:outline-none transition-colors"
                   />
                 </div>
 
@@ -657,7 +657,7 @@ export default function SuperAdminDashboard() {
                     type="email"
                     value={platformSettings?.supportEmail || 'support@brewhaus.com'}
                     onChange={(e) => setPlatformSettings({ ...platformSettings, supportEmail: e.target.value })}
-                    className="w-full rounded-xl border border-slate-200 dark:border-stone-800 bg-slate-50 dark:bg-stone-950 px-3.5 py-2.5 text-xs text-slate-900 dark:text-stone-100 focus:border-amber-500 focus:outline-none transition-colors"
+                    className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] px-3.5 py-2.5 text-xs text-slate-900 dark:text-stone-100 focus:border-[#1E3FAE] focus:ring-1 focus:ring-[#1E3FAE] focus:outline-none transition-colors"
                   />
                 </div>
 
@@ -669,11 +669,11 @@ export default function SuperAdminDashboard() {
                     type="number"
                     value={platformSettings?.trialDaysDefault || 14}
                     onChange={(e) => setPlatformSettings({ ...platformSettings, trialDaysDefault: Number(e.target.value) })}
-                    className="w-full rounded-xl border border-slate-200 dark:border-stone-800 bg-slate-50 dark:bg-stone-950 px-3.5 py-2.5 text-xs text-slate-900 dark:text-stone-100 focus:border-amber-500 focus:outline-none transition-colors"
+                    className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] px-3.5 py-2.5 text-xs text-slate-900 dark:text-stone-100 focus:border-[#1E3FAE] focus:ring-1 focus:ring-[#1E3FAE] focus:outline-none transition-colors"
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-2xl border border-slate-200 dark:border-stone-800 bg-slate-50 dark:bg-stone-950">
+                <div className="flex items-center justify-between p-4 rounded-2xl border border-[var(--border-primary)] bg-[var(--hover-bg)]">
                   <div>
                     <div className="text-xs font-bold text-slate-900 dark:text-white">Maintenance Mode</div>
                     <div className="text-[11px] text-slate-500 dark:text-stone-400 mt-0.5">
@@ -684,11 +684,11 @@ export default function SuperAdminDashboard() {
                     type="checkbox"
                     checked={Boolean(platformSettings?.maintenanceMode)}
                     onChange={(e) => setPlatformSettings({ ...platformSettings, maintenanceMode: e.target.checked })}
-                    className="h-4 w-4 rounded border-slate-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-amber-500 focus:ring-0"
+                    className="h-4 w-4 rounded border-slate-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-[#1E3FAE] focus:ring-[#1E3FAE]"
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-2xl border border-slate-200 dark:border-stone-800 bg-slate-50 dark:bg-stone-950">
+                <div className="flex items-center justify-between p-4 rounded-2xl border border-[var(--border-primary)] bg-[var(--hover-bg)]">
                   <div>
                     <div className="text-xs font-bold text-slate-900 dark:text-white">Open Tenant Self-Registration</div>
                     <div className="text-[11px] text-slate-500 dark:text-stone-400 mt-0.5">
@@ -699,14 +699,14 @@ export default function SuperAdminDashboard() {
                     type="checkbox"
                     checked={Boolean(platformSettings?.registrationOpen !== false)}
                     onChange={(e) => setPlatformSettings({ ...platformSettings, registrationOpen: e.target.checked })}
-                    className="h-4 w-4 rounded border-slate-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-amber-500 focus:ring-0"
+                    className="h-4 w-4 rounded border-slate-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-[#1E3FAE] focus:ring-[#1E3FAE]"
                   />
                 </div>
 
-                <div className="pt-4 border-t border-slate-200 dark:border-stone-800 flex justify-end">
+                <div className="pt-4 border-t border-[var(--border-primary)] flex justify-end">
                   <button
                     type="submit"
-                    className="rounded-xl bg-amber-500 px-5 py-2 text-xs font-bold text-stone-950 hover:bg-amber-400 transition"
+                    className="rounded-xl bg-[#1E3FAE] px-5 py-2 text-xs font-bold text-white hover:bg-[#17318A] transition shadow-xs"
                   >
                     Save Platform Settings
                   </button>

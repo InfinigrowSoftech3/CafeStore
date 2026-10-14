@@ -142,6 +142,48 @@ test('Phase 0A migrates the legacy café and centrally isolates tenant data and 
     headers: { origin: 'https://unknown-cafe.saas.test' },
   });
   assert.equal(unknownResponse.status, 404, 'unknown tenant slugs receive a clean not-found response');
+
+  // 6. Regression: tenantId in req.body is rejected with 400 MASS_ASSIGNMENT_FORBIDDEN
+  const bodyInjectResponse = await fetch(`${baseUrl}/api/orders`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      origin: 'https://brewhaus.saas.test',
+    },
+    body: JSON.stringify({
+      tenantId: String(second._id),
+      tableNumber: 1,
+      customer: { name: 'Attacker', phone: '9999999999' },
+      items: [{ productId: String(fixtures.productA._id), quantity: 1 }],
+      paymentMethod: 'cash',
+    }),
+  });
+  assert.equal(bodyInjectResponse.status, 400, 'tenantId in request body is blocked');
+  const bodyInjectData = await bodyInjectResponse.json();
+  assert.equal(bodyInjectData.code, 'MASS_ASSIGNMENT_FORBIDDEN');
+
+  // 7. Regression: tenantId in query params does not override tenant context from tenantResolver
+  const queryInjectResponse = await fetch(`${baseUrl}/api/menu?tenantId=${second._id}`, {
+    headers: { origin: 'https://brewhaus.saas.test' },
+  });
+  assert.equal(queryInjectResponse.status, 200);
+  const queryInjectData = await queryInjectResponse.json();
+  const queryInjectIds = queryInjectData.products.map((p) => String(p._id));
+  assert.ok(queryInjectIds.includes(String(fixtures.productA._id)), 'Query param tenantId cannot hijack tenant resolution');
+  assert.ok(!queryInjectIds.includes(String(fixtures.productB._id)), 'Query param tenantId does not leak other tenant data');
+
+  // 8. Regression: POST /api/public/orders rejects spoofing via body cafeId without valid header or QR token
+  const spoofPublicResponse = await fetch(`${baseUrl}/api/public/orders`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      cafeId: String(brewhaus._id),
+      tableId: String(fixtures.tableA._id),
+      items: [{ productId: String(fixtures.productA._id), quantity: 1 }],
+    }),
+  });
+  assert.equal(spoofPublicResponse.status, 400, 'public order creation requires verified header or signed QR token');
+
   await assert.rejects(rollbackPhase0A(), /other tenants exist/i);
 
   for (const name of ['categories', 'products', 'tables', 'orders', 'payments', 'users', 'counters']) {

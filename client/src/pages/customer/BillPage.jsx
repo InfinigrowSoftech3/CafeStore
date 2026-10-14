@@ -188,7 +188,7 @@ export default function BillPage() {
             Cash payment requested. Please see the cashier at the counter. Your bill will close after staff confirms payment.
           </div>
         ) : bill.status === 'PAYMENT_PENDING' ? (
-          <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 leading-relaxed">
+          <div className="rounded-2xl border border-brew-200 bg-brew-50 p-4 text-sm text-brew-800 leading-relaxed">
             Online payment submitted. Waiting for secure payment provider confirmation…
           </div>
         ) : bill.dueAmount > 0 ? (

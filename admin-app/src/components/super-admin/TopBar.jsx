@@ -49,10 +49,10 @@ export default function TopBar({
         <div className="flex-1 max-w-md hidden md:block">
           <button
             onClick={onOpenCommandPalette}
-            className="w-full flex items-center justify-between rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)]/80 px-3.5 py-2 text-xs text-[var(--header-text-muted)] hover:border-amber-500/40 hover:text-[var(--header-text)] transition shadow-inner"
+            className="w-full flex items-center justify-between rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)]/80 px-3.5 py-2 text-xs text-[var(--header-text-muted)] hover:border-[#1E3FAE]/40 focus:border-[#1E3FAE] hover:text-[var(--header-text)] transition shadow-inner focus:outline-none focus:ring-2 focus:ring-[#1E3FAE]/20"
           >
             <div className="flex items-center gap-2.5">
-              <Search size={14} className="text-amber-500" />
+              <Search size={14} className="text-[#1E3FAE]" />
               <span>Search cafés, commands or views...</span>
             </div>
             <kbd className="rounded border border-[var(--border-primary)] bg-[var(--bg-surface)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--header-text-muted)] shadow-2xs">
@@ -91,7 +91,7 @@ export default function TopBar({
             >
               <Bell size={15} />
               {activeAlertCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-white">
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#D4AF37] text-[9px] font-black text-[#0B1B4D] shadow-xs">
                   {activeAlertCount}
                 </span>
               )}
@@ -104,18 +104,18 @@ export default function TopBar({
               >
                 <div className="flex items-center justify-between pb-2 border-b border-[var(--border-primary)] font-bold text-[var(--text-primary)]">
                   <span>Platform Notifications</span>
-                  <span className="text-[10px] text-amber-500 font-bold">Live</span>
+                  <span className="text-[10px] text-[#1E3FAE] font-bold">Live</span>
                 </div>
                 <div className="py-3 space-y-2 text-[var(--text-secondary)]">
                   <div className="flex items-start gap-2 bg-[var(--hover-bg)] p-2.5 rounded-xl border border-[var(--border-primary)]">
-                    <CheckCircle2 size={14} className="text-emerald-500 dark:text-emerald-400 mt-0.5 shrink-0" />
+                    <CheckCircle2 size={14} className="text-[#12A37A] mt-0.5 shrink-0" />
                     <div>
                       <div className="font-semibold text-[var(--text-primary)]">Platform Health 100%</div>
                       <div className="text-[10px] text-[var(--text-muted)]">All registered café subdomains active and online.</div>
                     </div>
                   </div>
                   <div className="flex items-start gap-2 bg-[var(--hover-bg)] p-2.5 rounded-xl border border-[var(--border-primary)]">
-                    <ShieldCheck size={14} className="text-amber-500 dark:text-amber-400 mt-0.5 shrink-0" />
+                    <ShieldCheck size={14} className="text-[#1E3FAE] mt-0.5 shrink-0" />
                     <div>
                       <div className="font-semibold text-[var(--text-primary)]">Pure Vegetarian Filter</div>
                       <div className="text-[10px] text-[var(--text-muted)]">Zero-meat / zero-egg verification active across all menus.</div>
@@ -132,9 +132,9 @@ export default function TopBar({
           <div className="relative">
             <button
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-              className="flex items-center gap-2 rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] py-1.5 px-2.5 text-xs font-semibold text-[var(--header-text)] hover:border-amber-500/40 transition"
+              className="flex items-center gap-2 rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] py-1.5 px-2.5 text-xs font-semibold text-[var(--header-text)] hover:border-[#1E3FAE]/40 transition"
             >
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold text-[10px]">
+              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#0B1B4D] border border-[#0B1B4D] text-[#D4AF37] font-bold text-[10px]">
                 SA
               </div>
               <span className="hidden sm:inline font-bold text-[var(--header-text)]">Super Admin</span>
@@ -156,7 +156,7 @@ export default function TopBar({
                     setProfileDropdownOpen(false);
                     onOpenUserPanels();
                   }}
-                  className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] hover:text-amber-600 dark:hover:text-amber-400 transition"
+                  className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] hover:text-[#1E3FAE] transition"
                 >
                   <Smartphone size={13} /> User Panels Workstation
                 </button>
@@ -168,7 +168,7 @@ export default function TopBar({
                     setProfileDropdownOpen(false);
                     onLogout();
                   }}
-                  className="w-full flex items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition"
+                  className="w-full flex items-center gap-2 rounded-xl px-3 py-2 font-semibold text-[#DC2626] hover:bg-red-50 transition"
                 >
                   <LogOut size={13} /> Exit Platform Admin
                 </button>

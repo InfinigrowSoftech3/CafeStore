@@ -102,7 +102,7 @@ export default function ProductModal({ product, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 bg-espresso-950/70 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 bg-[#17110C]/75 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
     >
       <motion.div
         initial={{ y: '100%', opacity: 0 }}
@@ -111,22 +111,22 @@ export default function ProductModal({ product, onClose }) {
         transition={{ type: 'spring', damping: 28, stiffness: 360 }}
         onClick={e => e.stopPropagation()}
         className="bg-white w-full sm:max-w-lg sm:rounded-3xl rounded-t-3xl overflow-hidden
-                   max-h-[92vh] sm:max-h-[88vh] flex flex-col shadow-2xl border border-foam"
+                   max-h-[92vh] sm:max-h-[88vh] flex flex-col shadow-2xl border border-[#E9E0D2]"
       >
         {/* Mobile Swipe / Drag Handle */}
         <div className="sm:hidden flex items-center justify-center pt-2 pb-1 bg-white">
-          <div className="w-10 h-1 rounded-full bg-espresso-200" />
+          <div className="w-10 h-1 rounded-full bg-sand-200" />
         </div>
 
         {/* Hero Image Section */}
-        <div className="relative h-56 sm:h-64 flex-shrink-0 bg-foam overflow-hidden">
+        <div className="relative h-56 sm:h-64 flex-shrink-0 bg-sand-100 overflow-hidden">
           <img
             src={product.image || PLACEHOLDER}
             alt={product.name}
             className={`w-full h-full object-cover transition-opacity ${!isAvailable ? 'opacity-50 grayscale' : ''}`}
             onError={e => { e.currentTarget.src = PLACEHOLDER; }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-espresso-950/80 via-espresso-950/20 to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#17110C]/90 via-[#17110C]/30 to-black/30" />
 
           {/* Close button */}
           <button
@@ -134,7 +134,7 @@ export default function ProductModal({ product, onClose }) {
             onClick={onClose}
             aria-label="Close product modal"
             className="absolute top-3.5 right-3.5 min-h-[40px] min-w-[40px] w-10 h-10 bg-white/90 backdrop-blur-md rounded-full
-                       flex items-center justify-center shadow-md hover:bg-white text-espresso-900 transition-all active:scale-90 focus:outline-none focus:ring-2 focus:ring-brew-500"
+                       flex items-center justify-center shadow-md hover:bg-white text-espresso-950 transition-all active:scale-90 focus:outline-none focus:ring-2 focus:ring-brew-500"
           >
             <X size={18} strokeWidth={2.4} aria-hidden="true" />
           </button>
@@ -142,19 +142,19 @@ export default function ProductModal({ product, onClose }) {
           {/* Badges on Hero */}
           <div className="absolute top-3.5 left-4 flex flex-wrap items-center gap-1.5">
             {product.isVeg !== false ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/95 backdrop-blur-md px-2 py-0.5 text-[11px] font-bold text-emerald-800 shadow-xs">
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/95 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 shadow-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-600" />
                 <span>VEG</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/95 backdrop-blur-md px-2 py-0.5 text-[11px] font-bold text-amber-900 shadow-xs">
-                <span className="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[6px] border-b-amber-800" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/95 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-bold text-rose-800 shadow-xs">
+                <span className="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[6px] border-b-rose-600" />
                 <span>NON-VEG</span>
               </span>
             )}
 
             {product.popular && isAvailable && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-brew-500 text-white px-2 py-0.5 text-[11px] font-bold shadow-xs">
+              <span className="badge-popular inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold text-espresso-950">
                 <Star size={10} fill="currentColor" />
                 <span>POPULAR</span>
               </span>
@@ -168,13 +168,13 @@ export default function ProductModal({ product, onClose }) {
                 {product.name}
               </h2>
               {product.prepTime && (
-                <span className="inline-flex items-center gap-1 text-xs text-cream/80 mt-0.5">
-                  <Clock size={12} /> Prep time: ~{product.prepTime} mins
+                <span className="inline-flex items-center gap-1 text-xs text-sand-200 mt-0.5">
+                  <Clock size={12} className="text-brew-400" /> Prep time: ~{product.prepTime} mins
                 </span>
               )}
             </div>
             <div className="text-right">
-              <span className="price-tag text-lg sm:text-xl font-bold text-cream drop-shadow-sm">
+              <span className="price-tag text-lg sm:text-xl font-bold text-brew-400 drop-shadow-sm">
                 {formatMoney(basePrice, tenant.currency)}
               </span>
             </div>
@@ -184,7 +184,7 @@ export default function ProductModal({ product, onClose }) {
         {/* Modal Scrollable Body */}
         <div className="p-5 flex-1 overflow-y-auto space-y-5 bg-white">
           {product.description && (
-            <div className="rounded-2xl bg-foam/50 p-3.5 border border-foam">
+            <div className="rounded-2xl bg-[#FAF6EF] p-3.5 border border-[#E9E0D2]">
               <p className="text-espresso-700 text-sm leading-relaxed">{product.description}</p>
             </div>
           )}
@@ -194,7 +194,7 @@ export default function ProductModal({ product, onClose }) {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-bold uppercase tracking-wider text-espresso-700">
-                  Select Size / Option <span className="text-red-500">*</span>
+                  Select Size / Option <span className="text-rose-500">*</span>
                 </p>
                 <span className="text-[11px] text-espresso-400">Required</span>
               </div>
@@ -208,8 +208,8 @@ export default function ProductModal({ product, onClose }) {
                       onClick={() => setSelectedVariant(v)}
                       className={`min-h-[48px] flex items-center justify-between p-3 rounded-2xl border transition-all text-left ${
                         isSelected
-                          ? 'border-brew-500 bg-brew-50/80 text-espresso-950 ring-1 ring-brew-500 shadow-2xs'
-                          : 'border-foam bg-cream/40 text-espresso-800 hover:border-espresso-300'
+                          ? 'border-brew-500 bg-sand-100/90 text-espresso-950 font-semibold ring-1 ring-brew-500 shadow-2xs'
+                          : 'border-sand-200 bg-[#FAF6EF]/50 text-espresso-800 hover:border-brew-400'
                       }`}
                     >
                       <div className="flex items-center gap-2">
@@ -247,8 +247,8 @@ export default function ProductModal({ product, onClose }) {
                       aria-pressed={selected}
                       className={`min-h-[44px] flex items-center justify-between p-3 rounded-2xl border text-xs transition-all ${
                         selected
-                          ? 'border-brew-500 bg-brew-50/80 text-espresso-950 ring-1 ring-brew-500 font-semibold'
-                          : 'border-foam bg-cream/40 text-espresso-700 hover:border-espresso-300'
+                          ? 'border-brew-500 bg-sand-100/90 text-espresso-950 ring-1 ring-brew-500 font-semibold shadow-2xs'
+                          : 'border-sand-200 bg-[#FAF6EF]/50 text-espresso-700 hover:border-brew-400'
                       }`}
                     >
                       <span>{milk.name}</span>
@@ -278,8 +278,8 @@ export default function ProductModal({ product, onClose }) {
                       onClick={() => toggleAddon(addon)}
                       className={`min-h-[48px] w-full flex items-center justify-between p-3.5 rounded-2xl border text-sm transition-all ${
                         selected
-                          ? 'border-brew-500 bg-brew-50/70 text-espresso-950 ring-1 ring-brew-400'
-                          : 'border-foam bg-cream/40 text-espresso-800 hover:border-espresso-300'
+                          ? 'border-brew-500 bg-sand-100/90 text-espresso-950 ring-1 ring-brew-400 shadow-2xs font-semibold'
+                          : 'border-sand-200 bg-[#FAF6EF]/50 text-espresso-800 hover:border-brew-400'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
@@ -316,7 +316,7 @@ export default function ProductModal({ product, onClose }) {
                   key={preset}
                   type="button"
                   onClick={() => handlePresetInstruction(preset)}
-                  className="rounded-full border border-espresso-200 bg-cream px-3 py-1 text-[11px] font-semibold text-espresso-800 hover:bg-espresso-100 hover:border-espresso-300 transition shadow-2xs active:scale-95"
+                  className="rounded-full border border-sand-200 bg-[#FAF6EF] px-3 py-1 text-[11px] font-semibold text-espresso-800 hover:bg-foam hover:border-brew-400 transition shadow-2xs active:scale-95"
                 >
                   + {preset}
                 </button>
@@ -335,15 +335,15 @@ export default function ProductModal({ product, onClose }) {
         </div>
 
         {/* Modal Sticky Footer Action */}
-        <div className="p-4 sm:p-5 border-t border-foam bg-cream/70 flex items-center gap-3 flex-shrink-0">
+        <div className="p-4 sm:p-5 border-t border-[#E9E0D2] bg-[#FAF6EF] flex items-center gap-3 flex-shrink-0">
           {/* Quantity Stepper */}
-          <div className="flex items-center gap-1 border border-espresso-200/90 bg-white rounded-2xl p-1 shadow-2xs">
+          <div className="flex items-center gap-1 border border-[#E9E0D2] bg-white rounded-2xl p-1 shadow-2xs">
             <button
               type="button"
               onClick={() => changeQty(-1)}
               disabled={!isAvailable || quantity <= 1}
               aria-label="Decrease quantity"
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-cream text-espresso-900 hover:bg-espresso-900 hover:text-white transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-cream disabled:hover:text-espresso-900 active:scale-95"
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-sand-50 text-espresso-900 hover:bg-espresso-950 hover:text-white transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-sand-50 disabled:hover:text-espresso-900 active:scale-95"
             >
               <Minus size={15} strokeWidth={2.5} aria-hidden="true" />
             </button>
@@ -355,7 +355,7 @@ export default function ProductModal({ product, onClose }) {
               onClick={() => changeQty(1)}
               disabled={!isAvailable || quantity >= maxQty}
               aria-label="Increase quantity"
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-cream text-espresso-900 hover:bg-espresso-900 hover:text-white transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-cream disabled:hover:text-espresso-900 active:scale-95"
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-sand-50 text-espresso-900 hover:bg-espresso-950 hover:text-white transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-sand-50 disabled:hover:text-espresso-900 active:scale-95"
             >
               <Plus size={15} strokeWidth={2.5} aria-hidden="true" />
             </button>
@@ -369,8 +369,8 @@ export default function ProductModal({ product, onClose }) {
             disabled={!isAvailable}
             className={`flex-1 min-h-[50px] flex items-center justify-between py-3.5 rounded-2xl px-5 font-bold text-sm transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-brew-500
               ${!isAvailable
-                ? 'bg-espresso-200 text-espresso-400 cursor-not-allowed'
-                : 'bg-espresso-900 text-cream hover:bg-espresso-800 active:scale-[0.98]'
+                ? 'bg-sand-200 text-espresso-400 cursor-not-allowed'
+                : 'btn-primary'
               }`}
           >
             <div className="flex items-center gap-2">
@@ -378,7 +378,7 @@ export default function ProductModal({ product, onClose }) {
                 <span>Out of Stock</span>
               ) : !tableNumber ? (
                 <>
-                  <Lock size={17} className="text-cream/90" strokeWidth={2.4} aria-hidden="true" />
+                  <Lock size={17} strokeWidth={2.4} aria-hidden="true" />
                   <span>Scan Table to Order</span>
                 </>
               ) : (
@@ -389,7 +389,7 @@ export default function ProductModal({ product, onClose }) {
               )}
             </div>
             {isAvailable && (
-              <span className="font-mono font-bold text-base text-cream">
+              <span className="font-mono font-bold text-base">
                 {formatMoney(total, tenant.currency)}
               </span>
             )}

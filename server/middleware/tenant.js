@@ -16,6 +16,9 @@ const getSlugFromHost = (host) => {
     const prefix = host.slice(0, -'.localhost'.length);
     if (prefix && !prefix.includes('.') && prefix !== 'admin' && prefix !== 'www' && prefix !== 'cafe') return prefix;
   }
+  if (process.env.NODE_ENV === 'test' && (host === 'localhost' || host === '127.0.0.1')) {
+    return String(process.env.TENANT_DEFAULT_SLUG || 'brewhaus').toLowerCase();
+  }
   return null;
 };
 
@@ -96,22 +99,12 @@ export const tenantResolver = async (req, res, next) => {
       }
     }
 
-    // 2. Direct cafe / tenant query parameters or headers
+    // 2. Direct cafe / tenant headers (X-Tenant-Id, X-Tenant-Slug, X-Cafe-ID)
     if (!tenant) {
       const headerTenantId = req.headers['x-tenant-id'] || req.headers['x-cafe-id'];
       const headerTenantSlug = req.headers['x-tenant-slug'];
-      const queryCafe = req.query?.cafe || req.query?.cafeId || req.query?.tenant || req.query?.slug || req.body?.cafeId || req.body?.tenantId;
 
-      if (queryCafe) {
-        const idOrSlug = String(queryCafe).trim();
-        if (mongoose.isValidObjectId(idOrSlug)) {
-          tenant = await Tenant.findById(idOrSlug).lean();
-        }
-        if (!tenant) {
-          tenant = await Tenant.findOne({ slug: idOrSlug.toLowerCase() }).lean();
-        }
-        if (tenant) tenantId = tenant._id;
-      } else if (headerTenantId && mongoose.isValidObjectId(headerTenantId)) {
+      if (headerTenantId && mongoose.isValidObjectId(headerTenantId)) {
         tenant = await Tenant.findById(headerTenantId).lean();
         if (tenant) tenantId = tenant._id;
       } else if (headerTenantSlug) {

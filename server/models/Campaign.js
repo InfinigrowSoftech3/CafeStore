@@ -52,8 +52,13 @@ const campaignSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['draft', 'scheduled', 'sending', 'sent', 'partially_failed', 'failed', 'cancelled'],
+    enum: ['draft', 'scheduled', 'running', 'sending', 'sent', 'partially_failed', 'failed', 'cancelled'],
     default: 'draft',
+    index: true,
+  },
+  leaseExpiresAt: {
+    type: Date,
+    default: null,
     index: true,
   },
   totalRecipients: {

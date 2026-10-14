@@ -6,15 +6,25 @@ import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import { runWithSystemTenantAccess } from '../utils/tenantContext.js';
 import { sendApiSuccess, sendApiError } from '../utils/apiResponse.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
 // ── GET /api/cafes - List All Cafes with Profiles ─────────────────────────────
 router.get('/', async (req, res, next) => {
   try {
-    const list = await runWithSystemTenantAccess(async () => {
-      const tenants = await Tenant.find().sort({ name: 1 }).lean();
-      return Promise.all(
+    const { page, limit, skip } = parsePagination(req);
+    const { list, total } = await runWithSystemTenantAccess(async () => {
+      const [tenants, count] = await Promise.all([
+        Tenant.find()
+          .sort({ name: 1, _id: 1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+        Tenant.countDocuments(),
+      ]);
+
+      const cafesList = await Promise.all(
         tenants.map(async (t) => {
           const [tableCount, productCount] = await Promise.all([
             Table.countDocuments({ tenantId: t._id }),
@@ -50,9 +60,14 @@ router.get('/', async (req, res, next) => {
           };
         })
       );
+
+      return { list: cafesList, total: count };
     });
 
-    return sendApiSuccess(res, 200, { cafes: list });
+    return sendApiSuccess(res, 200, {
+      cafes: list,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     next(error);
   }

@@ -11,7 +11,7 @@ import usePageMeta from '../../hooks/usePageMeta';
 
 const STATUS = {
   pending: { label: 'Order received', detail: 'Waiting for the cafe to confirm your order.', tone: 'border-amber-200 bg-amber-50 text-amber-800' },
-  confirmed: { label: 'Confirmed', detail: 'Your order is confirmed and queued for preparation.', tone: 'border-sky-200 bg-sky-50 text-sky-800' },
+  confirmed: { label: 'Confirmed', detail: 'Your order is confirmed and queued for preparation.', tone: 'border-brew-200 bg-brew-50 text-brew-800' },
   preparing: { label: 'Being prepared', detail: 'The kitchen is preparing your order now.', tone: 'border-orange-200 bg-orange-50 text-orange-800' },
   ready: { label: 'Ready to serve', detail: 'Your order is ready and coming to your table.', tone: 'border-emerald-200 bg-emerald-50 text-emerald-800' },
   completed: { label: 'Served', detail: 'This order has been served.', tone: 'border-stone-200 bg-stone-100 text-stone-700' },

@@ -623,7 +623,7 @@ router.get('/', protect, ownerOrManager, async (req, res) => {
 
     const [campaigns, total] = await Promise.all([
       NotificationCampaign.find(query)
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1, _id: -1 })
         .skip(skip)
         .limit(limitNum)
         .lean(),
@@ -635,6 +635,11 @@ router.get('/', protect, ownerOrManager, async (req, res) => {
       total,
       page: pageNum,
       totalPages: Math.ceil(total / limitNum) || 1,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+      },
     });
   } catch (err) {
     console.error('List notification campaigns error:', err);

@@ -5,18 +5,36 @@ const transactionsUnsupported = (error) => (
   /transaction numbers are only allowed/i.test(error?.message || '')
 );
 
+let cachedTransactionsSupported = null;
+
 /**
  * Run work in a MongoDB transaction. Local non-production standalone MongoDB
  * instances lack transaction support; callers may provide a compensating
  * fallback for that development/test environment. Production never falls back.
  */
 export const withMongoTransaction = async (work, fallback) => {
-  const session = await mongoose.startSession();
+  if (process.env.NODE_ENV !== 'production' && fallback && cachedTransactionsSupported === false) {
+    return fallback();
+  }
+
+  let session;
   try {
-    return await session.withTransaction(() => work(session));
+    session = await mongoose.startSession();
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'production' && fallback) {
+      cachedTransactionsSupported = false;
+      return fallback();
+    }
+    throw err;
+  }
+
+  try {
+    const result = await session.withTransaction(() => work(session));
+    cachedTransactionsSupported = true;
+    return result;
   } catch (error) {
     if (process.env.NODE_ENV !== 'production' && fallback && transactionsUnsupported(error)) {
-      console.warn('MongoDB transactions are unavailable; using the route’s non-production compensating fallback.');
+      cachedTransactionsSupported = false;
       return fallback();
     }
     throw error;

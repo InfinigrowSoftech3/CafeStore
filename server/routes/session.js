@@ -21,6 +21,7 @@ import { withMongoTransaction } from '../utils/mongoTransaction.js';
 import TableServiceRequest from '../models/TableServiceRequest.js';
 import { publishLiveUpdate } from '../services/liveUpdates.js';
 import { awardLoyaltyPoints } from '../services/loyaltyService.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
@@ -64,7 +65,7 @@ const getRazorpay = async (req) => {
     !activeConfig.keySecret ||
     !activeConfig.webhookSecret ||
     activeConfig.keySecret === 'placeholder_secret' ||
-    (process.env.NODE_ENV === 'production' && activeConfig.keyId.startsWith('rzp_test_') && process.env.DEMO_PAYMENTS_ENABLED !== 'true')
+    (process.env.NODE_ENV === 'production' && activeConfig.keyId.startsWith('rzp_test_'))
   ) {
     throw new Error('Razorpay credentials are not configured for this café.');
   }
@@ -166,8 +167,13 @@ router.post('/request', async (req, res) => {
 });
 
 router.get('/requests', protect, tableServiceStaff, async (req, res) => {
-  const requests = await TableServiceRequest.find({ status: 'open' }).sort({ createdAt: 1 }).limit(100).lean();
-  return res.json({ requests });
+  const { page, limit, skip } = parsePagination(req.query, { defaultLimit: 20, maxLimit: 100 });
+  const filter = { status: 'open' };
+  const [requests, total] = await Promise.all([
+    TableServiceRequest.find(filter).sort({ createdAt: 1, _id: 1 }).skip(skip).limit(limit).lean(),
+    TableServiceRequest.countDocuments(filter),
+  ]);
+  return res.json({ requests, pagination: formatPagination({ page, limit, total }) });
 });
 
 router.put('/requests/:id/served', protect, tableServiceStaff, async (req, res) => {

@@ -9,19 +9,40 @@ const subscribers = new Map();
 let redisPublisher = null;
 let redisSubscriber = null;
 
-// Initialize Redis Pub/Sub if REDIS_URL or REDIS_HOST is provided
-if (process.env.REDIS_URL || process.env.REDIS_HOST) {
-  try {
-    const redisConfig = process.env.REDIS_URL || {
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: Number(process.env.REDIS_PORT) || 6379,
-      password: process.env.REDIS_PASSWORD || undefined,
-      lazyConnect: true,
-      maxRetriesPerRequest: 1,
-    };
+export const closeLiveUpdatesRedis = async () => {
+  if (redisPublisher) {
+    try { redisPublisher.disconnect(); } catch { /* ignore */ }
+    redisPublisher = null;
+  }
+  if (redisSubscriber) {
+    try { redisSubscriber.disconnect(); } catch { /* ignore */ }
+    redisSubscriber = null;
+  }
+};
 
-    redisPublisher = new Redis(redisConfig);
-    redisSubscriber = new Redis(redisConfig);
+const commonRedisOptions = {
+  lazyConnect: true,
+  maxRetriesPerRequest: 1,
+  enableOfflineQueue: false,
+  retryStrategy: () => null,
+};
+
+// Initialize Redis Pub/Sub if REDIS_URL or REDIS_HOST is provided
+if (process.env.NODE_ENV !== 'test' && !process.env.DISABLE_REDIS_PUBSUB && (process.env.REDIS_URL || process.env.REDIS_HOST)) {
+  try {
+    if (typeof process.env.REDIS_URL === 'string' && process.env.REDIS_URL) {
+      redisPublisher = new Redis(process.env.REDIS_URL, commonRedisOptions);
+      redisSubscriber = new Redis(process.env.REDIS_URL, commonRedisOptions);
+    } else {
+      const config = {
+        host: process.env.REDIS_HOST || '127.0.0.1',
+        port: Number(process.env.REDIS_PORT) || 6379,
+        password: process.env.REDIS_PASSWORD || undefined,
+        ...commonRedisOptions,
+      };
+      redisPublisher = new Redis(config);
+      redisSubscriber = new Redis(config);
+    }
 
     redisPublisher.on('error', (err) => {
       console.warn('[Redis Pub/Sub] Publisher connection notice:', err.message);
@@ -223,13 +244,35 @@ export const openLiveStream = (req, res, channel) => {
     if (!res.writableEnded) res.write(': keep-alive\n\n');
   }, 25000);
   heartbeat.unref?.();
+  res._heartbeat = heartbeat;
 
   const cleanup = () => {
-    clearInterval(heartbeat);
+    if (res._heartbeat) {
+      clearInterval(res._heartbeat);
+      res._heartbeat = null;
+    }
     listeners.delete(res);
     if (listeners.size === 0) subscribers.delete(channel);
   };
   res.on('close', cleanup);
+};
+
+export const closeAllLiveStreams = () => {
+  for (const [channel, listeners] of subscribers.entries()) {
+    for (const res of listeners) {
+      if (res._heartbeat) {
+        clearInterval(res._heartbeat);
+        res._heartbeat = null;
+      }
+      if (!res.writableEnded) {
+        try {
+          res.write('event: shutdown\ndata: {"message":"server shutting down"}\n\n');
+          res.end();
+        } catch { /* ignore */ }
+      }
+    }
+  }
+  subscribers.clear();
 };
 
 export const liveSubscriberCount = (channel) => subscribers.get(channel)?.size || 0;

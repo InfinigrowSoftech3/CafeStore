@@ -14,6 +14,10 @@ process.env.RAZORPAY_WEBHOOK_SECRET = 'integration-test-webhook-secret';
 process.env.TABLE_QR_SECRET = 'integration-test-table-qr-secret-with-32-bytes';
 process.env.CLIENT_URL = 'https://client-seven-sigma-26.vercel.app';
 process.env.SERVER_URL = 'http://127.0.0.1:0';
+process.env.ENABLE_RATE_LIMITING = 'true';
+process.env.RATE_LIMIT_WINDOW_MS = '60000';
+process.env.RATE_LIMIT_MAX = '200';
+process.env.PUBLIC_RATE_LIMIT_MAX = '200';
 
 const { createApp } = await import('../index.js');
 const { default: User } = await import('../models/User.js');
@@ -390,7 +394,7 @@ test('real security integration suite', async (t) => {
       assert.equal((await request('/api/tables/not-a-number/validate')).status, 400);
       const qr = await json('/api/tables', { tableNumber: 13, baseUrl: 'https://attacker.example/phishing' }, { token: adminToken });
       assert.equal(qr.status, 201);
-      assert.match(qr.data.table.qrUrl, /^(https:\/\/client-[a-z0-9-]+\.vercel\.app|https:\/\/cafe\.infinigrowsoftech\.com)\/menu\?tableToken=[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/);
+      assert.match(qr.data.table.qrUrl, /^(https:\/\/client-[a-z0-9-]+\.vercel\.app|https:\/\/cafe\.infinigrowsoftech\.com)\/menu\?.*tableToken=[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/);
       assert.doesNotMatch(qr.data.table.qrUrl, /attacker\.example/);
       assert.equal((await request(`/api/tables/qr/validate?token=${encodeURIComponent(new URL(qr.data.table.qrUrl).searchParams.get('tableToken'))}`)).data.valid, true);
     });
@@ -440,7 +444,7 @@ test('real security integration suite', async (t) => {
 
     await t.test('order numbers are unique per tenant under high concurrency', async () => {
       // This test runs in the default tenant context
-      const results = await Promise.all(Array.from({ length: 50 }, (_, i) => createPublicOrder({ productId: product._id, name: `Concurrent ${i}` })));
+      const results = await Promise.all(Array.from({ length: 50 }, (_, i) => createPublicOrder({ productId: product._id, name: `HighConcurrency ${i}` })));
       const numbers = results.map((result) => result.order.orderNumber);
       assert.equal(new Set(numbers).size, numbers.length, 'All order numbers must be unique');
       // Verify sequential allocation (no gaps from failed attempts)

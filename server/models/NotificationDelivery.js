@@ -40,6 +40,11 @@ const notificationDeliverySchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+notificationDeliverySchema.index({ tenantId: 1, campaignId: 1, status: 1 });
+notificationDeliverySchema.index({ tenantId: 1, customerId: 1, createdAt: -1 });
+notificationDeliverySchema.index({ tenantId: 1, status: 1, createdAt: -1 });
+notificationDeliverySchema.index({ tenantId: 1, createdAt: -1 });
+notificationDeliverySchema.index({ tenantId: 1, subscriptionId: 1 });
 notificationDeliverySchema.index({ campaignId: 1, status: 1 });
 notificationDeliverySchema.index({ customerId: 1, createdAt: -1 });
 notificationDeliverySchema.index({ createdAt: -1 });

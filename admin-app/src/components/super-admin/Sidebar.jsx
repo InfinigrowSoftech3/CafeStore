@@ -46,16 +46,16 @@ export default function Sidebar({
         {/* ── 1. Top Brand Header (h-16 pinned) ───────────────── */}
         <div className="flex h-16 shrink-0 items-center justify-between px-4 border-b border-[var(--sidebar-border)]">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/25 to-orange-500/10 border border-amber-500/40 text-amber-500 font-bold shadow-inner">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#1E3FAE]/30 to-[#0B1B4D] border border-[#D4AF37]/50 text-[#D4AF37] font-bold shadow-inner">
               <ShieldCheck size={20} />
             </div>
 
             {!isCollapsed && (
               <div className="truncate">
-                <span className="font-display text-sm font-bold tracking-tight text-[var(--sidebar-text)] block truncate">
+                <span className="font-display text-sm font-bold tracking-tight text-white block truncate">
                   Brewhaus Core
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-500 block">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] block">
                   Super Admin
                 </span>
               </div>
@@ -65,7 +65,7 @@ export default function Sidebar({
           {/* Desktop collapse toggle */}
           <button
             onClick={onToggleCollapse}
-            className="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--sidebar-border)] text-[var(--sidebar-text-muted)] hover:bg-[var(--sidebar-hover-bg)] hover:text-[var(--sidebar-text)] transition"
+            className="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--sidebar-border)] text-[var(--sidebar-text-muted)] hover:bg-[var(--sidebar-hover-bg)] hover:text-white transition"
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
           >
             {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
@@ -74,7 +74,7 @@ export default function Sidebar({
           {/* Mobile close button */}
           <button
             onClick={onCloseMobile}
-            className="lg:hidden p-1.5 text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text)] transition rounded-lg hover:bg-[var(--sidebar-hover-bg)]"
+            className="lg:hidden p-1.5 text-[var(--sidebar-text-muted)] hover:text-white transition rounded-lg hover:bg-[var(--sidebar-hover-bg)]"
           >
             <X size={18} />
           </button>
@@ -103,16 +103,16 @@ export default function Sidebar({
                   title={isCollapsed ? item.label : undefined}
                   className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold transition group ${
                     isActive
-                      ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border border-[var(--sidebar-active-border)] shadow-sm'
-                      : 'text-[var(--sidebar-text-muted)] hover:bg-[var(--sidebar-hover-bg)] hover:text-[var(--sidebar-text)] border border-transparent'
+                      ? 'bg-[#D4AF37]/14 text-white border-l-[3px] border-l-[#D4AF37] border-y-transparent border-r-transparent rounded-r-xl rounded-l-none pl-2.5 shadow-sm font-bold'
+                      : 'text-[#8E9BBF] hover:bg-white/[0.08] hover:text-white border-l-[3px] border-transparent'
                   }`}
                 >
                   <Icon
                     size={17}
                     className={`shrink-0 transition ${
                       isActive
-                        ? 'text-[var(--sidebar-active-border)]'
-                        : 'text-[var(--sidebar-text-muted)] group-hover:text-[var(--sidebar-text)]'
+                        ? 'text-[#D4AF37]'
+                        : 'text-[#8E9BBF] group-hover:text-white'
                     }`}
                   />
 
@@ -120,13 +120,7 @@ export default function Sidebar({
                     <div className="flex flex-1 items-center justify-between truncate">
                       <span className="truncate">{item.label}</span>
                       {item.badgeKey === 'tenantCount' && tenantCount > 0 && (
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                            isActive
-                              ? 'bg-[var(--sidebar-active-border)]/30 text-[var(--sidebar-active-text)]'
-                              : 'bg-[var(--sidebar-hover-bg)] text-[var(--sidebar-text-muted)]'
-                          }`}
-                        >
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-[#D4AF37] text-[#0B1B4D]">
                           {tenantCount}
                         </span>
                       )}
@@ -140,33 +134,33 @@ export default function Sidebar({
 
         {/* ── 3. Bottom Section: Pinned at bottom of screen ────── */}
         <div className="shrink-0 p-3 space-y-2 border-t border-[var(--sidebar-border)] bg-[var(--sidebar-hover-bg)]/60">
-          {/* Workstation Launcher */}
+          {/* Workstation Launcher - Gold Outline Button */}
           <button
             onClick={() => {
               onOpenUserPanels();
               if (onCloseMobile) onCloseMobile();
             }}
             title={isCollapsed ? 'User Panel Workstation' : undefined}
-            className={`w-full flex items-center gap-2.5 rounded-xl border border-cyan-500/30 bg-cyan-500/10 py-2.5 px-3 text-xs font-semibold text-cyan-700 dark:text-cyan-300 hover:bg-cyan-500/20 transition ${
+            className={`w-full flex items-center gap-2.5 rounded-xl border border-[#D4AF37] bg-transparent py-2.5 px-3 text-xs font-bold text-[#D4AF37] hover:bg-[#D4AF37]/10 transition ${
               isCollapsed ? 'justify-center' : ''
             }`}
           >
-            <Smartphone size={16} className="shrink-0 text-cyan-600 dark:text-cyan-400" />
+            <Smartphone size={16} className="shrink-0 text-[#D4AF37]" />
             {!isCollapsed && <span className="truncate font-bold">User Panel Workstation</span>}
           </button>
 
           {/* Admin User Profile Chip & Logout */}
           <div className={`pt-2 border-t border-[var(--sidebar-border)]/80 flex items-center gap-2.5 ${isCollapsed ? 'justify-center' : ''}`}>
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold text-xs">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#D4AF37] text-[#0B1B4D] font-black text-xs shadow-sm">
               SA
             </div>
 
             {!isCollapsed && (
               <div className="flex-1 truncate">
-                <div className="text-xs font-bold text-[var(--sidebar-text)] truncate">
+                <div className="text-xs font-bold text-white truncate">
                   {adminUser?.name || 'Platform Admin'}
                 </div>
-                <div className="text-[10px] text-[var(--sidebar-text-muted)] font-mono truncate">
+                <div className="text-[10px] text-[#8E9BBF] font-mono truncate">
                   {adminUser?.email || 'admin@brewhaus.com'}
                 </div>
               </div>
@@ -175,7 +169,7 @@ export default function Sidebar({
             {!isCollapsed && (
               <button
                 onClick={onLogout}
-                className="p-1.5 text-[var(--sidebar-text-muted)] hover:text-red-600 dark:hover:text-red-400 transition rounded-lg hover:bg-[var(--sidebar-hover-bg)]"
+                className="p-1.5 text-[var(--sidebar-text-muted)] hover:text-red-400 transition rounded-lg hover:bg-white/10"
                 title="Sign out of Super Admin"
               >
                 <LogOut size={15} />

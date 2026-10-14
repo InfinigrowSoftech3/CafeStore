@@ -40,9 +40,9 @@ export default function RecipeMappingPage() {
     setLoading(true);
     try {
       const [prodRes, itemsRes, mapRes] = await Promise.all([
-        api.get('/menu'),
+        api.get('/menu?limit=100'),
         api.get('/inventory/items?limit=300'),
-        api.get('/inventory/mappings'),
+        api.get('/inventory/mappings?limit=100'),
       ]);
 
       const prods = prodRes.data?.products || (Array.isArray(prodRes.data) ? prodRes.data : []);

@@ -5,6 +5,7 @@ import Table from '../models/Table.js';
 import Order from '../models/Order.js';
 import { protect, ownerOrManager } from '../middleware/auth.js';
 import { enforceUsageLimit } from '../services/usageLimitService.js';
+import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
@@ -29,12 +30,26 @@ export const ensureMainBranch = async (tenantId, tenantName = 'Main') => {
 // GET /api/branches - List branches
 router.get('/', protect, async (req, res, next) => {
   try {
-    let branches = await Branch.find().sort({ isMain: -1, createdAt: 1 }).lean();
-    if (branches.length === 0) {
+    const { page, limit, skip } = parsePagination(req);
+    let [branches, total] = await Promise.all([
+      Branch.find({ tenantId: req.tenantId })
+        .sort({ isMain: -1, createdAt: 1, _id: 1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Branch.countDocuments({ tenantId: req.tenantId }),
+    ]);
+
+    if (total === 0) {
       const defaultBranch = await ensureMainBranch(req.tenantId, req.tenant?.name || 'Main');
       branches = [defaultBranch.toObject ? defaultBranch.toObject() : defaultBranch];
+      total = 1;
     }
-    return res.json({ success: true, branches });
+    return res.json({
+      success: true,
+      branches,
+      pagination: formatPagination(page, limit, total),
+    });
   } catch (error) {
     next(error);
   }

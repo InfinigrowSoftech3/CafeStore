@@ -4,9 +4,9 @@
    ========================================================================== */
 
 .pageWrapper {
-  background-color: #080604;
-  color: #F7EFE8;
-  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #17110C;
+  color: #FAF6EF;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   user-select: none;
   -webkit-user-select: none;
   min-height: 100vh;
@@ -27,7 +27,7 @@
   align-items: center;
   justify-content: space-between;
   padding: max(1rem, env(safe-area-inset-top, 1rem)) max(1.5rem, env(safe-area-inset-right, 1.5rem)) 1rem max(1.5rem, env(safe-area-inset-left, 1.5rem));
-  background: linear-gradient(to bottom, rgba(8, 6, 4, 0.88) 0%, rgba(8, 6, 4, 0.45) 70%, transparent 100%);
+  background: linear-gradient(to bottom, rgba(23, 17, 12, 0.92) 0%, rgba(23, 17, 12, 0.5) 70%, transparent 100%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: padding 0.3s ease;
@@ -42,9 +42,9 @@
   min-height: 44px;
   min-width: 44px;
   border-radius: 9999px;
-  border: 1px solid rgba(247, 239, 232, 0.22);
-  background: rgba(26, 15, 8, 0.65);
-  color: #F7EFE8;
+  border: 1px solid rgba(233, 224, 210, 0.25);
+  background: rgba(23, 17, 12, 0.75);
+  color: #FAF6EF;
   font-size: 0.82rem;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -54,15 +54,15 @@
 }
 
 .backBtn:hover {
-  background: rgba(212, 175, 55, 0.2);
-  border-color: rgba(212, 175, 55, 0.6);
-  color: #fff;
+  background: rgba(200, 150, 62, 0.25);
+  border-color: rgba(200, 150, 62, 0.6);
+  color: #C8963E;
   transform: translateX(-2px);
 }
 
 .backBtn:active {
   transform: scale(0.96);
-  background: rgba(212, 175, 55, 0.28);
+  background: rgba(200, 150, 62, 0.35);
 }
 
 .navBrand {
@@ -95,7 +95,7 @@
 }
 
 .navLink:hover {
-  color: #D4AF37;
+  color: #C8963E;
 }
 
 /* Fixed Fullscreen Viewport pinned across 600vh */
@@ -114,9 +114,9 @@
   pointer-events: none;
   background: radial-gradient(
     circle at center,
-    #2A1B12 0%,
-    #140D09 45%,
-    #080604 100%
+    #2A1D15 0%,
+    #1F150E 45%,
+    #17110C 100%
   );
 }
 
@@ -144,10 +144,10 @@
   background: radial-gradient(
     ellipse at center,
     transparent 35%,
-    rgba(8, 6, 4, 0.48) 75%,
-    rgba(8, 6, 4, 0.92) 100%
+    rgba(23, 17, 12, 0.48) 75%,
+    rgba(23, 17, 12, 0.95) 100%
   );
-  box-shadow: inset 0 0 120px rgba(8, 6, 4, 0.88);
+  box-shadow: inset 0 0 120px rgba(23, 17, 12, 0.9);
 }
 
 /* Scroll Cue Prompt */
@@ -171,7 +171,7 @@
 }
 
 .scrollCueText {
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.72rem;
   letter-spacing: 0.24em;
   text-transform: uppercase;
@@ -195,7 +195,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, transparent, #D4AF37, transparent);
+  background: linear-gradient(to bottom, transparent, #C8963E, transparent);
   animation: scrollCuePulse 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
@@ -329,8 +329,8 @@
   gap: 0.5rem;
   padding: 0.75rem 1.6rem;
   min-height: 44px;
-  background: #FAF6F0;
-  color: #1a0f08;
+  background: #C8963E;
+  color: #17110C;
   border-radius: 9999px;
   font-size: 0.8rem;
   font-weight: 700;
@@ -343,9 +343,9 @@
 }
 
 .primaryCta:hover {
-  background: #faefd8;
+  background: #D8A54D;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 8px 25px rgba(200, 150, 62, 0.4);
 }
 
 .primaryCta:active {
@@ -360,7 +360,7 @@
   min-height: 44px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.32);
-  color: #FAF6F0;
+  color: #ffffff;
   border-radius: 9999px;
   font-size: 0.8rem;
   font-weight: 700;
@@ -375,8 +375,8 @@
 
 .secondaryCta:hover {
   background: rgba(255, 255, 255, 0.2);
-  border-color: #D4AF37;
-  color: #D4AF37;
+  border-color: #C8963E;
+  color: #C8963E;
   transform: translateY(-2px);
 }
 

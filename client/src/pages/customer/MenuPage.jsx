@@ -27,6 +27,7 @@ import { getCached, setCached, CATEGORIES_TTL_MS, DEFAULT_TTL_MS, clearClientCac
 import { subscribeToLiveStream } from '../../utils/liveStream';
 import TableServiceActions from '../../components/table/TableServiceActions';
 import { useTenant } from '../../context/TenantContext';
+import { getResolvedTenantSlug } from '../../utils/tenantHelper';
 import usePageMeta from '../../hooks/usePageMeta';
 import { formatMoney } from '../../utils/money';
 
@@ -149,21 +150,25 @@ export default function MenuPage() {
   }, [tableNumber, tableToken, setDiningSessionToken]);
 
   // Subscribe to real-time menu events
-  useEffect(() => subscribeToLiveStream('/menu/events', {
-    onEvent: (type, payload) => {
-      if (type === 'connected') {
-        setReloadKey((current) => current + 1);
-      } else if (type === 'availability') {
-        clearClientCache();
-        setProducts((current) => current.map((product) => String(product._id) === payload.productId
-          ? { ...product, available: payload.available }
-          : product));
-      } else if (type === 'removed') {
-        clearClientCache();
-        setProducts((current) => current.filter((product) => String(product._id) !== payload.productId));
-      }
-    },
-  }), []);
+  useEffect(() => {
+    const slug = tenant?.slug || getResolvedTenantSlug();
+    if (!slug && !tenant?.id) return;
+    return subscribeToLiveStream('/menu/events', {
+      onEvent: (type, payload) => {
+        if (type === 'connected') {
+          setReloadKey((current) => current + 1);
+        } else if (type === 'availability') {
+          clearClientCache();
+          setProducts((current) => current.map((product) => String(product._id) === payload.productId
+            ? { ...product, available: payload.available }
+            : product));
+        } else if (type === 'removed') {
+          clearClientCache();
+          setProducts((current) => current.filter((product) => String(product._id) !== payload.productId));
+        }
+      },
+    });
+  }, [tenant?.slug, tenant?.id]);
 
   useEffect(() => {
     const refreshScheduledAvailability = () => {
@@ -181,18 +186,23 @@ export default function MenuPage() {
 
   // Fetch categories with client cache
   useEffect(() => {
-    const cachedCats = getCached('categories');
+    const slug = tenant?.slug || getResolvedTenantSlug();
+    if (!slug && !tenant?.id) return;
+
+    const cacheKey = `categories_${slug || 'default'}`;
+    const cachedCats = getCached(cacheKey);
     if (cachedCats && cachedCats.length > 0) {
       setCategories(cachedCats);
     }
-    api.get('/categories')
+    const params = slug ? { cafe: slug } : {};
+    api.get('/categories', { params })
       .then(res => {
-        const cats = Array.isArray(res.data.categories) ? res.data.categories : [];
+        const cats = Array.isArray(res.data?.categories) ? res.data.categories : [];
         setCategories(cats);
-        setCached('categories', cats, CATEGORIES_TTL_MS);
+        setCached(cacheKey, cats, CATEGORIES_TTL_MS);
       })
       .catch(() => {});
-  }, []);
+  }, [tenant?.slug, tenant?.id]);
 
   // Debounce search
   useEffect(() => {
@@ -214,13 +224,18 @@ export default function MenuPage() {
 
   // Fetch products with stale-while-revalidate client cache
   useEffect(() => {
+    const slug = tenant?.slug || getResolvedTenantSlug();
+    if (!slug && !tenant?.id) return;
+
     const params = new URLSearchParams();
+    params.append('limit', '100');
     if (selectedCategory !== 'all') params.append('category', selectedCategory);
     if (debouncedSearch) params.append('search', debouncedSearch);
     if (vegOnly) params.append('veg', 'true');
     if (sort) params.append('sort', sort);
+    if (slug) params.append('cafe', slug);
 
-    const cacheKey = `menu_${params.toString()}`;
+    const cacheKey = `menu_${slug || 'default'}_${params.toString()}`;
     const cachedProducts = getCached(cacheKey);
 
     if (cachedProducts && cachedProducts.length > 0) {
@@ -234,7 +249,7 @@ export default function MenuPage() {
 
     api.get(`/menu?${params}`)
       .then(res => {
-        const prods = Array.isArray(res.data.products) ? res.data.products : [];
+        const prods = Array.isArray(res.data?.products) ? res.data.products : [];
         setProducts(prods);
         setCached(cacheKey, prods, DEFAULT_TTL_MS);
       })
@@ -246,7 +261,7 @@ export default function MenuPage() {
         }
       })
       .finally(() => setLoading(false));
-  }, [selectedCategory, debouncedSearch, vegOnly, sort, reloadKey]);
+  }, [selectedCategory, debouncedSearch, vegOnly, sort, reloadKey, tenant?.slug, tenant?.id]);
 
   // Count items per category
   const categoryCounts = useMemo(() => {
@@ -287,21 +302,22 @@ export default function MenuPage() {
             className="absolute inset-0 z-0 h-full w-full object-cover opacity-65"
           />
         ) : (
-          <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#160b06] via-[#241309] to-[#0d0603]" />
+          <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#2C241E] via-[#17110C] to-[#120D09]" />
         )}
 
-        {/* Multi-stage Luxury Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-espresso-950 via-espresso-950/60 to-black/35 z-0 pointer-events-none" />
+        {/* Multi-stage Luxury Gradient & Warm Radial Glow */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#17110C] via-[#17110C]/65 to-black/40 z-0 pointer-events-none" />
+        <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_30%_20%,rgba(200,150,62,0.14),transparent_60%)]" />
 
         {/* Hero Content Container */}
         <div className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             {/* Café Branding & Hours */}
-            <div className="space-y-3 max-w-2xl">
+            <div className="space-y-3.5 max-w-2xl">
               {/* Tagline / Subtitle */}
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md px-3 py-1 border border-white/10 text-xs font-semibold text-brew-300">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md px-3.5 py-1 border border-white/10 text-xs font-semibold text-brew-300 shadow-2xs">
                 <Sparkles size={13} className="text-brew-400" />
-                <span className="uppercase tracking-[0.16em]">{tenant.tagline || 'Artisanal Food & Fine Coffee'}</span>
+                <span className="uppercase tracking-[0.18em]">{tenant.tagline || 'Artisanal Food & Fine Coffee'}</span>
               </div>
 
               {/* Title / Logo */}
@@ -316,31 +332,27 @@ export default function MenuPage() {
                     <h1 className="sr-only">{tenant.name} Menu</h1>
                   </div>
                 ) : (
-                  <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+                  <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#FAF6EF] leading-tight drop-shadow-sm">
                     {tenant.name}
                   </h1>
                 )}
               </div>
 
-              {/* Operational metadata (Hours & Location) */}
-              <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-cream/75 pt-1">
-                <span className="inline-flex items-center gap-1.5 font-medium">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              {/* Operational metadata (Refined pills for Hours & Location) */}
+              <div className="flex flex-wrap items-center gap-2 text-xs text-sand-200 pt-1">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950/70 border border-emerald-500/30 px-3 py-1 font-medium text-emerald-300 backdrop-blur-md shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>Kitchen Open Today</span>
                 </span>
-                <span className="text-white/30">•</span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Clock size={13} className="text-brew-400" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/8 border border-white/10 px-3 py-1 text-sand-200 backdrop-blur-md shadow-2xs">
+                  <Clock size={12} className="text-brew-400" />
                   <span>8:00 AM – 11:00 PM</span>
                 </span>
                 {tenant.address && (
-                  <>
-                    <span className="text-white/30 hidden sm:inline">•</span>
-                    <span className="hidden sm:inline-flex items-center gap-1 text-cream/70 truncate max-w-xs">
-                      <MapPin size={13} className="text-brew-400 shrink-0" />
-                      <span className="truncate">{tenant.address}</span>
-                    </span>
-                  </>
+                  <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-white/8 border border-white/10 px-3 py-1 text-sand-200 backdrop-blur-md max-w-xs truncate shadow-2xs">
+                    <MapPin size={12} className="text-brew-400 shrink-0" />
+                    <span className="truncate">{tenant.address}</span>
+                  </span>
                 )}
               </div>
             </div>
@@ -354,10 +366,10 @@ export default function MenuPage() {
                     initial={{ opacity: 0, scale: 0.94 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.94 }}
-                    className={`inline-flex items-center gap-3 rounded-2xl p-2.5 sm:p-3 border backdrop-blur-xl transition-all ${
+                    className={`inline-flex items-center gap-3 rounded-2xl p-2.5 sm:p-3 border backdrop-blur-xl transition-all shadow-xl ${
                       tableConnectedAnim
-                        ? 'bg-emerald-950/70 border-emerald-400/80 text-emerald-100 ring-2 ring-emerald-400/40'
-                        : 'bg-white/10 border-white/20 text-cream shadow-lg'
+                        ? 'bg-emerald-950/80 border-emerald-400/80 text-emerald-100 ring-2 ring-emerald-400/40'
+                        : 'bg-white/10 border-white/20 text-[#FAF6EF]'
                     }`}
                   >
                     <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300">
@@ -374,7 +386,7 @@ export default function MenuPage() {
                     <button
                       type="button"
                       onClick={openScanner}
-                      className="ml-2 rounded-xl bg-white px-3 py-1.5 text-xs font-bold text-espresso-950 hover:bg-cream transition shadow-xs"
+                      className="ml-2 rounded-xl bg-white px-3 py-1.5 text-xs font-bold text-espresso-950 hover:bg-foam transition shadow-xs"
                       title="Switch to another table"
                     >
                       Change Table
@@ -390,20 +402,20 @@ export default function MenuPage() {
                     exit={{ opacity: 0, scale: 0.94 }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
-                    className="group inline-flex min-h-[48px] items-center gap-3 rounded-2xl bg-gradient-to-r from-brew-500 to-brew-600 px-4 sm:px-5 py-3 text-white shadow-xl shadow-brew-500/20 transition-all hover:from-brew-600 hover:to-brew-700 focus:outline-none focus:ring-2 focus:ring-brew-400"
+                    className="group btn-hero-cta inline-flex min-h-[48px] items-center gap-3 rounded-2xl px-5 py-3 text-espresso-950 font-bold transition-all hover:brightness-105 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-brew-400"
                   >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/20 text-white">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-espresso-950/15 text-espresso-950">
                       <ScanLine size={18} />
                     </div>
                     <div className="text-left">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-white/80 leading-none">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-espresso-900/80 leading-none">
                         Dine-in Customer?
                       </p>
-                      <p className="text-sm font-bold text-white leading-tight">
+                      <p className="text-sm font-bold text-espresso-950 leading-tight">
                         Scan Table QR to Order
                       </p>
                     </div>
-                    <ArrowRight size={16} className="text-white/80 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight size={16} className="text-espresso-950 group-hover:translate-x-1 transition-transform" />
                   </motion.button>
                 )}
               </AnimatePresence>
@@ -418,7 +430,7 @@ export default function MenuPage() {
       {/* ─── Sticky Search, Categories & Filter Header ───────────────────────── */}
       <section
         aria-label="Menu Filters & Categories"
-        className="sticky top-[58px] sm:top-[65px] z-30 bg-cream/95 backdrop-blur-xl border-b border-foam/90 px-3.5 py-2.5 sm:px-6 sm:py-3 shadow-xs space-y-2.5"
+        className="sticky top-[58px] sm:top-[65px] z-30 bg-[#FAF6EF]/95 backdrop-blur-xl border-b border-[#E9E0D2] px-3.5 py-2.5 sm:px-6 sm:py-3 shadow-xs space-y-2.5"
       >
         <div className="mx-auto max-w-7xl">
           {/* Search bar + Filter toggle */}
@@ -434,7 +446,7 @@ export default function MenuPage() {
                 placeholder="Search food, coffee & beverages..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="input-field pl-10 pr-9 py-2.5 text-sm rounded-2xl bg-white shadow-2xs"
+                className="input-field pl-10 pr-9 py-2.5 text-sm rounded-2xl bg-white border border-[#E9E0D2] shadow-2xs"
               />
               {search && (
                 <button
@@ -455,8 +467,8 @@ export default function MenuPage() {
               aria-pressed={vegOnly}
               className={`min-h-[44px] flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border text-xs font-bold transition-all active:scale-95 whitespace-nowrap shadow-2xs ${
                 vegOnly
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-600/20'
-                  : 'bg-white text-espresso-900 border-espresso-300 hover:border-espresso-400 hover:bg-espresso-50/50'
+                  ? 'bg-emerald-700 text-white border-emerald-700 shadow-emerald-700/20'
+                  : 'bg-white text-espresso-900 border-sand-200 hover:border-sand-300 hover:bg-foam'
               }`}
             >
               <Leaf size={14} className={vegOnly ? 'text-white' : 'text-emerald-700'} />
@@ -471,11 +483,11 @@ export default function MenuPage() {
               aria-label="Toggle menu sorting and options"
               className={`min-h-[44px] flex items-center gap-1.5 px-3.5 py-2 rounded-2xl border text-xs font-bold transition-all active:scale-95 shadow-2xs ${
                 showFilters || sort
-                  ? 'bg-espresso-900 text-cream border-espresso-900'
-                  : 'bg-white text-espresso-900 border-espresso-300 hover:border-espresso-400 hover:bg-espresso-50/50'
+                  ? 'bg-espresso-950 text-[#FAF6EF] border-espresso-950 shadow-sm'
+                  : 'bg-white text-espresso-900 border-sand-200 hover:border-sand-300 hover:bg-foam'
               }`}
             >
-              <SlidersHorizontal size={14} />
+              <SlidersHorizontal size={14} className={showFilters || sort ? 'text-brew-400' : 'text-espresso-600'} />
               <span className="hidden sm:inline">Sort</span>
             </button>
           </div>
@@ -490,14 +502,14 @@ export default function MenuPage() {
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden pt-2"
               >
-                <div className="flex flex-wrap items-center gap-2 p-2 rounded-2xl bg-white border border-foam">
+                <div className="flex flex-wrap items-center gap-2 p-2 rounded-2xl bg-white border border-[#E9E0D2] shadow-2xs">
                   <span className="text-xs font-semibold text-espresso-500 px-2">Sort by:</span>
                   <div className="relative flex-1 min-w-[180px]">
                     <select
                       value={sort}
                       onChange={e => setSort(e.target.value)}
                       aria-label="Sort menu items"
-                      className="w-full min-h-[40px] text-xs font-medium border border-foam rounded-xl px-3 py-2 bg-cream/50 text-espresso-800 appearance-none pr-8 focus:outline-none focus:ring-2 focus:ring-brew-500"
+                      className="w-full min-h-[40px] text-xs font-medium border border-[#E9E0D2] rounded-xl px-3 py-2 bg-[#FAF6EF]/60 text-espresso-900 appearance-none pr-8 focus:outline-none focus:ring-2 focus:ring-brew-500"
                     >
                       {SORT_OPTIONS.map(o => (
                         <option key={o.value} value={o.value}>{o.label}</option>
@@ -519,21 +531,21 @@ export default function MenuPage() {
             )}
           </AnimatePresence>
 
-          {/* Horizontally scrollable Category Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1.5 scrollbar-hide -mx-1 px-1">
+          {/* Horizontally scrollable Category Tabs with Snap Scroll */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1.5 scrollbar-hide -mx-1 px-1 snap-x snap-mandatory scroll-smooth">
             {/* All category tab */}
             <button
               type="button"
               onClick={() => setSelectedCategory('all')}
-              className={`relative flex-shrink-0 min-h-[38px] inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 border ${
+              className={`snap-start relative flex-shrink-0 min-h-[38px] inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 border ${
                 selectedCategory === 'all'
-                  ? 'bg-espresso-900 text-cream border-espresso-900 shadow-sm'
-                  : 'bg-white text-espresso-900 border-espresso-200/90 hover:border-espresso-400 hover:bg-espresso-50/60 shadow-2xs'
+                  ? 'bg-espresso-950 text-white border-espresso-950 shadow-sm'
+                  : 'bg-white text-espresso-900 border-sand-200 hover:border-sand-300 hover:bg-foam shadow-2xs'
               }`}
             >
               <span>All Items</span>
-              <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
-                selectedCategory === 'all' ? 'bg-white/20 text-white' : 'bg-espresso-100 text-espresso-800'
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                selectedCategory === 'all' ? 'bg-brew-500 text-espresso-950' : 'bg-sand-100 text-espresso-800'
               }`}>
                 {categoryCounts.all || 0}
               </span>
@@ -548,17 +560,17 @@ export default function MenuPage() {
                   key={cat._id}
                   type="button"
                   onClick={() => setSelectedCategory(cat._id)}
-                  className={`relative flex-shrink-0 min-h-[38px] inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 border whitespace-nowrap ${
+                  className={`snap-start relative flex-shrink-0 min-h-[38px] inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 border whitespace-nowrap ${
                     isSelected
-                      ? 'bg-espresso-900 text-cream border-espresso-900 shadow-sm'
-                      : 'bg-white text-espresso-900 border-espresso-200/90 hover:border-espresso-400 hover:bg-espresso-50/60 shadow-2xs'
+                      ? 'bg-espresso-950 text-white border-espresso-950 shadow-sm'
+                      : 'bg-white text-espresso-900 border-sand-200 hover:border-sand-300 hover:bg-foam shadow-2xs'
                   }`}
                 >
                   {cat.icon && <span className="text-sm leading-none">{cat.icon}</span>}
                   <span>{cat.name}</span>
                   {count > 0 && (
-                    <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
-                      isSelected ? 'bg-white/20 text-white' : 'bg-espresso-100 text-espresso-800'
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                      isSelected ? 'bg-brew-500 text-espresso-950' : 'bg-sand-100 text-espresso-800'
                     }`}>
                       {count}
                     </span>
@@ -674,32 +686,33 @@ export default function MenuPage() {
             <Link
               to="/cart"
               aria-label={`View Cart with ${itemCount} items`}
-              className="flex min-h-[52px] items-center justify-between gap-3 bg-espresso-950 text-cream
-                         rounded-2xl pl-3.5 pr-4 py-3 shadow-[0_16px_36px_rgba(20,10,5,0.28)] border border-espresso-800/80 hover:bg-espresso-900 transition-all active:scale-[0.985] focus:outline-none focus:ring-2 focus:ring-brew-500"
+              className="flex min-h-[54px] items-center justify-between gap-3 bg-[#17110C] text-[#FAF6EF]
+                         rounded-2xl pl-3.5 pr-3 py-2.5 shadow-[0_16px_36px_rgba(23,17,12,0.4)] border border-brew-500/35 hover:brightness-105 transition-all active:scale-[0.985] focus:outline-none focus:ring-2 focus:ring-brew-500"
             >
               {/* Left Item Count & Subtotal */}
               <div className="flex items-center gap-2.5">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brew-500 text-xs font-bold text-white shadow-xs">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brew-500 text-xs font-bold text-espresso-950 shadow-xs">
                   {itemCount}
                 </span>
                 <div className="flex flex-col">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-cream/90 leading-none">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#FAF6EF] leading-none">
                     View Cart
                   </span>
-                  <span className="text-[10px] text-cream/50 mt-0.5">
+                  <span className="text-[10px] text-sand-200 mt-0.5">
                     {itemCount} {itemCount === 1 ? 'item' : 'items'} ready
                   </span>
                 </div>
               </div>
 
-              {/* Right Total & Arrow */}
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-base font-bold text-brew-300">
+              {/* Right Total & Action Pill */}
+              <div className="flex items-center gap-2.5">
+                <span className="font-mono text-base font-bold text-brew-400">
                   {formatMoney(grandTotal, tenant.currency)}
                 </span>
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-white">
-                  <ArrowRight size={14} />
-                </div>
+                <span className="inline-flex items-center gap-1 bg-brew-500 text-espresso-950 text-xs font-bold px-3 py-1.5 rounded-xl shadow-xs">
+                  <span>Checkout</span>
+                  <ArrowRight size={13} strokeWidth={2.5} />
+                </span>
               </div>
             </Link>
           </motion.div>

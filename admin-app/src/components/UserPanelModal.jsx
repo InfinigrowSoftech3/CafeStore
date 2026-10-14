@@ -152,7 +152,7 @@ export default function UserPanelModal({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.96 }}
         transition={{ duration: 0.2 }}
-        className="relative flex flex-col w-full max-w-7xl h-[94vh] rounded-3xl border shadow-2xl overflow-hidden custom-scrollbar"
+        className="super-admin-theme relative flex flex-col w-full max-w-7xl h-[94vh] rounded-3xl border shadow-2xl overflow-hidden custom-scrollbar"
         style={{
           backgroundColor: 'var(--bg-card)',
           borderColor: 'var(--border-primary)',
@@ -347,7 +347,7 @@ export default function UserPanelModal({
                   }}
                   className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
                     isActive
-                      ? 'bg-[var(--brand-primary-subtle)] text-amber-800 border border-[var(--brand-primary-border)]'
+                      ? 'bg-[var(--brand-primary-subtle)] text-[#1E3FAE] dark:text-[#D4AF37] border border-[var(--brand-primary-border)] font-bold'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)]'
                   }`}
                 >
@@ -374,7 +374,7 @@ export default function UserPanelModal({
               onClick={() => setViewport('mobile')}
               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition ${
                 viewport === 'mobile'
-                  ? 'bg-[var(--hover-bg)] text-amber-600 shadow-xs'
+                  ? 'bg-[var(--hover-bg)] text-[#1E3FAE] dark:text-[#D4AF37] font-bold shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -384,7 +384,7 @@ export default function UserPanelModal({
               onClick={() => setViewport('tablet')}
               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition ${
                 viewport === 'tablet'
-                  ? 'bg-[var(--hover-bg)] text-amber-600 shadow-xs'
+                  ? 'bg-[var(--hover-bg)] text-[#1E3FAE] dark:text-[#D4AF37] font-bold shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -394,7 +394,7 @@ export default function UserPanelModal({
               onClick={() => setViewport('desktop')}
               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition ${
                 viewport === 'desktop'
-                  ? 'bg-[var(--hover-bg)] text-amber-600 shadow-xs'
+                  ? 'bg-[var(--hover-bg)] text-[#1E3FAE] dark:text-[#D4AF37] font-bold shadow-xs'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -411,7 +411,7 @@ export default function UserPanelModal({
                 setSelectedTable(e.target.value);
                 setIframeLoading(true);
               }}
-              className="border rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-amber-500 shadow-2xs"
+              className="border rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-[#1E3FAE] shadow-2xs"
               style={{
                 backgroundColor: 'var(--bg-surface)',
                 borderColor: 'var(--border-primary)',

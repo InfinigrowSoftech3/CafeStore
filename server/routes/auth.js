@@ -19,6 +19,8 @@ import {
   verifyTotpCode,
 } from '../utils/authTokens.js';
 import { sendPasswordResetEmail } from '../services/emailService.js';
+import { sendSms } from '../services/smsService.js';
+import { getRedisClient } from '../config/redis.js';
 
 const router = express.Router();
 
@@ -68,8 +70,9 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const clientIp = req.ip || req.connection?.remoteAddress || 'unknown';
+    const normalizedEmail = String(email || '').trim().toLowerCase();
 
-    if (await checkIpLockoutForLogin(clientIp)) {
+    if (await checkIpLockoutForLogin(clientIp, normalizedEmail)) {
       return res.status(429).json({ error: 'Too many failed login attempts from this IP. Try again later.', code: 'IP_LOCKED' });
     }
 
@@ -77,12 +80,11 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
 
-    const normalizedEmail = String(email).trim().toLowerCase();
     const user = await runWithSystemTenantAccess(async () => {
       return User.findOne({ email: normalizedEmail }).select('+password +failedLoginAttempts +loginLockUntil +twoFactorSecretEncrypted');
     });
     if (!user) {
-      await recordLoginAttemptForIp(clientIp, false);
+      await recordLoginAttemptForIp(clientIp, false, normalizedEmail);
       await runWithSystemTenantAccess(async () => {
         try {
           const defaultTenant = await Tenant.findOne({ slug: String(process.env.TENANT_DEFAULT_SLUG || 'brewhaus').toLowerCase() }).select('_id');
@@ -104,6 +106,7 @@ router.post('/login', async (req, res) => {
     }
 
     if (user.loginLockUntil && user.loginLockUntil > new Date()) {
+      await recordLoginAttemptForIp(clientIp, false, normalizedEmail);
       return res.status(423).json({ error: 'Login is temporarily locked. Try again later.', code: 'LOGIN_LOCKED' });
     }
 
@@ -117,7 +120,7 @@ router.post('/login', async (req, res) => {
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       await recordLoginFailure(user);
-      await recordLoginAttemptForIp(clientIp, false);
+      await recordLoginAttemptForIp(clientIp, false, normalizedEmail);
       await runWithSystemTenantAccess(async () => {
         await AuditEvent.create({
           tenantId: user.tenantId,
@@ -137,7 +140,7 @@ router.post('/login', async (req, res) => {
       const secret = decryptTwoFactorSecret(user.twoFactorSecretEncrypted);
       if (!verifyTotpCode(secret, req.body?.twoFactorCode)) {
         await recordLoginFailure(user);
-        await recordLoginAttemptForIp(clientIp, false);
+        await recordLoginAttemptForIp(clientIp, false, normalizedEmail);
         await runWithSystemTenantAccess(async () => {
           await AuditEvent.create({
             tenantId: user.tenantId,
@@ -169,7 +172,7 @@ router.post('/login', async (req, res) => {
         details: { ip: clientIp },
       });
     });
-    await recordLoginAttemptForIp(clientIp, true);
+    await recordLoginAttemptForIp(clientIp, true, normalizedEmail);
     const token = await issueSession(user, res);
     const tenant = user.tenantId
       ? await runWithSystemTenantAccess(async () => Tenant.findById(user.tenantId).lean())
@@ -521,6 +524,82 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+const OTP_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
+const OTP_RESEND_COOLDOWN_SEC = 60; // 60 seconds
+const OTP_MAX_ATTEMPTS = 5;
+
+const getOtpCooldown = async (phone) => {
+  const redis = getRedisClient();
+  if (!redis) return null;
+  const key = `brewhaus:otp:cooldown:${phone}`;
+  try {
+    return await redis.get(key);
+  } catch {
+    return null;
+  }
+};
+
+const setOtpCooldown = async (phone, seconds = OTP_RESEND_COOLDOWN_SEC) => {
+  const redis = getRedisClient();
+  if (!redis) return;
+  const key = `brewhaus:otp:cooldown:${phone}`;
+  try {
+    await redis.set(key, '1', 'EX', seconds);
+  } catch {
+    // Non-fatal
+  }
+};
+
+const getOtpAttempts = async (phone) => {
+  const redis = getRedisClient();
+  if (!redis) return 0;
+  const key = `brewhaus:otp:attempts:${phone}`;
+  try {
+    const val = await redis.get(key);
+    return val ? parseInt(val, 10) : 0;
+  } catch {
+    return 0;
+  }
+};
+
+const incrementOtpAttempts = async (phone, ttlSeconds = 300) => {
+  const redis = getRedisClient();
+  if (!redis) return 1;
+  const key = `brewhaus:otp:attempts:${phone}`;
+  try {
+    const count = await redis.incr(key);
+    if (count === 1) await redis.expire(key, ttlSeconds);
+    return count;
+  } catch {
+    return 1;
+  }
+};
+
+const clearOtpAttempts = async (phone) => {
+  const redis = getRedisClient();
+  if (!redis) return;
+  const key = `brewhaus:otp:attempts:${phone}`;
+  try {
+    await redis.del(key);
+  } catch {
+    // Non-fatal
+  }
+};
+
+const hashOtp = (code) => {
+  const secret = process.env.JWT_SECRET || 'brewhaus-otp-secret-min32chars';
+  return crypto.createHmac('sha256', secret).update(String(code)).digest('hex');
+};
+
+const verifyOtpHash = (inputCode, storedHash) => {
+  if (!inputCode || !storedHash) return false;
+  const inputHash = hashOtp(inputCode);
+  const inputBuffer = Buffer.from(inputHash);
+  const storedBuffer = Buffer.from(storedHash);
+  if (inputBuffer.length !== storedBuffer.length) return false;
+  return crypto.timingSafeEqual(inputBuffer, storedBuffer);
+};
+
 // POST /api/auth/send-otp — Send OTP to phone for login
 router.post('/send-otp', async (req, res) => {
   try {
@@ -530,10 +609,15 @@ router.post('/send-otp', async (req, res) => {
     const normalizedPhone = normalizePhoneNumber(phone);
     if (!normalizedPhone) return res.status(400).json({ error: 'Invalid phone number format.' });
 
+    // Check resend cooldown
+    const cooldownActive = await getOtpCooldown(normalizedPhone);
+    if (cooldownActive) {
+      return res.status(429).json({ error: 'Please wait a minute before requesting another OTP.' });
+    }
+
     // Find or create customer
     let customer = await Customer.findOne({ phone: normalizedPhone });
     if (!customer) {
-      // Create customer with minimal info - they'll complete profile on first order
       customer = await Customer.create({
         name: 'Guest',
         phone: normalizedPhone,
@@ -542,21 +626,46 @@ router.post('/send-otp', async (req, res) => {
 
     // Generate 6-digit OTP
     const otpCode = String(Math.floor(100000 + Math.random() * 900000));
-    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const otpExpiresAt = new Date(Date.now() + OTP_EXPIRY_MS); // 5 minutes
 
-    customer.otpCode = otpCode;
+    customer.otpCode = hashOtp(otpCode);
     customer.otpExpiresAt = otpExpiresAt;
     customer.otpVerified = false;
     await customer.save();
 
-    console.log(`[auth/send-otp] OTP for ${normalizedPhone}: >>> ${otpCode} <<<`);
+    // Reset attempt counter on fresh OTP issue
+    await clearOtpAttempts(normalizedPhone);
+    await setOtpCooldown(normalizedPhone, OTP_RESEND_COOLDOWN_SEC);
 
-    const showDevOtp = !process.env.SMS_API_KEY || process.env.DEMO_PAYMENTS_ENABLED === 'true' || process.env.ALLOW_DEMO_OTP === 'true' || process.env.NODE_ENV !== 'production';
+    const isProduction = process.env.NODE_ENV === 'production';
+    const canLogDevCode = !isProduction && process.env.NODE_ENV === 'development' && process.env.ALLOW_DEV_OTP === 'true';
+
+    // Outside production, dev verification code logged only when NODE_ENV=development and ALLOW_DEV_OTP=true
+    if (canLogDevCode) {
+      console.log(`[auth/send-otp] Dev verification code for ${normalizedPhone}: ${otpCode}`);
+    }
+
+    // Dispatch SMS via provider
+    let smsDispatched = false;
+    let smsError = null;
+    try {
+      await sendSms({
+        to: normalizedPhone,
+        message: `Your BrewHaus verification code is ${otpCode}. Valid for 5 minutes.`,
+      });
+      smsDispatched = true;
+    } catch (err) {
+      smsError = err.message;
+    }
+
+    if (!smsDispatched && !canLogDevCode) {
+      console.error(`[auth/send-otp] SMS delivery to ${normalizedPhone} failed: ${smsError || 'Provider unconfigured'}`);
+      return res.status(503).json({ error: 'SMS service is currently unavailable. Please try again later.' });
+    }
 
     res.json({
       success: true,
       message: 'OTP sent to your phone.',
-      ...(showDevOtp && { devOtp: otpCode }),
     });
   } catch (error) {
     console.error('Send OTP error:', error);
@@ -573,18 +682,34 @@ router.post('/verify-otp', async (req, res) => {
     const normalizedPhone = normalizePhoneNumber(phone);
     if (!normalizedPhone) return res.status(400).json({ error: 'Invalid phone number format.' });
 
+    const attempts = await incrementOtpAttempts(normalizedPhone, 300);
+    if (attempts > OTP_MAX_ATTEMPTS) {
+      await Customer.updateOne(
+        { phone: normalizedPhone },
+        { $set: { otpCode: '', otpExpiresAt: null } }
+      );
+      return res.status(429).json({ error: 'Maximum verification attempts exceeded. Please request a new OTP.' });
+    }
+
     const customer = await Customer.findOne({ phone: normalizedPhone }).select('+otpCode +otpExpiresAt');
     if (!customer) return res.status(404).json({ error: 'No account found with this phone number.' });
 
-    // Check OTP
-    if (customer.otpCode !== otp) {
-      return res.status(400).json({ error: 'Invalid OTP.' });
+    if (!customer.otpCode || !customer.otpExpiresAt) {
+      return res.status(400).json({ error: 'No active OTP found. Please request a new OTP.' });
     }
+
     if (customer.otpExpiresAt < new Date()) {
       return res.status(400).json({ error: 'OTP has expired.' });
     }
 
-    // Mark OTP as verified
+    // Check hashed OTP with timingSafeEqual
+    const isValid = verifyOtpHash(otp, customer.otpCode);
+    if (!isValid) {
+      return res.status(400).json({ error: 'Invalid OTP.' });
+    }
+
+    // Mark OTP as verified and reset attempts
+    await clearOtpAttempts(normalizedPhone);
     customer.otpVerified = true;
     customer.otpCode = '';
     customer.otpExpiresAt = null;
@@ -598,6 +723,7 @@ router.post('/verify-otp', async (req, res) => {
       email: customer.email || `${customer.phone}@guest.local`,
       password: crypto.randomBytes(32).toString('hex'), // Random password for guest accounts
       role: 'customer',
+      roleAssignments: [{ role: 'customer' }],
     });
 
     const token = await issueSession(tempUser, res);
