@@ -33,6 +33,12 @@ services:
         sync: false
       - key: REDIS_URL
         sync: false
+      - key: TABLE_QR_SECRET
+        sync: false
+      - key: TENANT_CREDENTIALS_ENCRYPTION_KEY
+        sync: false
+      - key: ALLOW_TEST_PAYMENTS
+        value: "true"
       - key: TRUST_PROXY_HOPS
         value: "1"
   - type: redis

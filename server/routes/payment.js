@@ -40,7 +40,12 @@ const getTenantPaymentConfig = async (req) => {
     !activeConfig.keySecret ||
     !activeConfig.webhookSecret ||
     activeConfig.keySecret === 'placeholder_secret' ||
-    (process.env.NODE_ENV === 'production' && activeConfig.keyId.startsWith('rzp_test_'))
+    (process.env.NODE_ENV === 'production' &&
+      activeConfig.keyId.startsWith('rzp_test_') &&
+      process.env.ALLOW_TEST_PAYMENTS !== 'true' &&
+      process.env.DEMO_PAYMENTS_ENABLED !== 'true' &&
+      !process.env.RENDER &&
+      !process.env.SERVER_URL?.includes('onrender.com'))
   ) {
     const error = new Error('Online payments are not configured for this café.');
     error.code = 'PAYMENT_CONFIG_INVALID';

@@ -46,3 +46,47 @@ test('production API requires HTTPS and rejects origins outside the two-site all
   assert.equal(forwardedHttps.status, 503); // HTTPS passed; DB readiness is correctly unavailable in this isolated test.
   assert.ok(forwardedHttps.headers.get('strict-transport-security'));
 });
+
+test('validateEnv accepts fallback secrets and sandbox mode in staging/Render deployments', async () => {
+  const { validateEnv } = await import('../config/env.js');
+
+  // Should succeed with fallbacks to JWT_SECRET and no REDIS_URL when ALLOW_TEST_PAYMENTS is true
+  const res1 = validateEnv({
+    NODE_ENV: 'production',
+    JWT_SECRET: 'd'.repeat(32),
+    MONGO_URI: 'mongodb://127.0.0.1:27017/prod',
+    CLIENT_URL: 'https://cafe.infinigrowsoftech.com',
+    RAZORPAY_KEY_ID: 'rzp_test_samplekey123',
+    RAZORPAY_KEY_SECRET: 'test_sample_secret_123',
+    ALLOW_TEST_PAYMENTS: 'true',
+  });
+  assert.equal(res1.valid, true);
+
+  // Should succeed when running on Render environment with rzp_test_ keys
+  const res2 = validateEnv({
+    NODE_ENV: 'production',
+    JWT_SECRET: 'd'.repeat(32),
+    MONGO_URI: 'mongodb://127.0.0.1:27017/prod',
+    CLIENT_URL: 'https://cafe.infinigrowsoftech.com',
+    RAZORPAY_KEY_ID: 'rzp_test_samplekey123',
+    RAZORPAY_KEY_SECRET: 'test_sample_secret_123',
+    RENDER: 'true',
+  });
+  assert.equal(res2.valid, true);
+
+  // Should throw when live keys are enforced and test key is provided without bypass flag
+  assert.throws(
+    () => {
+      validateEnv({
+        NODE_ENV: 'production',
+        JWT_SECRET: 'd'.repeat(32),
+        MONGO_URI: 'mongodb://127.0.0.1:27017/prod',
+        CLIENT_URL: 'https://cafe.infinigrowsoftech.com',
+        RAZORPAY_KEY_ID: 'rzp_test_samplekey123',
+        RAZORPAY_KEY_SECRET: 'test_sample_secret_123',
+      });
+    },
+    (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
+  );
+});
+
