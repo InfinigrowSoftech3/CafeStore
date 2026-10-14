@@ -233,6 +233,7 @@ test('PRODUCTION HARDENING & RATE LIMITING VERIFICATION TEST SUITE', async (t) =
     assert.ok(cc.includes('private'), 'Sensitive route must include private');
   });
 
+  delete process.env.ENABLE_RATE_LIMITING;
   if (mongoose.connection.readyState === 1) {
     await mongoose.connection.dropDatabase();
     await mongoose.disconnect();

@@ -536,6 +536,9 @@ test('real security integration suite', async (t) => {
       assert.ok(results.some((result) => result.status === 429));
     });
   } finally {
+    delete process.env.ENABLE_RATE_LIMITING;
+    delete process.env.RATE_LIMIT_MAX;
+    delete process.env.PUBLIC_RATE_LIMIT_MAX;
     for (const filename of uploadedFiles) {
       await fs.rm(path.join(process.cwd(), 'uploads', filename), { force: true });
     }

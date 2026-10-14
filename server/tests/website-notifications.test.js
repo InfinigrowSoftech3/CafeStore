@@ -44,7 +44,7 @@ const request = async (route, { method = 'GET', body, token, headers = {} } = {}
   if (body !== undefined) {
     if (['/api/orders', '/api/session'].includes(route) && body && typeof body === 'object' && !Object.prototype.hasOwnProperty.call(body, 'tableToken')) {
       const table = await Table.findOne({ tableNumber: Number(body.tableNumber) });
-      if (table) body = { ...body, tableToken: createTableQrToken(table._id) };
+      if (table) body = { ...body, tableToken: createTableQrToken(table._id, table.tenantId) };
     }
     if (route === '/api/orders' && body && typeof body === 'object' && !body.idempotencyKey) body = { ...body, idempotencyKey: crypto.randomUUID() };
     reqHeaders['Content-Type'] = 'application/json';
