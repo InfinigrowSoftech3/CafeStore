@@ -95,6 +95,16 @@ export default function MenuPage() {
       .then(({ data }) => {
         if (!active || !data.data?.table) return;
         const resolvedTable = data.data.table;
+        const currentStore = useCartStore.getState();
+        const isNewTableScan =
+          (currentStore.tableNumber != null && currentStore.tableNumber !== Number(resolvedTable.number)) ||
+          (currentStore.tableToken != null && currentStore.tableToken !== tableTokenParam);
+
+        if (isNewTableScan) {
+          currentStore.clearCart();
+          currentStore.setDiningSessionToken(null);
+        }
+
         setTable(resolvedTable.number, tableTokenParam);
         try {
           sessionStorage.setItem('cafe_table_token', tableTokenParam);
@@ -110,6 +120,16 @@ export default function MenuPage() {
         api.get('/tables/qr/validate', { params: { token: tableTokenParam } })
           .then(({ data }) => {
             if (!active || !data.valid) return;
+            const currentStore = useCartStore.getState();
+            const isNewTableScan =
+              (currentStore.tableNumber != null && currentStore.tableNumber !== Number(data.table.tableNumber)) ||
+              (currentStore.tableToken != null && currentStore.tableToken !== tableTokenParam);
+
+            if (isNewTableScan) {
+              currentStore.clearCart();
+              currentStore.setDiningSessionToken(null);
+            }
+
             setTable(data.table.tableNumber, tableTokenParam);
             try {
               sessionStorage.setItem('cafe_table_token', tableTokenParam);
@@ -141,8 +161,21 @@ export default function MenuPage() {
       tableNumber,
       tableToken,
       ...(useCartStore.getState().diningSessionToken && { diningSessionToken: useCartStore.getState().diningSessionToken }),
-    }).then(({ data }) => {
-      if (active && data.diningSessionToken) setDiningSessionToken(data.diningSessionToken);
+    }).then((res) => {
+      const data = res?.data;
+      if (!active || !data) return;
+
+      const prevSessionToken = useCartStore.getState().diningSessionToken;
+      // If server created a new dining session (status 201 Created),
+      // or if diningSessionToken changed, this is a fresh dining session.
+      // Wipe any lingering cart items from previous table / visit.
+      if (res.status === 201 || (prevSessionToken && data.diningSessionToken && prevSessionToken !== data.diningSessionToken)) {
+        useCartStore.getState().clearCart();
+      }
+
+      if (data.diningSessionToken) {
+        setDiningSessionToken(data.diningSessionToken);
+      }
     }).catch((error) => {
       if (active) toast.error(error.message || 'Unable to start your table session.');
     });

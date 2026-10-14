@@ -111,14 +111,13 @@ router.post('/', async (req, res) => {
     if (!table) return res.status(404).json({ error: 'Invalid or inactive table.' });
     if (Number.isInteger(tableNumber) && tableNumber !== table.tableNumber) return res.status(400).json({ error: 'Table number does not match the signed table QR token.' });
 
-    // Table lifecycle rule: If a table is AVAILABLE or CLEANING, a new scan starts a completely clean session.
-    // Never reuse an old session token for an available table.
-    const isFree = ['AVAILABLE', 'CLEANING'].includes(table.status);
-
-    if (!isFree && req.body.diningSessionToken) {
+    // Table lifecycle rule: If a table has no currentSessionId (e.g. freshly AVAILABLE after cleaning),
+    // or is in CLEANING status, a fresh scan starts a completely clean session.
+    // An existing session token is only reused if it matches table.currentSessionId for an active table.
+    if (table.currentSessionId && table.status !== 'CLEANING' && req.body.diningSessionToken) {
       try {
         const existing = await requireActiveDiningSession(req.body.diningSessionToken);
-        if (existing.tableNumber === tableNumber && (!table.currentSessionId || String(table.currentSessionId) === String(existing._id))) {
+        if (existing.tableNumber === tableNumber && String(table.currentSessionId) === String(existing._id)) {
           return res.status(200).json({
             session: { id: existing._id, tableNumber, status: existing.status, expiresAt: existing.expiresAt },
             diningSessionToken: req.body.diningSessionToken,

@@ -13,7 +13,29 @@ const useCartStore = create(
       isQuickCartOpen: false,
       lastAddedItemKey: null,
 
-      setTable: (num, token = null) => set({ tableNumber: Number(num), tableToken: token }),
+      setTable: (num, token = null) => {
+        const current = get();
+        const nextNum = num != null ? Number(num) : null;
+        const isTableChanged =
+          (current.tableNumber != null && nextNum != null && current.tableNumber !== nextNum) ||
+          (current.tableToken != null && token != null && current.tableToken !== token);
+
+        if (isTableChanged) {
+          set({
+            tableNumber: nextNum,
+            tableToken: token,
+            diningSessionToken: null,
+            items: [],
+            isQuickCartOpen: false,
+            lastAddedItemKey: null,
+          });
+        } else {
+          set({
+            tableNumber: nextNum,
+            tableToken: token,
+          });
+        }
+      },
       setDiningSessionToken: (token) => set({ diningSessionToken: token }),
 
       addRecentOrder: (orderInfo) =>
@@ -94,8 +116,15 @@ const useCartStore = create(
         });
       },
 
-      clearCart: () => set({ items: [] }),
-      resetTable: () => set({ tableNumber: null, tableToken: null, diningSessionToken: null }),
+      clearCart: () => set({ items: [], isQuickCartOpen: false, lastAddedItemKey: null }),
+      resetTable: () => set({
+        tableNumber: null,
+        tableToken: null,
+        diningSessionToken: null,
+        items: [],
+        isQuickCartOpen: false,
+        lastAddedItemKey: null,
+      }),
     }),
     {
       name: 'cafe-cart',

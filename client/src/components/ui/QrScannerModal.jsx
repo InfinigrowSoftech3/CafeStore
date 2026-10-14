@@ -81,6 +81,9 @@ export default function QrScannerModal({ onClose, onTableFound }) {
     setChecking(true);
     setError('');
     try {
+      if (tableNumber != null && tableNumber !== num) {
+        clearCart();
+      }
       setTable(num, token);
       toast.success(`Table ${String(num).padStart(2, '0')} connected!`, {
         id: 'table-connected',
