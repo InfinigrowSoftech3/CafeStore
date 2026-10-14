@@ -29,11 +29,10 @@ const router = express.Router();
 const SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Dev verification code logging permitted strictly outside production when ALLOW_DEV_OTP=true
+// Dev verification code logging permitted strictly outside production in test or when ALLOW_DEV_OTP=true
 const canLogDevCode = () =>
   process.env.NODE_ENV !== 'production' &&
-  process.env.NODE_ENV === 'development' &&
-  process.env.ALLOW_DEV_OTP === 'true';
+  (process.env.NODE_ENV === 'test' || (process.env.NODE_ENV === 'development' && process.env.ALLOW_DEV_OTP === 'true'));
 
 const EMAIL_FAILED_MESSAGE =
   'We could not send the verification email right now. Please try again in a moment or contact support.';

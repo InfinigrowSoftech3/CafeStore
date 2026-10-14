@@ -638,7 +638,7 @@ router.post('/send-otp', async (req, res) => {
     await setOtpCooldown(normalizedPhone, OTP_RESEND_COOLDOWN_SEC);
 
     const isProduction = process.env.NODE_ENV === 'production';
-    const canLogDevCode = !isProduction && process.env.NODE_ENV === 'development' && process.env.ALLOW_DEV_OTP === 'true';
+    const canLogDevCode = !isProduction && (process.env.NODE_ENV === 'test' || (process.env.NODE_ENV === 'development' && process.env.ALLOW_DEV_OTP === 'true'));
 
     // Outside production, dev verification code logged only when NODE_ENV=development and ALLOW_DEV_OTP=true
     if (canLogDevCode) {
