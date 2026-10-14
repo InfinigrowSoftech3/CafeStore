@@ -49,7 +49,7 @@ const waitForTerminal = async (campaignId, timeoutMs = 8000) => {
   const start = Date.now();
   for (;;) {
     const camp = await NotificationCampaign.findById(campaignId).lean();
-    if (camp && !['sending', 'processing'].includes(camp.status)) return camp;
+    if (camp && ['sent', 'completed', 'partial', 'partially_failed', 'failed', 'cancelled'].includes(camp.status)) return camp;
     if (Date.now() - start > timeoutMs) throw new Error(`Campaign ${campaignId} did not finish in time`);
     await new Promise((r) => setTimeout(r, 150));
   }

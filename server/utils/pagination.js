@@ -3,9 +3,18 @@
  * Standardizes page and limit extraction and response pagination metadata.
  */
 
-export const parsePagination = (req, defaultLimit = 20, maxLimit = 100) => {
-  const page = Math.max(1, parseInt(req.query?.page, 10) || 1);
-  const rawLimit = parseInt(req.query?.limit, 10);
+export const parsePagination = (reqOrQuery, defaultLimitOrOptions = 20, maxLimitArg = 100) => {
+  const query = reqOrQuery?.query || reqOrQuery || {};
+  const isOptionsObj = defaultLimitOrOptions && typeof defaultLimitOrOptions === 'object';
+  const defaultLimit = isOptionsObj
+    ? (Number(defaultLimitOrOptions.defaultLimit) || 20)
+    : (Number(defaultLimitOrOptions) || 20);
+  const maxLimit = isOptionsObj
+    ? (Number(defaultLimitOrOptions.maxLimit) || 100)
+    : (Number(maxLimitArg) || 100);
+
+  const page = Math.max(1, parseInt(query.page, 10) || 1);
+  const rawLimit = parseInt(query.limit, 10);
   const limit = Math.min(maxLimit, Math.max(1, rawLimit || defaultLimit));
   const skip = (page - 1) * limit;
   return { page, limit, skip };

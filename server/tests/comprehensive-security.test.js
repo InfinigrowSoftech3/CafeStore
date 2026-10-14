@@ -519,7 +519,7 @@ test('real security integration suite', async (t) => {
       const sales = await request('/api/analytics/exports/sales.csv', { token: adminToken });
       assert.equal(sales.status, 200);
       assert.match(sales.data.toString(), /GROW10/);
-      const gst = await request('/api/analytics/reports/gst', { token: adminToken });
+      const gst = await request('/api/analytics/reports/gst?limit=100', { token: adminToken });
       assert.equal(gst.status, 200);
       assert.ok(gst.data.totals.orders >= 1);
       assert.ok(gst.data.orders.some((entry) => entry.orderNumber === created.data.order.orderNumber));
@@ -527,7 +527,12 @@ test('real security integration suite', async (t) => {
     });
 
     await t.test('API rate limiting returns 429 after the configured threshold', async () => {
-      const results = await Promise.all(Array.from({ length: 220 }, () => request('/api/health')));
+      const results = [];
+      for (let i = 0; i < 220; i++) {
+        const res = await request('/api/health');
+        results.push(res);
+        if (res.status === 429) break;
+      }
       assert.ok(results.some((result) => result.status === 429));
     });
   } finally {
