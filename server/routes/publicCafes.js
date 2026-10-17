@@ -13,6 +13,8 @@ import { parsePagination, formatPagination } from '../utils/pagination.js';
 
 const router = express.Router();
 
+const SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
+
 // Helper to resolve cafe by ID or slug
 const resolveCafe = async (cafeIdOrSlug) => {
   if (!cafeIdOrSlug) return { error: 'INVALID_ID' };
@@ -23,9 +25,12 @@ const resolveCafe = async (cafeIdOrSlug) => {
     return { cafe };
   }
   // Try slug lookup
-  const cafe = await Tenant.findOne({ slug: trimmed.toLowerCase() }).lean();
-  if (!cafe) return { error: 'INVALID_ID' };
-  return { cafe };
+  if (SLUG_REGEX.test(trimmed.toLowerCase())) {
+    const cafe = await Tenant.findOne({ slug: trimmed.toLowerCase() }).lean();
+    if (!cafe) return { error: 'NOT_FOUND' };
+    return { cafe };
+  }
+  return { error: 'INVALID_ID' };
 };
 
 // ── 1. Resolve Cafe From QR ──────────────────────────────────────────────────

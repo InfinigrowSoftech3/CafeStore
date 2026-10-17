@@ -17,6 +17,12 @@ const NAV_LINKS = [
 export default function Navbar() {
   const tenant = useTenant();
   const location = useLocation();
+
+  // Drop old top nav links on the customer menu page
+  if (location.pathname === '/menu') {
+    return null;
+  }
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuButtonRef = useRef(null);
   const drawerRef = useRef(null);

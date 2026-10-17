@@ -14,6 +14,16 @@
   --brand-soft: #F6EBD5;
   --tenant-primary: #C8963E;
   --tenant-accent: #17110C;
+
+  /* Customer Menu Redesign Tokens (Butter & Deep Green Theme) */
+  --menu-bg: #FFF1C9;
+  --menu-ink: #0F3D2E;
+  --menu-accent: #C93A1C;
+  --menu-accent-text: #FFFFFF;
+  --menu-card: #FFFFFF;
+  --menu-card-radius: 26px;
+  --menu-veg: #1B7A3E;
+  --menu-nonveg: #C93A1C;
 }
 
 :focus-visible {
@@ -70,6 +80,32 @@
 
   .bottom-safe {
     padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scroll-fade-right {
+    mask-image: linear-gradient(to right, black calc(100% - 32px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 32px), transparent 100%);
+  }
+
+  @media (min-width: 640px) {
+    .sm\:mask-none {
+      mask-image: none !important;
+      -webkit-mask-image: none !important;
+    }
   }
 }
 

@@ -47,8 +47,8 @@ export default function QuickCartPopup() {
   const recentItem =
     items.find((i) => i.key === lastAddedItemKey) || items[items.length - 1] || null;
 
-  // Don't show popup on Cart or Checkout pages
-  const isExcludedPage = location.pathname === '/cart' || location.pathname === '/checkout';
+  // Don't show popup on Cart, Checkout, or Menu pages (Menu has dedicated floating order bar)
+  const isExcludedPage = location.pathname === '/cart' || location.pathname === '/checkout' || location.pathname === '/menu';
 
   // Auto-dismiss countdown (5.5 seconds), pauses on hover
   useEffect(() => {

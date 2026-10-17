@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 import { isProductScheduledAvailable } from './productAvailability.js';
+import { runWithSystemTenantAccess } from './tenantContext.js';
 
 /**
  * Generate a cryptographically secure access token for order retrieval.
@@ -87,11 +88,26 @@ export const validateAndFetchProductPrices = async (items, Product, expectedTena
     // Fetch product from database
     const product = await Product.findById(productId);
     if (!product) {
-      throw new Error(`Product not found: ${productId}`);
+      if (expectedTenantId) {
+        const foreignProduct = await runWithSystemTenantAccess(async () => Product.findById(productId).lean());
+        if (foreignProduct && String(foreignProduct.tenantId) !== String(expectedTenantId)) {
+          const err = new Error(`Product does not belong to this café: ${foreignProduct.name}`);
+          err.code = 'PRODUCT_CAFE_MISMATCH';
+          err.status = 400;
+          throw err;
+        }
+      }
+      const err = new Error(`Product not found: ${productId}`);
+      err.code = 'PRODUCT_NOT_FOUND';
+      err.status = 400;
+      throw err;
     }
 
     if (expectedTenantId && product.tenantId && String(product.tenantId) !== String(expectedTenantId)) {
-      throw new Error(`Product does not belong to this café: ${product.name}`);
+      const err = new Error(`Product does not belong to this café: ${product.name}`);
+      err.code = 'PRODUCT_CAFE_MISMATCH';
+      err.status = 400;
+      throw err;
     }
 
     if (!product.available) {

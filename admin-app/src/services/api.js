@@ -16,7 +16,7 @@ api.interceptors.request.use((config) => {
   if (token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  const activeBranchId = localStorage.getItem('activeBranchId');
+  const activeBranchId = localStorage.getItem('admin:activeBranchId') || localStorage.getItem('activeBranchId');
   if (activeBranchId && !config.headers['X-Branch-Id'] && !config.headers['x-branch-id']) {
     config.headers['X-Branch-Id'] = activeBranchId;
   }

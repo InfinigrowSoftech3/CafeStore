@@ -1,5 +1,5 @@
 import api from '../services/api';
-import { getResolvedTenantSlug, getResolvedTenantId } from './tenantHelper';
+import { getResolvedTenantSlug } from './tenantHelper';
 
 /**
  * Converts a base64 string to a Uint8Array for PushManager applicationServerKey
@@ -41,8 +41,7 @@ export const subscribeToWebPush = async ({ customerId, phone } = {}) => {
   }
 
   const tenantSlug = getResolvedTenantSlug();
-  const tenantId = getResolvedTenantId();
-  if (!tenantSlug && !tenantId) {
+  if (!tenantSlug) {
     throw new Error('Please select or scan a valid café before enabling notifications.');
   }
 
@@ -118,8 +117,7 @@ export const ensureWebPushSubscription = async ({ customerId, phone } = {}) => {
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
 
   const tenantSlug = getResolvedTenantSlug();
-  const tenantId = getResolvedTenantId();
-  if (!tenantSlug && !tenantId) {
+  if (!tenantSlug) {
     return false;
   }
 

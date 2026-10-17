@@ -85,7 +85,7 @@ export default function AdminLayout({ children, title }) {
 
   // Layout states
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(() => localStorage.getItem('cafe_admin_sidebar_collapsed') === 'true');
+  const [isCollapsed, setIsCollapsed] = useState(() => localStorage.getItem('admin:sidebar_collapsed') === 'true' || localStorage.getItem('cafe_admin_sidebar_collapsed') === 'true');
   const [refreshing, setRefreshing] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
@@ -95,7 +95,7 @@ export default function AdminLayout({ children, title }) {
 
   // Branches
   const [branches, setBranches] = useState([]);
-  const [selectedBranchId, setSelectedBranchId] = useState(() => localStorage.getItem('activeBranchId') || '');
+  const [selectedBranchId, setSelectedBranchId] = useState(() => localStorage.getItem('admin:activeBranchId') || localStorage.getItem('activeBranchId') || '');
 
   // Live alerts & billing summary for contextual banners
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
@@ -105,7 +105,7 @@ export default function AdminLayout({ children, title }) {
   const toggleCollapse = () => {
     setIsCollapsed(prev => {
       const next = !prev;
-      localStorage.setItem('cafe_admin_sidebar_collapsed', String(next));
+      localStorage.setItem('admin:sidebar_collapsed', String(next));
       return next;
     });
   };
@@ -142,7 +142,7 @@ export default function AdminLayout({ children, title }) {
       if (!selectedBranchId && list.length > 0) {
         const main = list.find(b => b.isMain) || list[0];
         setSelectedBranchId(main._id);
-        localStorage.setItem('activeBranchId', main._id);
+        localStorage.setItem('admin:activeBranchId', main._id);
         api.defaults.headers.common['X-Branch-Id'] = main._id;
       } else if (selectedBranchId) {
         api.defaults.headers.common['X-Branch-Id'] = selectedBranchId;
@@ -171,7 +171,7 @@ export default function AdminLayout({ children, title }) {
 
   const handleBranchChange = (newBranchId) => {
     setSelectedBranchId(newBranchId);
-    localStorage.setItem('activeBranchId', newBranchId);
+    localStorage.setItem('admin:activeBranchId', newBranchId);
     api.defaults.headers.common['X-Branch-Id'] = newBranchId;
     window.location.reload();
   };

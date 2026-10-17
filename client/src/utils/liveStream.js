@@ -1,4 +1,4 @@
-import { getResolvedTenantSlug, getResolvedTenantId } from './tenantHelper';
+import { getResolvedTenantSlug } from './tenantHelper';
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -12,28 +12,24 @@ export const subscribeToLiveStream = (path, { headers = {}, onEvent }) => {
     while (!controller.signal.aborted) {
       try {
         const tenantSlug = getResolvedTenantSlug();
-        const tenantId = getResolvedTenantId();
 
-        if (!tenantSlug && !tenantId) {
+        if (!tenantSlug) {
           await wait(1500);
           continue;
         }
 
         const url = new URL(`${baseUrl}${path}`, window.location.origin);
-        if (tenantSlug) {
-          url.searchParams.set('cafe', tenantSlug);
-        }
+        url.searchParams.set('cafe', tenantSlug);
 
         const reqHeaders = {
           Accept: 'text/event-stream',
-          ...(tenantSlug ? { 'X-Tenant-Slug': tenantSlug } : {}),
-          ...(tenantId ? { 'X-Tenant-Id': tenantId } : {}),
+          'X-Tenant-Slug': tenantSlug,
           ...headers,
         };
 
         const response = await fetch(url.toString(), {
           headers: reqHeaders,
-          credentials: 'include',
+          credentials: 'same-origin',
           signal: controller.signal,
         });
         if (!response.ok || !response.body) {

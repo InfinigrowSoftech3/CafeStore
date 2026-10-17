@@ -10,8 +10,12 @@ const router = express.Router();
 // GET /api/categories — public
 router.get('/', async (req, res) => {
   try {
-    res.set('Cache-Control', 'private, no-cache');
-    res.set('Vary', 'X-Tenant-Slug, X-Tenant-Id, X-Table-Token, Origin');
+    res.set({
+      'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'Vary': 'X-Tenant-Slug, X-Tenant-Id, X-Table-Token, Origin',
+    });
     const { page, limit, skip } = parsePagination(req);
     const filter = { active: true };
     const [categories, total] = await Promise.all([

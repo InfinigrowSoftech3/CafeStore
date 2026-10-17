@@ -1,12 +1,22 @@
 import axios from 'axios';
+import { getResolvedTenantSlug, getCustomerStorageKey } from '../utils/tenantHelper';
+import useCartStore from '../context/cartStore';
 
 const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD
   ? 'https://cafe-app-n8mn.onrender.com/api'
   : '/api');
 
+/**
+ * Dedicated Customer API Client
+ * - withCredentials: false (never sends admin session cookies across ports/origins)
+ * - Never attaches Authorization header
+ * - Strictly tenant-scoped by URL slug via X-Tenant-Slug header
+ * - Never injects stale un-namespaced X-Tenant-Id
+ */
 const api = axios.create({
   baseURL: apiUrl,
   timeout: 35000,
+  withCredentials: false,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -16,24 +26,27 @@ const RETRY_DELAY_MS = 1000;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-import { getResolvedTenantSlug, getResolvedTenantId } from '../utils/tenantHelper';
-import useCartStore from '../context/cartStore';
-
 api.interceptors.request.use((config) => {
   config._retryCount = config._retryCount ?? 0;
+
+  // Single source of truth: strictly scoped by the URL slug
   const tenantSlug = getResolvedTenantSlug();
-  if (tenantSlug && !config.headers['X-Tenant-Slug'] && !config.headers['x-tenant-slug']) {
+  if (tenantSlug) {
     config.headers['X-Tenant-Slug'] = tenantSlug;
   }
-  const tenantId = getResolvedTenantId();
-  if (tenantId && !config.headers['X-Tenant-Id'] && !config.headers['x-tenant-id']) {
-    config.headers['X-Tenant-Id'] = tenantId;
-  }
+
+  // Strictly remove any stale Authorization or X-Tenant-Id on customer calls
+  delete config.headers['Authorization'];
+  delete config.headers['authorization'];
+  delete config.headers['X-Tenant-Id'];
+  delete config.headers['x-tenant-id'];
+
   try {
     const tableToken =
       new URLSearchParams(window.location.search).get('tableToken') ||
+      new URLSearchParams(window.location.search).get('token') ||
       useCartStore.getState()?.tableToken ||
-      sessionStorage.getItem('cafe_table_token');
+      sessionStorage.getItem(getCustomerStorageKey(tenantSlug, 'table_token'));
     if (tableToken && !config.headers['X-Table-Token'] && !config.headers['x-table-token']) {
       config.headers['X-Table-Token'] = tableToken;
     }
@@ -91,7 +104,7 @@ api.interceptors.response.use(
   }
 );
 
-// In-flight GET request deduplication to prevent duplicate network calls
+// In-flight GET request deduplication strictly partitioned by tenant slug
 const inFlightRequests = new Map();
 const originalGet = api.get.bind(api);
 
@@ -101,7 +114,8 @@ api.get = function (url, config) {
     return originalGet(url, config);
   }
 
-  const key = `${url}_${JSON.stringify(config?.params || {})}`;
+  const tenantSlug = getResolvedTenantSlug() || 'no-tenant';
+  const key = `${tenantSlug}:${method}:${url}_${JSON.stringify(config?.params || {})}`;
   if (inFlightRequests.has(key)) {
     return inFlightRequests.get(key);
   }

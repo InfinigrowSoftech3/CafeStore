@@ -24,15 +24,9 @@ export function extractTenantFromTableToken(token) {
 }
 
 /**
- * Client-side tenant slug / ID resolver.
- * Priority order:
- * 1. URL search params (?cafe=..., ?cafeId=..., ?tenant=..., ?slug=...)
- * 2. URL tableToken payload claims (if present)
- * 3. Subdomain (e.g. velvet.localhost or velvet.cafe.domain.com)
- * 4. Session storage cache from current active tab session
- *
- * If a URL parameter points to a new/different café, this immediately busts
- * the client-side cache and resets session state for complete tenant isolation.
+ * Authoritative customer tenant slug resolver.
+ * On customer routes, the café comes ONLY from the URL (or table QR token / subdomain).
+ * It NEVER falls back to global admin tokens, localStorage, or default cafes.
  */
 export function getResolvedTenantSlug() {
   if (typeof window === 'undefined') return '';
@@ -49,7 +43,7 @@ export function getResolvedTenantSlug() {
     ).trim();
 
     if (!urlTenant) {
-      const token = params.get('tableToken');
+      const token = params.get('tableToken') || params.get('token');
       if (token) {
         const extracted = extractTenantFromTableToken(token);
         if (extracted) urlTenant = extracted;
@@ -57,30 +51,13 @@ export function getResolvedTenantSlug() {
     }
 
     if (urlTenant) {
-      const normalized = urlTenant.toLowerCase();
-      const currentCached = (sessionStorage.getItem('cafe_tenant_slug') || '').toLowerCase();
-
-      // If opening a QR code / URL for a DIFFERENT café, bust all stale client cache
-      if (currentCached && currentCached !== normalized) {
-        clearClientCache();
-        try {
-          sessionStorage.removeItem('cafe_table_token');
-          sessionStorage.removeItem('cafe_table_number');
-          sessionStorage.removeItem('cafe_tenant_id');
-        } catch { /* ignore */ }
-      }
-
-      sessionStorage.setItem('cafe_tenant_slug', normalized);
-      try { localStorage.setItem('cafe_tenant_slug', normalized); } catch { /* ignore */ }
-      return normalized;
+      return urlTenant.toLowerCase();
     }
 
     const host = window.location.hostname.toLowerCase();
     if (host.endsWith('.localhost')) {
       const prefix = host.slice(0, -'.localhost'.length);
       if (prefix && prefix !== 'admin' && prefix !== 'www' && prefix !== 'cafe' && !prefix.includes('.')) {
-        sessionStorage.setItem('cafe_tenant_slug', prefix);
-        try { localStorage.setItem('cafe_tenant_slug', prefix); } catch { /* ignore */ }
         return prefix;
       }
     }
@@ -88,15 +65,8 @@ export function getResolvedTenantSlug() {
     // Check custom multi-tenant subdomain
     const parts = host.split('.');
     if (parts.length > 2 && parts[0] !== 'www' && parts[0] !== 'admin' && parts[0] !== 'cafe') {
-      const sub = parts[0];
-      sessionStorage.setItem('cafe_tenant_slug', sub);
-      try { localStorage.setItem('cafe_tenant_slug', sub); } catch { /* ignore */ }
-      return sub;
+      return parts[0];
     }
-
-    // Retain tenant context across page navigation and new tabs
-    const cached = sessionStorage.getItem('cafe_tenant_slug') || localStorage.getItem('cafe_tenant_slug');
-    if (cached) return cached;
   } catch {
     // ignore
   }
@@ -104,36 +74,70 @@ export function getResolvedTenantSlug() {
   return '';
 }
 
-export function setResolvedTenantSlug(slug) {
-  if (!slug || typeof window === 'undefined') return;
-  try {
-    const normalized = String(slug).toLowerCase().trim();
-    sessionStorage.setItem('cafe_tenant_slug', normalized);
-    localStorage.setItem('cafe_tenant_slug', normalized);
-  } catch {
-    // ignore
-  }
-}
-
-export function getResolvedTenantId() {
-  if (typeof window === 'undefined') return '';
-  try {
-    return sessionStorage.getItem('cafe_tenant_id') || localStorage.getItem('cafe_tenant_id') || '';
-  } catch {
-    return '';
-  }
-}
-
-export function setResolvedTenantId(id) {
-  if (!id || typeof window === 'undefined') return;
-  try {
-    const trimmed = String(id).trim();
-    sessionStorage.setItem('cafe_tenant_id', trimmed);
-    localStorage.setItem('cafe_tenant_id', trimmed);
-  } catch {
-    // ignore
-  }
-}
-
 export const getTenantSlug = getResolvedTenantSlug;
 
+/**
+ * Storage namespacing helpers for multi-tenant isolation.
+ * Customer storage keys: customer:<slug>:<key>
+ * Admin storage keys: admin:<key>
+ */
+export function getCustomerStorageKey(slug, key) {
+  const safeSlug = (slug || getResolvedTenantSlug() || 'anon').toLowerCase().trim();
+  return `customer:${safeSlug}:${key}`;
+}
+
+export function getCustomerSessionItem(slug, key) {
+  try {
+    return sessionStorage.getItem(getCustomerStorageKey(slug, key));
+  } catch {
+    return null;
+  }
+}
+
+export function setCustomerSessionItem(slug, key, value) {
+  try {
+    sessionStorage.setItem(getCustomerStorageKey(slug, key), String(value));
+  } catch {
+    // ignore
+  }
+}
+
+export function removeCustomerSessionItem(slug, key) {
+  try {
+    sessionStorage.removeItem(getCustomerStorageKey(slug, key));
+  } catch {
+    // ignore
+  }
+}
+
+/**
+ * Clears any legacy or previous café storage keys when switching cafes
+ */
+export function cleanupPreviousTenantStorage(newSlug) {
+  if (typeof window === 'undefined') return;
+  try {
+    clearClientCache();
+    // Remove un-namespaced legacy keys
+    sessionStorage.removeItem('cafe_tenant_slug');
+    sessionStorage.removeItem('cafe_tenant_id');
+    sessionStorage.removeItem('cafe_table_token');
+    sessionStorage.removeItem('cafe_table_number');
+    sessionStorage.removeItem('cafe_table_id');
+    localStorage.removeItem('cafe_tenant_slug');
+    localStorage.removeItem('cafe_tenant_id');
+    localStorage.removeItem('brewhaus-cart');
+
+    // Remove customer keys that belong to other slugs
+    const normalizedNew = String(newSlug || '').toLowerCase().trim();
+    if (normalizedNew) {
+      for (let i = sessionStorage.length - 1; i >= 0; i--) {
+        const k = sessionStorage.key(i);
+        if (k && k.startsWith('customer:') && !k.startsWith(`customer:${normalizedNew}:`)) {
+          sessionStorage.removeItem(k);
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+}

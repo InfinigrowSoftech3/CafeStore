@@ -185,7 +185,7 @@ router.get('/floor-plan', protect, ownerOrManager, async (req, res) => {
       const totalItemsCount = unpaidOrders.reduce((sum, o) => sum + (o.items ? o.items.length : 0), 0);
       const earliestOrder = unpaidOrders[0];
 
-      let effectiveStatus = table.status || 'AVAILABLE';
+      let effectiveStatus;
 
       // 1. Check auto-release for CLEANING tables
       if (table.status === 'CLEANING') {

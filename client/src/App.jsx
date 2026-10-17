@@ -1,5 +1,5 @@
 import { Component, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 import QuickCartPopup from './components/ui/QuickCartPopup';
@@ -94,6 +94,12 @@ function PageFallback() {
   );
 }
 
+function MenuRouteWrapper() {
+  const [searchParams] = useSearchParams();
+  const slug = searchParams.get('cafeSlug') || searchParams.get('cafe') || searchParams.get('cafeId') || searchParams.get('slug') || searchParams.get('token') || searchParams.get('tableToken') || '';
+  return <MenuPage key={slug} />;
+}
+
 export default function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -121,7 +127,7 @@ export default function App() {
         <Suspense fallback={<PageFallback />}>
           <Routes>
             <Route path="/" element={<Navigate to="/menu" replace />} />
-            <Route path="/menu" element={<MenuPage />} />
+            <Route path="/menu" element={<MenuRouteWrapper />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/offers" element={<OffersPage />} />
             <Route path="/contact" element={<ContactPage />} />

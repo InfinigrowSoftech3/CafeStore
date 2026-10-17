@@ -1,7 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import api from '../services/api';
 import { TenantNotFoundScreen, TenantSuspendedScreen } from '../components/ui/TenantErrorState';
-import { getResolvedTenantSlug, setResolvedTenantSlug, setResolvedTenantId } from '../utils/tenantHelper';
+import {
+  getResolvedTenantSlug,
+  setCustomerSessionItem,
+  cleanupPreviousTenantStorage,
+} from '../utils/tenantHelper';
 import { clearClientCache } from '../utils/menuCache';
 
 const TenantContext = createContext(null);
@@ -10,63 +14,55 @@ const fallback = { name: 'Café', currency: 'INR', taxRate: 5, primaryColor: '#C
 export function TenantProvider({ children }) {
   const [tenant, setTenant] = useState(fallback);
   const [tenantState, setTenantState] = useState({ status: 'loading', message: '' });
+  const [currentSearch, setCurrentSearch] = useState(() => (typeof window !== 'undefined' ? window.location.search : ''));
+
+  // Reactive URL search param detection (e.g. back/forward navigation or URL updates)
+  useEffect(() => {
+    const onLocationChange = () => {
+      setCurrentSearch(window.location.search);
+    };
+
+    window.addEventListener('popstate', onLocationChange);
+    // Listen for custom pushstate/replacestate if used
+    window.addEventListener('urlchange', onLocationChange);
+
+    return () => {
+      window.removeEventListener('popstate', onLocationChange);
+      window.removeEventListener('urlchange', onLocationChange);
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token') || params.get('tableToken');
-    const cafeSlug = params.get('cafeSlug') || params.get('cafe') || params.get('cafeId');
+    const cafeSlug = params.get('cafeSlug') || params.get('cafe') || params.get('cafeId') || params.get('tenant') || params.get('slug');
     const tableSlug = params.get('tableSlug') || params.get('table') || params.get('tableId');
+
+    // Strict single source of truth:
+    // If no token and no slug in query, check if a multi-tenant subdomain exists
+    const resolvedSlug = cafeSlug || getResolvedTenantSlug();
+
+    if (!token && !resolvedSlug) {
+      // Missing slug: show "Café not found" screen. NEVER fall back to default or admin owner café.
+      setTenantState({
+        status: 'not_found',
+        message: 'Café not found. Please scan your table QR code to view the menu.',
+      });
+      document.title = 'Café Not Found | Please Scan QR';
+      return undefined;
+    }
+
+    setTenantState({ status: 'loading', message: '' });
 
     const resolveEndpoint = () => {
       if (token) {
         return api.get('/public/cafes/resolve', { params: { token } });
       }
-      if (cafeSlug && tableSlug) {
-        return api.get('/public/cafes/resolve', { params: { cafeSlug, tableSlug } });
+      if (resolvedSlug && tableSlug) {
+        return api.get('/public/cafes/resolve', { params: { cafeSlug: resolvedSlug, tableSlug } });
       }
-      if (cafeSlug) {
-        return api.get(`/public/cafes/${encodeURIComponent(cafeSlug)}`);
-      }
-      const cachedSlug = getResolvedTenantSlug();
-      if (cachedSlug) {
-        return api.get(`/public/cafes/${encodeURIComponent(cachedSlug)}`).catch(() => {
-          try {
-            sessionStorage.removeItem('cafe_tenant_slug');
-            sessionStorage.removeItem('cafe_tenant_id');
-            localStorage.removeItem('cafe_tenant_slug');
-            localStorage.removeItem('cafe_tenant_id');
-          } catch {
-            /* ignore storage errors */
-          }
-          return api.get('/cafes').then(({ data }) => {
-            const list = data?.data?.cafes || data?.cafes || [];
-            const activeCafe = list.find((c) => c.status === 'active' && c.productCount > 0) || list.find((c) => c.status === 'active') || list[0];
-            return activeCafe ? { data: { cafe: activeCafe } } : { data: { cafe: fallback } };
-          });
-        });
-      }
-
-      // Direct navigation without params (e.g. http://localhost:5173/menu):
-      // Automatically load the active café so customer menu displays properly
-      return api.get('/cafes')
-        .then(({ data }) => {
-          const list = data?.data?.cafes || data?.cafes || [];
-          const activeCafe = list.find((c) => c.status === 'active' && c.productCount > 0) || list.find((c) => c.status === 'active') || list[0];
-          if (activeCafe) {
-            return {
-              data: {
-                cafe: activeCafe,
-              },
-            };
-          }
-          return { data: { cafe: fallback } };
-        })
-        .catch(() => ({
-          data: {
-            cafe: fallback,
-          },
-        }));
+      return api.get(`/public/cafes/${encodeURIComponent(resolvedSlug)}`);
     };
 
     resolveEndpoint()
@@ -77,14 +73,15 @@ export function TenantProvider({ children }) {
         const qrData = data.data?.qr;
 
         if (!cafeData) {
-          setTenantState({ status: 'not_found', message: 'Café not found.' });
+          setTenantState({
+            status: 'not_found',
+            message: 'Café not found. Please scan your table QR code or check the URL.',
+          });
           return;
         }
 
-        const prevSlug = getResolvedTenantSlug();
-        if (prevSlug && prevSlug !== cafeData.slug) {
-          clearClientCache();
-        }
+        // Clean up previous café storage when switching tenants
+        cleanupPreviousTenantStorage(cafeData.slug);
 
         const rawPrimary = cafeData.branding?.primaryColor || cafeData.settings?.primaryColor;
         const rawAccent = cafeData.branding?.secondaryColor || cafeData.settings?.accentColor;
@@ -109,18 +106,13 @@ export function TenantProvider({ children }) {
         };
 
         setTenant(normalizedTenant);
-        setResolvedTenantSlug(cafeData.slug);
-        setResolvedTenantId(cafeData.id || cafeData._id);
 
+        // Store table info under customer namespaced keys
         if (tableData) {
-          try {
-            sessionStorage.setItem('cafe_table_number', String(tableData.number));
-            sessionStorage.setItem('cafe_table_id', String(tableData.id));
-            if (qrData?.token) {
-              sessionStorage.setItem('cafe_table_token', String(qrData.token));
-            }
-          } catch {
-            // Ignore sessionStorage access errors
+          setCustomerSessionItem(cafeData.slug, 'table_number', tableData.number);
+          setCustomerSessionItem(cafeData.slug, 'table_id', tableData.id);
+          if (qrData?.token) {
+            setCustomerSessionItem(cafeData.slug, 'table_token', qrData.token);
           }
         }
 
@@ -143,21 +135,21 @@ export function TenantProvider({ children }) {
         const errorMessage =
           typeof errObj === 'object'
             ? errObj?.message
-            : error.response?.data?.error || 'QR code was not found or is no longer valid.';
+            : error.response?.data?.error || 'Café not found. Please scan your table QR code.';
 
         if (statusCode === 410 || errorCode === 'QR_EXPIRED' || statusCode === 423 || errorCode === 'TENANT_SUSPENDED') {
           setTenantState({ status: 'suspended', message: errorMessage });
           document.title = 'Café Suspended | Online Ordering Paused';
         } else {
           setTenantState({ status: 'not_found', message: errorMessage });
-          document.title = 'Café Not Found';
+          document.title = 'Café Not Found | Please Scan QR';
         }
       });
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [currentSearch]);
 
   const value = useMemo(() => tenant, [tenant]);
 
@@ -171,14 +163,14 @@ export function TenantProvider({ children }) {
 
   if (tenantState.status === 'loading') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAF8F5] text-[#17110C] font-sans">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#C8963E] to-[#9E6E24] flex items-center justify-center text-white shadow-lg shadow-[#C8963E]/20 animate-pulse mb-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFF1C9] text-[#0F3D2E] font-sans">
+        <div className="w-12 h-12 rounded-2xl bg-[#0F3D2E] flex items-center justify-center text-[#FFF1C9] shadow-lg animate-pulse mb-4">
           <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
           </svg>
         </div>
-        <p className="text-sm font-medium text-[#7D6E63] tracking-wide">Loading menu...</p>
+        <p className="text-sm font-semibold text-[#0F3D2E] tracking-wide">Loading menu...</p>
       </div>
     );
   }

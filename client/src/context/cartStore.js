@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getTenantSlug } from '../utils/tenantHelper';
+import { getTenantSlug, getCustomerStorageKey } from '../utils/tenantHelper';
 
 const useCartStore = create(
   persist(
@@ -12,6 +12,7 @@ const useCartStore = create(
       recentOrders: [],
       isQuickCartOpen: false,
       lastAddedItemKey: null,
+      currentSlug: null,
 
       setTable: (num, token = null) => {
         const current = get();
@@ -127,28 +128,33 @@ const useCartStore = create(
       }),
     }),
     {
-      name: 'cafe-cart',
+      name: 'customer-cart',
       storage: {
-        getItem: (name) => {
+        getItem: (_name) => {
           try {
-            const slug = getTenantSlug() || 'default';
-            const tenantKey = `cafe_cart_${slug}`;
-            const raw = localStorage.getItem(tenantKey) || (slug === 'brewhaus' ? localStorage.getItem('brewhaus-cart') : null);
+            const slug = getTenantSlug();
+            if (!slug) return null;
+            const tenantKey = getCustomerStorageKey(slug, 'cart');
+            const raw = localStorage.getItem(tenantKey);
             return raw ? JSON.parse(raw) : null;
           } catch {
             return null;
           }
         },
-        setItem: (name, value) => {
+        setItem: (_name, value) => {
           try {
-            const slug = getTenantSlug() || 'default';
-            localStorage.setItem(`cafe_cart_${slug}`, JSON.stringify(value));
+            const slug = getTenantSlug();
+            if (!slug) return;
+            const tenantKey = getCustomerStorageKey(slug, 'cart');
+            localStorage.setItem(tenantKey, JSON.stringify(value));
           } catch { /* Storage unavailable */ }
         },
-        removeItem: (name) => {
+        removeItem: (_name) => {
           try {
-            const slug = getTenantSlug() || 'default';
-            localStorage.removeItem(`cafe_cart_${slug}`);
+            const slug = getTenantSlug();
+            if (!slug) return;
+            const tenantKey = getCustomerStorageKey(slug, 'cart');
+            localStorage.removeItem(tenantKey);
           } catch { /* Storage unavailable */ }
         },
       },
@@ -158,15 +164,32 @@ const useCartStore = create(
         tableToken: state.tableToken,
         recentOrders: state.recentOrders,
         diningSessionToken: state.diningSessionToken,
+        currentSlug: getTenantSlug(),
       }),
-      merge: (persistedState, currentState) => ({
-        ...currentState,
-        items: Array.isArray(persistedState?.items) ? persistedState.items : [],
-        recentOrders: Array.isArray(persistedState?.recentOrders) ? persistedState.recentOrders : [],
-        diningSessionToken: typeof persistedState?.diningSessionToken === 'string' ? persistedState.diningSessionToken : null,
-        tableNumber: Number.isInteger(persistedState?.tableNumber) ? persistedState.tableNumber : null,
-        tableToken: typeof persistedState?.tableToken === 'string' ? persistedState.tableToken : null,
-      }),
+      merge: (persistedState, currentState) => {
+        const slug = getTenantSlug();
+        // If persisted cart belongs to a DIFFERENT café slug, do NOT carry items over!
+        if (persistedState?.currentSlug && slug && persistedState.currentSlug !== slug) {
+          return {
+            ...currentState,
+            items: [],
+            tableNumber: null,
+            tableToken: null,
+            diningSessionToken: null,
+            recentOrders: [],
+            currentSlug: slug,
+          };
+        }
+        return {
+          ...currentState,
+          items: Array.isArray(persistedState?.items) ? persistedState.items : [],
+          recentOrders: Array.isArray(persistedState?.recentOrders) ? persistedState.recentOrders : [],
+          diningSessionToken: typeof persistedState?.diningSessionToken === 'string' ? persistedState.diningSessionToken : null,
+          tableNumber: Number.isInteger(persistedState?.tableNumber) ? persistedState.tableNumber : null,
+          tableToken: typeof persistedState?.tableToken === 'string' ? persistedState.tableToken : null,
+          currentSlug: slug || persistedState?.currentSlug || null,
+        };
+      },
     }
   )
 );
@@ -184,6 +207,5 @@ export const cartItemCount = (state) =>
  */
 export const cartSubtotal = (state) =>
   state.items.reduce((s, i) => s + i.itemTotal, 0);
-
 
 export default useCartStore;

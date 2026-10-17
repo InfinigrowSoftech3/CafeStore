@@ -409,7 +409,7 @@ router.post('/', async (req, res) => {
         }
       }
     }
-    res.status(400).json({ error: error.message, code: error.code });
+    res.status(error.status || 400).json({ error: error.message, code: error.code || 'ORDER_ERROR' });
   }
 });
 

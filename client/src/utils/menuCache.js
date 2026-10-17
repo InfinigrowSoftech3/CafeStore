@@ -7,8 +7,8 @@ export const DEFAULT_TTL_MS = 60 * 1000; // 1 minute default for menu queries
 export const CATEGORIES_TTL_MS = 5 * 60 * 1000; // 5 minutes for categories
 
 function getTenantPrefix() {
-  const slug = getTenantSlug() || 'default';
-  return `cafe_cache_${slug}_`;
+  const slug = getTenantSlug() || 'anon';
+  return `customer:${slug}:cache:`;
 }
 
 export function getCached(key) {
@@ -65,7 +65,7 @@ export function clearClientCache() {
   memoryCache.clear();
   try {
     Object.keys(sessionStorage).forEach((k) => {
-      if (k.startsWith('cafe_cache_') || k.startsWith('brewhaus_cache_')) {
+      if (k.startsWith('customer:') || k.startsWith('cafe_cache_') || k.startsWith('brewhaus_cache_')) {
         sessionStorage.removeItem(k);
       }
     });
