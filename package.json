@@ -14,6 +14,7 @@
     "lint": "eslint server client/src admin-app/src client/*.js admin-app/*.js",
     "test": "cd server && npm test",
     "seed": "cd server && npm run seed",
+    "clean:db": "cd server && npm run clean:db",
     "install:all": "npm install && cd server && npm install && cd ../client && npm install && cd ../admin-app && npm install"
   },
   "devDependencies": {

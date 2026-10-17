@@ -18,7 +18,8 @@
     "migrate:phase0b": "node migrations/20261004_phase0b_white_label_settings.js",
     "rollback:phase0b": "node migrations/20261004_phase0b_white_label_settings.js --rollback",
     "backup:db": "node scripts/backup-db.js",
-    "restore:db": "node scripts/restore-db.js"
+    "restore:db": "node scripts/restore-db.js",
+    "clean:db": "node scripts/cleanDatabase.js"
   },
   "dependencies": {
     "@sentry/node": "^8.0.0",
