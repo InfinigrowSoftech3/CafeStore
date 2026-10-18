@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Search, LayoutDashboard, Monitor, ShoppingBag, UtensilsCrossed,
   Tag, Users, BarChart2, Settings, CreditCard, Bell, Star,
-  Plus, Smartphone, ArrowRight, X, Clock, HelpCircle
+  Plus, Smartphone, ArrowRight, X, Clock, HelpCircle, ExternalLink
 } from 'lucide-react';
 
 const ACTIONS = [
@@ -21,7 +21,7 @@ const ACTIONS = [
   { id: 'analytics', title: 'Analytics & Reports', subtitle: 'Daily revenue, hourly peak & GST exports', icon: BarChart2, to: '/analytics', category: 'Finance' },
   { id: 'billing', title: 'Plan & Billing', subtitle: 'View usage limits, quotas & invoices', icon: CreditCard, to: '/billing', category: 'Admin' },
   { id: 'settings', title: 'Café Settings', subtitle: 'Brand colors, logo, taxes & hours', icon: Settings, to: '/settings', category: 'Admin' },
-  { id: 'user-panel', title: 'Customer Storefront Preview', subtitle: 'Interactive diner table simulation', icon: Smartphone, to: '/user-panel', category: 'Storefront' },
+  { id: 'storefront', title: 'Open Live Storefront', subtitle: 'Launch customer menu and ordering app in new tab', icon: ExternalLink, href: 'https://cafe-client-app.vercel.app/', category: 'Storefront' },
 ];
 
 export default function CommandPaletteModal({ isOpen, onClose }) {
@@ -49,7 +49,9 @@ export default function CommandPaletteModal({ isOpen, onClose }) {
   });
 
   const handleSelect = (action) => {
-    if (action.to) {
+    if (action.href) {
+      window.open(action.href, '_blank', 'noopener,noreferrer');
+    } else if (action.to) {
       navigate(action.to);
     }
     onClose();

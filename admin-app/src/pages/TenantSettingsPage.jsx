@@ -22,7 +22,8 @@ import {
   QrCode,
   Save,
   CheckCircle2,
-  Layers
+  Layers,
+  ExternalLink
 } from 'lucide-react';
 import api from '../services/api';
 import { useTenant } from '../context/TenantContext';
@@ -319,14 +320,16 @@ export default function TenantSettingsPage() {
         ]}
         actions={
           <div className="flex items-center gap-2">
-            <Link
-              to="/user-panel"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-xs transition"
-              title="Preview Customer Digital Menu"
+            <a
+              href="https://cafe-client-app.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition"
+              title="Open Live Customer Storefront"
             >
-              <Smartphone size={14} className="text-amber-600" />
-              <span>Preview Customer View</span>
-            </Link>
+              <ExternalLink size={14} className="text-emerald-700" />
+              <span>Live Storefront ↗</span>
+            </a>
           </div>
         }
       />

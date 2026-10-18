@@ -62,20 +62,9 @@ const NAV_GROUPS = [
       { to: '/team', icon: Shield, label: 'Team & Security', access: 'owner' },
       { to: '/billing', icon: CreditCard, label: 'Plan & Billing', access: 'owner' },
       { to: '/settings', icon: Settings, label: 'Café Settings', access: 'owner' },
-      { to: '/user-panel', icon: Smartphone, label: 'User Panel Preview', access: 'any' },
     ],
   },
 ];
-
-const SIDEBAR_THEME = {
-  '--sidebar-bg': '#1a0f08',
-  '--sidebar-border': '#49372b',
-  '--sidebar-text': '#fff7ed',
-  '--sidebar-text-muted': '#ddc8b4',
-  '--sidebar-active-bg': '#8f4616',
-  '--sidebar-active-text': '#ffffff',
-  '--sidebar-hover-bg': '#302219',
-};
 
 export default function AdminLayout({ children, title }) {
   const { user, logout } = useAuth();
@@ -205,24 +194,14 @@ export default function AdminLayout({ children, title }) {
     <div className="flex h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] overflow-hidden font-body select-none" style={{ height: '100dvh' }}>
       {/* ── Left Sidebar ────────────────────────────────────────── */}
       <aside
-        className={`hidden md:flex flex-col h-full shrink-0 border-r transition-all duration-300 z-30 custom-scrollbar ${
+        className={`hidden md:flex flex-col h-full shrink-0 border-r border-slate-200 bg-white transition-all duration-300 z-30 custom-scrollbar ${
           isCollapsed ? 'w-20' : 'w-64'
         }`}
-        style={{
-          ...SIDEBAR_THEME,
-          backgroundColor: 'var(--sidebar-bg)',
-          borderColor: 'var(--sidebar-border)',
-          color: 'var(--sidebar-text)',
-        }}
       >
         {/* 1. Tenant Brand Header */}
-        <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b"
-          style={{ borderColor: 'var(--sidebar-border)' }}
-        >
+        <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-slate-200 bg-white">
           <div className="flex items-center gap-3 min-w-0 overflow-hidden">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl font-display text-base font-bold text-white shadow-sm overflow-hidden border"
-              style={{ backgroundColor: 'var(--brand-primary)', borderColor: 'var(--brand-primary-border)' }}
-            >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-none border border-slate-200 bg-[#0F3D2E] font-display text-base font-extrabold text-white shadow-2xs overflow-hidden">
               {tenant.logoUrl ? (
                 <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
               ) : (
@@ -232,12 +211,12 @@ export default function AdminLayout({ children, title }) {
 
             {!isCollapsed && (
               <div className="min-w-0 truncate">
-                <div className="truncate font-display text-sm font-bold text-[var(--sidebar-text)] tracking-wide">
+                <div className="truncate font-display text-sm font-extrabold text-slate-900 tracking-wide">
                   {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'Café'}
                 </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-medium text-amber-200">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="truncate">Branch Console</span>
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="truncate">Admin Console</span>
                 </div>
               </div>
             )}
@@ -245,7 +224,7 @@ export default function AdminLayout({ children, title }) {
 
           <button
             onClick={toggleCollapse}
-            className="p-1 rounded-lg text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover-bg)] transition"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
             title={isCollapsed ? 'Expand sidebar' : 'Collapse to icon rail'}
           >
             {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
@@ -261,7 +240,7 @@ export default function AdminLayout({ children, title }) {
             return (
               <div key={group.title} className="space-y-1">
                 {!isCollapsed && (
-                  <div className="px-3 pt-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-amber-200">
+                  <div className="px-3 pt-1 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
                     {group.title}
                   </div>
                 )}
@@ -275,17 +254,17 @@ export default function AdminLayout({ children, title }) {
                       title={isCollapsed ? label : undefined}
                       className={({ isActive: directActive }) => {
                         const active = directActive || isActive;
-                        return `w-full flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold transition group ${
+                        return `w-full flex items-center gap-3 rounded-none px-3 py-2 text-xs font-semibold transition group ${
                           active
-                            ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] font-bold border-l-3 border-amber-300 shadow-2xs'
-                            : `text-[var(--sidebar-text-muted)] hover:bg-[var(--sidebar-hover-bg)] hover:text-[var(--sidebar-text)] border-l-3 border-transparent`
+                            ? 'bg-emerald-50 text-emerald-950 font-bold border-l-4 border-[#0F3D2E] shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950 border-l-4 border-transparent'
                         } ${isCollapsed ? 'justify-center' : ''}`;
                       }}
                     >
                       <Icon
                         size={17}
                         className={`shrink-0 transition ${
-                          isActive ? 'text-amber-200' : `text-[var(--sidebar-text-muted)] group-hover:text-[var(--sidebar-text)]`
+                          isActive ? 'text-[#0F3D2E]' : 'text-slate-400 group-hover:text-slate-700'
                         }`}
                       />
                       {!isCollapsed && <span className="truncate">{label}</span>}
@@ -298,32 +277,26 @@ export default function AdminLayout({ children, title }) {
         </nav>
 
         {/* 3. Sticky User Profile & Sign Out Footer */}
-        <div className="border-t p-3 bg-[var(--sidebar-hover-bg)]/80 shrink-0 space-y-2"
-          style={{ borderColor: 'var(--sidebar-border)' }}
-        >
+        <div className="border-t border-slate-200 p-3 bg-slate-50/80 shrink-0 space-y-2">
           <NavLink
             to="/profile"
             title={isCollapsed ? `${user?.name} (${user?.role})` : undefined}
-            className={`flex items-center gap-3 rounded-xl p-2 transition hover:bg-[var(--sidebar-hover-bg)] ${
+            className={`flex items-center gap-3 rounded-none p-2 transition hover:bg-slate-100 ${
               isCollapsed ? 'justify-center' : ''
             }`}
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border text-amber-200 font-bold text-xs"
-              style={{ backgroundColor: 'var(--brand-primary-subtle)', borderColor: 'var(--brand-primary-border)' }}
-            >
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0F3D2E] text-white font-bold text-xs shadow-2xs">
               {user?.name?.charAt(0)?.toUpperCase() || 'A'}
             </div>
             {!isCollapsed && (
               <div className="min-w-0 flex-1 truncate">
-                <div className="truncate text-xs font-bold text-[var(--sidebar-text)] flex items-center gap-1.5">
+                <div className="truncate text-xs font-bold text-slate-900 flex items-center gap-1.5">
                   <span className="truncate">{user?.name || 'Staff Member'}</span>
-                  <span className="text-[9px] uppercase px-1.5 py-0.2 rounded font-mono"
-                    style={{ backgroundColor: 'var(--sidebar-hover-bg)', color: 'var(--sidebar-text-muted)' }}
-                  >
+                  <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-full font-bold bg-slate-200 text-slate-700 font-mono">
                     {user?.role || 'staff'}
                   </span>
                 </div>
-                <div className="truncate text-[10px] text-[var(--sidebar-text-muted)] font-mono">
+                <div className="truncate text-[10px] text-slate-500 font-mono">
                   {user?.email || ''}
                 </div>
               </div>
@@ -333,10 +306,9 @@ export default function AdminLayout({ children, title }) {
           <button
             onClick={handleLogout}
             title={isCollapsed ? 'Sign out' : undefined}
-            className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold transition hover:bg-red-500/20 hover:text-red-200 border ${
+            className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold transition bg-white hover:bg-red-50 hover:text-red-700 hover:border-red-200 border border-slate-200 text-slate-600 ${
               isCollapsed ? 'justify-center' : ''
             }`}
-            style={{ borderColor: 'var(--sidebar-border)', color: 'var(--sidebar-text-muted)' }}
           >
             <LogOut size={14} className="shrink-0" />
             {!isCollapsed && <span>Sign out</span>}
@@ -353,30 +325,19 @@ export default function AdminLayout({ children, title }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 z-40 md:hidden"
-              style={{ backgroundColor: 'var(--drawer-backdrop)', backdropFilter: 'blur(4px)' }}
+              className="fixed inset-0 z-40 md:hidden bg-slate-900/50 backdrop-blur-xs"
             />
             <motion.div
               initial={{ x: -280 }}
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-              className="fixed inset-y-0 left-0 z-50 w-[calc(100vw-2rem)] max-w-72 md:hidden flex flex-col custom-scrollbar"
-              style={{
-                ...SIDEBAR_THEME,
-                backgroundColor: 'var(--sidebar-bg)',
-                borderColor: 'var(--sidebar-border)',
-                color: 'var(--sidebar-text)',
-              }}
+              className="fixed inset-y-0 left-0 z-50 w-[calc(100vw-2rem)] max-w-72 md:hidden flex flex-col bg-white border-r border-slate-200 text-slate-800 custom-scrollbar"
             >
               {/* Mobile Header */}
-              <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b"
-                style={{ borderColor: 'var(--sidebar-border)' }}
-              >
+              <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-slate-200">
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-[var(--brand-primary)] flex items-center justify-center font-bold text-white"
-                    style={{ backgroundColor: 'var(--brand-primary)' }}
-                  >
+                  <div className="h-9 w-9 rounded-none bg-[#0F3D2E] border border-slate-200 flex items-center justify-center font-bold text-white shadow-2xs">
                     {tenant.logoUrl ? (
                       <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
@@ -384,23 +345,23 @@ export default function AdminLayout({ children, title }) {
                     )}
                   </div>
                   <div>
-                    <div className="font-bold text-sm text-[var(--sidebar-text)]">
+                    <div className="font-extrabold text-sm text-slate-900">
                       {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'Café'}
                     </div>
-                    <div className="text-[10px] text-amber-300">Admin Console</div>
+                    <div className="text-[10px] text-emerald-700 font-semibold">Admin Console</div>
                   </div>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-1 rounded-lg text-[var(--sidebar-text-muted)] hover:text-[var(--sidebar-text)]"
+                  className="p-1 rounded-md text-slate-400 hover:text-slate-700"
                 >
                   <ChevronLeft size={18} />
                 </button>
               </div>
 
               {branches.length > 0 && (
-                <div className="shrink-0 border-b px-4 py-3" style={{ borderColor: 'var(--sidebar-border)' }}>
-                  <label htmlFor="mobile-branch-switcher" className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-amber-200">
+                <div className="shrink-0 border-b border-slate-200 px-4 py-3 bg-slate-50">
+                  <label htmlFor="mobile-branch-switcher" className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-500">
                     Current branch
                   </label>
                   <select
@@ -410,8 +371,7 @@ export default function AdminLayout({ children, title }) {
                       handleBranchChange(event.target.value);
                       setSidebarOpen(false);
                     }}
-                    className="w-full rounded-lg border px-2.5 py-2 text-xs font-semibold text-[var(--sidebar-text)] focus:outline-none focus:ring-2 focus:ring-amber-400"
-                    style={{ backgroundColor: 'var(--sidebar-hover-bg)', borderColor: 'var(--sidebar-border)' }}
+                    className="w-full rounded-md border border-slate-300 bg-white px-2.5 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     {branches.map((branch) => (
                       <option key={branch._id} value={branch._id}>
@@ -426,7 +386,7 @@ export default function AdminLayout({ children, title }) {
               <nav className="flex-1 overflow-y-auto p-3 space-y-4">
                 {NAV_GROUPS.map((group) => (
                   <div key={group.title} className="space-y-1">
-                    <div className="px-3 pt-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-amber-200">
+                    <div className="px-3 pt-1 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
                       {group.title}
                     </div>
                     {group.items.filter(item => canAccessItem(item.access)).map(({ to, icon: Icon, label }) => (
@@ -435,10 +395,10 @@ export default function AdminLayout({ children, title }) {
                         to={to}
                         onClick={() => setSidebarOpen(false)}
                         className={({ isActive }) =>
-                          `flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold transition ${
+                          `flex items-center gap-3 rounded-none px-3 py-2.5 text-xs font-semibold transition ${
                             isActive
-                              ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] font-bold border-l-3 border-amber-300'
-                              : 'text-[var(--sidebar-text-muted)] hover:bg-[var(--sidebar-hover-bg)] hover:text-[var(--sidebar-text)]'
+                              ? 'bg-emerald-50 text-emerald-950 font-bold border-l-4 border-[#0F3D2E]'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950 border-l-4 border-transparent'
                           }`
                         }
                       >
@@ -451,12 +411,10 @@ export default function AdminLayout({ children, title }) {
               </nav>
 
               {/* Mobile Footer */}
-              <div className="border-t p-3 bg-[var(--sidebar-hover-bg)]/80"
-                style={{ borderColor: 'var(--sidebar-border)' }}
-              >
+              <div className="border-t border-slate-200 p-3 bg-slate-50">
                 <button
                   onClick={handleLogout}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl p-2 text-xs font-semibold text-red-300 hover:bg-red-500/20"
+                  className="flex w-full items-center justify-center gap-2 rounded-md p-2 text-xs font-semibold text-red-600 bg-white border border-slate-200 hover:bg-red-50"
                 >
                   <LogOut size={14} /> Sign out
                 </button>
@@ -544,42 +502,43 @@ export default function AdminLayout({ children, title }) {
           </div>
 
           {/* Right Action Cluster */}
-          <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2.5">
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
+            {/* Live Storefront External Link Button */}
+            <a
+              href="https://cafe-client-app.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-emerald-300 bg-emerald-50 px-3 text-xs font-bold text-emerald-900 hover:bg-emerald-100 hover:border-emerald-400 transition shadow-2xs"
+              title="Open Live Customer Ordering Storefront in new tab"
+            >
+              <ExternalLink size={13} className="text-emerald-700" />
+              <span className="hidden sm:inline">Live Storefront</span>
+              <span className="sm:hidden text-[10px]">Store ↗</span>
+            </a>
+
             {/* Global ⌘K Trigger Button */}
             <button
               type="button"
               onClick={() => setShowCommandPalette(true)}
-              className="hidden lg:flex items-center gap-2 h-9 px-3 rounded-xl border px-3 py-1.5 text-xs font-medium transition"
+              className="hidden lg:flex items-center gap-2 h-9 px-3 rounded-md border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 text-xs font-medium transition shadow-2xs"
               title="Global quick navigation (⌘K)"
-              style={{
-                borderColor: 'var(--border-primary)',
-                backgroundColor: 'var(--hover-bg)',
-                color: 'var(--header-text-muted)',
-              }}
             >
               <Search size={14} />
-              <span>Search or jump...</span>
-              <kbd className="ml-1 rounded px-1.5 py-0.5 text-[10px] font-bold text-[var(--header-text-muted)] font-mono"
-                style={{ backgroundColor: 'var(--border-primary)' }}
-              >
+              <span>Search...</span>
+              <kbd className="ml-1 rounded px-1.5 py-0.5 text-[10px] font-bold text-slate-500 font-mono bg-slate-200/80">
                 ⌘K
               </kbd>
             </button>
 
             {/* Branch Switcher */}
             {branches.length > 0 && (
-              <div className="hidden items-center gap-1.5 rounded-xl px-2.5 py-1.5 border sm:flex"
-                style={{
-                  backgroundColor: 'var(--hover-bg)',
-                  borderColor: 'var(--border-primary)',
-                }}
-              >
+              <div className="hidden items-center gap-1.5 rounded-md px-2.5 py-1.5 border border-slate-200 bg-slate-50 sm:flex shadow-2xs">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-                <Store size={13} className="text-[var(--header-text-muted)] shrink-0" />
+                <Store size={13} className="text-slate-500 shrink-0" />
                 <select
                   value={selectedBranchId}
                   onChange={e => handleBranchChange(e.target.value)}
-                  className="bg-transparent text-xs font-semibold text-[var(--header-text)] focus:outline-none cursor-pointer max-w-[140px] truncate"
+                  className="bg-transparent text-xs font-semibold text-slate-800 focus:outline-none cursor-pointer max-w-[140px] truncate"
                   title="Switch Branch Outlet"
                 >
                   {branches.map(b => (
@@ -593,27 +552,26 @@ export default function AdminLayout({ children, title }) {
 
             {/* Online / Sync Badge */}
             <div
-              className={`hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold border ${
+              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
                 isOnline
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : 'bg-red-50 text-red-700 border-red-200 animate-pulse'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                  : 'bg-red-50 text-red-800 border-red-200 animate-pulse'
               }`}
               title={isOnline ? 'Online: System synced in real-time' : 'Offline mode'}
             >
-              {isOnline ? <Wifi size={13} /> : <WifiOff size={13} />}
-              <span className="text-[11px]">{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
+              <span className={`h-1.5 w-1.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-red-500 animate-ping'}`} />
+              <span className="text-[10px] tracking-wider">{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
             </div>
 
             {/* Live Orders Notification Bell */}
             <NavLink
               to="/orders"
-              className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl border bg-[var(--bg-surface)] text-[var(--header-text-muted)] hover:bg-[var(--hover-bg)] hover:text-[var(--header-text)] transition shadow-2xs"
+              className="relative inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition shadow-2xs"
               title={`${pendingOrdersCount} pending orders`}
-              style={{ borderColor: 'var(--border-primary)' }}
             >
               <Bell size={16} />
               {pendingOrdersCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-xs animate-bounce">
+                <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[9px] font-extrabold text-white shadow-xs animate-bounce">
                   {pendingOrdersCount}
                 </span>
               )}
@@ -623,9 +581,9 @@ export default function AdminLayout({ children, title }) {
             {canAccessPos(user?.role) && (
               <NavLink
                 to="/pos"
-                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl px-3.5 text-xs font-bold text-white shadow-xs hover:opacity-90 active:scale-98 transition"
+                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-3.5 text-xs font-bold text-white shadow-xs hover:bg-[#165a44] active:scale-98 transition"
                 title="Launch Fast POS Terminal"
-                style={{ backgroundColor: 'var(--brand-primary)' }}
+                style={{ backgroundColor: '#0F3D2E' }}
               >
                 <Monitor size={14} />
                 <span className="hidden sm:inline">Open POS</span>
@@ -636,11 +594,10 @@ export default function AdminLayout({ children, title }) {
             <button
               type="button"
               onClick={() => setShowAiModal(true)}
-              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold text-white shadow-xs transition"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-3 text-xs font-bold text-white shadow-xs transition bg-amber-600 hover:bg-amber-700"
               title="Ask InfiniGrow AI Business Advisor"
-              style={{ background: 'linear-gradient(to right, var(--brand-primary), var(--brand-primary-hover))' }}
             >
-              <Sparkles size={13} className="text-amber-300 animate-pulse" />
+              <Sparkles size={13} className="text-amber-200 animate-pulse" />
               <span className="hidden md:inline">AI Advisor</span>
             </button>
 
@@ -650,8 +607,7 @@ export default function AdminLayout({ children, title }) {
               onClick={handleRefresh}
               disabled={refreshing}
               title="Refresh all admin data"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border bg-[var(--bg-surface)] text-[var(--header-text-muted)] hover:border-amber-500/40 hover:bg-[var(--hover-bg)] hover:text-[var(--header-text)] disabled:cursor-wait transition shadow-2xs"
-              style={{ borderColor: 'var(--border-primary)' }}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 disabled:cursor-wait transition shadow-2xs"
             >
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
             </button>

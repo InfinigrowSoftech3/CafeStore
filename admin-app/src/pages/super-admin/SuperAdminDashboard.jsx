@@ -24,7 +24,6 @@ import PlanModal from '../../components/super-admin/PlanModal';
 import InviteOwnerModal from '../../components/super-admin/InviteOwnerModal';
 import AuditTimeline from '../../components/super-admin/AuditTimeline';
 import ImpersonationBanner from '../../components/super-admin/ImpersonationBanner';
-import UserPanelModal from '../../components/UserPanelModal';
 
 export default function SuperAdminDashboard() {
   const navigate = useNavigate();
@@ -56,7 +55,10 @@ export default function SuperAdminDashboard() {
   const [selectedDrawerTenant, setSelectedDrawerTenant] = useState(null);
   const [planModalTenant, setPlanModalTenant] = useState(null);
   const [inviteModalTenant, setInviteModalTenant] = useState(null);
-  const [userPanelModalCafe, setUserPanelModalCafe] = useState(null);
+  const handleOpenCustomerStorefront = (tenantObj) => {
+    const slug = tenantObj?.slug || 'velvet';
+    window.open(`https://cafe-client-app.vercel.app/?cafe=${slug}`, '_blank', 'noopener,noreferrer');
+  };
   const [confirmDialogProps, setConfirmDialogProps] = useState({
     isOpen: false,
     title: '',
@@ -261,7 +263,7 @@ export default function SuperAdminDashboard() {
         tenantCount={tenants.length}
         adminUser={adminUser}
         onLogout={handleLogout}
-        onOpenUserPanels={() => setUserPanelModalCafe(tenants[0] || { slug: 'velvet', name: 'Velvet Cafe' })}
+        onOpenUserPanels={() => handleOpenCustomerStorefront(tenants[0] || { slug: 'velvet', name: 'Velvet Cafe' })}
       />
 
       {/* ── Main Content Area ──────────────────────────────────── */}
@@ -286,7 +288,7 @@ export default function SuperAdminDashboard() {
           onLogout={handleLogout}
           onRefresh={loadData}
           loading={loading}
-          onOpenUserPanels={() => setUserPanelModalCafe(tenants[0] || { slug: 'velvet', name: 'Velvet Cafe' })}
+          onOpenUserPanels={() => handleOpenCustomerStorefront(tenants[0] || { slug: 'velvet', name: 'Velvet Cafe' })}
           activeAlertCount={(metrics?.suspendedTenants || 0) + (metrics?.paymentFailures || 0)}
         />
 
@@ -416,7 +418,7 @@ export default function SuperAdminDashboard() {
                   tenants={tenants.slice(0, 5)}
                   loading={loading}
                   onRowClick={(t) => setSelectedDrawerTenant(t)}
-                  onOpenPanel={(t) => setUserPanelModalCafe(t)}
+                  onOpenPanel={(t) => handleOpenCustomerStorefront(t)}
                   onImpersonate={handleRequestImpersonate}
                   onToggleStatus={handleRequestToggleStatus}
                   onChangePlan={(t) => setPlanModalTenant(t)}
@@ -447,7 +449,7 @@ export default function SuperAdminDashboard() {
                 tenants={tenants}
                 loading={loading}
                 onRowClick={(t) => setSelectedDrawerTenant(t)}
-                onOpenPanel={(t) => setUserPanelModalCafe(t)}
+                onOpenPanel={(t) => handleOpenCustomerStorefront(t)}
                 onImpersonate={handleRequestImpersonate}
                 onToggleStatus={handleRequestToggleStatus}
                 onChangePlan={(t) => setPlanModalTenant(t)}
@@ -725,7 +727,7 @@ export default function SuperAdminDashboard() {
         auditLogs={auditLogs}
         onOpenPanel={(t) => {
           setSelectedDrawerTenant(null);
-          setUserPanelModalCafe(t);
+          handleOpenCustomerStorefront(t);
         }}
         onImpersonate={handleRequestImpersonate}
         onChangePlan={(t) => setPlanModalTenant(t)}
@@ -774,15 +776,7 @@ export default function SuperAdminDashboard() {
         onNavigateTab={(tab) => setActiveTab(tab)}
         onRefresh={loadData}
         onLogout={handleLogout}
-        onOpenUserPanels={() => setUserPanelModalCafe(tenants[0] || { slug: 'velvet', name: 'Velvet Cafe' })}
-      />
-
-      {/* ── Customer Ordering User Panel Simulator Modal ─────────── */}
-      <UserPanelModal
-        isOpen={Boolean(userPanelModalCafe)}
-        onClose={() => setUserPanelModalCafe(null)}
-        initialCafe={userPanelModalCafe}
-        allCafes={tenants}
+        onOpenUserPanels={() => handleOpenCustomerStorefront(tenants[0] || { slug: 'velvet', name: 'Velvet Cafe' })}
       />
     </div>
   );

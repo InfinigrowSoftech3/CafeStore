@@ -173,7 +173,7 @@ export default function DashboardPage() {
     { key: 'menuAdded', title: 'Add Menu Items & Categories', desc: 'Setup dishes, prices and vegetarian flags', to: '/products' },
     { key: 'tablesAdded', title: 'Setup Dining Tables & Floor', desc: 'Create tables and generate QR ordering links', to: '/tables' },
     { key: 'staffInvited', title: 'Invite Staff & Kitchen Team', desc: 'Assign roles for Cashier, Manager & Chef', to: '/team' },
-    { key: 'qrPrinted', title: 'Test Customer Storefront', desc: 'Simulate live customer ordering on table', to: '/user-panel' },
+    { key: 'qrPrinted', title: 'Tables & QR Codes', desc: 'Download table QR codes for instant customer ordering', to: '/tables' },
   ];
   const completedChecklistCount = Object.values(checklist).filter(Boolean).length;
   const isAllChecklistDone = completedChecklistCount === 4;
@@ -186,37 +186,37 @@ export default function DashboardPage() {
       {/* ── 1. Greeting & Date Filter ───────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-espresso-950 tracking-tight">
+          <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             {greeting}, {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'Café'}! ☕
           </h2>
-          <p className="text-xs sm:text-sm text-stone-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
             Here's what's happening at your café today. All orders, kitchen flow and revenue are synced.
           </p>
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto">
           {/* Date Segmented Control */}
-          <div className="inline-flex rounded-xl bg-stone-200/80 p-1 text-xs font-semibold text-stone-600 shadow-inner">
+          <div className="inline-flex rounded-md bg-slate-200/70 p-1 text-xs font-semibold text-slate-600 shadow-2xs">
             <button
               onClick={() => setDateRange('today')}
-              className={`rounded-lg px-3 py-1.5 transition ${
-                dateRange === 'today' ? 'bg-white text-stone-900 shadow-2xs font-bold' : 'hover:text-stone-900'
+              className={`rounded-md px-3 py-1.5 transition ${
+                dateRange === 'today' ? 'bg-white text-slate-900 shadow-2xs font-extrabold' : 'hover:text-slate-900'
               }`}
             >
               Today
             </button>
             <button
               onClick={() => setDateRange('yesterday')}
-              className={`rounded-lg px-3 py-1.5 transition ${
-                dateRange === 'yesterday' ? 'bg-white text-stone-900 shadow-2xs font-bold' : 'hover:text-stone-900'
+              className={`rounded-md px-3 py-1.5 transition ${
+                dateRange === 'yesterday' ? 'bg-white text-slate-900 shadow-2xs font-extrabold' : 'hover:text-slate-900'
               }`}
             >
               Yesterday
             </button>
             <button
               onClick={() => setDateRange('7d')}
-              className={`rounded-lg px-3 py-1.5 transition ${
-                dateRange === '7d' ? 'bg-white text-stone-900 shadow-2xs font-bold' : 'hover:text-stone-900'
+              className={`rounded-md px-3 py-1.5 transition ${
+                dateRange === '7d' ? 'bg-white text-slate-900 shadow-2xs font-extrabold' : 'hover:text-slate-900'
               }`}
             >
               7 Days
@@ -226,7 +226,7 @@ export default function DashboardPage() {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="p-2 rounded-xl border border-stone-200 bg-white text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition shadow-2xs"
+            className="p-2 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition shadow-2xs"
             title="Refresh dashboard metrics"
           >
             <RefreshCw size={15} className={refreshing ? 'animate-spin' : ''} />
@@ -236,24 +236,24 @@ export default function DashboardPage() {
 
       {/* ── 2. Onboarding "Get Started" Checklist (If not all done) ── */}
       {!isAllChecklistDone && (
-        <div className="rounded-3xl border border-amber-200/90 bg-gradient-to-r from-amber-50/90 via-orange-50/50 to-white p-6 shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-amber-200/60">
+        <div className="rounded-none border border-slate-200 bg-white p-6 shadow-2xs">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
               <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-500 text-white font-bold text-xs">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0F3D2E] text-white font-bold text-xs shadow-2xs">
                   ⚡
                 </span>
-                <h3 className="font-display text-base font-bold text-espresso-950">
-                  Getting Started with Brewhaus ({completedChecklistCount}/4 Completed)
+                <h3 className="font-display text-base font-extrabold text-slate-900">
+                  Getting Started ({completedChecklistCount}/4 Completed)
                 </h3>
               </div>
-              <p className="text-xs text-stone-600 mt-1">
+              <p className="text-xs text-slate-500 mt-1 font-normal">
                 Complete these 4 steps to launch high-speed QR table-ordering and kitchen printing in your café.
               </p>
             </div>
-            <div className="w-full md:w-48 bg-stone-200 rounded-full h-2.5 overflow-hidden">
+            <div className="w-full md:w-48 bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/60">
               <div
-                className="bg-amber-600 h-2.5 rounded-full transition-all duration-500"
+                className="bg-[#0F3D2E] h-2 rounded-full transition-all duration-500"
                 style={{ width: `${(completedChecklistCount / 4) * 100}%` }}
               />
             </div>
@@ -266,24 +266,24 @@ export default function DashboardPage() {
                 <NavLink
                   key={item.key}
                   to={item.to}
-                  className={`flex flex-col justify-between p-3.5 rounded-2xl border transition ${
+                  className={`flex flex-col justify-between p-4 rounded-none border transition ${
                     done
-                      ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
-                      : 'bg-white border-amber-200/80 hover:border-amber-400 text-stone-800 shadow-2xs hover:shadow-xs'
+                      ? 'bg-emerald-50/60 border-emerald-200 text-emerald-950'
+                      : 'bg-white border-slate-200 hover:border-slate-400 text-slate-800 shadow-2xs'
                   }`}
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs font-bold">{item.title}</span>
                       {done ? (
-                        <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                        <CheckCircle2 size={16} className="text-emerald-700 shrink-0" />
                       ) : (
-                        <span className="h-4 w-4 rounded-full border border-stone-300 shrink-0" />
+                        <span className="h-4 w-4 rounded-full border border-slate-300 shrink-0" />
                       )}
                     </div>
-                    <p className="text-[11px] text-stone-500 leading-tight">{item.desc}</p>
+                    <p className="text-[11px] text-slate-500 leading-tight font-normal">{item.desc}</p>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 text-[11px] font-bold text-brew-700">
+                  <div className="mt-3 flex items-center gap-1 text-[11px] font-extrabold text-[#0F3D2E]">
                     <span>{done ? 'Review' : 'Set up now'}</span>
                     <ArrowUpRight size={12} />
                   </div>
@@ -337,18 +337,18 @@ export default function DashboardPage() {
       {/* ── 4. Main Two-Column Row: Live Orders Board + Hourly Chart ─ */}
       <div className="grid gap-6 lg:grid-cols-12">
         {/* Left Column (7 cols): Live Orders Kanban Board */}
-        <div className="lg:col-span-7 space-y-4 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6 shadow-sm">
-          <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+        <div className="lg:col-span-7 space-y-4 rounded-none border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <h3 className="font-display text-lg font-bold text-espresso-950">Live Orders Flow</h3>
+                <h3 className="font-display text-lg font-extrabold text-slate-900">Live Orders Flow</h3>
               </div>
-              <p className="text-xs text-stone-500">Real-time status of orders moving through kitchen and counter.</p>
+              <p className="text-xs text-slate-500 font-normal">Real-time status of orders moving through kitchen and counter.</p>
             </div>
             <NavLink
               to="/orders"
-              className="inline-flex items-center gap-1 text-xs font-bold text-brew-700 hover:text-brew-900"
+              className="inline-flex items-center gap-1 text-xs font-bold text-[#0F3D2E] hover:underline"
             >
               <span>View All</span>
               <ChevronRight size={14} />
@@ -358,32 +358,32 @@ export default function DashboardPage() {
           {/* 3 Kanban Columns */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Column 1: Pending */}
-            <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-3 space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-amber-900 pb-1 border-b border-amber-200/50">
+            <div className="rounded-none border border-slate-200 bg-slate-50/70 p-3 space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-800 pb-1.5 border-b border-slate-200">
                 <span>Received</span>
-                <span className="rounded-full bg-amber-200/80 px-2 py-0.2 text-[10px]">
+                <span className="rounded-full bg-amber-100 text-amber-800 px-2 py-0.5 text-[10px] font-bold border border-amber-200">
                   {pendingQueue.length}
                 </span>
               </div>
 
               <div className="space-y-2 max-h-[300px] overflow-y-auto custom-sidebar-scroll pr-1">
                 {pendingQueue.length === 0 ? (
-                  <div className="py-8 text-center text-[11px] text-stone-400">No new orders in queue.</div>
+                  <div className="py-8 text-center text-[11px] text-slate-400">No new orders in queue.</div>
                 ) : (
                   pendingQueue.slice(0, 4).map(order => (
-                    <div key={order._id} className="rounded-xl bg-white p-2.5 border border-amber-200/60 shadow-2xs space-y-1">
-                      <div className="flex items-center justify-between text-xs font-bold text-stone-900">
+                    <div key={order._id} className="rounded-none bg-white p-3 border border-slate-200 shadow-2xs space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-900">
                         <span>#{order.orderNumber || order._id.slice(-4)}</span>
                         <span className="text-[10px] text-amber-700 font-mono font-normal">
                           {getElapsedMinutes(order.createdAt)}
                         </span>
                       </div>
-                      <div className="text-[11px] text-stone-600 truncate">
+                      <div className="text-[11px] text-slate-600 truncate font-medium">
                         {order.tableNumber ? `Table ${order.tableNumber}` : 'Counter / Takeaway'} · {order.items?.length || 1} items
                       </div>
-                      <div className="text-xs font-bold text-stone-900 pt-1 border-t border-stone-100 flex justify-between">
+                      <div className="text-xs font-bold text-slate-900 pt-1.5 border-t border-slate-100 flex justify-between items-center">
                         <span>{formatMoney(order.total, currency)}</span>
-                        <span className="text-[10px] text-amber-600 uppercase font-semibold">New</span>
+                        <span className="text-[10px] rounded-full bg-amber-50 text-amber-800 border border-amber-200 px-1.5 py-0.2 uppercase font-bold">New</span>
                       </div>
                     </div>
                   ))
@@ -392,32 +392,32 @@ export default function DashboardPage() {
             </div>
 
             {/* Column 2: Preparing */}
-            <div className="rounded-2xl border border-orange-200/80 bg-orange-50/40 p-3 space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-orange-900 pb-1 border-b border-orange-200/50">
+            <div className="rounded-none border border-slate-200 bg-slate-50/70 p-3 space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-800 pb-1.5 border-b border-slate-200">
                 <span>Cooking</span>
-                <span className="rounded-full bg-orange-200/80 px-2 py-0.2 text-[10px]">
+                <span className="rounded-full bg-orange-100 text-orange-800 px-2 py-0.5 text-[10px] font-bold border border-orange-200">
                   {preparingQueue.length}
                 </span>
               </div>
 
               <div className="space-y-2 max-h-[300px] overflow-y-auto custom-sidebar-scroll pr-1">
                 {preparingQueue.length === 0 ? (
-                  <div className="py-8 text-center text-[11px] text-stone-400">Kitchen is all clear!</div>
+                  <div className="py-8 text-center text-[11px] text-slate-400">Kitchen is all clear!</div>
                 ) : (
                   preparingQueue.slice(0, 4).map(order => (
-                    <div key={order._id} className="rounded-xl bg-white p-2.5 border border-orange-200/60 shadow-2xs space-y-1">
-                      <div className="flex items-center justify-between text-xs font-bold text-stone-900">
+                    <div key={order._id} className="rounded-none bg-white p-3 border border-slate-200 shadow-2xs space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-900">
                         <span>#{order.orderNumber || order._id.slice(-4)}</span>
                         <span className="text-[10px] text-orange-700 font-mono font-normal">
                           {getElapsedMinutes(order.createdAt)}
                         </span>
                       </div>
-                      <div className="text-[11px] text-stone-600 truncate">
+                      <div className="text-[11px] text-slate-600 truncate font-medium">
                         {order.tableNumber ? `Table ${order.tableNumber}` : 'Takeaway'} · {order.items?.length || 1} items
                       </div>
-                      <div className="text-xs font-bold text-stone-900 pt-1 border-t border-stone-100 flex justify-between">
+                      <div className="text-xs font-bold text-slate-900 pt-1.5 border-t border-slate-100 flex justify-between items-center">
                         <span>{formatMoney(order.total, currency)}</span>
-                        <span className="text-[10px] text-orange-600 uppercase font-semibold">In Kitchen</span>
+                        <span className="text-[10px] rounded-full bg-orange-50 text-orange-800 border border-orange-200 px-1.5 py-0.2 uppercase font-bold">In Kitchen</span>
                       </div>
                     </div>
                   ))
@@ -426,32 +426,32 @@ export default function DashboardPage() {
             </div>
 
             {/* Column 3: Ready */}
-            <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/40 p-3 space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-emerald-900 pb-1 border-b border-emerald-200/50">
+            <div className="rounded-none border border-slate-200 bg-slate-50/70 p-3 space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-800 pb-1.5 border-b border-slate-200">
                 <span>Ready to Serve</span>
-                <span className="rounded-full bg-emerald-200/80 px-2 py-0.2 text-[10px]">
+                <span className="rounded-full bg-emerald-100 text-emerald-800 px-2 py-0.5 text-[10px] font-bold border border-emerald-200">
                   {readyQueue.length}
                 </span>
               </div>
 
               <div className="space-y-2 max-h-[300px] overflow-y-auto custom-sidebar-scroll pr-1">
                 {readyQueue.length === 0 ? (
-                  <div className="py-8 text-center text-[11px] text-stone-400">No tickets waiting for pickup.</div>
+                  <div className="py-8 text-center text-[11px] text-slate-400">No tickets waiting for pickup.</div>
                 ) : (
                   readyQueue.slice(0, 4).map(order => (
-                    <div key={order._id} className="rounded-xl bg-white p-2.5 border border-emerald-200/60 shadow-2xs space-y-1">
-                      <div className="flex items-center justify-between text-xs font-bold text-stone-900">
+                    <div key={order._id} className="rounded-none bg-white p-3 border border-slate-200 shadow-2xs space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-900">
                         <span>#{order.orderNumber || order._id.slice(-4)}</span>
                         <span className="text-[10px] text-emerald-700 font-mono font-normal">
                           {getElapsedMinutes(order.createdAt)}
                         </span>
                       </div>
-                      <div className="text-[11px] text-stone-600 truncate">
+                      <div className="text-[11px] text-slate-600 truncate font-medium">
                         {order.tableNumber ? `Table ${order.tableNumber}` : 'Counter'} · {order.items?.length || 1} items
                       </div>
-                      <div className="text-xs font-bold text-stone-900 pt-1 border-t border-stone-100 flex justify-between">
+                      <div className="text-xs font-bold text-slate-900 pt-1.5 border-t border-slate-100 flex justify-between items-center">
                         <span>{formatMoney(order.total, currency)}</span>
-                        <span className="text-[10px] text-emerald-600 uppercase font-bold">Ready</span>
+                        <span className="text-[10px] rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 px-1.5 py-0.2 uppercase font-bold">Ready</span>
                       </div>
                     </div>
                   ))
@@ -462,39 +462,39 @@ export default function DashboardPage() {
         </div>
 
         {/* Right Column (5 cols): Hourly Revenue Chart */}
-        <div className="lg:col-span-5 rounded-3xl border border-stone-200 bg-white p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-5 rounded-none border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
-              <h3 className="font-display text-lg font-bold text-espresso-950">Revenue by Hour</h3>
-              <span className="text-[11px] font-bold text-stone-400 uppercase">Hourly Rush</span>
+              <h3 className="font-display text-lg font-extrabold text-slate-900">Revenue by Hour</h3>
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Hourly Rush</span>
             </div>
-            <p className="text-xs text-stone-500 mb-4">Peak café traffic distribution through operating hours.</p>
+            <p className="text-xs text-slate-500 mb-4 font-normal">Peak café traffic distribution through operating hours.</p>
 
             <div className="h-60 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={hourlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="hourGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#c96b18" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#c96b18" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#0F3D2E" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#0F3D2E" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1ece7" vertical={false} />
-                  <XAxis dataKey="hour" tick={{ fontSize: 10, fill: '#78716c' }} tickLine={false} axisLine={false} interval={2} />
-                  <YAxis tick={{ fontSize: 10, fill: '#78716c' }} tickLine={false} axisLine={false} tickFormatter={v => `₹${v}`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="hour" tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false} interval={2} />
+                  <YAxis tick={{ fontSize: 10, fill: '#64748b' }} tickLine={false} axisLine={false} tickFormatter={v => `₹${v}`} />
                   <Tooltip
                     formatter={(val) => [`₹${Number(val).toLocaleString('en-IN')}`, 'Revenue']}
-                    contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+                    contentStyle={{ borderRadius: '0px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                   />
-                  <Area type="monotone" dataKey="revenue" stroke="#c96b18" strokeWidth={2.5} fill="url(#hourGrad)" />
+                  <Area type="monotone" dataKey="revenue" stroke="#0F3D2E" strokeWidth={2.5} fill="url(#hourGrad)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
             <span>Peak rush usually occurs between 12 PM - 3 PM</span>
-            <NavLink to="/analytics" className="font-bold text-brew-700 hover:text-brew-900">
+            <NavLink to="/analytics" className="font-bold text-[#0F3D2E] hover:underline">
               Full Analytics →
             </NavLink>
           </div>
@@ -504,30 +504,30 @@ export default function DashboardPage() {
       {/* ── 5. Bottom Row: Top Selling Items + Table Occupancy Mini-Map + Low Stock ─ */}
       <div className="grid gap-6 md:grid-cols-3">
         {/* Widget 1: Top Selling Items */}
-        <div className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+        <div className="rounded-none border border-slate-200 bg-white p-5 shadow-2xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center gap-2">
               <Flame size={18} className="text-orange-500" />
-              <h3 className="font-display text-base font-bold text-espresso-950">Top Selling Items</h3>
+              <h3 className="font-display text-base font-extrabold text-slate-900">Top Selling Items</h3>
             </div>
-            <span className="text-[11px] font-bold text-stone-400 uppercase">Volume</span>
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Volume</span>
           </div>
 
           <div className="space-y-3">
             {topProducts.length === 0 ? (
-              <div className="py-8 text-center text-xs text-stone-400">No sales recorded yet.</div>
+              <div className="py-8 text-center text-xs text-slate-400">No sales recorded yet.</div>
             ) : (
               topProducts.map((p, idx) => (
                 <div key={idx} className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-stone-100 text-[10px] font-bold text-stone-600">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold text-slate-700">
                       {idx + 1}
                     </span>
-                    <span className="font-semibold text-stone-800 truncate">{p.name}</span>
+                    <span className="font-semibold text-slate-800 truncate">{p.name}</span>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="font-bold text-stone-900">{p.quantity} sold</span>
-                    <span className="text-[10px] text-stone-400 block font-mono">
+                    <span className="font-bold text-slate-900">{p.quantity} sold</span>
+                    <span className="text-[10px] text-slate-400 block font-mono">
                       {formatMoney(p.revenue, currency)}
                     </span>
                   </div>
@@ -538,28 +538,28 @@ export default function DashboardPage() {
         </div>
 
         {/* Widget 2: Table Occupancy Mini-Map */}
-        <div className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+        <div className="rounded-none border border-slate-200 bg-white p-5 shadow-2xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center gap-2">
-              <Layers size={18} className="text-blue-500" />
-              <h3 className="font-display text-base font-bold text-espresso-950">Floor Occupancy</h3>
+              <Layers size={18} className="text-emerald-700" />
+              <h3 className="font-display text-base font-extrabold text-slate-900">Floor Occupancy</h3>
             </div>
-            <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
               {tableOccupancyPercent}% Full
             </span>
           </div>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-stone-600">
+            <div className="flex items-center justify-between text-xs text-slate-600 font-medium">
               <span>{occupiedTables} occupied of {tables.length} tables</span>
-              <span className="text-stone-400 font-mono">{tables.length - occupiedTables} vacant</span>
+              <span className="text-slate-400 font-mono">{tables.length - occupiedTables} vacant</span>
             </div>
 
             {/* Mini Table Visual Matrix */}
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 max-h-40 overflow-y-auto p-1 custom-sidebar-scroll">
               {tables.length === 0 ? (
-                <div className="col-span-full py-8 text-center text-xs text-stone-400">
-                  No tables configured. <NavLink to="/tables" className="text-brew-600 underline">Add tables</NavLink>
+                <div className="col-span-full py-8 text-center text-xs text-slate-400">
+                  No tables configured. <NavLink to="/tables" className="text-[#0F3D2E] underline font-bold">Add tables</NavLink>
                 </div>
               ) : (
                 tables.map(tbl => {
@@ -567,10 +567,10 @@ export default function DashboardPage() {
                   return (
                     <div
                       key={tbl._id || tbl.number}
-                      className={`flex flex-col items-center justify-center h-12 rounded-xl border text-[11px] font-bold transition ${
+                      className={`flex flex-col items-center justify-center h-12 rounded-none border text-[11px] font-bold transition ${
                         isOcc
-                          ? 'bg-blue-50 border-blue-300 text-blue-900'
-                          : 'bg-stone-50 border-stone-200 text-stone-600 hover:border-stone-300'
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-950 shadow-2xs'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
                       }`}
                       title={`Table ${tbl.number} (${isOcc ? 'Occupied' : 'Vacant'})`}
                     >
@@ -585,7 +585,7 @@ export default function DashboardPage() {
 
           <NavLink
             to="/tables"
-            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border border-stone-200 text-xs font-bold text-stone-700 hover:bg-stone-50 transition"
+            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
           >
             <span>Open Floor Plan Canvas</span>
             <ArrowUpRight size={13} />
@@ -593,29 +593,31 @@ export default function DashboardPage() {
         </div>
 
         {/* Widget 3: Inventory Alerts */}
-        <div className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+        <div className="rounded-none border border-slate-200 bg-white p-5 shadow-2xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center gap-2">
-              <AlertTriangle size={18} className="text-red-500" />
-              <h3 className="font-display text-base font-bold text-espresso-950">Low Stock Buffer</h3>
+              <AlertTriangle size={18} className="text-rose-600" />
+              <h3 className="font-display text-base font-extrabold text-slate-900">Low Stock Buffer</h3>
             </div>
-            <span className="text-[11px] font-bold text-stone-400 uppercase">Alerts</span>
+            <span className="text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              Alerts
+            </span>
           </div>
 
           <div className="space-y-2.5">
             {lowStockItems.length === 0 ? (
-              <div className="py-8 text-center text-xs text-emerald-600 flex flex-col items-center gap-1">
-                <CheckCircle2 size={20} />
+              <div className="py-8 text-center text-xs text-emerald-700 flex flex-col items-center gap-1 font-semibold">
+                <CheckCircle2 size={20} className="text-emerald-600" />
                 <span>All ingredients above reorder levels!</span>
               </div>
             ) : (
               lowStockItems.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-red-50/60 border border-red-100 text-xs">
+                <div key={idx} className="flex items-center justify-between p-2.5 rounded-none bg-rose-50/50 border border-rose-100 text-xs">
                   <div>
-                    <span className="font-semibold text-red-950 block">{item.name}</span>
-                    <span className="text-[10px] text-red-700">Min buffer: {item.reorderLevel} {item.unit}</span>
+                    <span className="font-bold text-rose-950 block">{item.name}</span>
+                    <span className="text-[10px] text-rose-700">Min buffer: {item.reorderLevel} {item.unit}</span>
                   </div>
-                  <span className="font-bold text-red-700 font-mono">
+                  <span className="font-bold text-rose-800 font-mono">
                     {item.currentStock} {item.unit}
                   </span>
                 </div>
@@ -625,7 +627,7 @@ export default function DashboardPage() {
 
           <NavLink
             to="/inventory"
-            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border border-stone-200 text-xs font-bold text-stone-700 hover:bg-stone-50 transition"
+            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
           >
             <span>Manage Inventory & POs</span>
             <ArrowUpRight size={13} />
