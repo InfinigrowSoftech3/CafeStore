@@ -25,7 +25,7 @@ const router = express.Router();
 router.get('/events', protect, ownerOrManager, (req, res) => openLiveStream(req, res, 'admin'));
 
 const getTrustedClientUrl = () => {
-  const configured = String(process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafe.infinigrowsoftech.com').trim();
+  const configured = String(process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafe-client-app.vercel.app').trim();
   if (!configured) throw new Error('CUSTOMER_APP_URL or CLIENT_URL is not configured.');
 
   const parsed = new URL(configured);
@@ -78,6 +78,8 @@ const refreshStaleQrCodes = async (tables, tenantId = null, tenantSlug = null) =
     }
     const expectedCafe = expectedSlug || String(effectiveTenantId);
     if (
+      table.qrUrl &&
+      table.qrUrl.startsWith(getTrustedClientUrl()) &&
       existingClaims?.tableId === String(table._id) &&
       String(existingClaims?.tenantId) === String(effectiveTenantId) &&
       existingCafe &&

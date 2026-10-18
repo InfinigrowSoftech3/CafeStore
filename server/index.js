@@ -103,6 +103,9 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
   app.use(cookieParser());
 
   const productionOrigins = new Set([
+    'https://cafe-client-app.vercel.app',
+    'https://admincafe-panel.vercel.app',
+    'http://admincafe-panel.vercel.app',
     'https://cafe.infinigrowsoftech.com',
     'https://admin-cafe.infinigrowsoftech.com',
     ...[
