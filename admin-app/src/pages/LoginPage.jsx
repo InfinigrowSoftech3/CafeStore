@@ -140,32 +140,30 @@ export default function LoginPage() {
       {/* ── Background Photography Layer (Left ~68%) ── */}
       <div className="absolute inset-0 lg:right-[32%] pointer-events-none z-0">
         <img
-          src="/images/cafe-login-bg.jpg"
+          src="/images/cafe-hero-clean.jpg"
           alt="Café Interior"
           className="h-full w-full object-cover object-left"
         />
-        {/* Soft daylight ambient vignette on top-left to guarantee text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent lg:w-[65%]" />
       </div>
 
       {/* ── Right Section Background Fill (#0D4032) ── */}
       <div className="absolute inset-y-0 right-0 w-full lg:w-[32%] bg-[#0D4032] pointer-events-none z-0" />
 
-      {/* ── Seamless Organic Ribbon Wave Curves (Desktop: 1650 x 927 viewport) ── */}
+      {/* ── Seamless Organic Curves (Exact 1650 x 927 viewport baseline) ── */}
       <svg
         className="absolute inset-0 h-full w-full pointer-events-none z-0 hidden lg:block"
         preserveAspectRatio="none"
         viewBox="0 0 1650 927"
         fill="none"
       >
-        {/* Deep Forest Green Upper-Right Curve */}
+        {/* Deep Forest Green Upper-Right Boundary Curve */}
         <path
-          d="M 1120,0 C 1080,240 1140,420 1280,510 C 1400,570 1520,590 1650,600 L 1650,0 Z"
+          d="M 1120,0 C 1070,260 1130,430 1270,510 C 1390,570 1520,590 1650,600 L 1650,0 Z"
           fill="#0D4032"
         />
-        {/* Warm Cream Bottom Curve (starts at x=880 to leave the croissant board & cup completely clear) */}
+        {/* Warm Cream Decorative Curve along the lower portion */}
         <path
-          d="M 880,927 C 980,780 1080,710 1240,650 C 1400,600 1540,580 1650,600 L 1650,927 Z"
+          d="M 900,927 C 1000,790 1110,720 1260,650 C 1410,600 1540,580 1650,600 L 1650,927 Z"
           fill="#F6EFE4"
         />
       </svg>
@@ -175,7 +173,7 @@ export default function LoginPage() {
         <BotanicalLeaves className="w-full h-full text-[#F6EFE4]/20" />
       </div>
 
-      {/* ── Left Content Area (~68% width): Branding, Headline, Description, 4 Feature Cards ── */}
+      {/* ── Left Content Area (~68% width): Branding, Headline, Description, 4 Feature Groups ── */}
       <div className="relative z-10 w-full lg:w-[68%] min-h-[540px] lg:min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:pl-[7%] lg:pt-[8%] lg:pr-12">
         <div className="max-w-[580px]">
           {/* Top Brand Logo */}
@@ -196,7 +194,7 @@ export default function LoginPage() {
           {/* Thin Gold Horizontal Accent Line */}
           <div className="w-12 h-[2.5px] bg-[#C58A43] mt-5 mb-7 rounded-full" />
 
-          {/* Main Headline (Playfair Display, ~68px on desktop, leading-[1.02]) */}
+          {/* Main Headline (Playfair Display, ~68px on desktop, leading-[1.02], #111827) */}
           <h1 className="font-display text-4xl sm:text-5xl lg:text-[68px] font-bold tracking-tight text-[#111827] leading-[1.02]">
             Manage Your <br />
             Café, <span className="italic font-normal text-[#C58A43]">Smarter</span>
@@ -251,7 +249,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Bottom spacer to keep the latte cup, saucer, beans, and croissant prominently visible */}
+        {/* Bottom spacer so the emerald latte cup, saucer, beans, and croissant on board stay fully visible */}
         <div className="h-44 xl:h-56 pointer-events-none hidden lg:block" />
       </div>
 
@@ -261,7 +259,7 @@ export default function LoginPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: 'easeOut' }}
-          className="relative w-full max-w-[570px] min-h-[720px] rounded-[22px] bg-white px-6 sm:px-[54px] py-10 shadow-2xl shadow-black/20 border border-slate-100 flex flex-col justify-between"
+          className="relative w-full max-w-[570px] min-h-[720px] rounded-[22px] bg-white px-6 sm:px-[52px] py-10 shadow-2xl shadow-black/20 border border-slate-100 flex flex-col justify-between"
         >
           {/* Coffee beans motif near bottom-left edge of the card */}
           <div className="absolute -bottom-3 -left-3 pointer-events-none z-20">
@@ -277,8 +275,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* 2. Dark green square containing coffee cup logo (~82 x 82px) */}
-            <div className="mx-auto mb-3 flex h-[82px] w-[82px] items-center justify-center rounded-2xl bg-[#0D4032] text-amber-200 shadow-sm">
+            {/* 2. Dark green square containing coffee cup logo (~80 x 80px) */}
+            <div className="mx-auto mb-3 flex h-[80px] w-[80px] items-center justify-center rounded-2xl bg-[#0D4032] text-amber-200 shadow-sm">
               <CoffeeCupLogo className="w-10 h-10 text-[#E5B574]" />
             </div>
 
@@ -294,12 +292,12 @@ export default function LoginPage() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-              {/* 5. Email address field (53px height, rounded-lg, #DCE4EC border) */}
+              {/* 5. Email address field (52px height, rounded-lg, #DCE4EC border) */}
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-[#111827] mb-1.5">
                   EMAIL ADDRESS
                 </label>
-                <div className="relative h-[53px]">
+                <div className="relative h-[52px]">
                   <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
                   <input
                     type="email"
@@ -314,12 +312,12 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* 6. Password field (53px height, lock icon, visibility toggle) */}
+              {/* 6. Password field (52px height, lock icon, visibility toggle) */}
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-[#111827] mb-1.5">
                   PASSWORD
                 </label>
-                <div className="relative h-[53px]">
+                <div className="relative h-[52px]">
                   <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -376,7 +374,7 @@ export default function LoginPage() {
                     value={twoFactorCode}
                     onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
                     disabled={loading || rateLimitCountdown > 0}
-                    className="w-full h-[53px] rounded-[8px] border border-amber-300 bg-amber-50/40 text-sm text-center font-mono tracking-widest text-[#111827] focus:border-[#0D4032] focus:outline-none focus:ring-1 focus:ring-[#0D4032]"
+                    className="w-full h-[52px] rounded-[8px] border border-amber-300 bg-amber-50/40 text-sm text-center font-mono tracking-widest text-[#111827] focus:border-[#0D4032] focus:outline-none focus:ring-1 focus:ring-[#0D4032]"
                     placeholder="000000"
                   />
                 </div>
@@ -405,11 +403,11 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {/* 8. Full-width dark forest-green button (53px height, rounded-lg, uppercase) */}
+              {/* 8. Full-width dark forest-green button (52px height, rounded-[8px], uppercase) */}
               <button
                 type="submit"
                 disabled={isButtonDisabled}
-                className="w-full h-[53px] rounded-[8px] bg-[#0D4032] hover:bg-[#083D2E] active:bg-[#05291E] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+                className="w-full h-[52px] rounded-[8px] bg-[#0D4032] hover:bg-[#083D2E] active:bg-[#05291E] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-3"
               >
                 {loading ? (
                   <>
