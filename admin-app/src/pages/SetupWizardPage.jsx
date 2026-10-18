@@ -240,23 +240,23 @@ export default function SetupWizardPage() {
   const firstTable = tables[0];
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] text-stone-900 pb-16">
+    <div className="min-h-screen bg-slate-50 text-slate-800 pb-16">
       {/* Top Header */}
-      <header className="border-b border-stone-200 bg-white/90 backdrop-blur sticky top-0 z-30">
+      <header className="border-b border-slate-200 bg-white sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-amber-600 to-orange-500 flex items-center justify-center text-white font-bold shadow-md shadow-orange-500/20">
+            <div className="h-9 w-9 rounded-none bg-[#0F3D2E] flex items-center justify-center text-white font-bold shadow-sm">
               <Sparkles size={18} />
             </div>
             <div>
-              <div className="font-bold text-sm text-stone-900">{tenant.name || 'Your Café'}</div>
-              <div className="text-[11px] text-stone-500">Quick Setup Wizard</div>
+              <div className="font-bold text-sm text-slate-900">{tenant.name || 'Your Café'}</div>
+              <div className="text-[11px] text-slate-500">Quick Setup Wizard</div>
             </div>
           </div>
 
           <button
             onClick={() => navigate('/dashboard')}
-            className="text-xs text-stone-500 hover:text-stone-900 font-medium px-3 py-1.5 rounded-lg border border-stone-200 hover:bg-stone-50 transition"
+            className="text-xs text-slate-600 hover:text-slate-900 font-semibold px-3 py-1.5 rounded-none border border-slate-200 hover:bg-slate-50 transition cursor-pointer"
           >
             Skip to Dashboard
           </button>
@@ -278,28 +278,28 @@ export default function SetupWizardPage() {
                   key={s.id}
                   onClick={() => handleStepClick(idx)}
                   disabled={!canClick}
-                  className={`flex flex-col items-center text-center p-2 rounded-2xl transition border ${
-                    canClick ? 'cursor-pointer hover:border-amber-300' : 'cursor-default'
+                  className={`flex flex-col items-center text-center p-2 rounded-none transition border ${
+                    canClick ? 'cursor-pointer hover:border-emerald-300' : 'cursor-default'
                   } ${
                     isCurrent
-                      ? 'border-amber-500 bg-amber-50/50 shadow-sm'
+                      ? 'border-[#0F3D2E] bg-emerald-50/50 shadow-sm'
                       : isDone
                       ? 'border-emerald-300 bg-emerald-50/30'
-                      : 'border-transparent text-stone-400'
+                      : 'border-transparent text-slate-400'
                   }`}
                 >
                   <div
                     className={`h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold mb-1.5 transition ${
                       isDone
-                        ? 'bg-emerald-500 text-white'
+                        ? 'bg-emerald-600 text-white'
                         : isCurrent
-                        ? 'bg-amber-600 text-white'
-                        : 'bg-stone-100 text-stone-400'
+                        ? 'bg-[#0F3D2E] text-white'
+                        : 'bg-slate-100 text-slate-400'
                     }`}
                   >
                     {isDone ? <CheckCircle2 size={18} /> : <Icon size={16} />}
                   </div>
-                  <span className={`text-xs font-semibold hidden sm:block ${isCurrent ? 'text-amber-900' : 'text-stone-600'}`}>
+                  <span className={`text-xs font-semibold hidden sm:block ${isCurrent ? 'text-[#0F3D2E]' : 'text-slate-600'}`}>
                     {s.label}
                   </span>
                 </button>
@@ -309,17 +309,17 @@ export default function SetupWizardPage() {
         </div>
 
         {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="mb-6 flex items-start gap-3 rounded-none border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             <AlertCircle size={18} className="mt-0.5 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {/* Wizard Card */}
-        <div className="rounded-3xl border border-stone-200/90 bg-white p-6 sm:p-10 shadow-xl shadow-stone-200/40">
+        <div className="rounded-none border border-slate-200 bg-white p-6 sm:p-10 shadow-xl">
           {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center text-stone-400">
-              <Loader2 size={32} className="animate-spin text-amber-600 mb-3" />
+            <div className="py-20 flex flex-col items-center justify-center text-slate-400">
+              <Loader2 size={32} className="animate-spin text-[#0F3D2E] mb-3" />
               <p className="text-sm">Loading your starter configuration...</p>
             </div>
           ) : (
@@ -697,7 +697,7 @@ export default function SetupWizardPage() {
                         )}
                       </div>
 
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 py-1.5 rounded-xl border border-amber-200">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 py-1.5 rounded-full border border-emerald-200">
                         Scan to View Menu & Order
                       </div>
 
@@ -706,7 +706,7 @@ export default function SetupWizardPage() {
                           <a
                             href={firstTable.qrCode}
                             download={`${tenant.slug || 'cafe'}-table-1-qr.png`}
-                            className="inline-flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2 text-xs font-bold text-white hover:bg-stone-800 transition"
+                            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0F3D2E] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#165a44] transition shadow-xs"
                           >
                             <Download size={14} /> Download QR (.png)
                           </a>
@@ -717,7 +717,7 @@ export default function SetupWizardPage() {
                             href={firstTable.qrUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center gap-1.5 text-xs text-amber-700 hover:text-amber-900 font-semibold py-1"
+                            className="inline-flex items-center justify-center gap-1.5 text-xs text-emerald-700 hover:text-emerald-900 font-semibold py-1"
                           >
                             Open Customer Menu <ExternalLink size={12} />
                           </a>
@@ -725,7 +725,7 @@ export default function SetupWizardPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="p-8 text-stone-400">Generating QR code...</div>
+                    <div className="p-8 text-slate-400">Generating QR code...</div>
                   )}
                 </motion.div>
               )}
@@ -733,12 +733,12 @@ export default function SetupWizardPage() {
           )}
 
           {/* Navigation Controls */}
-          <div className="mt-10 pt-6 border-t border-stone-100 flex items-center justify-between">
+          <div className="mt-10 pt-6 border-t border-slate-200 flex items-center justify-between">
             <button
               type="button"
               onClick={handlePrev}
               disabled={currentStepIndex === 0 || saving}
-              className="inline-flex items-center gap-2 rounded-xl border border-stone-200 px-4 py-2.5 text-xs font-bold text-stone-600 hover:bg-stone-50 disabled:opacity-30 disabled:cursor-not-allowed transition"
+              className="inline-flex items-center gap-2 rounded-none border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer"
             >
               <ArrowLeft size={16} /> Back
             </button>
@@ -747,7 +747,7 @@ export default function SetupWizardPage() {
               type="button"
               onClick={handleNext}
               disabled={saving}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-orange-500/25 hover:brightness-105 disabled:opacity-60 transition"
+              className="inline-flex items-center gap-2 rounded-md bg-[#0F3D2E] hover:bg-[#165a44] active:bg-[#0c2a20] px-6 py-2.5 text-xs font-bold text-white shadow-md disabled:opacity-60 transition cursor-pointer"
             >
               {saving ? (
                 <>
