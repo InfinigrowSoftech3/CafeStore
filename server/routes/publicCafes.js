@@ -19,6 +19,12 @@ const SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 const resolveCafe = async (cafeIdOrSlug) => {
   if (!cafeIdOrSlug) return { error: 'INVALID_ID' };
   const trimmed = String(cafeIdOrSlug).trim();
+  if (trimmed.toLowerCase() === 'default') {
+    const cafe = (await Tenant.findOne({ slug: 'default', status: 'active' }).lean())
+      || (await Tenant.findOne({ status: 'active' }).sort({ createdAt: 1 }).lean());
+    if (!cafe) return { error: 'NOT_FOUND' };
+    return { cafe };
+  }
   if (mongoose.isValidObjectId(trimmed)) {
     const cafe = await Tenant.findById(trimmed).lean();
     if (!cafe) return { error: 'NOT_FOUND' };

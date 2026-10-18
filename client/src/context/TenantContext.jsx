@@ -43,16 +43,6 @@ export function TenantProvider({ children }) {
     // If no token and no slug in query, check if a multi-tenant subdomain exists
     const resolvedSlug = cafeSlug || getResolvedTenantSlug();
 
-    if (!token && !resolvedSlug) {
-      // Missing slug: show "Café not found" screen. NEVER fall back to default or admin owner café.
-      setTenantState({
-        status: 'not_found',
-        message: 'Café not found. Please scan your table QR code to view the menu.',
-      });
-      document.title = 'Café Not Found | Please Scan QR';
-      return undefined;
-    }
-
     setTenantState({ status: 'loading', message: '' });
 
     const resolveEndpoint = () => {
@@ -62,7 +52,11 @@ export function TenantProvider({ children }) {
       if (resolvedSlug && tableSlug) {
         return api.get('/public/cafes/resolve', { params: { cafeSlug: resolvedSlug, tableSlug } });
       }
-      return api.get(`/public/cafes/${encodeURIComponent(resolvedSlug)}`);
+      if (resolvedSlug) {
+        return api.get(`/public/cafes/${encodeURIComponent(resolvedSlug)}`);
+      }
+      // If no token or slug was provided in the URL or subdomain, resolve the default active café
+      return api.get('/public/cafes/default');
     };
 
     resolveEndpoint()
