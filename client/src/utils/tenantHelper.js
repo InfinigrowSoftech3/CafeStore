@@ -21,10 +21,23 @@ export function extractTenantFromTableToken(token) {
   }
 }
 
+const EXCLUDED_PLATFORM_DOMAINS = [
+  'vercel.app',
+  'onrender.com',
+  'netlify.app',
+  'github.io',
+  'ngrok.io',
+  'loca.lt',
+  'herokuapp.com',
+  'azurewebsites.net',
+  'cloudfunctions.net',
+  'run.app',
+];
+
 /**
  * Authoritative customer tenant slug resolver.
- * On customer routes, the café comes ONLY from the URL (or table QR token / subdomain).
- * It NEVER falls back to global admin tokens, localStorage, or default cafes.
+ * On customer routes, the café comes from URL query params, table QR tokens,
+ * active session storage, or verified custom tenant subdomains.
  */
 export function getResolvedTenantSlug() {
   if (typeof window === 'undefined') return '';
@@ -52,6 +65,26 @@ export function getResolvedTenantSlug() {
       return urlTenant.toLowerCase();
     }
 
+    // Check persistent active café slug in sessionStorage/localStorage
+    const storedSlug =
+      sessionStorage.getItem('active_cafe_slug') ||
+      localStorage.getItem('active_cafe_slug');
+    if (storedSlug && typeof storedSlug === 'string') {
+      const cleanStored = storedSlug.trim().toLowerCase();
+      if (cleanStored && !EXCLUDED_PLATFORM_DOMAINS.some((d) => cleanStored.includes(d))) {
+        return cleanStored;
+      }
+    }
+
+    // Check table token stored in session/local storage
+    const storedToken =
+      sessionStorage.getItem('active_table_token') ||
+      localStorage.getItem('active_table_token');
+    if (storedToken) {
+      const extracted = extractTenantFromTableToken(storedToken);
+      if (extracted) return extracted.toLowerCase();
+    }
+
     const host = window.location.hostname.toLowerCase();
     if (host.endsWith('.localhost')) {
       const prefix = host.slice(0, -'.localhost'.length);
@@ -60,10 +93,13 @@ export function getResolvedTenantSlug() {
       }
     }
 
-    // Check custom multi-tenant subdomain
-    const parts = host.split('.');
-    if (parts.length > 2 && parts[0] !== 'www' && parts[0] !== 'admin' && parts[0] !== 'cafe') {
-      return parts[0];
+    // DO NOT treat deployment platforms (e.g. cafe-client-app.vercel.app) as custom tenant subdomains!
+    const isPlatformDomain = EXCLUDED_PLATFORM_DOMAINS.some((d) => host === d || host.endsWith(`.${d}`));
+    if (!isPlatformDomain) {
+      const parts = host.split('.');
+      if (parts.length > 2 && parts[0] !== 'www' && parts[0] !== 'admin' && parts[0] !== 'cafe') {
+        return parts[0];
+      }
     }
   } catch {
     // ignore

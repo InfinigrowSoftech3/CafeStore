@@ -141,9 +141,28 @@ export default function CheckoutPage() {
     setLoading(true);
     setError('');
     try {
+      const effectiveTableToken =
+        tableToken ||
+        sessionStorage.getItem('active_table_token') ||
+        localStorage.getItem('active_table_token') ||
+        '';
+      const cafeSlug =
+        tenant?.slug ||
+        sessionStorage.getItem('active_cafe_slug') ||
+        localStorage.getItem('active_cafe_slug') ||
+        '';
+      const activeTenantId =
+        tenant?.id ||
+        tenant?._id ||
+        sessionStorage.getItem('active_tenant_id') ||
+        localStorage.getItem('active_tenant_id') ||
+        '';
+
       const orderData = {
         tableNumber,
-        tableToken,
+        tableToken: effectiveTableToken,
+        cafeSlug,
+        tenantId: activeTenantId,
         customer: {
           name: name.trim(),
           phone: phone.trim(),
@@ -156,7 +175,13 @@ export default function CheckoutPage() {
         idempotencyKey,
         ...(diningSessionToken && { diningSessionToken }),
       };
-      const res = await api.post('/orders', orderData);
+      const res = await api.post('/orders', orderData, {
+        headers: {
+          ...(cafeSlug && { 'X-Tenant-Slug': cafeSlug }),
+          ...(activeTenantId && { 'X-Tenant-Id': String(activeTenantId) }),
+          ...(effectiveTableToken && { 'X-Table-Token': effectiveTableToken }),
+        },
+      });
       const { accessToken, order } = res.data;
       if (order?.customerId) {
         localStorage.setItem('brewhaus_customer_id', order.customerId);
@@ -190,9 +215,28 @@ export default function CheckoutPage() {
     setError('');
 
     try {
+      const effectiveTableToken =
+        tableToken ||
+        sessionStorage.getItem('active_table_token') ||
+        localStorage.getItem('active_table_token') ||
+        '';
+      const cafeSlug =
+        tenant?.slug ||
+        sessionStorage.getItem('active_cafe_slug') ||
+        localStorage.getItem('active_cafe_slug') ||
+        '';
+      const activeTenantId =
+        tenant?.id ||
+        tenant?._id ||
+        sessionStorage.getItem('active_tenant_id') ||
+        localStorage.getItem('active_tenant_id') ||
+        '';
+
       const orderData = {
         tableNumber,
-        tableToken,
+        tableToken: effectiveTableToken,
+        cafeSlug,
+        tenantId: activeTenantId,
         customer: {
           name: name.trim(),
           phone: phone.trim(),
@@ -205,7 +249,13 @@ export default function CheckoutPage() {
         idempotencyKey,
         ...(diningSessionToken && { diningSessionToken }),
       };
-      const orderRes = await api.post('/orders', orderData);
+      const orderRes = await api.post('/orders', orderData, {
+        headers: {
+          ...(cafeSlug && { 'X-Tenant-Slug': cafeSlug }),
+          ...(activeTenantId && { 'X-Tenant-Id': String(activeTenantId) }),
+          ...(effectiveTableToken && { 'X-Table-Token': effectiveTableToken }),
+        },
+      });
       const order = orderRes.data.order;
       const { accessToken } = orderRes.data;
 
@@ -226,7 +276,17 @@ export default function CheckoutPage() {
         });
       }
 
-      const rzpRes = await api.post('/payment/create-order', { orderId: order._id, accessToken });
+      const rzpRes = await api.post(
+        '/payment/create-order',
+        { orderId: order._id, accessToken, tenantId: activeTenantId, cafeSlug },
+        {
+          headers: {
+            ...(cafeSlug && { 'X-Tenant-Slug': cafeSlug }),
+            ...(activeTenantId && { 'X-Tenant-Id': String(activeTenantId) }),
+            ...(effectiveTableToken && { 'X-Table-Token': effectiveTableToken }),
+          },
+        }
+      );
       const { razorpayOrderId, amount, keyId, currency } = rzpRes.data;
 
       const loaded = await loadRazorpay();
@@ -244,7 +304,16 @@ export default function CheckoutPage() {
         modal: {
           ondismiss: () => {
             setLoading(false);
-            api.post('/payment/cancel', { orderId: order._id, accessToken }).catch(() => {});
+            api.post(
+              '/payment/cancel',
+              { orderId: order._id, accessToken, tenantId: activeTenantId, cafeSlug },
+              {
+                headers: {
+                  ...(cafeSlug && { 'X-Tenant-Slug': cafeSlug }),
+                  ...(activeTenantId && { 'X-Tenant-Id': String(activeTenantId) }),
+                },
+              }
+            ).catch(() => {});
             toast.error('Payment cancelled.');
           }
         },

@@ -86,6 +86,7 @@ export const isCustomerPublicRoute = (req) => {
   if (p === '/api/coupons/validate') return true;
   if (p === '/api/contact' && req.method === 'POST') return true;
   if (p === '/api/tenant' && req.method === 'GET') return true;
+  if (p.startsWith('/api/payment/') && p !== '/api/payment/webhook') return true;
   return false;
 };
 
@@ -139,9 +140,9 @@ export const tenantResolver = async (req, res, next) => {
       tenantId = tenant._id;
     }
 
-    // 2. Explicit X-Tenant-Slug header
+    // 2. Explicit X-Tenant-Slug header or body cafeSlug
     if (!tenant) {
-      const headerTenantSlug = req.headers['x-tenant-slug'];
+      const headerTenantSlug = req.headers['x-tenant-slug'] || req.body?.cafeSlug;
       if (headerTenantSlug) {
         const rawSlug = String(headerTenantSlug).trim();
         if (mongoose.isValidObjectId(rawSlug)) {
@@ -150,19 +151,33 @@ export const tenantResolver = async (req, res, next) => {
         if (!tenant) {
           tenant = await Tenant.findOne({ slug: rawSlug.toLowerCase() }).lean();
         }
-        if (!tenant) {
-          return cleanTenantError(res, 404, 'Café not found. Please scan a table QR code or specify a valid café.');
+        if (tenant) {
+          tenantId = tenant._id;
         }
-        tenantId = tenant._id;
       }
     }
 
-    // 3. Explicit X-Tenant-Id header
+    // 3. Explicit X-Tenant-Id header or body tenantId
     if (!tenant) {
-      const headerTenantId = req.headers['x-tenant-id'] || req.headers['x-cafe-id'];
+      const headerTenantId = req.headers['x-tenant-id'] || req.headers['x-cafe-id'] || req.body?.tenantId;
       if (headerTenantId && mongoose.isValidObjectId(headerTenantId)) {
         tenant = await Tenant.findById(headerTenantId).lean();
         if (tenant) tenantId = tenant._id;
+      }
+    }
+
+    // 3b. Order ID lookup (for payment / receipt / order-confirm actions)
+    if (!tenant && (req.body?.orderId || req.query?.orderId)) {
+      const oId = req.body?.orderId || req.query?.orderId;
+      if (mongoose.isValidObjectId(oId)) {
+        const existingOrder = await mongoose.connection.collection('orders').findOne(
+          { _id: new mongoose.Types.ObjectId(oId) },
+          { projection: { tenantId: 1 } }
+        );
+        if (existingOrder?.tenantId) {
+          tenant = await Tenant.findById(existingOrder.tenantId).lean();
+          if (tenant) tenantId = tenant._id;
+        }
       }
     }
 
@@ -264,6 +279,13 @@ export const tenantResolver = async (req, res, next) => {
         tenant = await Tenant.findOne({ slug: defaultSlug }).lean();
         if (tenant) tenantId = tenant._id;
       }
+    }
+
+    // 7b. Customer route fallback to active default café when no explicit query slug was requested
+    if (!tenant && !querySlug && isCustomerPublicRoute(req)) {
+      tenant = (await Tenant.findOne({ slug: 'default', status: 'active' }).lean())
+        || (await Tenant.findOne({ status: 'active' }).sort({ createdAt: 1 }).lean());
+      if (tenant) tenantId = tenant._id;
     }
 
     if (!tenant) {

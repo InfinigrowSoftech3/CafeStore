@@ -29,23 +29,30 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 api.interceptors.request.use((config) => {
   config._retryCount = config._retryCount ?? 0;
 
-  // Single source of truth: strictly scoped by the URL slug
+  // Single source of truth: strictly scoped by the URL slug or active session
   const tenantSlug = getResolvedTenantSlug();
   if (tenantSlug) {
     config.headers['X-Tenant-Slug'] = tenantSlug;
   }
 
-  // Strictly remove any stale Authorization or X-Tenant-Id on customer calls
+  // Strictly remove any stale Authorization on customer calls
   delete config.headers['Authorization'];
   delete config.headers['authorization'];
-  delete config.headers['X-Tenant-Id'];
-  delete config.headers['x-tenant-id'];
+
+  const storedTenantId =
+    sessionStorage.getItem('active_tenant_id') ||
+    localStorage.getItem('active_tenant_id');
+  if (storedTenantId && !config.headers['X-Tenant-Id'] && !config.headers['x-tenant-id']) {
+    config.headers['X-Tenant-Id'] = storedTenantId;
+  }
 
   try {
     const tableToken =
       new URLSearchParams(window.location.search).get('tableToken') ||
       new URLSearchParams(window.location.search).get('token') ||
       useCartStore.getState()?.tableToken ||
+      sessionStorage.getItem('active_table_token') ||
+      localStorage.getItem('active_table_token') ||
       sessionStorage.getItem(getCustomerStorageKey(tenantSlug, 'table_token'));
     if (tableToken && !config.headers['X-Table-Token'] && !config.headers['x-table-token']) {
       config.headers['X-Table-Token'] = tableToken;

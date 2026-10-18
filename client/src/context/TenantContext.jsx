@@ -110,12 +110,26 @@ export function TenantProvider({ children }) {
 
         setTenant(normalizedTenant);
 
+        // Store active tenant slug and ID so checkout and cart requests retain cafe context
+        if (cafeData.slug) {
+          sessionStorage.setItem('active_cafe_slug', cafeData.slug);
+          sessionStorage.setItem('active_tenant_id', String(cafeData.id || cafeData._id));
+          localStorage.setItem('active_cafe_slug', cafeData.slug);
+          localStorage.setItem('active_tenant_id', String(cafeData.id || cafeData._id));
+        }
+
+        const effectiveToken = qrData?.token || token;
+        if (effectiveToken) {
+          sessionStorage.setItem('active_table_token', effectiveToken);
+          localStorage.setItem('active_table_token', effectiveToken);
+        }
+
         // Store table info under customer namespaced keys
         if (tableData) {
           setCustomerSessionItem(cafeData.slug, 'table_number', tableData.number);
           setCustomerSessionItem(cafeData.slug, 'table_id', tableData.id);
-          if (qrData?.token) {
-            setCustomerSessionItem(cafeData.slug, 'table_token', qrData.token);
+          if (effectiveToken) {
+            setCustomerSessionItem(cafeData.slug, 'table_token', effectiveToken);
           }
         }
 
