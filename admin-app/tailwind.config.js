@@ -28,7 +28,7 @@ export default {
         },
       },
       fontFamily: {
-        display: ['"Playfair Display"', 'Georgia', 'serif'],
+        display: ['Georgia', 'serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
