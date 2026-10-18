@@ -387,19 +387,31 @@ canvas {
 }
 
 .btn-primary {
-  background-color: var(--tenant-primary, var(--brand, #C8963E)) !important;
-  color: #1C1612 !important;
+  background-color: var(--tenant-primary, #0F3D2E) !important;
+  color: #FFFFFF !important;
 }
 .btn-primary:hover {
-  filter: brightness(0.94);
-  color: #1C1612 !important;
+  background-color: #16503D !important;
+  color: #FFFFFF !important;
 }
-.btn-accent, .bg-brew-500, .bg-brand {
-  background-color: var(--tenant-primary, var(--brand, #C8963E)) !important;
-  color: #1C1612 !important;
+.btn-primary svg {
+  stroke: currentColor !important;
+  color: #FFFFFF !important;
+}
+.btn-accent {
+  background-color: var(--menu-accent, #C93A1C) !important;
+  color: #FFFFFF !important;
+}
+.btn-accent:hover {
+  filter: brightness(0.95);
+  color: #FFFFFF !important;
+}
+.btn-accent svg {
+  stroke: currentColor !important;
+  color: #FFFFFF !important;
 }
 .text-brew-500, .text-brand {
-  color: var(--tenant-primary, var(--brand, #C8963E)) !important;
+  color: var(--tenant-primary, #0F3D2E) !important;
 }
 .text-brew-600, .text-brand-strong {
   color: var(--brand-strong, #A87420) !important;

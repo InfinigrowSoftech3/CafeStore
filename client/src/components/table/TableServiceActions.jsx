@@ -26,14 +26,33 @@ export default function TableServiceActions() {
   if (!diningSessionToken) return null;
 
   return (
-    <div className="mx-auto flex max-w-2xl gap-2 px-4 py-3 sm:px-6">
-      <button type="button" onClick={() => requestService('waiter')} disabled={Boolean(requesting)} className="btn-secondary flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl text-sm">
-        {requesting === 'waiter' ? <Loader2 size={16} className="animate-spin" /> : <BellRing size={16} />}
-        Call waiter
+    <div className="flex w-full gap-2.5 py-1">
+      <button
+        type="button"
+        onClick={() => requestService('waiter')}
+        disabled={Boolean(requesting)}
+        className="flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-2xl border border-stone-200/90 bg-white px-4 text-xs sm:text-sm font-sora font-bold text-stone-800 shadow-2xs hover:bg-stone-50 active:scale-98 transition-all disabled:opacity-50"
+      >
+        {requesting === 'waiter' ? (
+          <Loader2 size={16} className="animate-spin text-stone-600" />
+        ) : (
+          <BellRing size={16} className="text-[#0F3D2E]" />
+        )}
+        <span>Call waiter</span>
       </button>
-      <button type="button" onClick={() => requestService('bill')} disabled={Boolean(requesting)} className="btn-primary flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl text-sm">
-        {requesting === 'bill' ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
-        Request bill
+
+      <button
+        type="button"
+        onClick={() => requestService('bill')}
+        disabled={Boolean(requesting)}
+        className="flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-2xl bg-[#0F3D2E] hover:bg-[#16503D] px-4 text-xs sm:text-sm font-sora font-bold text-white shadow-xs active:scale-98 transition-all disabled:opacity-50"
+      >
+        {requesting === 'bill' ? (
+          <Loader2 size={16} className="animate-spin text-white" />
+        ) : (
+          <FileText size={16} className="text-white" />
+        )}
+        <span className="text-white">Request bill</span>
       </button>
     </div>
   );

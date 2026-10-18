@@ -16,6 +16,7 @@ import {
   Tag,
   QrCode,
   Lock,
+  Menu,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
@@ -44,7 +45,15 @@ export default function CheckoutPage() {
     'Complete your table order securely with instant UPI, Cards, or Counter payment.'
   );
 
-  const { items, tableNumber, tableToken, clearCart, diningSessionToken, addRecentOrder } = useCartStore();
+  const {
+    items,
+    tableNumber,
+    tableToken,
+    clearCart,
+    diningSessionToken,
+    addRecentOrder,
+    openNavDrawer,
+  } = useCartStore();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -279,9 +288,21 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-          <ShieldCheck size={14} className="text-[#16A34A]" />
-          <span className="font-semibold">Secure Checkout</span>
+        <div className="flex items-center gap-2">
+          <div className="hidden min-[380px]:flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+            <ShieldCheck size={14} className="text-[#16A34A]" />
+            <span className="font-semibold">Secure Checkout</span>
+          </div>
+
+          {/* Hamburger All Pages Button */}
+          <button
+            type="button"
+            onClick={openNavDrawer}
+            aria-label="Open navigation menu - show all pages"
+            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-full border border-stone-200 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all"
+          >
+            <Menu size={18} strokeWidth={2.4} />
+          </button>
         </div>
       </header>
 
@@ -550,9 +571,15 @@ export default function CheckoutPage() {
                     type="button"
                     onClick={applyCoupon}
                     disabled={couponLoading || !couponInput.trim()}
-                    className="btn-secondary px-4 py-2 text-xs font-sora font-bold shrink-0 disabled:opacity-50 rounded-full"
+                    className={`px-4 py-2 text-xs font-sora font-bold shrink-0 rounded-full transition active:scale-95 ${
+                      appliedCoupon
+                        ? 'bg-emerald-600 text-white'
+                        : couponInput.trim()
+                          ? 'bg-[#0F3D2E] text-white hover:bg-[#16503D]'
+                          : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
+                    }`}
                   >
-                    {couponLoading ? 'Checking...' : appliedCoupon ? 'Applied' : 'Apply'}
+                    {couponLoading ? 'Checking...' : appliedCoupon ? 'Applied ✓' : 'Apply'}
                   </button>
                 </div>
                 {appliedCoupon && (
@@ -590,17 +617,17 @@ export default function CheckoutPage() {
                 whileTap={{ scale: 0.985 }}
                 onClick={handleSubmit}
                 disabled={loading}
-                className="hidden lg:flex w-full btn-primary items-center justify-center gap-2 py-3.5 text-sm font-sora font-bold shadow-md rounded-full"
+                className="hidden lg:flex w-full !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white items-center justify-center gap-2 py-3.5 text-sm font-sora font-bold shadow-md rounded-full transition active:scale-98 disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <Loader2 size={18} className="animate-spin" />
-                    <span>{paymentMethod === 'razorpay' ? 'Opening Payment...' : 'Submitting Order...'}</span>
+                    <Loader2 size={18} className="animate-spin text-white" />
+                    <span className="text-white">{paymentMethod === 'razorpay' ? 'Opening Payment...' : 'Submitting Order...'}</span>
                   </>
                 ) : (
                   <>
-                    {paymentMethod === 'razorpay' ? <CreditCard size={18} /> : <Banknote size={18} />}
-                    <span>{paymentMethod === 'razorpay' ? `Pay ${formatMoney(total, tenant.currency)}` : `Place Order · ${formatMoney(total, tenant.currency)}`}</span>
+                    {paymentMethod === 'razorpay' ? <CreditCard size={18} className="text-white" /> : <Banknote size={18} className="text-white" />}
+                    <span className="text-white">{paymentMethod === 'razorpay' ? `Pay ${formatMoney(total, tenant.currency)}` : `Place Order · ${formatMoney(total, tenant.currency)}`}</span>
                   </>
                 )}
               </motion.button>
@@ -620,17 +647,17 @@ export default function CheckoutPage() {
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 min-h-[48px] btn-primary flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-full"
+            className="flex-1 min-h-[48px] !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-full shadow-md transition active:scale-98 disabled:opacity-50"
           >
             {loading ? (
               <>
-                <Loader2 size={16} className="animate-spin" />
-                <span>Processing...</span>
+                <Loader2 size={16} className="animate-spin text-white" />
+                <span className="text-white font-bold">Processing...</span>
               </>
             ) : (
               <>
-                {paymentMethod === 'razorpay' ? <CreditCard size={16} /> : <Banknote size={16} />}
-                <span>{paymentMethod === 'razorpay' ? 'Proceed to Pay' : 'Confirm Order'}</span>
+                {paymentMethod === 'razorpay' ? <CreditCard size={16} className="text-white" /> : <Banknote size={16} className="text-white" />}
+                <span className="text-white font-bold">{paymentMethod === 'razorpay' ? 'Proceed to Pay' : 'Confirm Order'}</span>
               </>
             )}
           </motion.button>

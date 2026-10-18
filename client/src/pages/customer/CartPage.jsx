@@ -12,6 +12,7 @@ import {
   UtensilsCrossed,
   ArrowRight,
   ShieldCheck,
+  Menu,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useCartStore, { cartItemCount } from '../../context/cartStore';
@@ -25,7 +26,17 @@ const FALLBACK_IMAGE = '/images/coffee-placeholder.svg';
 export default function CartPage() {
   const tenant = useTenant();
   const navigate = useNavigate();
-  const { items, tableNumber, removeItem, updateQuantity, clearCart, isScannerOpen, openScanner, closeScanner } = useCartStore();
+  const {
+    items,
+    tableNumber,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    isScannerOpen,
+    openScanner,
+    closeScanner,
+    openNavDrawer,
+  } = useCartStore();
   const itemCount = useCartStore(cartItemCount);
 
   usePageMeta(
@@ -109,12 +120,24 @@ export default function CartPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {items.length > 0 && (
+            <button
+              type="button"
+              onClick={clearCart}
+              className="min-h-[38px] px-3 py-1 text-xs font-sora font-semibold text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-full transition"
+            >
+              Clear All
+            </button>
+          )}
+
+          {/* Hamburger All Pages Button */}
           <button
             type="button"
-            onClick={clearCart}
-            className="min-h-[36px] px-3 py-1 text-xs font-semibold text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition"
+            onClick={openNavDrawer}
+            aria-label="Open navigation menu - show all pages"
+            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-full border border-stone-200 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all"
           >
-            Clear All
+            <Menu size={18} strokeWidth={2.4} />
           </button>
         </div>
       </header>
@@ -307,11 +330,11 @@ export default function CartPage() {
                 type="button"
                 whileTap={{ scale: 0.985 }}
                 onClick={handleProceedCheckout}
-                className="hidden lg:flex w-full min-h-[50px] btn-primary items-center justify-between px-6 py-3.5 text-sm font-sora font-bold shadow-md rounded-full"
+                className="hidden lg:flex w-full min-h-[50px] !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white items-center justify-between px-6 py-3.5 text-sm font-sora font-bold shadow-md rounded-full transition active:scale-98"
               >
-                <div className="flex items-center gap-2">
-                  <ShoppingBag size={18} />
-                  <span>Proceed to Checkout</span>
+                <div className="flex items-center gap-2 text-white">
+                  <ShoppingBag size={18} className="text-white" />
+                  <span className="text-white">Proceed to Checkout</span>
                 </div>
                 <span className="font-sora text-base font-bold text-[#FFF1C9]">{formatMoney(total, tenant.currency)}</span>
               </motion.button>
@@ -331,10 +354,10 @@ export default function CartPage() {
             type="button"
             whileTap={{ scale: 0.98 }}
             onClick={handleProceedCheckout}
-            className="flex-1 min-h-[48px] btn-primary flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-full shadow-xs"
+            className="flex-1 min-h-[48px] !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-full shadow-md transition active:scale-98"
           >
-            <ShoppingBag size={16} />
-            <span>Proceed to Checkout</span>
+            <ShoppingBag size={17} className="text-white shrink-0" />
+            <span className="text-white font-bold">Proceed to Checkout</span>
           </motion.button>
         </div>
       </div>

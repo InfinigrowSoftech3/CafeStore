@@ -495,18 +495,24 @@ export default function MenuPage() {
 
           {/* Right: Dark Table Pill + Round White Cart Button (cart button hidden on desktop since sidebar is visible) */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* Dark pill showing the table ("Table 7", from QR/session) */}
+            {/* Dark pill showing the table ("Table 1", from QR/session) */}
             <button
               type="button"
               onClick={openScanner}
               aria-label={tableNumber ? `Current Table ${tableNumber}, tap to change table` : 'Scan table QR code'}
-              className="inline-flex min-h-[44px] items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0F3D2E] text-white text-xs font-sora font-bold shadow-xs hover:bg-[#16503D] active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+              className="inline-flex min-h-[42px] items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full bg-[#0F3D2E] text-white text-xs font-sora font-bold shadow-xs hover:bg-[#16503D] active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
             >
               {tableNumber ? (
-                <span>Table {tableNumber}</span>
+                <>
+                  <span className="relative flex h-2 w-2 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                  </span>
+                  <span>Table {tableNumber}</span>
+                </>
               ) : (
                 <>
-                  <ScanLine size={14} />
+                  <ScanLine size={14} className="text-white" />
                   <span>Scan Table</span>
                 </>
               )}
@@ -516,11 +522,11 @@ export default function MenuPage() {
             <Link
               to="/cart"
               aria-label={`View Cart with ${itemCount} items`}
-              className="relative lg:hidden w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-white border border-[#0F3D2E]/15 flex items-center justify-center text-[#0F3D2E] shadow-sm hover:shadow-md active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+              className="relative lg:hidden w-[42px] h-[42px] min-w-[42px] min-h-[42px] rounded-full bg-white border border-stone-200 flex items-center justify-center text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
             >
               <ShoppingBag size={18} strokeWidth={2.4} />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] px-1 items-center justify-center rounded-full bg-[var(--menu-accent,#C93A1C)] text-white text-[11px] font-sora font-extrabold shadow-xs">
+                <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] px-1 items-center justify-center rounded-full bg-[var(--menu-accent,#C93A1C)] text-white text-[10px] font-sora font-extrabold shadow-xs">
                   {itemCount}
                 </span>
               )}
@@ -531,7 +537,7 @@ export default function MenuPage() {
               type="button"
               onClick={openNavDrawer}
               aria-label="Open navigation menu - show all pages"
-              className="min-h-[44px] min-w-[44px] px-3 sm:px-3.5 flex items-center justify-center gap-1.5 rounded-full border border-stone-200 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 hover:border-[#0F3D2E]/30 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+              className="min-h-[42px] min-w-[42px] px-2.5 sm:px-3.5 flex items-center justify-center gap-1.5 rounded-full border border-stone-200 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
             >
               <MenuIcon size={19} strokeWidth={2.4} />
               <span className="hidden sm:inline text-xs font-sora font-bold tracking-wide">All Pages</span>

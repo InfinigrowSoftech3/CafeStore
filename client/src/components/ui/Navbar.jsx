@@ -17,8 +17,8 @@ export default function Navbar() {
   const tenant = useTenant();
   const location = useLocation();
 
-  // Drop old top nav links on the customer menu page
-  if (location.pathname === '/menu') {
+  // Hide global navbar on menu, cart, and checkout since they have their own dedicated headers
+  if (['/menu', '/cart', '/checkout'].includes(location.pathname)) {
     return null;
   }
 
