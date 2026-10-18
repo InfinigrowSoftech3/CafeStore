@@ -123,6 +123,7 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     try {
       const parsed = new URL(normalized);
       if (parsed.hostname === 'localhost' || parsed.hostname.endsWith('.localhost') || parsed.hostname === '127.0.0.1') return true;
+      if (parsed.hostname.endsWith('.vercel.app')) return true;
     } catch { /* ignore parsing errors */ }
     const tenantBaseDomain = String(process.env.TENANT_BASE_DOMAIN || '').trim().toLowerCase().replace(/^\.+|\.+$/g, '');
     let tenantCustomerOrigin = false;
