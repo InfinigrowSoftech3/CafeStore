@@ -9,7 +9,7 @@ import {
 import { clearClientCache } from '../utils/menuCache';
 
 const TenantContext = createContext(null);
-const fallback = { name: 'Café', currency: 'INR', taxRate: 5, primaryColor: '#C8963E', accentColor: '#17110C' };
+const fallback = { name: 'Café', currency: 'INR', taxRate: 5, primaryColor: '#0F3D2E', accentColor: '#FFF1C9' };
 
 export function TenantProvider({ children }) {
   const [tenant, setTenant] = useState(fallback);
@@ -80,8 +80,16 @@ export function TenantProvider({ children }) {
 
         const rawPrimary = cafeData.branding?.primaryColor || cafeData.settings?.primaryColor;
         const rawAccent = cafeData.branding?.secondaryColor || cafeData.settings?.accentColor;
-        const primaryColor = rawPrimary && rawPrimary !== '#c96b18' && rawPrimary !== '#2563eb' ? rawPrimary : '#C8963E';
-        const accentColor = rawAccent && rawAccent !== '#1a0f08' && rawAccent !== '#0f172a' ? rawAccent : '#17110C';
+        const primaryColor =
+          rawPrimary &&
+          !['#c96b18', '#2563eb', '#c8963e', '#c8963e'].includes(rawPrimary.toLowerCase())
+            ? rawPrimary
+            : '#0F3D2E';
+        const accentColor =
+          rawAccent &&
+          !['#1a0f08', '#0f172a', '#17110c'].includes(rawAccent.toLowerCase())
+            ? rawAccent
+            : '#FFF1C9';
 
         const normalizedTenant = {
           id: cafeData.id || cafeData._id,

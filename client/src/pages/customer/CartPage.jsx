@@ -302,12 +302,12 @@ export default function CartPage() {
                 <span>Orders are prepared fresh by {tenant.name} upon placement.</span>
               </div>
 
-              {/* Checkout Button */}
+              {/* Checkout Button (Desktop Only — Mobile uses the sticky bottom bar) */}
               <motion.button
                 type="button"
                 whileTap={{ scale: 0.985 }}
                 onClick={handleProceedCheckout}
-                className="w-full min-h-[50px] btn-primary flex items-center justify-between px-6 py-3.5 text-sm font-sora font-bold shadow-md rounded-full"
+                className="hidden lg:flex w-full min-h-[50px] btn-primary items-center justify-between px-6 py-3.5 text-sm font-sora font-bold shadow-md rounded-full"
               >
                 <div className="flex items-center gap-2">
                   <ShoppingBag size={18} />
@@ -320,7 +320,7 @@ export default function CartPage() {
         </div>
       </main>
 
-      {/* Floating Bottom Bar for Mobile Viewports */}
+      {/* Floating Bottom Bar for Mobile Viewports (Single Mobile Checkout Button) */}
       <div className="lg:hidden bottom-safe fixed bottom-0 left-0 right-0 p-3.5 bg-white/95 backdrop-blur-xl border-t border-stone-200 shadow-2xl z-20">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -331,10 +331,10 @@ export default function CartPage() {
             type="button"
             whileTap={{ scale: 0.98 }}
             onClick={handleProceedCheckout}
-            className="flex-1 min-h-[48px] btn-primary flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-full"
+            className="flex-1 min-h-[48px] btn-primary flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-full shadow-xs"
           >
             <ShoppingBag size={16} />
-            <span>Checkout ({itemCount})</span>
+            <span>Proceed to Checkout</span>
           </motion.button>
         </div>
       </div>

@@ -28,7 +28,7 @@
 }
 
 :focus-visible {
-  outline: 2px solid var(--brand, #C8963E);
+  outline: 2px solid var(--brand, #0F3D2E);
   outline-offset: 2px;
 }
 
@@ -75,7 +75,7 @@
     background-color: var(--brand-soft, #F6EBD5);
   }
   ::-webkit-scrollbar-thumb {
-    background-color: var(--brand, #C8963E);
+    background-color: var(--brand, #0F3D2E);
     border-radius: 9999px;
   }
 
