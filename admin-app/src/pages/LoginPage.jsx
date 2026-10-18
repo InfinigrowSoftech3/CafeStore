@@ -49,14 +49,14 @@ function CoffeeBeansGraphic({ className = "w-8 h-8 text-[#542B12]" }) {
 /* Botanical Monstera leaf line art watermark in top-right */
 function BotanicalLeaves({ className = "text-[#F6EFE4]/20" }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 240 240" stroke="currentColor">
-      <path d="M220 20 C180 50 130 110 100 190" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M150 65 C175 55 205 60 215 75" strokeWidth="1.4" strokeLinecap="round" />
-      <path d="M125 100 C155 100 190 115 205 135" strokeWidth="1.4" strokeLinecap="round" />
-      <path d="M110 135 C135 145 165 170 180 195" strokeWidth="1.4" strokeLinecap="round" />
-      <path d="M240 70 C200 90 150 160 120 240" strokeWidth="1.6" strokeLinecap="round" />
-      <path d="M180 100 C205 105 225 125 230 145" strokeWidth="1.4" strokeLinecap="round" />
-      <path d="M150 135 C180 150 200 180 205 210" strokeWidth="1.4" strokeLinecap="round" />
+    <svg className={className} fill="none" viewBox="0 0 280 280" stroke="currentColor">
+      <path d="M260 20 C210 60 150 130 110 220" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M170 80 C200 70 240 75 255 95" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M140 120 C180 120 220 140 240 165" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M125 160 C155 175 190 205 210 235" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M280 80 C230 110 170 190 140 280" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M205 120 C235 125 260 150 265 170" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M170 160 C205 180 230 215 235 250" strokeWidth="1.4" strokeLinecap="round" />
     </svg>
   );
 }
@@ -130,13 +130,13 @@ export default function LoginPage() {
   };
 
   const handleForgotPassword = () => {
-    setError('Password reset instructions will be sent to your verified administrator email.');
+    setError('Password reset instructions will be sent to your registered administrator email.');
   };
 
   const isButtonDisabled = loading || rateLimitCountdown > 0;
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col lg:flex-row bg-[#082F25] font-body text-[#17233A] select-none overflow-x-hidden">
+    <div className="relative min-h-screen w-full flex flex-col lg:flex-row bg-[#0D4032] font-body text-[#111827] select-none overflow-x-hidden">
       {/* ── Background Photography Layer (Left ~68%) ── */}
       <div className="absolute inset-0 lg:right-[32%] pointer-events-none z-0">
         <img
@@ -144,313 +144,321 @@ export default function LoginPage() {
           alt="Café Interior"
           className="h-full w-full object-cover object-left"
         />
-        {/* Soft daylight ambient vignette to guarantee text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/85 to-transparent lg:w-[65%]" />
+        {/* Soft daylight ambient vignette on top-left to guarantee text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent lg:w-[65%]" />
       </div>
 
       {/* ── Right Section Background Fill (#0D4032) ── */}
       <div className="absolute inset-y-0 right-0 w-full lg:w-[32%] bg-[#0D4032] pointer-events-none z-0" />
 
-      {/* ── Seamless Organic Ribbon Wave Curves (Desktop) ── */}
+      {/* ── Seamless Organic Ribbon Wave Curves (Desktop: 1650 x 927 viewport) ── */}
       <svg
         className="absolute inset-0 h-full w-full pointer-events-none z-0 hidden lg:block"
         preserveAspectRatio="none"
-        viewBox="0 0 1440 900"
+        viewBox="0 0 1650 927"
         fill="none"
       >
         {/* Deep Forest Green Upper-Right Curve */}
         <path
-          d="M 940,0 C 910,240 960,420 1100,500 C 1220,560 1340,580 1440,590 L 1440,0 Z"
+          d="M 1120,0 C 1080,240 1140,420 1280,510 C 1400,570 1520,590 1650,600 L 1650,0 Z"
           fill="#0D4032"
         />
-        {/* Warm Cream Bottom Curve (starts at x=760 to leave the croissant & coffee cup unobstructed) */}
+        {/* Warm Cream Bottom Curve (starts at x=880 to leave the croissant board & cup completely clear) */}
         <path
-          d="M 760,900 C 840,760 920,680 1060,610 C 1200,550 1320,530 1440,550 L 1440,900 Z"
+          d="M 880,927 C 980,780 1080,710 1240,650 C 1400,600 1540,580 1650,600 L 1650,927 Z"
           fill="#F6EFE4"
         />
       </svg>
 
-      {/* Botanical Leaf Art Watermark in top-right */}
-      <div className="absolute top-0 right-0 w-80 h-80 pointer-events-none z-0 hidden lg:block overflow-hidden">
+      {/* Botanical Leaf Art Watermark in top-right corner */}
+      <div className="absolute top-0 right-0 w-96 h-96 pointer-events-none z-0 hidden lg:block overflow-hidden">
         <BotanicalLeaves className="w-full h-full text-[#F6EFE4]/20" />
       </div>
 
-      {/* ── Left Section (~68% width): Branding, Narrative & 4 Feature Cards ── */}
-      <div className="relative z-10 w-full lg:w-[68%] min-h-[500px] lg:min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16">
-        <div className="max-w-lg">
+      {/* ── Left Content Area (~68% width): Branding, Headline, Description, 4 Feature Cards ── */}
+      <div className="relative z-10 w-full lg:w-[68%] min-h-[540px] lg:min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:pl-[7%] lg:pt-[8%] lg:pr-12">
+        <div className="max-w-[580px]">
           {/* Top Brand Logo */}
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0D4032] text-amber-200 shadow-sm">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0D4032] text-amber-200 shadow-xs">
               <CoffeeCupLogo className="w-6 h-6 text-[#E5B574]" />
             </div>
             <div>
-              <span className="font-display text-2xl font-bold tracking-tight text-[#17233A] block leading-tight">
+              <span className="font-display text-[28px] font-bold tracking-tight text-[#111827] block leading-none">
                 Café Admin
               </span>
-              <span className="text-[9px] font-bold tracking-[0.25em] text-[#8C7A6B] block uppercase">
+              <span className="text-[10px] font-bold tracking-[0.28em] text-[#8C7A6B] block uppercase mt-1">
                 OPERATIONS CONSOLE
               </span>
             </div>
           </div>
 
-          {/* Gold Accent Line */}
-          <div className="w-12 h-[2.5px] bg-[#C58A43] mt-4 mb-6 rounded-full" />
+          {/* Thin Gold Horizontal Accent Line */}
+          <div className="w-12 h-[2.5px] bg-[#C58A43] mt-5 mb-7 rounded-full" />
 
-          {/* Main Headline */}
-          <h1 className="font-display text-4xl xl:text-5xl font-bold tracking-tight text-[#17233A] leading-[1.12]">
+          {/* Main Headline (Playfair Display, ~68px on desktop, leading-[1.02]) */}
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-[68px] font-bold tracking-tight text-[#111827] leading-[1.02]">
             Manage Your <br />
             Café, <span className="italic font-normal text-[#C58A43]">Smarter</span>
           </h1>
 
-          {/* Supporting Text */}
-          <p className="mt-3.5 text-sm text-[#64748B] font-normal leading-relaxed max-w-md">
+          {/* Supporting Paragraph (~19px, comfortable line spacing, muted slate-gray #64748B, wraps ~3 lines) */}
+          <p className="mt-4 text-[16px] sm:text-[18px] lg:text-[19px] text-[#64748B] font-normal leading-[1.4] max-w-[540px]">
             Streamline orders, track inventory, manage menus, and grow your café with powerful tools — all in one place.
           </p>
 
-          {/* 4 Feature Cards in One Horizontal Row */}
-          <div className="grid grid-cols-4 gap-2.5 max-w-md mt-6">
-            <div className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-[#F6EFE4] border border-[#EADBCA]/80 text-center shadow-xs">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/80 text-[#C58A43] mb-1.5 shadow-2xs">
-                <UtensilsCrossed size={16} />
+          {/* Four Compact Feature Groups in a Single Horizontal Row */}
+          <div className="flex items-center gap-4 sm:gap-6 mt-8">
+            {/* Feature 1: Manage Orders */}
+            <div className="flex flex-col items-center">
+              <div className="flex h-[54px] w-[54px] items-center justify-center rounded-xl bg-[#F9EBDD] text-[#B77932] shadow-xs">
+                <UtensilsCrossed size={22} />
               </div>
-              <span className="text-[11px] font-bold text-[#17233A] leading-tight">
+              <span className="text-[13px] sm:text-[14px] font-semibold text-[#111827] text-center mt-2 leading-tight">
                 Manage<br />Orders
               </span>
             </div>
 
-            <div className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-[#F6EFE4] border border-[#EADBCA]/80 text-center shadow-xs">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/80 text-[#C58A43] mb-1.5 shadow-2xs">
-                <BarChart3 size={16} />
+            {/* Feature 2: Track Inventory */}
+            <div className="flex flex-col items-center">
+              <div className="flex h-[54px] w-[54px] items-center justify-center rounded-xl bg-[#F9EBDD] text-[#B77932] shadow-xs">
+                <BarChart3 size={22} />
               </div>
-              <span className="text-[11px] font-bold text-[#17233A] leading-tight">
+              <span className="text-[13px] sm:text-[14px] font-semibold text-[#111827] text-center mt-2 leading-tight">
                 Track<br />Inventory
               </span>
             </div>
 
-            <div className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-[#F6EFE4] border border-[#EADBCA]/80 text-center shadow-xs">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/80 text-[#C58A43] mb-1.5 shadow-2xs">
-                <FileText size={16} />
+            {/* Feature 3: Update Menu */}
+            <div className="flex flex-col items-center">
+              <div className="flex h-[54px] w-[54px] items-center justify-center rounded-xl bg-[#F9EBDD] text-[#B77932] shadow-xs">
+                <FileText size={22} />
               </div>
-              <span className="text-[11px] font-bold text-[#17233A] leading-tight">
+              <span className="text-[13px] sm:text-[14px] font-semibold text-[#111827] text-center mt-2 leading-tight">
                 Update<br />Menu
               </span>
             </div>
 
-            <div className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-[#F6EFE4] border border-[#EADBCA]/80 text-center shadow-xs">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/80 text-[#C58A43] mb-1.5 shadow-2xs">
-                <Users size={16} />
+            {/* Feature 4: Live Sales */}
+            <div className="flex flex-col items-center">
+              <div className="flex h-[54px] w-[54px] items-center justify-center rounded-xl bg-[#F9EBDD] text-[#B77932] shadow-xs">
+                <Users size={22} />
               </div>
-              <span className="text-[11px] font-bold text-[#17233A] leading-tight">
+              <span className="text-[13px] sm:text-[14px] font-semibold text-[#111827] text-center mt-2 leading-tight">
                 Live<br />Sales
               </span>
             </div>
           </div>
         </div>
 
-        {/* Bottom space ensuring the latte cup & croissant photography is unobstructed */}
-        <div className="h-40 xl:h-52 pointer-events-none hidden lg:block" />
+        {/* Bottom spacer to keep the latte cup, saucer, beans, and croissant prominently visible */}
+        <div className="h-44 xl:h-56 pointer-events-none hidden lg:block" />
       </div>
 
-      {/* ── Right Section (~32% width): Centered Login Card ── */}
-      <div className="relative z-10 w-full lg:w-[32%] flex items-center justify-center p-4 sm:p-6 lg:p-8 my-auto">
+      {/* ── Right Content Area: Centered Login Card ── */}
+      <div className="relative z-10 w-full lg:w-[32%] flex items-center justify-center p-4 sm:p-6 lg:p-8 lg:pr-[5%] my-auto">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: 'easeOut' }}
-          className="relative w-full max-w-[410px] rounded-[28px] bg-white p-7 sm:p-8 shadow-2xl border border-slate-100/90"
+          className="relative w-full max-w-[570px] min-h-[720px] rounded-[22px] bg-white px-6 sm:px-[54px] py-10 shadow-2xl shadow-black/20 border border-slate-100 flex flex-col justify-between"
         >
-          {/* Coffee beans corner decoration */}
+          {/* Coffee beans motif near bottom-left edge of the card */}
           <div className="absolute -bottom-3 -left-3 pointer-events-none z-20">
-            <CoffeeBeansGraphic className="w-8 h-8 text-[#542B12]" />
+            <CoffeeBeansGraphic className="w-9 h-9 text-[#542B12]" />
           </div>
 
-          {/* 1. Green outlined badge */}
-          <div className="text-center mb-4">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50/90 border border-emerald-300/80 px-3.5 py-1 text-[11px] font-semibold text-[#0D4032]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#12A37A] animate-pulse" />
-              <span>Café Operations Console</span>
-            </div>
-          </div>
-
-          {/* 2. Dark green square containing the coffee cup logo */}
-          <div className="mx-auto mb-2.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0D4032] text-amber-200 shadow-sm">
-            <CoffeeCupLogo className="w-7 h-7 text-[#E5B574]" />
-          </div>
-
-          {/* 3. Heading & 4. Subtitle */}
-          <h2 className="font-display text-2xl font-bold tracking-tight text-[#17233A] text-center">
-            Café Admin
-          </h2>
-          <p className="mt-1 text-center text-xs text-[#64748B]">
-            Sign in to manage orders, kitchen flow, and live sales
-          </p>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="mt-5 space-y-3.5">
-            {/* 5. Email address input */}
-            <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#17233A] mb-1">
-                EMAIL ADDRESS
-              </label>
-              <div className="relative">
-                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  disabled={loading || rateLimitCountdown > 0}
-                  placeholder="owner@cafe.com"
-                  className="w-full rounded-xl border border-[#DCE4EC] bg-white py-2.5 pl-9 pr-4 text-sm text-[#17233A] placeholder:text-[#94A3B8] focus:border-[#0D4032] focus:outline-none focus:ring-1 focus:ring-[#0D4032] shadow-2xs transition disabled:opacity-75"
-                />
+          <div>
+            {/* 1. Green outlined pill badge */}
+            <div className="text-center mb-3">
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50/90 border border-emerald-300/80 px-4 py-1.5 text-xs font-semibold text-[#0D4032]">
+                <span className="h-2 w-2 rounded-full bg-[#12A37A] animate-pulse" />
+                <span>Café Operations Console</span>
               </div>
             </div>
 
-            {/* 6. Password input with visibility toggle */}
-            <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#17233A] mb-1">
-                PASSWORD
-              </label>
-              <div className="relative">
-                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
-                  disabled={loading || rateLimitCountdown > 0}
-                  placeholder="••••••••"
-                  className="w-full rounded-xl border border-[#DCE4EC] bg-white py-2.5 pl-9 pr-10 text-sm text-[#17233A] placeholder:text-[#94A3B8] focus:border-[#0D4032] focus:outline-none focus:ring-1 focus:ring-[#0D4032] shadow-2xs transition disabled:opacity-75"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#17233A] transition"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
+            {/* 2. Dark green square containing coffee cup logo (~82 x 82px) */}
+            <div className="mx-auto mb-3 flex h-[82px] w-[82px] items-center justify-center rounded-2xl bg-[#0D4032] text-amber-200 shadow-sm">
+              <CoffeeCupLogo className="w-10 h-10 text-[#E5B574]" />
             </div>
 
-            {/* 7. Keep me signed in & 8. Forgot password */}
-            <div className="flex items-center justify-between text-xs pt-0.5">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={keepSignedIn}
-                  onChange={(e) => setKeepSignedIn(e.target.checked)}
-                  className="h-4 w-4 rounded border-[#DCE4EC] text-[#0D4032] focus:ring-[#0D4032] accent-[#0D4032]"
-                />
-                <span className="text-xs text-[#17233A] font-medium">Keep me signed in</span>
-              </label>
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                className="text-xs font-semibold text-[#0D4032] hover:underline cursor-pointer"
-              >
-                Forgot password?
-              </button>
-            </div>
+            {/* 3. Heading (Playfair Display, ~44px, bold, dark navy-black #111827) */}
+            <h2 className="font-display text-3xl sm:text-[44px] font-bold tracking-tight text-[#111827] text-center leading-tight">
+              Café Admin
+            </h2>
 
-            {/* Two-Factor Authentication Code (if required) */}
-            {requiresTwoFactor && (
+            {/* 4. Subtitle (~14-15px, muted blue-gray #64748B) */}
+            <p className="mt-1 text-center text-[14px] sm:text-[15px] text-[#64748B]">
+              Sign in to manage orders, kitchen flow, and live sales
+            </p>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              {/* 5. Email address field (53px height, rounded-lg, #DCE4EC border) */}
               <div>
-                <label htmlFor="two-factor-code" className="block text-[10px] font-bold uppercase tracking-wider text-[#17233A] mb-1">
-                  Two-Factor Code
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#111827] mb-1.5">
+                  EMAIL ADDRESS
                 </label>
-                <input
-                  id="two-factor-code"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  value={twoFactorCode}
-                  onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
-                  disabled={loading || rateLimitCountdown > 0}
-                  className="w-full rounded-xl border border-amber-300 bg-amber-50/40 py-2.5 text-sm text-center font-mono tracking-widest text-[#17233A] focus:border-[#0D4032] focus:outline-none focus:ring-1 focus:ring-[#0D4032]"
-                  placeholder="000000"
-                />
-              </div>
-            )}
-
-            {/* Error Message Alert */}
-            {error && (
-              <div className={`flex items-start gap-2.5 rounded-xl border p-2.5 text-xs font-semibold ${
-                rateLimitCountdown > 0
-                  ? 'border-amber-300 bg-amber-50 text-amber-900'
-                  : 'border-rose-200 bg-rose-50 text-rose-900'
-              }`}>
-                {rateLimitCountdown > 0 ? (
-                  <Clock size={15} className="mt-0.5 shrink-0 text-amber-700 animate-spin" />
-                ) : (
-                  <AlertCircle size={15} className="mt-0.5 shrink-0 text-rose-600" />
-                )}
-                <div className="flex-1">
-                  <span>{error}</span>
-                  {rateLimitCountdown > 0 && (
-                    <div className="mt-1 text-[11px] text-amber-800 font-normal">
-                      Button re-enables in <strong className="font-mono">{rateLimitCountdown}s</strong>.
-                    </div>
-                  )}
+                <div className="relative h-[53px]">
+                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                    disabled={loading || rateLimitCountdown > 0}
+                    placeholder="owner@cafe.com"
+                    className="w-full h-full rounded-[8px] border border-[#DCE4EC] bg-white pl-11 pr-4 text-sm text-[#111827] placeholder:text-[#94A3B8] focus:border-[#0D4032] focus:outline-none focus:ring-1 focus:ring-[#0D4032] shadow-2xs transition disabled:opacity-75"
+                  />
                 </div>
               </div>
-            )}
 
-            {/* 9. Full-width dark green button */}
-            <button
-              type="submit"
-              disabled={isButtonDisabled}
-              className="w-full rounded-xl bg-[#0D4032] hover:bg-[#082F25] active:bg-[#051F19] text-white py-3 px-4 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 size={15} className="animate-spin" />
-                  <span>Signing in...</span>
-                </>
-              ) : rateLimitCountdown > 0 ? (
-                <span className="flex items-center gap-1.5">
-                  <Clock size={14} />
-                  <span>Try again in {rateLimitCountdown}s</span>
-                </span>
-              ) : (
-                <>
-                  <span>SIGN IN TO DASHBOARD</span>
-                  <ArrowRight size={14} />
-                </>
-              )}
-            </button>
-
-            {/* 10. Subtle divider with OR */}
-            <div className="relative my-3 flex items-center justify-center">
-              <div className="border-t border-[#E2E8F0] w-full" />
-              <span className="absolute bg-white px-3 text-[10px] font-bold tracking-widest text-[#94A3B8] uppercase">
-                OR
-              </span>
-            </div>
-
-            {/* 11. & 12. Footer Navigation Links */}
-            <div className="space-y-1.5 text-center text-xs">
-              <div className="text-[#64748B]">
-                Opening a new café?{' '}
-                <Link to="/signup" className="font-bold text-[#0D4032] hover:underline">
-                  Start 14-day free trial →
-                </Link>
+              {/* 6. Password field (53px height, lock icon, visibility toggle) */}
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#111827] mb-1.5">
+                  PASSWORD
+                </label>
+                <div className="relative h-[53px]">
+                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                    disabled={loading || rateLimitCountdown > 0}
+                    placeholder="••••••••"
+                    className="w-full h-full rounded-[8px] border border-[#DCE4EC] bg-white pl-11 pr-11 text-sm text-[#111827] placeholder:text-[#94A3B8] focus:border-[#0D4032] focus:outline-none focus:ring-1 focus:ring-[#0D4032] shadow-2xs transition disabled:opacity-75"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#111827] transition cursor-pointer"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
-              <div className="text-[#64748B]">
-                Looking for customer ordering?{' '}
-                <a
-                  href="https://cafe-client-app.vercel.app/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-bold text-[#0D4032] hover:underline inline-flex items-center gap-1"
+
+              {/* 7. Remember-me row immediately below password */}
+              <div className="flex items-center justify-between text-xs pt-1">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={keepSignedIn}
+                    onChange={(e) => setKeepSignedIn(e.target.checked)}
+                    className="h-4 w-4 rounded border-[#DCE4EC] text-[#0D4032] focus:ring-[#0D4032] accent-[#0D4032] cursor-pointer"
+                  />
+                  <span className="text-xs text-[#111827] font-medium">Keep me signed in</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="text-xs font-semibold text-[#0D4032] hover:underline cursor-pointer"
                 >
-                  <span>Live Menu →</span>
-                </a>
+                  Forgot password?
+                </button>
               </div>
-            </div>
-          </form>
+
+              {/* Two-Factor Authentication Code (if required) */}
+              {requiresTwoFactor && (
+                <div>
+                  <label htmlFor="two-factor-code" className="block text-[11px] font-bold uppercase tracking-wider text-[#111827] mb-1.5">
+                    Two-Factor Code
+                  </label>
+                  <input
+                    id="two-factor-code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={twoFactorCode}
+                    onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                    disabled={loading || rateLimitCountdown > 0}
+                    className="w-full h-[53px] rounded-[8px] border border-amber-300 bg-amber-50/40 text-sm text-center font-mono tracking-widest text-[#111827] focus:border-[#0D4032] focus:outline-none focus:ring-1 focus:ring-[#0D4032]"
+                    placeholder="000000"
+                  />
+                </div>
+              )}
+
+              {/* Error Message Alert */}
+              {error && (
+                <div className={`flex items-start gap-2.5 rounded-lg border p-3 text-xs font-semibold ${
+                  rateLimitCountdown > 0
+                    ? 'border-amber-300 bg-amber-50 text-amber-900'
+                    : 'border-rose-200 bg-rose-50 text-rose-900'
+                }`}>
+                  {rateLimitCountdown > 0 ? (
+                    <Clock size={16} className="mt-0.5 shrink-0 text-amber-700 animate-spin" />
+                  ) : (
+                    <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600" />
+                  )}
+                  <div className="flex-1">
+                    <span>{error}</span>
+                    {rateLimitCountdown > 0 && (
+                      <div className="mt-1 text-[11px] text-amber-800 font-normal">
+                        Button re-enables in <strong className="font-mono">{rateLimitCountdown}s</strong>.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 8. Full-width dark forest-green button (53px height, rounded-lg, uppercase) */}
+              <button
+                type="submit"
+                disabled={isButtonDisabled}
+                className="w-full h-[53px] rounded-[8px] bg-[#0D4032] hover:bg-[#083D2E] active:bg-[#05291E] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Signing in...</span>
+                  </>
+                ) : rateLimitCountdown > 0 ? (
+                  <span className="flex items-center gap-1.5">
+                    <Clock size={14} />
+                    <span>Try again in {rateLimitCountdown}s</span>
+                  </span>
+                ) : (
+                  <>
+                    <span>SIGN IN TO DASHBOARD</span>
+                    <ArrowRight size={16} />
+                  </>
+                )}
+              </button>
+
+              {/* 9. Subtle divider with OR */}
+              <div className="relative my-4 flex items-center justify-center">
+                <div className="border-t border-[#E2E8F0] w-full" />
+                <span className="absolute bg-white px-3 text-[11px] font-bold tracking-widest text-[#94A3B8] uppercase">
+                  OR
+                </span>
+              </div>
+
+              {/* 10. Footer links */}
+              <div className="space-y-1.5 text-center text-[13px] pt-1">
+                <div className="text-[#64748B]">
+                  Opening a new café?{' '}
+                  <Link to="/signup" className="font-bold text-[#0D4032] hover:underline">
+                    Start 14-day free trial →
+                  </Link>
+                </div>
+                <div className="text-[#64748B]">
+                  Looking for customer ordering?{' '}
+                  <a
+                    href="https://cafe-client-app.vercel.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold text-[#0D4032] hover:underline inline-flex items-center gap-1"
+                  >
+                    <span>Live Menu →</span>
+                  </a>
+                </div>
+              </div>
+            </form>
+          </div>
         </motion.div>
       </div>
     </div>
