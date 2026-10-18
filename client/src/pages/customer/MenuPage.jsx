@@ -832,7 +832,7 @@ export default function MenuPage() {
                     <h2 className="font-sora font-extrabold text-xl sm:text-2xl text-[#0F3D2E] tracking-tight pt-1">
                       {section.name}
                     </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5 2xl:gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 min-[390px]:gap-3.5 sm:gap-4">
                       {section.items.map((prod) => (
                         <MenuItemRow
                           key={prod._id}

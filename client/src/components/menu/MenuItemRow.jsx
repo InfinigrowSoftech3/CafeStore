@@ -77,139 +77,115 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
   return (
     <article
       onClick={isAvailable ? () => onSelect(product) : undefined}
-      className={`bg-white rounded-[24px] sm:rounded-[26px] p-2.5 min-[390px]:p-3 sm:p-3.5 flex items-center gap-2.5 min-[390px]:gap-3 sm:gap-4 shadow-[0_2px_12px_rgba(15,61,46,0.04)] border border-[#0F3D2E]/8 transition-all duration-150 ${
+      className={`group relative aspect-square w-full rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#0F3D2E]/5 shadow-[0_4px_16px_rgba(15,61,46,0.06)] border border-[#0F3D2E]/10 select-none transition-all duration-200 ${
         isAvailable
-          ? 'cursor-pointer hover:border-[#0F3D2E]/25 hover:shadow-md'
+          ? 'cursor-pointer hover:shadow-lg hover:scale-[1.02]'
           : 'opacity-60 grayscale-[40%] cursor-default'
       }`}
     >
-      {/* Responsive Thumbnail (84px on small phone, 92px on phone, 100px on desktop) */}
-      <div className="relative w-[84px] h-[84px] min-w-[84px] min-h-[84px] min-[390px]:w-[92px] min-[390px]:h-[92px] min-[390px]:min-w-[92px] min-[390px]:min-h-[92px] lg:w-[98px] lg:h-[98px] lg:min-w-[98px] lg:min-h-[98px] rounded-[18px] min-[390px]:rounded-[22px] overflow-hidden bg-[#0F3D2E]/5 shrink-0">
-        {product.image && !imgError ? (
-          <img
-            src={product.image}
-            alt={product.name}
-            width="98"
-            height="98"
-            loading="lazy"
-            decoding="async"
-            onError={() => setImgError(true)}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          /* Tinted block fallback */
-          <div className="w-full h-full flex flex-col items-center justify-center bg-[#0F3D2E]/5 text-[#0F3D2E]/30">
-            <Utensils size={24} strokeWidth={1.5} />
-          </div>
-        )}
+      {/* Background Image filling full square card */}
+      {product.image && !imgError ? (
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          decoding="async"
+          onError={() => setImgError(true)}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center bg-[#0F3D2E]/10 text-[#0F3D2E]/40">
+          <Utensils size={32} strokeWidth={1.5} />
+        </div>
+      )}
 
-        {/* Prep-time badge */}
-        {product.prepTime && (
-          <span className="absolute bottom-1.5 right-1.5 inline-flex items-center gap-0.5 bg-black/65 backdrop-blur-md px-1.5 py-0.5 rounded-full text-[9px] font-jakarta font-semibold text-white shadow-xs">
-            <Clock size={9} className="text-[#FFF1C9]" />
-            <span>{product.prepTime}m</span>
-          </span>
-        )}
-
-        {/* Sold out overlay */}
-        {!isAvailable && (
-          <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] flex items-center justify-center">
-            <span className="rounded-full bg-[#0F3D2E] text-white text-[10px] font-sora font-bold px-2 py-0.5 shadow-xs">
-              Sold out
-            </span>
-          </div>
-        )}
+      {/* Top-Left: Veg Mark Badge */}
+      <div className="absolute top-2.5 left-2.5 z-10">
+        <VegMark isVeg={product.isVeg} size={16} />
       </div>
 
-      {/* Item info & Actions */}
-      <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch py-0.5">
-        <div>
-          {/* Top line: Veg mark + Name */}
-          <div className="flex items-center gap-1.5 min-w-0">
-            <VegMark isVeg={product.isVeg} size={13} />
-            <h3 className="font-sora font-bold text-sm min-[390px]:text-[15px] sm:text-base text-[#0F3D2E] leading-snug truncate">
-              {product.name}
-            </h3>
-          </div>
-
-          {/* One-line description */}
-          {product.description && (
-            <p className="text-xs text-[#0F3D2E]/70 line-clamp-1 font-jakarta mt-0.5">
-              {product.description}
-            </p>
-          )}
+      {/* Top-Right: Prep Time Badge */}
+      {product.prepTime && (
+        <div className="absolute top-2.5 right-2.5 z-10 inline-flex items-center gap-1 bg-black/65 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] min-[390px]:text-[11px] font-jakarta font-semibold text-white shadow-xs">
+          <Clock size={11} className="text-white/80" />
+          <span>{product.prepTime}m</span>
         </div>
+      )}
 
-        {/* Bottom row: Price on left, Action on right */}
-        <div className="flex items-center justify-between gap-2 mt-2 pt-1 border-t border-[#0F3D2E]/6">
-          <div className="flex items-baseline gap-1.5 shrink-0">
-            <span className="font-sora font-extrabold text-sm min-[390px]:text-base sm:text-lg text-[#0F3D2E]">
+      {/* Sold Out Overlay */}
+      {!isAvailable && (
+        <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-[2px] flex items-center justify-center">
+          <span className="rounded-full bg-[#E53935] text-white text-xs font-sora font-extrabold px-3 py-1 shadow-md">
+            Sold out
+          </span>
+        </div>
+      )}
+
+      {/* Bottom Gradient Overlay with Title, Price, and Action Button */}
+      <div className="absolute inset-x-0 bottom-0 pt-16 pb-2.5 min-[390px]:pb-3 px-2.5 min-[390px]:px-3.5 bg-gradient-to-t from-black/95 via-black/60 to-transparent flex items-end justify-between gap-2 z-10">
+        {/* Title and Price */}
+        <div className="min-w-0 flex-1 pr-1">
+          <h3 className="font-sora font-bold text-xs min-[390px]:text-sm sm:text-base text-white leading-tight line-clamp-1 drop-shadow-sm group-hover:text-[#FFF1C9] transition-colors">
+            {product.name}
+          </h3>
+          <div className="flex items-baseline gap-1 mt-0.5 min-[390px]:mt-1">
+            <span className="font-sora font-extrabold text-xs min-[390px]:text-sm sm:text-base text-white drop-shadow-sm">
               {formatMoney(product.price, tenant.currency)}
             </span>
             {product.originalPrice && product.originalPrice > product.price && (
-              <span className="text-xs text-[#0F3D2E]/40 line-through tabular-nums font-jakarta">
+              <span className="text-[10px] sm:text-xs text-white/50 line-through tabular-nums font-jakarta">
                 {formatMoney(product.originalPrice, tenant.currency)}
               </span>
             )}
           </div>
+        </div>
 
-          {/* Action: Add pill or Stepper */}
-          <div onClick={(e) => e.stopPropagation()}>
-            {!isAvailable ? (
+        {/* Action Button: Red/Orange Circle with White Plus or Stepper */}
+        <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+          {!isAvailable ? null : totalQtyInCart > 0 && !hasCustomizations ? (
+            /* Compact Stepper */
+            <div className="inline-flex items-center gap-1 rounded-full bg-[#E53935] text-white p-1 shadow-md">
               <button
                 type="button"
-                disabled
-                className="min-h-[44px] px-3.5 py-1.5 rounded-full bg-[#0F3D2E]/10 text-[#0F3D2E]/40 text-xs font-sora font-bold cursor-not-allowed"
+                onClick={handleDecrement}
+                aria-label={`Decrease quantity of ${product.name}`}
+                className="w-6 h-6 min-[390px]:w-7 min-[390px]:h-7 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center active:scale-90 transition"
               >
-                Sold out
+                <Minus size={13} strokeWidth={2.6} />
               </button>
-            ) : totalQtyInCart > 0 && !hasCustomizations ? (
-              /* Inline "− qty +" Stepper */
-              <div className="inline-flex min-h-[44px] items-center rounded-full bg-[var(--menu-accent,#C93A1C)] text-white px-1 shadow-xs">
-                <button
-                  type="button"
-                  onClick={handleDecrement}
-                  aria-label={`Decrease quantity of ${product.name}`}
-                  className="w-8 h-8 min-h-[44px] min-w-[36px] flex items-center justify-center rounded-full hover:bg-black/15 transition active:scale-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
-                >
-                  <Minus size={14} strokeWidth={2.8} />
-                </button>
-                <span className="min-w-[20px] text-center font-sora text-xs font-extrabold text-white">
-                  {totalQtyInCart}
-                </span>
-                <button
-                  type="button"
-                  onClick={handleIncrement}
-                  aria-label={`Increase quantity of ${product.name}`}
-                  className="w-8 h-8 min-h-[44px] min-w-[36px] flex items-center justify-center rounded-full hover:bg-black/15 transition active:scale-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
-                >
-                  <Plus size={14} strokeWidth={2.8} />
-                </button>
-              </div>
-            ) : totalQtyInCart > 0 && hasCustomizations ? (
-              /* Customizable item already in cart */
+              <span className="font-sora font-extrabold text-xs px-1 min-w-[16px] text-center text-white">
+                {totalQtyInCart}
+              </span>
               <button
                 type="button"
-                onClick={() => onSelect(product)}
-                aria-label={`Item in cart, customize ${product.name}`}
-                className="min-h-[44px] min-w-[76px] px-3.5 py-1.5 rounded-full bg-[var(--menu-accent,#C93A1C)] text-white font-sora font-extrabold text-xs shadow-xs hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+                onClick={handleIncrement}
+                aria-label={`Increase quantity of ${product.name}`}
+                className="w-6 h-6 min-[390px]:w-7 min-[390px]:h-7 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center active:scale-90 transition"
               >
-                <span>{totalQtyInCart} in cart</span>
-                <Plus size={12} strokeWidth={3} />
+                <Plus size={13} strokeWidth={2.6} />
               </button>
-            ) : (
-              /* "Add" pill */
-              <button
-                type="button"
-                onClick={handleQuickAdd}
-                aria-label={`Add ${product.name} to cart`}
-                className="min-h-[44px] min-w-[68px] px-4 py-2 rounded-full bg-[var(--menu-accent,#C93A1C)] text-white font-sora font-extrabold text-xs shadow-xs hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
-              >
-                <span>Add</span>
-                {hasCustomizations && <span className="text-[10px] font-bold opacity-80">+</span>}
-              </button>
-            )}
-          </div>
+            </div>
+          ) : totalQtyInCart > 0 && hasCustomizations ? (
+            /* Customizable item in cart badge */
+            <button
+              type="button"
+              onClick={() => onSelect(product)}
+              aria-label={`Customize ${product.name}`}
+              className="w-8 h-8 min-[390px]:w-9 min-[390px]:h-9 sm:w-10 sm:h-10 rounded-full bg-[#E53935] hover:bg-[#D32F2F] text-white flex items-center justify-center font-sora font-extrabold text-xs shadow-md active:scale-90 transition-transform"
+            >
+              <span>{totalQtyInCart}</span>
+            </button>
+          ) : (
+            /* Round Red/Orange Action Button with White Plus */
+            <button
+              type="button"
+              onClick={handleQuickAdd}
+              aria-label={`Add ${product.name} to order`}
+              className="w-8 h-8 min-[390px]:w-9 min-[390px]:h-9 sm:w-10 sm:h-10 rounded-full bg-[#E53935] hover:bg-[#D32F2F] text-white flex items-center justify-center shadow-md active:scale-90 transition-transform"
+            >
+              <Plus size={18} strokeWidth={2.8} />
+            </button>
+          )}
         </div>
       </div>
     </article>
