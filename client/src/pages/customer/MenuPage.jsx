@@ -19,6 +19,7 @@ import {
   RotateCcw,
   ChevronLeft,
   ChevronRight,
+  Menu as MenuIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
@@ -160,6 +161,7 @@ export default function MenuPage() {
     isScannerOpen,
     openScanner,
     closeScanner,
+    openNavDrawer,
   } = useCartStore();
 
   const itemCount = useCartStore(cartItemCount);
@@ -523,6 +525,17 @@ export default function MenuPage() {
                 </span>
               )}
             </Link>
+
+            {/* Hamburger Button to Show All Pages */}
+            <button
+              type="button"
+              onClick={openNavDrawer}
+              aria-label="Open navigation menu - show all pages"
+              className="min-h-[44px] min-w-[44px] px-3 sm:px-3.5 flex items-center justify-center gap-1.5 rounded-full border border-stone-200 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 hover:border-[#0F3D2E]/30 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+            >
+              <MenuIcon size={19} strokeWidth={2.4} />
+              <span className="hidden sm:inline text-xs font-sora font-bold tracking-wide">All Pages</span>
+            </button>
           </div>
         </header>
 

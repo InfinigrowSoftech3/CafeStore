@@ -7,6 +7,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import QuickCartPopup from './components/ui/QuickCartPopup';
 import WebPushPrompt from './components/ui/WebPushPrompt';
 import Navbar from './components/ui/Navbar';
+import CustomerNavDrawer from './components/ui/CustomerNavDrawer';
 
 // Primary customer entry page loaded eagerly
 import MenuPage from './pages/customer/MenuPage';
@@ -106,6 +107,7 @@ export default function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Navbar />
+      <CustomerNavDrawer />
       <QuickCartPopup />
       <WebPushPrompt />
       <Analytics />
