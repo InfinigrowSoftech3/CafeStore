@@ -81,6 +81,7 @@ export function TenantProvider({ children }) {
         }
 
         // Clean up previous café storage when switching tenants
+        clearClientCache();
         cleanupPreviousTenantStorage(cafeData.slug);
 
         const rawPrimary = cafeData.branding?.primaryColor || cafeData.settings?.primaryColor;

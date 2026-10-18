@@ -1,5 +1,3 @@
-import { clearClientCache } from './menuCache';
-
 /**
  * Safely extracts tenantId from a signed table QR token's payload (base64url JSON)
  * without validating the cryptographic signature (the server validates the signature).
@@ -116,7 +114,6 @@ export function removeCustomerSessionItem(slug, key) {
 export function cleanupPreviousTenantStorage(newSlug) {
   if (typeof window === 'undefined') return;
   try {
-    clearClientCache();
     // Remove un-namespaced legacy keys
     sessionStorage.removeItem('cafe_tenant_slug');
     sessionStorage.removeItem('cafe_tenant_id');
@@ -127,12 +124,14 @@ export function cleanupPreviousTenantStorage(newSlug) {
     localStorage.removeItem('cafe_tenant_id');
     localStorage.removeItem('brewhaus-cart');
 
-    // Remove customer keys that belong to other slugs
+    // Remove legacy cache keys and customer keys that belong to other slugs
     const normalizedNew = String(newSlug || '').toLowerCase().trim();
-    if (normalizedNew) {
-      for (let i = sessionStorage.length - 1; i >= 0; i--) {
-        const k = sessionStorage.key(i);
-        if (k && k.startsWith('customer:') && !k.startsWith(`customer:${normalizedNew}:`)) {
+    for (let i = sessionStorage.length - 1; i >= 0; i--) {
+      const k = sessionStorage.key(i);
+      if (k) {
+        if (k.startsWith('cafe_cache_') || k.startsWith('brewhaus_cache_')) {
+          sessionStorage.removeItem(k);
+        } else if (normalizedNew && k.startsWith('customer:') && !k.startsWith(`customer:${normalizedNew}:`)) {
           sessionStorage.removeItem(k);
         }
       }
