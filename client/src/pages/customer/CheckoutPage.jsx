@@ -102,15 +102,15 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center flex-col gap-4 p-6 text-center">
-        <div className="w-20 h-20 rounded-3xl bg-[#FFF1C9]/80 border border-[#FFF1C9] flex items-center justify-center text-4xl mb-2 shadow-xs">
+      <div className="min-h-screen bg-white flex items-center justify-center flex-col gap-4 p-6 text-center">
+        <div className="w-16 h-16 rounded-none bg-stone-100 border border-stone-200 flex items-center justify-center text-3xl mb-2 shadow-2xs">
           🛒
         </div>
-        <h1 className="font-sora text-2xl font-extrabold text-[#0F3D2E]">Your cart is empty</h1>
+        <h1 className="font-sora text-2xl font-extrabold text-stone-900">Your cart is empty</h1>
         <p className="text-stone-500 text-sm max-w-sm">
           Please add items to your cart before proceeding to checkout.
         </p>
-        <Link to="/menu" className="btn-primary min-h-[48px] px-8 text-xs font-sora font-bold tracking-wider mt-2">
+        <Link to="/menu" className="btn-primary min-h-[46px] px-8 text-xs font-sora font-bold tracking-wider mt-2 rounded-none">
           Browse Menu
         </Link>
       </div>
@@ -327,19 +327,19 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Top Header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3.5 border-b border-stone-200/80 bg-white/95 backdrop-blur-md shadow-2xs">
+      <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3.5 border-b border-stone-200 bg-white/95 backdrop-blur-md shadow-2xs">
         <div className="flex items-center gap-3">
           <Link
             to="/cart"
             aria-label="Back to Cart"
-            className="min-h-[40px] min-w-[40px] rounded-full border border-stone-200 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition active:scale-95"
+            className="min-h-[38px] min-w-[38px] rounded-none border border-stone-300 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition active:scale-95"
           >
             <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="font-sora text-lg sm:text-xl font-bold text-[#0F3D2E] leading-none">
+            <h1 className="font-sora text-lg sm:text-xl font-bold text-stone-900 leading-none">
               Checkout
             </h1>
             <p className="text-[11px] text-stone-500 mt-0.5">{tenant.name}</p>
@@ -347,7 +347,7 @@ export default function CheckoutPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden min-[380px]:flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+          <div className="hidden min-[380px]:flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-none border border-emerald-300">
             <ShieldCheck size={14} className="text-[#16A34A]" />
             <span className="font-semibold">Secure Checkout</span>
           </div>
@@ -357,7 +357,7 @@ export default function CheckoutPage() {
             type="button"
             onClick={openNavDrawer}
             aria-label="Open navigation menu - show all pages"
-            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-full border border-stone-200 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all"
+            className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-none border border-stone-300 bg-white text-stone-900 shadow-2xs hover:bg-stone-50 active:scale-95 transition-all"
           >
             <Menu size={18} strokeWidth={2.4} />
           </button>
@@ -370,37 +370,37 @@ export default function CheckoutPage() {
           {/* Left Column: Table Details + Customer Details + Payment Method */}
           <div className="lg:col-span-7 space-y-4">
             {/* Table Badge Card */}
-            <div className="card p-4 bg-white border border-stone-200/80 flex items-center justify-between gap-3 shadow-2xs rounded-2xl">
+            <div className="p-4 bg-white border border-stone-200 flex items-center justify-between gap-3 shadow-2xs rounded-none">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-[#0F3D2E] text-white font-sora font-bold text-base shadow-xs">
+                <div className="w-10 h-10 rounded-none flex items-center justify-center bg-stone-900 text-white font-sora font-bold text-sm shadow-2xs">
                   {String(tableNumber || '—').padStart(2, '0')}
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-stone-400">Dine-In Table</p>
-                  <p className="font-sora text-base font-bold text-[#0F3D2E]">
+                  <p className="text-xs font-bold uppercase tracking-wider text-stone-500">Dine-In Table</p>
+                  <p className="font-sora text-base font-bold text-stone-900">
                     {tableNumber ? `Table ${String(tableNumber).padStart(2, '0')}` : 'Table not selected'}
                   </p>
                 </div>
               </div>
 
               {tableNumber ? (
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-none border border-emerald-300">
                   <CheckCircle2 size={13} className="text-[#16A34A]" />
                   <span>Verified</span>
                 </div>
               ) : (
-                <Link to="/menu" className="text-xs font-bold text-[#C93A1C] underline">
+                <Link to="/menu" className="text-xs font-bold text-[var(--menu-accent,#C93A1C)] underline">
                   Scan Table QR
                 </Link>
               )}
             </div>
 
             {/* Customer Details Card */}
-            <div className="card p-5 bg-white border border-stone-200/80 space-y-4 shadow-2xs rounded-3xl">
-              <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+            <div className="p-5 bg-white border border-stone-200 space-y-4 shadow-2xs rounded-none">
+              <div className="flex items-center justify-between border-b border-stone-200 pb-3">
                 <div className="flex items-center gap-2">
-                  <User size={18} className="text-[#0F3D2E]" />
-                  <h2 className="font-sora text-base font-bold text-[#0F3D2E]">
+                  <User size={18} className="text-stone-900" />
+                  <h2 className="font-sora text-base font-bold text-stone-900">
                     Customer Information
                   </h2>
                 </div>
@@ -418,7 +418,7 @@ export default function CheckoutPage() {
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Enter your full name"
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-stone-200 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-[#0F3D2E] focus:ring-2 focus:ring-[#0F3D2E]/20 transition"
+                    className="w-full h-11 pl-10 pr-4 rounded-none border border-stone-300 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 transition"
                     autoComplete="name"
                   />
                 </div>
@@ -438,12 +438,12 @@ export default function CheckoutPage() {
                     value={phone}
                     onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     placeholder="10-digit mobile number"
-                    className="w-full h-11 pl-12 pr-4 rounded-xl border border-stone-200 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-[#0F3D2E] focus:ring-2 focus:ring-[#0F3D2E]/20 transition"
+                    className="w-full h-11 pl-12 pr-4 rounded-none border border-stone-300 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 transition"
                     autoComplete="tel"
                     inputMode="numeric"
                   />
                 </div>
-                <p className="text-[11px] text-stone-400 mt-1">
+                <p className="text-[11px] text-stone-500 mt-1">
                   We will send order confirmation and kitchen updates via SMS/WhatsApp.
                 </p>
               </div>
@@ -460,20 +460,20 @@ export default function CheckoutPage() {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="you@domain.com"
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-stone-200 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-[#0F3D2E] focus:ring-2 focus:ring-[#0F3D2E]/20 transition"
+                    className="w-full h-11 pl-10 pr-4 rounded-none border border-stone-300 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 transition"
                     autoComplete="email"
                   />
                 </div>
               </div>
 
               {/* Marketing Consent */}
-              <div className="pt-2 border-t border-stone-100">
+              <div className="pt-2 border-t border-stone-200">
                 <label className="flex items-start gap-2.5 cursor-pointer text-stone-700 select-none group">
                   <input
                     type="checkbox"
                     checked={marketingConsent}
                     onChange={e => setMarketingConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-stone-300 text-[#0F3D2E] focus:ring-[#0F3D2E] cursor-pointer transition accent-[#0F3D2E]"
+                    className="mt-0.5 h-4 w-4 rounded-none border-stone-300 text-stone-900 focus:ring-stone-900 cursor-pointer transition accent-stone-900"
                   />
                   <span className="text-xs leading-relaxed text-stone-600 group-hover:text-stone-900 transition">
                     Keep me updated with chef specials, seasonal brews, and promotions from {tenant.name}.
@@ -483,10 +483,10 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment Method Card */}
-            <div className="card p-5 bg-white border border-stone-200/80 space-y-4 shadow-2xs rounded-3xl">
-              <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
-                <CreditCard size={18} className="text-[#0F3D2E]" />
-                <h2 className="font-sora text-base font-bold text-[#0F3D2E]">
+            <div className="p-5 bg-white border border-stone-200 space-y-4 shadow-2xs rounded-none">
+              <div className="flex items-center gap-2 border-b border-stone-200 pb-3">
+                <CreditCard size={18} className="text-stone-900" />
+                <h2 className="font-sora text-base font-bold text-stone-900">
                   Select Payment Method
                 </h2>
               </div>
@@ -496,25 +496,25 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('razorpay')}
-                  className={`p-4 rounded-2xl border-2 transition-all text-left flex flex-col justify-between min-h-[92px] ${
+                  className={`p-4 rounded-none border transition-all text-left flex flex-col justify-between min-h-[92px] ${
                     paymentMethod === 'razorpay'
-                      ? 'border-[#0F3D2E] bg-emerald-50/40 shadow-xs'
-                      : 'border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50/50'
+                      ? 'border-stone-900 bg-stone-50 ring-1 ring-stone-900 shadow-2xs'
+                      : 'border-stone-200 bg-white hover:border-stone-300'
                   }`}
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2.5">
-                      <div className={`p-2 rounded-xl ${paymentMethod === 'razorpay' ? 'bg-[#0F3D2E] text-white' : 'bg-stone-100 text-stone-700'}`}>
+                      <div className={`p-2 rounded-none ${paymentMethod === 'razorpay' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-700'}`}>
                         <CreditCard size={18} />
                       </div>
-                      <span className="font-sora font-bold text-sm text-[#0F3D2E]">
+                      <span className="font-sora font-bold text-sm text-stone-900">
                         Online Payment
                       </span>
                     </div>
-                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                      paymentMethod === 'razorpay' ? 'border-[#0F3D2E] bg-[#0F3D2E]' : 'border-stone-300'
+                    <div className={`w-3.5 h-3.5 rounded-none border flex items-center justify-center ${
+                      paymentMethod === 'razorpay' ? 'border-stone-900 bg-stone-900' : 'border-stone-300'
                     }`}>
-                      {paymentMethod === 'razorpay' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      {paymentMethod === 'razorpay' && <span className="w-1.5 h-1.5 bg-white" />}
                     </div>
                   </div>
                   <p className="text-[11px] text-stone-500 mt-2">
@@ -526,25 +526,25 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('cash')}
-                  className={`p-4 rounded-2xl border-2 transition-all text-left flex flex-col justify-between min-h-[92px] ${
+                  className={`p-4 rounded-none border transition-all text-left flex flex-col justify-between min-h-[92px] ${
                     paymentMethod === 'cash'
-                      ? 'border-[#0F3D2E] bg-emerald-50/40 shadow-xs'
-                      : 'border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50/50'
+                      ? 'border-stone-900 bg-stone-50 ring-1 ring-stone-900 shadow-2xs'
+                      : 'border-stone-200 bg-white hover:border-stone-300'
                   }`}
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2.5">
-                      <div className={`p-2 rounded-xl ${paymentMethod === 'cash' ? 'bg-[#0F3D2E] text-white' : 'bg-stone-100 text-stone-700'}`}>
+                      <div className={`p-2 rounded-none ${paymentMethod === 'cash' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-700'}`}>
                         <Banknote size={18} />
                       </div>
-                      <span className="font-sora font-bold text-sm text-[#0F3D2E]">
+                      <span className="font-sora font-bold text-sm text-stone-900">
                         Cash at Counter
                       </span>
                     </div>
-                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                      paymentMethod === 'cash' ? 'border-[#0F3D2E] bg-[#0F3D2E]' : 'border-stone-300'
+                    <div className={`w-3.5 h-3.5 rounded-none border flex items-center justify-center ${
+                      paymentMethod === 'cash' ? 'border-stone-900 bg-stone-900' : 'border-stone-300'
                     }`}>
-                      {paymentMethod === 'cash' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      {paymentMethod === 'cash' && <span className="w-1.5 h-1.5 bg-white" />}
                     </div>
                   </div>
                   <p className="text-[11px] text-stone-500 mt-2">
@@ -561,7 +561,7 @@ export default function CheckoutPage() {
                 animate={{ opacity: 1, y: 0 }}
                 role="alert"
                 aria-live="polite"
-                className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-2xl p-3.5 shadow-xs"
+                className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-none p-3.5 shadow-2xs"
               >
                 <AlertCircle size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
                 <p className="text-red-800 text-xs sm:text-sm font-medium">{error}</p>
@@ -571,15 +571,15 @@ export default function CheckoutPage() {
 
           {/* Right Column: Order Summary & Coupon Code & Pay Button */}
           <div className="lg:col-span-5">
-            <div className="card p-5 sm:p-6 bg-white border border-stone-200/80 space-y-5 shadow-xs rounded-3xl sticky top-24">
-              <h2 className="font-sora text-lg font-bold text-[#0F3D2E] border-b border-stone-100 pb-3">
+            <div className="p-5 sm:p-6 bg-white border border-stone-200 space-y-5 shadow-2xs rounded-none sticky top-24">
+              <h2 className="font-sora text-lg font-bold text-stone-900 border-b border-stone-200 pb-3">
                 Order Summary ({items.length} items)
               </h2>
 
               {/* Items List Snapshot */}
-              <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+              <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1 divide-y divide-stone-100">
                 {items.map(item => (
-                  <div key={item.key} className="flex justify-between items-baseline text-xs font-jakarta">
+                  <div key={item.key} className="pt-2 first:pt-0 flex justify-between items-baseline text-xs font-jakarta">
                     <div className="pr-2 min-w-0">
                       <p className="font-semibold text-stone-900 truncate">
                         {item.name} × {item.quantity}
@@ -591,7 +591,7 @@ export default function CheckoutPage() {
                         <p className="text-[10px] text-stone-400">+{item.addons.map(a => a.name).join(', ')}</p>
                       )}
                     </div>
-                    <span className="font-sora text-xs font-bold text-[#0F3D2E] flex-shrink-0">
+                    <span className="font-sora text-xs font-bold text-stone-900 flex-shrink-0">
                       {formatMoney(item.itemTotal, tenant.currency)}
                     </span>
                   </div>
@@ -599,7 +599,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Coupon Code Input */}
-              <div className="border-t border-stone-100 pt-3">
+              <div className="border-t border-stone-200 pt-3">
                 <label className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5 block">
                   Have a Coupon?
                 </label>
@@ -612,7 +612,7 @@ export default function CheckoutPage() {
                         setCouponInput(e.target.value.toUpperCase());
                         setAppliedCoupon(null);
                       }}
-                      className="w-full h-10 pl-9 pr-3 rounded-xl border border-stone-200 bg-white text-xs uppercase font-mono tracking-wider text-stone-900 focus:outline-none focus:border-[#0F3D2E] focus:ring-2 focus:ring-[#0F3D2E]/20"
+                      className="w-full h-10 pl-9 pr-3 rounded-none border border-stone-300 bg-white text-xs uppercase font-mono tracking-wider text-stone-900 focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
                       placeholder="ENTER CODE"
                       maxLength={32}
                     />
@@ -621,12 +621,12 @@ export default function CheckoutPage() {
                     type="button"
                     onClick={applyCoupon}
                     disabled={couponLoading || !couponInput.trim()}
-                    className={`px-4 py-2 text-xs font-sora font-bold shrink-0 rounded-full transition active:scale-95 ${
+                    className={`px-4 py-2 text-xs font-sora font-bold shrink-0 rounded-none transition active:scale-95 ${
                       appliedCoupon
                         ? 'bg-emerald-600 text-white'
                         : couponInput.trim()
-                          ? 'bg-[#0F3D2E] text-white hover:bg-[#16503D]'
-                          : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
+                          ? 'bg-stone-900 text-white hover:bg-stone-800'
+                          : 'bg-stone-100 text-stone-400 border border-stone-300 cursor-not-allowed'
                     }`}
                   >
                     {couponLoading ? 'Checking...' : appliedCoupon ? 'Applied ✓' : 'Apply'}
@@ -641,10 +641,10 @@ export default function CheckoutPage() {
               </div>
 
               {/* Bill Details */}
-              <div className="border-t border-stone-100 pt-3 space-y-2 text-xs font-jakarta">
+              <div className="border-t border-stone-200 pt-3 space-y-2 text-xs font-jakarta">
                 <div className="flex justify-between text-stone-600">
                   <span>Subtotal</span>
-                  <span className="font-sora font-semibold text-stone-800">{formatMoney(subtotal, tenant.currency)}</span>
+                  <span className="font-sora font-semibold text-stone-900">{formatMoney(subtotal, tenant.currency)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-emerald-800 font-semibold">
@@ -654,11 +654,11 @@ export default function CheckoutPage() {
                 )}
                 <div className="flex justify-between text-stone-600">
                   <span>GST &amp; Taxes ({tenant.taxRate}%)</span>
-                  <span className="font-sora font-semibold text-stone-800">{formatMoney(tax, tenant.currency)}</span>
+                  <span className="font-sora font-semibold text-stone-900">{formatMoney(tax, tenant.currency)}</span>
                 </div>
                 <div className="flex justify-between border-t border-dashed border-stone-200 pt-2.5 text-base font-bold text-stone-900">
                   <span>Final Total</span>
-                  <span className="font-sora text-xl font-extrabold text-[#0F3D2E]">{formatMoney(total, tenant.currency)}</span>
+                  <span className="font-sora text-xl font-extrabold text-stone-900">{formatMoney(total, tenant.currency)}</span>
                 </div>
               </div>
 
@@ -667,7 +667,7 @@ export default function CheckoutPage() {
                 whileTap={{ scale: 0.985 }}
                 onClick={handleSubmit}
                 disabled={loading}
-                className="hidden lg:flex w-full !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white items-center justify-center gap-2 py-3.5 text-sm font-sora font-bold shadow-md rounded-full transition active:scale-98 disabled:opacity-50"
+                className="hidden lg:flex w-full !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white items-center justify-center gap-2 py-3.5 text-sm font-sora font-bold shadow-2xs rounded-none transition active:scale-98 disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -687,17 +687,17 @@ export default function CheckoutPage() {
       </main>
 
       {/* Floating Bottom Pay Bar for Mobile */}
-      <div className="lg:hidden bottom-safe fixed bottom-0 left-0 right-0 p-3.5 bg-white/95 backdrop-blur-xl border-t border-stone-200 shadow-2xl z-20">
+      <div className="lg:hidden bottom-safe fixed bottom-0 left-0 right-0 p-3.5 bg-white border-t border-stone-200 shadow-xl z-20">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-[11px] text-stone-500 uppercase tracking-wider font-semibold">Amount to Pay</p>
-            <p className="font-sora text-lg font-extrabold text-[#0F3D2E]">{formatMoney(total, tenant.currency)}</p>
+            <p className="font-sora text-lg font-extrabold text-stone-900">{formatMoney(total, tenant.currency)}</p>
           </div>
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 min-h-[48px] !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-full shadow-md transition active:scale-98 disabled:opacity-50"
+            className="flex-1 min-h-[46px] !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-none shadow-2xs transition active:scale-98 disabled:opacity-50"
           >
             {loading ? (
               <>

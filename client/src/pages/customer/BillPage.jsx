@@ -91,7 +91,7 @@ export default function BillPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="animate-spin text-[#0F3D2E]" size={32} />
       </div>
     );
@@ -99,14 +99,14 @@ export default function BillPage() {
 
   if (!diningSessionToken || !bill) {
     return (
-      <div className="min-h-screen bg-[#FAFAF8] flex flex-col items-center justify-center gap-4 p-8 text-center">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4 p-8 text-center">
         <p className="font-display text-2xl font-bold text-[#0F3D2E]">
           Scan your table QR code to view your bill.
         </p>
         <p className="text-sm text-stone-600 max-w-sm">
           Your dining session starts automatically when you scan the QR code located on your table.
         </p>
-        <Link to="/menu" className="btn-primary min-h-[44px] inline-flex items-center justify-center mt-2 px-6 rounded-full shadow-sm">
+        <Link to="/menu" className="btn-primary min-h-[44px] inline-flex items-center justify-center mt-2 px-6 rounded-none shadow-sm">
           Back to Menu
         </Link>
       </div>
@@ -114,12 +114,12 @@ export default function BillPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8]">
-      <header className="flex items-center gap-3 border-b border-stone-200/80 bg-white/95 backdrop-blur-md p-4">
+    <div className="min-h-screen bg-white">
+      <header className="flex items-center gap-3 border-b border-stone-200 bg-white p-4">
         <Link
           to="/menu"
           aria-label="Back to menu"
-          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-stone-200 text-stone-700 hover:bg-stone-50 transition-colors"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-none border border-stone-300 text-stone-700 hover:bg-stone-50 transition-colors"
         >
           <ArrowLeft size={18} />
         </Link>
@@ -128,7 +128,7 @@ export default function BillPage() {
           type="button"
           onClick={loadBill}
           aria-label="Refresh bill"
-          className="ml-auto flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-stone-200 text-stone-700 hover:bg-stone-50 transition-colors"
+          className="ml-auto flex min-h-[44px] min-w-[44px] items-center justify-center rounded-none border border-stone-300 text-stone-700 hover:bg-stone-50 transition-colors"
           title="Refresh bill"
         >
           <RefreshCw size={16} />
@@ -137,10 +137,10 @@ export default function BillPage() {
 
       <main className="mx-auto max-w-2xl space-y-4 p-4 pb-12">
         <TableServiceActions />
-        <section className="card space-y-3 p-5 bg-white border border-stone-200/80 rounded-2xl shadow-2xs">
+        <section className="card space-y-3 p-5 bg-white border border-stone-200 rounded-none shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-stone-700">Table {bill.tableNumber || ''}</span>
-            <span className="rounded-full bg-[#FFF1C9] border border-amber-300 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#0F3D2E]">
+            <span className="rounded-none bg-[#FFF1C9] border border-amber-300 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#0F3D2E]">
               {bill.status}
             </span>
           </div>
@@ -184,11 +184,11 @@ export default function BillPage() {
         </section>
 
         {bill.status === 'CASH_PENDING' ? (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 leading-relaxed">
+          <div className="rounded-none border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 leading-relaxed">
             Cash payment requested. Please see the cashier at the counter. Your bill will close after staff confirms payment.
           </div>
         ) : bill.status === 'PAYMENT_PENDING' ? (
-          <div className="rounded-2xl border border-[#0F3D2E]/20 bg-emerald-50/60 p-4 text-sm text-[#0F3D2E] leading-relaxed">
+          <div className="rounded-none border border-[#0F3D2E]/20 bg-emerald-50/60 p-4 text-sm text-[#0F3D2E] leading-relaxed">
             Online payment submitted. Waiting for secure payment provider confirmation…
           </div>
         ) : bill.dueAmount > 0 ? (
@@ -197,7 +197,7 @@ export default function BillPage() {
               type="button"
               onClick={payOnline}
               disabled={payingOnline}
-              className="btn-primary min-h-[46px] flex items-center justify-center gap-2 py-3.5 rounded-full shadow-sm"
+              className="btn-primary min-h-[46px] flex items-center justify-center gap-2 py-3.5 rounded-none shadow-sm"
             >
               {payingOnline ? <Loader2 size={18} className="animate-spin" /> : <CreditCard size={18} />}
               <span>Pay ₹{bill.dueAmount} Online</span>
@@ -206,14 +206,14 @@ export default function BillPage() {
               type="button"
               onClick={requestCash}
               disabled={requestingCash}
-              className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 py-3.5 rounded-full"
+              className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 py-3.5 rounded-none"
             >
               {requestingCash ? <Loader2 size={18} className="animate-spin" /> : <Banknote size={18} />}
               <span>Pay Cash at Counter</span>
             </button>
           </div>
         ) : (
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-center text-sm font-semibold text-emerald-800">
+          <div className="rounded-none border border-emerald-200 bg-emerald-50 p-4 text-center text-sm font-semibold text-emerald-800">
             Bill fully settled. Thank you for dining with us!
           </div>
         )}

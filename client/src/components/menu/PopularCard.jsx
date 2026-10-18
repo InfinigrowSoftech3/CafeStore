@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Minus, Clock, Utensils } from 'lucide-react';
+import { Plus, Minus, Clock, Utensils, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useCartStore from '../../context/cartStore';
 import { useTenant } from '../../context/TenantContext';
@@ -77,108 +77,112 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
   return (
     <div
       onClick={isAvailable ? () => onSelect(product) : undefined}
-      className={`group relative aspect-square w-[170px] min-w-[170px] min-[390px]:w-[185px] min-[390px]:min-w-[185px] sm:w-[205px] sm:min-w-[205px] shrink-0 snap-start rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#0F3D2E]/5 shadow-[0_4px_16px_rgba(15,61,46,0.06)] border border-[#0F3D2E]/10 select-none transition-all duration-200 ${
-        isAvailable
-          ? 'cursor-pointer hover:shadow-lg hover:scale-[1.02]'
-          : 'opacity-60 grayscale-[40%] cursor-default'
+      className={`group w-[180px] min-w-[180px] sm:w-[205px] sm:min-w-[205px] shrink-0 snap-start rounded-none bg-white border border-stone-200 overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all select-none ${
+        isAvailable ? 'cursor-pointer' : 'opacity-60 grayscale-[40%] cursor-default'
       }`}
     >
-      {/* Background Image filling full square card */}
-      {product.image && !imgError ? (
-        <img
-          src={product.image}
-          alt={product.name}
-          loading="lazy"
-          decoding="async"
-          onError={() => setImgError(true)}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center bg-[#0F3D2E]/10 text-[#0F3D2E]/40">
-          <Utensils size={32} strokeWidth={1.5} />
+      {/* ─── Top Square Image Section ─── */}
+      <div className="relative w-full aspect-square bg-stone-100 border-b border-stone-200 overflow-hidden">
+        {product.image && !imgError ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImgError(true)}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-stone-100 text-stone-400">
+            <Utensils size={28} strokeWidth={1.5} />
+          </div>
+        )}
+
+        {/* Top-Left: Veg Mark */}
+        <div className="absolute top-2 left-2 z-10">
+          <VegMark isVeg={product.isVeg} size={14} />
         </div>
-      )}
 
-      {/* Top-Left: Veg Mark Badge */}
-      <div className="absolute top-2.5 left-2.5 z-10">
-        <VegMark isVeg={product.isVeg} size={16} />
-      </div>
+        {/* Top-Right: Prep Time Badge */}
+        {product.prepTime && (
+          <div className="absolute top-2 right-2 z-10 inline-flex items-center gap-1 bg-black/75 px-1.5 py-0.5 rounded-none text-[10px] font-jakarta font-semibold text-white">
+            <Clock size={10} className="text-white/80" />
+            <span>{product.prepTime}m</span>
+          </div>
+        )}
 
-      {/* Top-Right: Prep Time Badge */}
-      {product.prepTime && (
-        <div className="absolute top-2.5 right-2.5 z-10 inline-flex items-center gap-1 bg-black/65 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] min-[390px]:text-[11px] font-jakarta font-semibold text-white shadow-xs">
-          <Clock size={11} className="text-white/80" />
-          <span>{product.prepTime}m</span>
-        </div>
-      )}
-
-      {/* Sold Out Overlay */}
-      {!isAvailable && (
-        <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-[2px] flex items-center justify-center">
-          <span className="rounded-full bg-[#E53935] text-white text-xs font-sora font-extrabold px-3 py-1 shadow-md">
-            Sold out
-          </span>
-        </div>
-      )}
-
-      {/* Bottom Gradient Overlay with Title, Price, and Action Button */}
-      <div className="absolute inset-x-0 bottom-0 pt-16 pb-2.5 min-[390px]:pb-3 px-2.5 min-[390px]:px-3.5 bg-gradient-to-t from-black/95 via-black/60 to-transparent flex items-end justify-between gap-2 z-10">
-        {/* Title and Price */}
-        <div className="min-w-0 flex-1 pr-1">
-          <h4 className="font-sora font-bold text-xs min-[390px]:text-sm sm:text-base text-white leading-tight line-clamp-1 drop-shadow-sm group-hover:text-[#FFF1C9] transition-colors">
-            {product.name}
-          </h4>
-          <div className="flex items-baseline gap-1 mt-0.5 min-[390px]:mt-1">
-            <span className="font-sora font-extrabold text-xs min-[390px]:text-sm sm:text-base text-white drop-shadow-sm">
-              {formatMoney(product.price, tenant.currency)}
+        {/* Sold Out Overlay */}
+        {!isAvailable && (
+          <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-[1px] flex items-center justify-center">
+            <span className="bg-stone-900 text-white text-[10px] font-sora font-extrabold px-2 py-0.5 uppercase tracking-wider rounded-none border border-white/20">
+              Sold out
             </span>
           </div>
+        )}
+      </div>
+
+      {/* ─── Bottom Info on Pure White ─── */}
+      <div className="p-3 bg-white flex flex-col justify-between flex-1">
+        <div>
+          <h4 className="font-sora font-bold text-xs sm:text-sm text-stone-900 leading-snug line-clamp-1 group-hover:text-[#0F3D2E] transition-colors">
+            {product.name}
+          </h4>
+          {product.description && (
+            <p className="text-[11px] text-stone-500 font-jakarta line-clamp-1 mt-0.5 leading-tight">
+              {product.description}
+            </p>
+          )}
         </div>
 
-        {/* Action Button: Red/Orange Circle with White Plus or Stepper */}
-        <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
-          {!isAvailable ? null : totalQtyInCart > 0 && !hasCustomizations ? (
-            /* Compact Stepper */
-            <div className="inline-flex items-center gap-1 rounded-full bg-[#E53935] text-white p-1 shadow-md">
+        <div className="mt-2.5 flex items-center justify-between gap-2 pt-2 border-t border-stone-100">
+          <span className="font-sora font-extrabold text-xs sm:text-sm text-[#0F3D2E]">
+            {formatMoney(product.price, tenant.currency)}
+          </span>
+
+          <div onClick={(e) => e.stopPropagation()}>
+            {!isAvailable ? null : totalQtyInCart > 0 && !hasCustomizations ? (
+              <div className="inline-flex items-center bg-[#0F3D2E] text-white rounded-none border border-[#0F3D2E]">
+                <button
+                  type="button"
+                  onClick={handleDecrement}
+                  aria-label={`Decrease ${product.name}`}
+                  className="w-6 h-6 flex items-center justify-center hover:bg-white/20 active:scale-90"
+                >
+                  <Minus size={11} strokeWidth={2.6} />
+                </button>
+                <span className="font-sora font-extrabold text-[11px] px-1 min-w-[16px] text-center">
+                  {totalQtyInCart}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleIncrement}
+                  aria-label={`Increase ${product.name}`}
+                  className="w-6 h-6 flex items-center justify-center hover:bg-white/20 active:scale-90"
+                >
+                  <Plus size={11} strokeWidth={2.6} />
+                </button>
+              </div>
+            ) : totalQtyInCart > 0 && hasCustomizations ? (
               <button
                 type="button"
-                onClick={handleDecrement}
-                aria-label={`Decrease quantity of ${product.name}`}
-                className="w-6 h-6 min-[390px]:w-7 min-[390px]:h-7 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center active:scale-90 transition"
+                onClick={() => onSelect(product)}
+                aria-label={`Customize ${product.name}`}
+                className="h-6 px-2 bg-[#0F3D2E] text-[#FFF1C9] font-sora font-extrabold text-[10px] uppercase rounded-none border border-[#0F3D2E]"
               >
-                <Minus size={13} strokeWidth={2.6} />
+                <span>{totalQtyInCart} IN</span>
               </button>
-              <span className="font-sora font-extrabold text-xs px-1 min-w-[16px] text-center text-white">
-                {totalQtyInCart}
-              </span>
+            ) : (
               <button
                 type="button"
-                onClick={handleIncrement}
-                aria-label={`Increase quantity of ${product.name}`}
-                className="w-6 h-6 min-[390px]:w-7 min-[390px]:h-7 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center active:scale-90 transition"
+                onClick={handleQuickAdd}
+                aria-label={`Add ${product.name}`}
+                className="h-6 px-2.5 bg-white text-[#0F3D2E] font-sora font-extrabold text-[10px] uppercase tracking-wider border border-[#0F3D2E] hover:bg-[#0F3D2E] hover:text-white rounded-none flex items-center gap-0.5"
               >
-                <Plus size={13} strokeWidth={2.6} />
+                <span>ADD</span>
+                <Plus size={11} strokeWidth={3} />
               </button>
-            </div>
-          ) : totalQtyInCart > 0 && hasCustomizations ? (
-            <button
-              type="button"
-              onClick={() => onSelect(product)}
-              aria-label={`Customize ${product.name}`}
-              className="w-8 h-8 min-[390px]:w-9 min-[390px]:h-9 sm:w-10 sm:h-10 rounded-full bg-[#E53935] hover:bg-[#D32F2F] text-white flex items-center justify-center font-sora font-extrabold text-xs shadow-md active:scale-90 transition-transform"
-            >
-              <span>{totalQtyInCart}</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleQuickAdd}
-              aria-label={`Add ${product.name} to order`}
-              className="w-8 h-8 min-[390px]:w-9 min-[390px]:h-9 sm:w-10 sm:h-10 rounded-full bg-[#E53935] hover:bg-[#D32F2F] text-white flex items-center justify-center shadow-md active:scale-90 transition-transform"
-            >
-              <Plus size={18} strokeWidth={2.8} />
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

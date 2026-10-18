@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Minus, Clock, Utensils } from 'lucide-react';
+import { Plus, Minus, Clock, Utensils, Star, SlidersHorizontal } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useCartStore from '../../context/cartStore';
 import { useTenant } from '../../context/TenantContext';
@@ -77,113 +77,139 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
   return (
     <article
       onClick={isAvailable ? () => onSelect(product) : undefined}
-      className={`group relative aspect-square w-full rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#0F3D2E]/5 shadow-[0_4px_16px_rgba(15,61,46,0.06)] border border-[#0F3D2E]/10 select-none transition-all duration-200 ${
+      className={`group relative w-full bg-white p-4 sm:p-5 flex flex-row items-start justify-between gap-3 sm:gap-4 select-none transition-colors border-b border-stone-200 last:border-b-0 ${
         isAvailable
-          ? 'cursor-pointer hover:shadow-lg hover:scale-[1.02]'
+          ? 'cursor-pointer hover:bg-stone-50/70'
           : 'opacity-60 grayscale-[40%] cursor-default'
       }`}
     >
-      {/* Background Image filling full square card */}
-      {product.image && !imgError ? (
-        <img
-          src={product.image}
-          alt={product.name}
-          loading="lazy"
-          decoding="async"
-          onError={() => setImgError(true)}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center bg-[#0F3D2E]/10 text-[#0F3D2E]/40">
-          <Utensils size={32} strokeWidth={1.5} />
-        </div>
-      )}
+      {/* ─── Left: Food Information (Title, Badges, Price, Description) ─── */}
+      <div className="flex-1 min-w-0 pr-1 sm:pr-2">
+        {/* Top Badges Row: Veg Mark + Popular Tag + Prep Time */}
+        <div className="flex flex-wrap items-center gap-2 mb-1.5">
+          <VegMark isVeg={product.isVeg} size={15} />
 
-      {/* Top-Left: Veg Mark Badge */}
-      <div className="absolute top-2.5 left-2.5 z-10">
-        <VegMark isVeg={product.isVeg} size={16} />
+          {product.popular && (
+            <span className="inline-flex items-center gap-1 rounded-none bg-[#FFF1C9] border border-amber-300 px-2 py-0.5 text-[10px] font-sora font-extrabold text-[#0F3D2E] tracking-wider uppercase">
+              <Star size={9} fill="currentColor" />
+              <span>Bestseller</span>
+            </span>
+          )}
+
+          {product.prepTime && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-jakarta font-medium text-stone-500">
+              <Clock size={11} className="text-stone-400" />
+              <span>{product.prepTime} mins</span>
+            </span>
+          )}
+        </div>
+
+        {/* Product Title */}
+        <h3 className="font-sora font-bold text-base sm:text-lg text-stone-900 leading-snug group-hover:text-[#0F3D2E] transition-colors">
+          {product.name}
+        </h3>
+
+        {/* Product Price */}
+        <div className="flex items-baseline gap-2 mt-1">
+          <span className="font-sora font-extrabold text-sm sm:text-base text-[#0F3D2E]">
+            {formatMoney(product.price, tenant.currency)}
+          </span>
+          {product.originalPrice && product.originalPrice > product.price && (
+            <span className="text-xs text-stone-400 line-through tabular-nums font-jakarta">
+              {formatMoney(product.originalPrice, tenant.currency)}
+            </span>
+          )}
+        </div>
+
+        {/* Product Description */}
+        {product.description && (
+          <p className="mt-2 text-xs sm:text-sm text-stone-500 font-jakarta leading-relaxed line-clamp-2 sm:line-clamp-3">
+            {product.description}
+          </p>
+        )}
+
+        {/* Customisable Indicator */}
+        {hasCustomizations && (
+          <div className="mt-2.5 inline-flex items-center gap-1 text-[11px] font-sora font-semibold text-[#0F3D2E]">
+            <SlidersHorizontal size={11} />
+            <span>Customisable</span>
+          </div>
+        )}
       </div>
 
-      {/* Top-Right: Prep Time Badge */}
-      {product.prepTime && (
-        <div className="absolute top-2.5 right-2.5 z-10 inline-flex items-center gap-1 bg-black/65 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] min-[390px]:text-[11px] font-jakarta font-semibold text-white shadow-xs">
-          <Clock size={11} className="text-white/80" />
-          <span>{product.prepTime}m</span>
-        </div>
-      )}
+      {/* ─── Right: Square Food Image & Square Action Button ─── */}
+      <div className="shrink-0 flex flex-col items-center">
+        <div className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 aspect-square overflow-hidden bg-stone-100 border border-stone-200 rounded-none">
+          {product.image && !imgError ? (
+            <img
+              src={product.image}
+              alt={product.name}
+              loading="lazy"
+              decoding="async"
+              onError={() => setImgError(true)}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-stone-100 text-stone-400">
+              <Utensils size={28} strokeWidth={1.5} />
+            </div>
+          )}
 
-      {/* Sold Out Overlay */}
-      {!isAvailable && (
-        <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-[2px] flex items-center justify-center">
-          <span className="rounded-full bg-[#E53935] text-white text-xs font-sora font-extrabold px-3 py-1 shadow-md">
-            Sold out
-          </span>
-        </div>
-      )}
-
-      {/* Bottom Gradient Overlay with Title, Price, and Action Button */}
-      <div className="absolute inset-x-0 bottom-0 pt-16 pb-2.5 min-[390px]:pb-3 px-2.5 min-[390px]:px-3.5 bg-gradient-to-t from-black/95 via-black/60 to-transparent flex items-end justify-between gap-2 z-10">
-        {/* Title and Price */}
-        <div className="min-w-0 flex-1 pr-1">
-          <h3 className="font-sora font-bold text-xs min-[390px]:text-sm sm:text-base text-white leading-tight line-clamp-1 drop-shadow-sm group-hover:text-[#FFF1C9] transition-colors">
-            {product.name}
-          </h3>
-          <div className="flex items-baseline gap-1 mt-0.5 min-[390px]:mt-1">
-            <span className="font-sora font-extrabold text-xs min-[390px]:text-sm sm:text-base text-white drop-shadow-sm">
-              {formatMoney(product.price, tenant.currency)}
-            </span>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <span className="text-[10px] sm:text-xs text-white/50 line-through tabular-nums font-jakarta">
-                {formatMoney(product.originalPrice, tenant.currency)}
+          {/* Sold Out Overlay */}
+          {!isAvailable && (
+            <div className="absolute inset-0 bg-stone-900/65 backdrop-blur-[1px] flex items-center justify-center p-2 text-center">
+              <span className="bg-stone-900 text-white text-[10px] sm:text-xs font-sora font-extrabold px-2.5 py-1 uppercase tracking-wider rounded-none border border-white/20 shadow-xs">
+                Sold out
               </span>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        {/* Action Button: Red/Orange Circle with White Plus or Stepper */}
-        <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+        {/* Square ADD Button or Quantity Stepper */}
+        <div className="-mt-4 relative z-10" onClick={(e) => e.stopPropagation()}>
           {!isAvailable ? null : totalQtyInCart > 0 && !hasCustomizations ? (
-            /* Compact Stepper */
-            <div className="inline-flex items-center gap-1 rounded-full bg-[#E53935] text-white p-1 shadow-md">
+            /* Square Quantity Stepper */
+            <div className="inline-flex items-center bg-[#0F3D2E] text-white shadow-md border border-[#0F3D2E] rounded-none">
               <button
                 type="button"
                 onClick={handleDecrement}
                 aria-label={`Decrease quantity of ${product.name}`}
-                className="w-6 h-6 min-[390px]:w-7 min-[390px]:h-7 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center active:scale-90 transition"
+                className="w-8 h-8 flex items-center justify-center hover:bg-white/20 active:scale-95 transition"
               >
-                <Minus size={13} strokeWidth={2.6} />
+                <Minus size={14} strokeWidth={2.5} />
               </button>
-              <span className="font-sora font-extrabold text-xs px-1 min-w-[16px] text-center text-white">
+              <span className="font-sora font-extrabold text-xs px-2 min-w-[22px] text-center text-white">
                 {totalQtyInCart}
               </span>
               <button
                 type="button"
                 onClick={handleIncrement}
                 aria-label={`Increase quantity of ${product.name}`}
-                className="w-6 h-6 min-[390px]:w-7 min-[390px]:h-7 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center active:scale-90 transition"
+                className="w-8 h-8 flex items-center justify-center hover:bg-white/20 active:scale-95 transition"
               >
-                <Plus size={13} strokeWidth={2.6} />
+                <Plus size={14} strokeWidth={2.5} />
               </button>
             </div>
           ) : totalQtyInCart > 0 && hasCustomizations ? (
-            /* Customizable item in cart badge */
+            /* Customizable item in cart */
             <button
               type="button"
               onClick={() => onSelect(product)}
               aria-label={`Customize ${product.name}`}
-              className="w-8 h-8 min-[390px]:w-9 min-[390px]:h-9 sm:w-10 sm:h-10 rounded-full bg-[#E53935] hover:bg-[#D32F2F] text-white flex items-center justify-center font-sora font-extrabold text-xs shadow-md active:scale-90 transition-transform"
+              className="h-8 px-3.5 bg-[#0F3D2E] text-[#FFF1C9] font-sora font-extrabold text-xs uppercase tracking-wider shadow-md hover:bg-[#16503D] active:scale-95 transition rounded-none border border-[#0F3D2E] flex items-center gap-1"
             >
-              <span>{totalQtyInCart}</span>
+              <span>{totalQtyInCart} IN CART</span>
             </button>
           ) : (
-            /* Round Red/Orange Action Button with White Plus */
+            /* Square ADD Button */
             <button
               type="button"
               onClick={handleQuickAdd}
               aria-label={`Add ${product.name} to order`}
-              className="w-8 h-8 min-[390px]:w-9 min-[390px]:h-9 sm:w-10 sm:h-10 rounded-full bg-[#E53935] hover:bg-[#D32F2F] text-white flex items-center justify-center shadow-md active:scale-90 transition-transform"
+              className="h-8 px-4 sm:px-5 bg-white text-[#0F3D2E] font-sora font-extrabold text-xs uppercase tracking-wider shadow-md border-2 border-[#0F3D2E] hover:bg-[#0F3D2E] hover:text-white active:scale-95 transition rounded-none flex items-center gap-1"
             >
-              <Plus size={18} strokeWidth={2.8} />
+              <span>ADD</span>
+              <Plus size={14} strokeWidth={3} />
             </button>
           )}
         </div>

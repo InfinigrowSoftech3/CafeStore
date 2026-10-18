@@ -89,7 +89,7 @@ export default function ReceiptPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FAFAF8]">
+      <div className="flex min-h-screen items-center justify-center bg-white">
         <Loader2 className="animate-spin text-[#0F3D2E]" size={32} />
       </div>
     );
@@ -97,14 +97,14 @@ export default function ReceiptPage() {
 
   if (!receipt) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#FAFAF8] p-8 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-white p-8 text-center">
         <p className="font-display text-2xl font-bold text-[#0F3D2E]">
           Order receipt not found.
         </p>
         <p className="text-sm text-stone-600 max-w-sm">
           Please check your order confirmation link or return to the menu.
         </p>
-        <Link to="/menu" className="btn-primary min-h-[44px] inline-flex items-center justify-center px-6 rounded-full shadow-sm">
+        <Link to="/menu" className="btn-primary min-h-[44px] inline-flex items-center justify-center px-6 rounded-none shadow-sm">
           Back to Menu
         </Link>
       </div>
@@ -112,11 +112,11 @@ export default function ReceiptPage() {
   }
 
   return (
-    <div className="receipt-page min-h-screen bg-[#FAFAF8] px-3 py-6 sm:px-6 sm:py-8">
+    <div className="receipt-page min-h-screen bg-white px-3 py-6 sm:px-6 sm:py-8">
       <div className="receipt-actions mx-auto mb-5 flex max-w-md flex-wrap items-center justify-between gap-2.5">
         <Link
           to="/orders"
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 transition shadow-2xs"
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-none border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 transition shadow-2xs"
         >
           <ArrowLeft size={16} />
           <span>My Orders</span>
@@ -125,7 +125,7 @@ export default function ReceiptPage() {
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-stone-200 bg-white px-3.5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 transition shadow-2xs"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-none border border-stone-300 bg-white px-3.5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 transition shadow-2xs"
           >
             <Printer size={16} />
             <span>Print</span>
@@ -134,7 +134,7 @@ export default function ReceiptPage() {
             type="button"
             onClick={handleDownload}
             disabled={downloading}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0F3D2E] px-4 py-2 text-sm font-bold text-white disabled:opacity-60 hover:bg-[#16503D] transition shadow-2xs"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-none bg-[#0F3D2E] px-4 py-2 text-sm font-bold text-white disabled:opacity-60 hover:bg-[#16503D] transition shadow-2xs"
           >
             <Download size={16} />
             <span>{downloading ? 'Preparing...' : 'Download'}</span>
@@ -142,7 +142,7 @@ export default function ReceiptPage() {
           <button
             type="button"
             onClick={shareReceipt}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-stone-200 bg-white px-3.5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 transition shadow-2xs"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-none border border-stone-300 bg-white px-3.5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 transition shadow-2xs"
           >
             <Share2 size={16} />
             <span>Share</span>
@@ -150,7 +150,7 @@ export default function ReceiptPage() {
         </div>
       </div>
 
-      <article className="receipt-sheet mx-auto max-w-md bg-white border border-stone-200/80 px-5 py-7 shadow-sm rounded-3xl sm:px-7 sm:py-8">
+      <article className="receipt-sheet mx-auto max-w-md bg-white border border-stone-200 px-5 py-7 shadow-sm rounded-none sm:px-7 sm:py-8">
         <header className="border-b border-stone-200 pb-6 text-center">
           <p className="font-display text-3xl font-bold tracking-[0.08em] text-[#0F3D2E]">
             {receipt.tenant?.name || 'Café'}
@@ -169,7 +169,7 @@ export default function ReceiptPage() {
               {receipt.tenant?.gstNumber && <span>· GSTIN: {receipt.tenant.gstNumber}</span>}
             </div>
           </div>
-          <p className="mt-5 font-mono text-sm font-bold text-stone-800 bg-stone-100 py-1 rounded-full inline-block px-3.5 border border-stone-200">
+          <p className="mt-5 font-mono text-sm font-bold text-stone-800 bg-stone-100 py-1 rounded-none inline-block px-3.5 border border-stone-200">
             {receipt.receiptNumber}
           </p>
         </header>

@@ -104,17 +104,17 @@ export default function GalleryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] text-stone-900">
-      <div className="border-b border-stone-200/80 bg-white/95 backdrop-blur-md px-4 py-3 sm:px-6">
+    <div className="min-h-screen bg-white text-stone-900">
+      <div className="border-b border-stone-200 bg-white/95 backdrop-blur-md px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <Link
             to="/menu"
-            className="inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-stone-700 transition hover:text-[#0F3D2E]"
+            className="inline-flex min-h-[38px] items-center gap-2 text-sm font-semibold text-stone-700 transition hover:text-stone-900"
           >
             <ArrowLeft size={16} />
             <span>Back to menu</span>
           </Link>
-          <span className="text-xs uppercase tracking-widest text-[#0F3D2E] font-bold">
+          <span className="text-xs uppercase tracking-widest text-stone-900 font-bold">
             Guest Wall
           </span>
         </div>
@@ -124,16 +124,16 @@ export default function GalleryPage() {
         <section className="grid items-end gap-8 lg:grid-cols-[1fr_0.8fr]">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0F3D2E]">{tenant.name} community</p>
-            <h1 className="mt-3 max-w-2xl font-display text-4xl font-bold leading-[1.05] text-[#0F3D2E] sm:text-5xl lg:text-6xl">
+            <h1 className="mt-3 max-w-2xl font-display text-4xl font-bold leading-[1.05] text-stone-900 sm:text-5xl lg:text-6xl">
               Good food looks better together.
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-stone-600">
               See the dishes, beverages, and warm moments our guests have shared. Add yours to the wall.
             </p>
           </div>
-          <div className="rounded-3xl bg-[#0F3D2E] p-6 text-white shadow-xl shadow-[#0F3D2E]/10 sm:p-8">
+          <div className="rounded-none bg-[#0F3D2E] p-6 text-white shadow-2xs sm:p-8">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FFF1C9] text-[#0F3D2E]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-none bg-stone-100 text-[#0F3D2E]">
                 <Camera size={21} />
               </div>
               <div>
@@ -147,17 +147,17 @@ export default function GalleryPage() {
         <section className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {loading ? (
             <div className="col-span-full flex min-h-56 items-center justify-center text-stone-400">
-              <Loader2 size={28} className="animate-spin text-[#0F3D2E]" />
+              <Loader2 size={28} className="animate-spin text-stone-900" />
             </div>
           ) : items.length === 0 ? (
-            <div className="col-span-full rounded-3xl border border-dashed border-stone-200 bg-white px-6 py-16 text-center shadow-2xs">
-              <ImagePlus className="mx-auto text-[#0F3D2E]" size={32} />
-              <h2 className="mt-4 font-display text-2xl font-bold text-[#0F3D2E]">Be the first on the wall</h2>
+            <div className="col-span-full rounded-none border border-dashed border-stone-300 bg-white px-6 py-16 text-center shadow-2xs">
+              <ImagePlus className="mx-auto text-stone-900" size={32} />
+              <h2 className="mt-4 font-display text-2xl font-bold text-stone-900">Be the first on the wall</h2>
               <p className="mt-2 text-sm text-stone-500">Share your {tenant.name} moment below.</p>
             </div>
           ) : (
             items.map((item) => (
-              <article key={item._id} className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xs transition hover:-translate-y-1 hover:shadow-md">
+              <article key={item._id} className="group overflow-hidden rounded-none border border-stone-200 bg-white shadow-2xs transition hover:border-stone-400">
                 <div className="aspect-[4/3] overflow-hidden bg-stone-100">
                   <img
                     src={item.imageUrl}
@@ -182,10 +182,10 @@ export default function GalleryPage() {
           )}
         </section>
 
-        <section className="mt-14 grid gap-8 rounded-3xl border border-stone-200/80 bg-white p-6 shadow-xs sm:p-8 lg:grid-cols-[0.85fr_1.15fr] lg:p-10">
+        <section className="mt-14 grid gap-8 rounded-none border border-stone-200 bg-white p-6 shadow-2xs sm:p-8 lg:grid-cols-[0.85fr_1.15fr] lg:p-10">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#0F3D2E]">Leave a little love</p>
-            <h2 className="mt-3 font-display text-4xl font-bold text-[#0F3D2E]">Add your moment</h2>
+            <h2 className="mt-3 font-display text-4xl font-bold text-stone-900">Add your moment</h2>
             <p className="mt-4 text-sm leading-7 text-stone-600">
               Tell the next guest what you ordered, who you came with, or what made you stay a little longer.
             </p>
@@ -201,7 +201,7 @@ export default function GalleryPage() {
                   maxLength={60}
                   value={form.customerName}
                   onChange={(event) => setForm({ ...form, customerName: event.target.value })}
-                  className="input-field mt-2 text-base"
+                  className="input-field mt-2 text-base rounded-none"
                   placeholder="Aarav"
                 />
               </label>
@@ -221,7 +221,7 @@ export default function GalleryPage() {
                 maxLength={500}
                 value={form.review}
                 onChange={(event) => setForm({ ...form, review: event.target.value })}
-                className="input-field mt-2 min-h-28 resize-y text-base"
+                className="input-field mt-2 min-h-28 resize-y text-base rounded-none"
                 placeholder="The pour-over and artisanal sandwich were wonderful..."
               />
             </label>
@@ -229,20 +229,20 @@ export default function GalleryPage() {
             <div>
               <div className="text-sm font-semibold text-stone-800">Your photo (optional)</div>
               {preview ? (
-                <div className="relative mt-2 overflow-hidden rounded-2xl border border-stone-200 bg-stone-50">
+                <div className="relative mt-2 overflow-hidden rounded-none border border-stone-200 bg-stone-50">
                   <img src={preview} alt="Selected preview" width={400} height={200} className="h-48 w-full object-cover" />
                   <button
                     type="button"
                     onClick={() => { setPhoto(null); setPreview(''); }}
-                    className="absolute right-3 top-3 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-stone-900/80 text-white hover:bg-stone-900 transition"
+                    className="absolute right-3 top-3 inline-flex min-h-[38px] min-w-[38px] items-center justify-center rounded-none bg-stone-900/90 text-white hover:bg-stone-900 transition"
                     aria-label="Remove selected photo"
                   >
                     <X size={18} />
                   </button>
                 </div>
               ) : (
-                <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-8 text-center transition hover:border-[#0F3D2E] hover:bg-stone-100">
-                  <ImagePlus className="text-[#0F3D2E]" size={26} />
+                <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-none border border-dashed border-stone-300 bg-stone-50 px-4 py-8 text-center transition hover:border-stone-900 hover:bg-stone-100">
+                  <ImagePlus className="text-stone-900" size={26} />
                   <span className="mt-2 text-sm font-semibold text-stone-800">Choose a photo</span>
                   <span className="mt-1 text-xs text-stone-400">JPG, PNG, or WEBP up to 5MB</span>
                   <input type="file" accept="image/jpeg,image/png,image/webp" onChange={choosePhoto} className="sr-only" />
@@ -253,7 +253,7 @@ export default function GalleryPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="btn-primary inline-flex min-h-[46px] w-full items-center justify-center gap-2 sm:w-auto px-7 rounded-full shadow-sm"
+              className="btn-primary inline-flex min-h-[44px] w-full items-center justify-center gap-2 sm:w-auto px-7 rounded-none shadow-2xs"
             >
               {submitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
               <span>{submitting ? 'Publishing...' : 'Publish review'}</span>

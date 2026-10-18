@@ -110,33 +110,30 @@ export default function ProductModal({ product, onClose }) {
         exit={{ y: '100%', opacity: 0 }}
         transition={{ type: 'spring', damping: 28, stiffness: 360 }}
         onClick={e => e.stopPropagation()}
-        className="bg-[#FFFDF7] w-full sm:max-w-lg sm:rounded-[32px] rounded-t-[32px] overflow-hidden
-                   max-h-[92vh] sm:max-h-[88vh] flex flex-col shadow-[0_20px_50px_rgba(15,61,46,0.25)] border border-[#0F3D2E]/12"
+        className="bg-white w-full sm:max-w-lg rounded-none overflow-hidden max-h-[92vh] sm:max-h-[88vh] flex flex-col shadow-2xl border border-stone-200"
       >
         {/* Mobile Swipe / Drag Handle */}
-        <div className="sm:hidden flex items-center justify-center pt-2.5 pb-1 bg-[#FFFDF7]">
-          <div className="w-10 h-1.5 rounded-full bg-[#0F3D2E]/20" />
+        <div className="sm:hidden flex items-center justify-center pt-2.5 pb-1 bg-white">
+          <div className="w-10 h-1 rounded-none bg-stone-300" />
         </div>
 
         {/* Hero Image Section */}
-        <div className="relative h-60 sm:h-64 flex-shrink-0 bg-[#0F3D2E]/5 overflow-hidden">
+        <div className="relative h-60 sm:h-64 flex-shrink-0 bg-stone-100 overflow-hidden">
           <img
             src={product.image || PLACEHOLDER}
             alt={product.name}
             className={`w-full h-full object-cover transition-opacity duration-300 ${!isAvailable ? 'opacity-50 grayscale' : ''}`}
             onError={e => { e.currentTarget.src = PLACEHOLDER; }}
           />
-          {/* Deep Forest Green Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0F3D2E] via-[#0F3D2E]/45 to-black/25" />
+          {/* Subtle Contrast Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
 
-          {/* Close button - Butter & Green Theme */}
+          {/* Close button */}
           <button
             type="button"
             onClick={onClose}
             aria-label="Close product modal"
-            className="absolute top-3.5 right-3.5 min-h-[38px] min-w-[38px] w-9.5 h-9.5 bg-[#FFF1C9] hover:bg-white text-[#0F3D2E]
-                       rounded-full flex items-center justify-center shadow-md border border-[#0F3D2E]/10
-                       transition-all active:scale-90 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]"
+            className="absolute top-3.5 right-3.5 min-h-[36px] min-w-[36px] w-9 h-9 bg-white hover:bg-stone-100 text-stone-900 rounded-none flex items-center justify-center shadow-sm border border-stone-300 transition-all active:scale-95 focus:outline-none focus:ring-1 focus:ring-stone-900"
           >
             <X size={18} strokeWidth={2.4} aria-hidden="true" />
           </button>
@@ -144,14 +141,14 @@ export default function ProductModal({ product, onClose }) {
           {/* Badges on Hero */}
           <div className="absolute top-3.5 left-4 flex flex-wrap items-center gap-1.5">
             {/* Veg / Non-Veg Badge */}
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-md px-2.5 py-1 text-[11px] font-sora font-bold text-[#0F3D2E] shadow-xs border border-[#0F3D2E]/10">
+            <span className="inline-flex items-center gap-1.5 rounded-none bg-white px-2.5 py-1 text-[11px] font-sora font-bold text-stone-900 shadow-2xs border border-stone-200">
               <VegMark isVeg={product.isVeg} size={13} />
               <span>{product.isVeg !== false ? 'VEG' : 'NON-VEG'}</span>
             </span>
 
             {/* Popular Badge */}
             {product.popular && isAvailable && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0F3D2E] text-[#FFF1C9] border border-[#FFF1C9]/30 px-2.5 py-1 text-[11px] font-sora font-bold shadow-xs">
+              <span className="inline-flex items-center gap-1.5 rounded-none bg-[#0F3D2E] text-white border border-[#0F3D2E] px-2.5 py-1 text-[11px] font-sora font-bold shadow-2xs">
                 <Sparkles size={11} className="text-[#FFF1C9]" />
                 <span>POPULAR</span>
               </span>
@@ -161,17 +158,17 @@ export default function ProductModal({ product, onClose }) {
           {/* Bottom title & price overlay */}
           <div className="absolute bottom-3.5 left-4 right-4 flex items-end justify-between gap-3">
             <div>
-              <h2 className="font-sora text-xl sm:text-2xl font-extrabold text-[#FFF1C9] drop-shadow-sm leading-tight tracking-tight">
+              <h2 className="font-sora text-xl sm:text-2xl font-extrabold text-white drop-shadow-sm leading-tight tracking-tight">
                 {product.name}
               </h2>
               {product.prepTime && (
-                <span className="inline-flex items-center gap-1 text-xs text-[#FFF1C9]/90 font-jakarta font-semibold mt-1">
-                  <Clock size={12} className="text-[#FFF1C9]" /> Prep time: ~{product.prepTime} mins
+                <span className="inline-flex items-center gap-1 text-xs text-white/90 font-jakarta font-semibold mt-1">
+                  <Clock size={12} className="text-white" /> Prep time: ~{product.prepTime} mins
                 </span>
               )}
             </div>
             <div className="text-right shrink-0">
-              <span className="font-sora text-xl sm:text-2xl font-extrabold text-[#FFF1C9] drop-shadow-sm">
+              <span className="font-sora text-xl sm:text-2xl font-extrabold text-white drop-shadow-sm">
                 {formatMoney(basePrice, tenant.currency)}
               </span>
             </div>
@@ -179,11 +176,11 @@ export default function ProductModal({ product, onClose }) {
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#FFFDF7] no-scrollbar">
+        <div className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-white no-scrollbar">
           {/* Description */}
           {product.description && (
-            <div className="rounded-[20px] bg-[#FFF1C9]/45 p-4 border border-[#0F3D2E]/10 shadow-2xs">
-              <p className="text-[#0F3D2E]/85 text-sm font-jakarta font-medium leading-relaxed">
+            <div className="rounded-none bg-stone-50 p-4 border border-stone-200 shadow-2xs">
+              <p className="text-stone-700 text-sm font-jakarta font-medium leading-relaxed">
                 {product.description}
               </p>
             </div>
@@ -193,10 +190,10 @@ export default function ProductModal({ product, onClose }) {
           {variants.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-2.5">
-                <p className="text-xs font-sora font-extrabold uppercase tracking-wider text-[#0F3D2E]">
+                <p className="text-xs font-sora font-extrabold uppercase tracking-wider text-stone-900">
                   Select Size / Option <span className="text-[var(--menu-accent,#C93A1C)]">*</span>
                 </p>
-                <span className="text-[11px] font-sora font-semibold text-[#0F3D2E]/50">Required</span>
+                <span className="text-[11px] font-sora font-semibold text-stone-500">Required</span>
               </div>
               <div className="grid grid-cols-2 gap-2.5">
                 {variants.map(v => {
@@ -206,21 +203,21 @@ export default function ProductModal({ product, onClose }) {
                       key={v.name}
                       type="button"
                       onClick={() => setSelectedVariant(v)}
-                      className={`min-h-[50px] flex items-center justify-between p-3.5 rounded-2xl border transition-all text-left ${
+                      className={`min-h-[48px] flex items-center justify-between p-3 rounded-none border transition-all text-left ${
                         isSelected
-                          ? 'border-[#0F3D2E] bg-[#FFF1C9]/70 text-[#0F3D2E] font-sora font-bold ring-2 ring-[#0F3D2E] shadow-2xs'
-                          : 'border-[#0F3D2E]/12 bg-white text-[#0F3D2E]/80 hover:border-[#0F3D2E]/35 font-jakarta font-semibold shadow-2xs'
+                          ? 'border-stone-900 bg-stone-50 text-stone-900 font-sora font-bold ring-1 ring-stone-900'
+                          : 'border-stone-200 bg-white text-stone-700 hover:border-stone-400 font-jakarta font-semibold'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          isSelected ? 'border-[#0F3D2E] bg-[#0F3D2E]' : 'border-[#0F3D2E]/30 bg-white'
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3.5 h-3.5 rounded-none border flex items-center justify-center ${
+                          isSelected ? 'border-stone-900 bg-stone-900' : 'border-stone-400 bg-white'
                         }`}>
-                          {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-[#FFF1C9]" />}
+                          {isSelected && <span className="w-1.5 h-1.5 bg-white" />}
                         </div>
                         <span className="text-xs font-sora font-bold">{v.name}</span>
                       </div>
-                      <span className="text-xs font-sora font-extrabold text-[#0F3D2E]">
+                      <span className="text-xs font-sora font-extrabold text-stone-900">
                         {v.price > 0 ? `+${formatMoney(v.price, tenant.currency)}` : 'Standard'}
                       </span>
                     </button>
@@ -233,7 +230,7 @@ export default function ProductModal({ product, onClose }) {
           {/* Milk Options */}
           {milkAddons.length > 0 && (
             <div>
-              <p className="text-xs font-sora font-extrabold uppercase tracking-wider text-[#0F3D2E] mb-2.5">
+              <p className="text-xs font-sora font-extrabold uppercase tracking-wider text-stone-900 mb-2.5">
                 Choice of Milk
               </p>
               <div className="grid grid-cols-2 gap-2.5">
@@ -245,14 +242,14 @@ export default function ProductModal({ product, onClose }) {
                       type="button"
                       onClick={() => toggleAddon(milk)}
                       aria-pressed={selected}
-                      className={`min-h-[46px] flex items-center justify-between p-3.5 rounded-2xl border text-xs transition-all ${
+                      className={`min-h-[44px] flex items-center justify-between p-3 rounded-none border text-xs transition-all ${
                         selected
-                          ? 'border-[#0F3D2E] bg-[#FFF1C9]/70 text-[#0F3D2E] ring-2 ring-[#0F3D2E] font-sora font-bold shadow-2xs'
-                          : 'border-[#0F3D2E]/12 bg-white text-[#0F3D2E]/80 hover:border-[#0F3D2E]/35 font-jakarta font-semibold shadow-2xs'
+                          ? 'border-stone-900 bg-stone-50 text-stone-900 ring-1 ring-stone-900 font-sora font-bold'
+                          : 'border-stone-200 bg-white text-stone-700 hover:border-stone-400 font-jakarta font-semibold'
                       }`}
                     >
                       <span className="font-sora font-bold">{milk.name}</span>
-                      <span className="text-[#0F3D2E] font-sora font-extrabold">
+                      <span className="text-stone-900 font-sora font-extrabold">
                         +{formatMoney(milk.price, tenant.currency)}
                       </span>
                     </button>
@@ -265,7 +262,7 @@ export default function ProductModal({ product, onClose }) {
           {/* Add-ons & Extras */}
           {regularAddons.length > 0 && (
             <div>
-              <p className="text-xs font-sora font-extrabold uppercase tracking-wider text-[#0F3D2E] mb-2.5">
+              <p className="text-xs font-sora font-extrabold uppercase tracking-wider text-stone-900 mb-2.5">
                 Add-ons &amp; Extras
               </p>
               <div className="space-y-2">
@@ -276,21 +273,21 @@ export default function ProductModal({ product, onClose }) {
                       key={addon.name}
                       type="button"
                       onClick={() => toggleAddon(addon)}
-                      className={`min-h-[50px] w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
+                      className={`min-h-[48px] w-full flex items-center justify-between p-3 rounded-none border transition-all ${
                         selected
-                          ? 'border-[#0F3D2E] bg-[#FFF1C9]/70 text-[#0F3D2E] ring-2 ring-[#0F3D2E] shadow-2xs font-sora font-bold'
-                          : 'border-[#0F3D2E]/12 bg-white text-[#0F3D2E]/80 hover:border-[#0F3D2E]/35 font-jakarta font-semibold shadow-2xs'
+                          ? 'border-stone-900 bg-stone-50 text-stone-900 ring-1 ring-stone-900 font-sora font-bold'
+                          : 'border-stone-200 bg-white text-stone-700 hover:border-stone-400 font-jakarta font-semibold'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <div className={`w-4.5 h-4.5 rounded-md border flex items-center justify-center transition-colors ${
-                          selected ? 'border-[#0F3D2E] bg-[#0F3D2E] text-[#FFF1C9]' : 'border-[#0F3D2E]/30 bg-white'
+                        <div className={`w-4 h-4 rounded-none border flex items-center justify-center transition-colors ${
+                          selected ? 'border-stone-900 bg-stone-900 text-white' : 'border-stone-400 bg-white'
                         }`}>
                           {selected && <Check size={12} strokeWidth={3} />}
                         </div>
                         <span className="font-sora font-bold text-xs sm:text-sm">{addon.name}</span>
                       </div>
-                      <span className="text-xs font-sora font-extrabold text-[#0F3D2E]">
+                      <span className="text-xs font-sora font-extrabold text-stone-900">
                         +{formatMoney(addon.price, tenant.currency)}
                       </span>
                     </button>
@@ -303,10 +300,10 @@ export default function ProductModal({ product, onClose }) {
           {/* Special Instructions & Presets */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-sora font-extrabold uppercase tracking-wider text-[#0F3D2E]">
+              <p className="text-xs font-sora font-extrabold uppercase tracking-wider text-stone-900">
                 Special Instructions
               </p>
-              <span className="text-[11px] font-sora font-bold text-[#0F3D2E]/50">{instructions.length}/120</span>
+              <span className="text-[11px] font-sora font-bold text-stone-500">{instructions.length}/120</span>
             </div>
 
             {/* Quick preset chips */}
@@ -316,7 +313,7 @@ export default function ProductModal({ product, onClose }) {
                   key={preset}
                   type="button"
                   onClick={() => handlePresetInstruction(preset)}
-                  className="rounded-full border border-[#0F3D2E]/15 bg-[#FFF1C9]/50 hover:bg-[#FFF1C9] hover:border-[#0F3D2E]/40 px-3.5 py-1.5 text-xs font-sora font-bold text-[#0F3D2E] transition active:scale-95 shadow-2xs"
+                  className="rounded-none border border-stone-300 bg-stone-50 hover:bg-stone-100 hover:border-stone-400 px-3 py-1.5 text-xs font-sora font-bold text-stone-800 transition active:scale-95"
                 >
                   + {preset}
                 </button>
@@ -329,25 +326,25 @@ export default function ProductModal({ product, onClose }) {
               value={instructions}
               onChange={e => setInstructions(e.target.value)}
               maxLength={120}
-              className="w-full min-h-[46px] rounded-2xl bg-white border border-[#0F3D2E]/20 px-4 py-2.5 text-sm font-jakarta font-medium text-[#0F3D2E] placeholder:text-[#0F3D2E]/40 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E] focus:border-transparent transition shadow-2xs"
+              className="w-full min-h-[44px] rounded-none bg-white border border-stone-300 px-4 py-2.5 text-sm font-jakarta font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-900 focus:border-stone-900 transition"
             />
           </div>
         </div>
 
         {/* Modal Sticky Footer Action */}
-        <div className="p-4 sm:p-5 border-t border-[#0F3D2E]/10 bg-[#FFF1C9]/85 backdrop-blur-md flex items-center gap-3 flex-shrink-0">
+        <div className="p-4 sm:p-5 border-t border-stone-200 bg-white flex items-center gap-3 flex-shrink-0">
           {/* Quantity Stepper */}
-          <div className="flex items-center gap-1 border border-[#0F3D2E]/15 bg-white rounded-2xl p-1 shadow-2xs">
+          <div className="flex items-center gap-1 border border-stone-300 bg-white rounded-none p-1">
             <button
               type="button"
               onClick={() => changeQty(-1)}
               disabled={!isAvailable || quantity <= 1}
               aria-label="Decrease quantity"
-              className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FFF1C9]/70 text-[#0F3D2E] hover:bg-[#0F3D2E] hover:text-[#FFF1C9] transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-[#FFF1C9]/70 disabled:hover:text-[#0F3D2E] active:scale-95"
+              className="flex h-10 w-10 items-center justify-center rounded-none bg-stone-50 text-stone-900 hover:bg-stone-200 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 border border-stone-200"
             >
               <Minus size={15} strokeWidth={2.5} aria-hidden="true" />
             </button>
-            <span className="w-8 text-center font-sora font-extrabold text-base text-[#0F3D2E]">
+            <span className="w-8 text-center font-sora font-extrabold text-base text-stone-900">
               {quantity}
             </span>
             <button
@@ -355,7 +352,7 @@ export default function ProductModal({ product, onClose }) {
               onClick={() => changeQty(1)}
               disabled={!isAvailable || quantity >= maxQty}
               aria-label="Increase quantity"
-              className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FFF1C9]/70 text-[#0F3D2E] hover:bg-[#0F3D2E] hover:text-[#FFF1C9] transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-[#FFF1C9]/70 disabled:hover:text-[#0F3D2E] active:scale-95"
+              className="flex h-10 w-10 items-center justify-center rounded-none bg-stone-50 text-stone-900 hover:bg-stone-200 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 border border-stone-200"
             >
               <Plus size={15} strokeWidth={2.5} aria-hidden="true" />
             </button>
@@ -367,10 +364,10 @@ export default function ProductModal({ product, onClose }) {
             whileTap={isAvailable ? { scale: 0.98 } : {}}
             onClick={handleAdd}
             disabled={!isAvailable}
-            className={`flex-1 min-h-[52px] flex items-center justify-between py-3.5 px-5 rounded-2xl font-sora font-extrabold text-sm transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]
+            className={`flex-1 min-h-[48px] flex items-center justify-between py-3 px-5 rounded-none font-sora font-extrabold text-sm transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-stone-900
               ${!isAvailable
-                ? 'bg-[#0F3D2E]/10 text-[#0F3D2E]/40 cursor-not-allowed'
-                : 'bg-[#0F3D2E] text-[#FFF1C9] hover:bg-[#14533C] active:scale-98'
+                ? 'bg-stone-100 text-stone-400 border border-stone-300 cursor-not-allowed'
+                : 'bg-[var(--menu-accent,#C93A1C)] text-white hover:brightness-105 active:scale-98'
               }`}
           >
             <div className="flex items-center gap-2">
@@ -389,7 +386,7 @@ export default function ProductModal({ product, onClose }) {
               )}
             </div>
             {isAvailable && (
-              <span className="font-sora font-extrabold text-base text-[#FFF1C9]">
+              <span className="font-sora font-extrabold text-base text-white">
                 {formatMoney(total, tenant.currency)}
               </span>
             )}

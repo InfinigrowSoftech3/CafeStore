@@ -6,11 +6,11 @@ export function TenantNotFoundScreen({ message }) {
     <main
       id="tenant-not-found-screen"
       role="main"
-      className="flex min-h-screen flex-col items-center justify-center bg-[#FAFAF8] px-6 text-center text-stone-900"
+      className="flex min-h-screen flex-col items-center justify-center bg-white px-6 text-center text-stone-900"
     >
-      <div className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-amber-200 bg-[#FFF1C9] shadow-sm">
+      <div className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-none border border-amber-300 bg-[#FFF1C9] shadow-sm">
         <Coffee className="h-10 w-10 text-[#0F3D2E]" />
-        <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-rose-500 text-xs font-bold text-white shadow-xs">
+        <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-none bg-rose-500 text-xs font-bold text-white shadow-xs">
           ?
         </span>
       </div>
@@ -35,7 +35,7 @@ export function TenantNotFoundScreen({ message }) {
             }
             window.location.href = '/menu';
           }}
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#16503D] active:scale-95"
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-none bg-[#0F3D2E] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#16503D] active:scale-95"
         >
           <RefreshCw className="h-3.5 w-3.5" />
           <span>Browse Menu</span>
@@ -50,9 +50,9 @@ export function TenantSuspendedScreen({ message }) {
     <main
       id="tenant-suspended-screen"
       role="main"
-      className="flex min-h-screen flex-col items-center justify-center bg-[#FAFAF8] px-6 text-center text-stone-900"
+      className="flex min-h-screen flex-col items-center justify-center bg-white px-6 text-center text-stone-900"
     >
-      <div className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-amber-200 bg-[#FFF1C9] shadow-sm">
+      <div className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-none border border-amber-300 bg-[#FFF1C9] shadow-sm">
         <AlertTriangle className="h-10 w-10 text-amber-600" />
       </div>
 
@@ -68,7 +68,7 @@ export function TenantSuspendedScreen({ message }) {
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#16503D] active:scale-95"
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-none bg-[#0F3D2E] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#16503D] active:scale-95"
         >
           <RefreshCw className="h-3.5 w-3.5" />
           <span>Check Again</span>

@@ -48,8 +48,8 @@ export default function LegalPage() {
   });
 
   return (
-    <main className="min-h-[70vh] bg-[#FAFAF8] px-4 py-10 text-stone-900 sm:px-6">
-      <article className="mx-auto max-w-3xl rounded-3xl border border-stone-200/80 bg-white p-6 shadow-xs sm:p-10">
+    <main className="min-h-[70vh] bg-white px-4 py-10 text-stone-900 sm:px-6">
+      <article className="mx-auto max-w-3xl rounded-none border border-stone-200 bg-white p-6 shadow-xs sm:p-10">
         <Link
           to="/menu"
           className="inline-flex min-h-[44px] items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0F3D2E] hover:text-[#16503D]"

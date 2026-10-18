@@ -139,12 +139,12 @@ export default function QrScannerModal({ onClose, onTableFound }) {
       onClick={handleClose}
     >
       <div
-        className="w-full max-w-md overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-2xl text-stone-900"
+        className="w-full max-w-md overflow-hidden rounded-none border border-stone-200 bg-white shadow-2xl text-stone-900"
         onClick={event => event.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-stone-100 bg-white px-5 py-4">
+        <div className="flex items-center justify-between border-b border-stone-200 bg-white px-5 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FFF1C9] text-[#0F3D2E]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-none bg-stone-100 text-stone-900 border border-stone-200">
               <QrCode size={19} />
             </div>
             <div>
@@ -156,16 +156,16 @@ export default function QrScannerModal({ onClose, onTableFound }) {
             type="button"
             onClick={handleClose}
             aria-label="Close QR scanner"
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-stone-200 text-stone-500 hover:bg-stone-50 hover:text-stone-900 transition focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+            className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-none border border-stone-300 text-stone-500 hover:bg-stone-50 hover:text-stone-900 transition focus:outline-none focus:ring-1 focus:ring-stone-900"
           >
             <X size={18} aria-hidden="true" />
           </button>
         </div>
 
-        <div className="p-5 sm:p-6">
+        <div className="p-5 sm:p-6 bg-white">
           {/* Different-table confirmation dialog */}
           {pendingTable && (
-            <div className="mb-4 rounded-2xl border border-amber-200 bg-[#FFF1C9]/50 p-4">
+            <div className="mb-4 rounded-none border border-amber-300 bg-amber-50/60 p-4">
               <div className="flex items-start gap-3">
                 <AlertTriangle size={20} className="text-amber-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
@@ -178,7 +178,7 @@ export default function QrScannerModal({ onClose, onTableFound }) {
                     <button
                       type="button"
                       onClick={handleCancelNewTable}
-                      className="flex-1 min-h-[44px] rounded-xl border border-stone-200 bg-white py-2 px-3 text-xs font-bold text-stone-700 hover:bg-stone-50 transition focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                      className="flex-1 min-h-[40px] rounded-none border border-stone-300 bg-white py-2 px-3 text-xs font-bold text-stone-700 hover:bg-stone-50 transition focus:outline-none focus:ring-1 focus:ring-stone-900"
                     >
                       Cancel
                     </button>
@@ -186,7 +186,7 @@ export default function QrScannerModal({ onClose, onTableFound }) {
                       type="button"
                       onClick={handleConfirmNewTable}
                       disabled={checking}
-                      className="flex-1 min-h-[44px] rounded-xl bg-[#0F3D2E] py-2 px-3 text-xs font-bold text-white hover:bg-[#16503D] transition disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                      className="flex-1 min-h-[40px] rounded-none bg-[#0F3D2E] py-2 px-3 text-xs font-bold text-white hover:bg-[#16503D] transition disabled:opacity-50 focus:outline-none focus:ring-1 focus:ring-stone-900"
                     >
                       Switch to Table {String(pendingTable.number).padStart(2, '0')}
                     </button>
@@ -198,7 +198,7 @@ export default function QrScannerModal({ onClose, onTableFound }) {
 
           {!pendingTable && (
             <>
-              <div id="qr-reader" className="overflow-hidden rounded-2xl bg-stone-900 shadow-inner" />
+              <div id="qr-reader" className="overflow-hidden rounded-none bg-stone-900 shadow-inner border border-stone-300" />
               <p className="mt-3.5 text-center text-xs text-stone-600">
                 Point your camera at the QR code stand on your cafe table.
               </p>
@@ -206,12 +206,12 @@ export default function QrScannerModal({ onClose, onTableFound }) {
           )}
 
           {error && (
-            <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-2.5 text-center text-xs font-medium text-red-700" role="alert" aria-live="polite">
+            <div className="mt-3 rounded-none border border-red-200 bg-red-50 p-2.5 text-center text-xs font-medium text-red-700" role="alert" aria-live="polite">
               {error}
             </div>
           )}
           {checking && (
-            <div className="mt-3 rounded-xl border border-amber-200 bg-[#FFF1C9]/60 p-2.5 text-center text-xs font-medium text-[#0F3D2E]" role="status" aria-live="polite">
+            <div className="mt-3 rounded-none border border-amber-300 bg-amber-50 p-2.5 text-center text-xs font-medium text-stone-900" role="status" aria-live="polite">
               Validating table & starting dining session...
             </div>
           )}

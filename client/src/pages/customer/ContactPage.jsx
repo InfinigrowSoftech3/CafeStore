@@ -282,7 +282,7 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="contact-page min-h-screen overflow-hidden bg-[#FAFAF8] text-stone-900">
+    <main className="contact-page min-h-screen overflow-hidden bg-white text-stone-900">
       {/* ========================================================================= */}
       {/* 1. HERO SECTION WITH CINEMATIC VIDEO & 3D FLOATING CUP */}
       {/* ========================================================================= */}
@@ -357,7 +357,7 @@ export default function ContactPage() {
               <button
                 type="button"
                 onClick={scrollToContact}
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#FFF1C9] px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[#0F3D2E] shadow-[0_10px_25px_rgba(0,0,0,0.2)] transition-all duration-300 hover:bg-[#fde68a] hover:shadow-[0_14px_30px_rgba(0,0,0,0.3)] active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-none bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-stone-900 shadow-sm transition-all duration-300 hover:bg-stone-100 active:scale-95 focus:outline-none focus:ring-1 focus:ring-white"
               >
                 Reach out to us <ArrowDown size={15} />
               </button>
@@ -365,7 +365,7 @@ export default function ContactPage() {
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tenant.address || 'Cafe')}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/25 bg-white/10 px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md transition-all hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-none border border-white/40 bg-white/10 px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md transition-all hover:bg-white/20 focus:outline-none focus:ring-1 focus:ring-white"
               >
                 <MapPin size={14} className="text-[#FFF1C9]" />
                 <span>{tenant.address ? 'Visit Our Café' : 'View Location'}</span>
@@ -403,7 +403,7 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* 2. CONTACT INFORMATION EDITORIAL CARDS */}
       {/* ========================================================================= */}
-      <section ref={contactSectionRef} className="scroll-mt-8 px-4 py-20 sm:px-6 sm:py-28 lg:px-8 bg-[#FAFAF8]">
+      <section ref={contactSectionRef} className="scroll-mt-8 px-4 py-20 sm:px-6 sm:py-28 lg:px-8 bg-white">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
             <SectionEyebrow>Direct channels</SectionEyebrow>
@@ -425,11 +425,11 @@ export default function ContactPage() {
                   key={item.id}
                   {...reveal}
                   transition={{ ...reveal.transition, delay: index * 0.08 }}
-                  className="group relative flex flex-col justify-between rounded-3xl border border-stone-200/90 bg-white p-7 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[#0F3D2E]/30 hover:shadow-md"
+                  className="group relative flex flex-col justify-between rounded-none border border-stone-200 bg-white p-7 shadow-2xs transition-all duration-300 hover:border-stone-400"
                 >
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF1C9] text-[#0F3D2E] transition-colors duration-300 group-hover:bg-[#0F3D2E] group-hover:text-white">
+                      <span className="inline-flex h-12 w-12 items-center justify-center rounded-none bg-stone-100 text-stone-900 border border-stone-200 transition-colors duration-300 group-hover:bg-stone-900 group-hover:text-white">
                         <Icon size={20} />
                       </span>
                       <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">
@@ -511,7 +511,7 @@ export default function ContactPage() {
                 </p>
 
                 <div className="mt-10 space-y-5">
-                  <div className="rounded-2xl border border-stone-200 bg-stone-50/70 p-5 shadow-2xs">
+                  <div className="rounded-none border border-stone-200 bg-stone-50 p-5 shadow-2xs">
                     <div className="flex items-center gap-3 text-stone-900">
                       <Clock size={18} className="text-[#0F3D2E]" />
                       <span className="text-xs font-bold uppercase tracking-[0.16em]">
@@ -523,7 +523,7 @@ export default function ContactPage() {
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-stone-200 bg-stone-50/70 p-5 shadow-2xs">
+                  <div className="rounded-none border border-stone-200 bg-stone-50 p-5 shadow-2xs">
                     <div className="flex items-center gap-3 text-stone-900">
                       <Coffee size={18} className="text-[#0F3D2E]" />
                       <span className="text-xs font-bold uppercase tracking-[0.16em]">
@@ -552,7 +552,7 @@ export default function ContactPage() {
             {/* Right Contact Form / Success Container */}
             <motion.div
               {...reveal}
-              className="relative overflow-hidden rounded-[2.5rem] border border-stone-200 bg-white p-7 shadow-xs sm:p-10 lg:p-12"
+              className="relative overflow-hidden rounded-none border border-stone-200 bg-white p-7 shadow-2xs sm:p-10 lg:p-12"
             >
               <AnimatePresence mode="wait">
                 {!isSuccess ? (
@@ -579,7 +579,7 @@ export default function ContactPage() {
                       <div
                         role="alert"
                         aria-live="assertive"
-                        className="rounded-2xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-800"
+                        className="rounded-none border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-800"
                       >
                         {serverError}
                       </div>
@@ -618,10 +618,10 @@ export default function ContactPage() {
                           value={formData.name}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={`w-full rounded-2xl border bg-stone-50 px-5 py-3.5 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 ${
+                          className={`w-full rounded-none border bg-white px-5 py-3 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
                             formErrors.name
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-                              : 'border-stone-200 focus:border-[#0F3D2E] focus:ring-[#0F3D2E]/20'
+                              : 'border-stone-300 focus:border-stone-900 focus:ring-stone-900'
                           }`}
                         />
                       </div>
@@ -651,10 +651,10 @@ export default function ContactPage() {
                           value={formData.contact}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={`w-full rounded-2xl border bg-stone-50 px-5 py-3.5 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 ${
+                          className={`w-full rounded-none border bg-white px-5 py-3 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
                             formErrors.contact
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-                              : 'border-stone-200 focus:border-[#0F3D2E] focus:ring-[#0F3D2E]/20'
+                              : 'border-stone-300 focus:border-stone-900 focus:ring-stone-900'
                           }`}
                         />
                       </div>
@@ -683,10 +683,10 @@ export default function ContactPage() {
                           value={formData.subject}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={`w-full rounded-2xl border bg-stone-50 px-5 py-3.5 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 ${
+                          className={`w-full rounded-none border bg-white px-5 py-3 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
                             formErrors.subject
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-                              : 'border-stone-200 focus:border-[#0F3D2E] focus:ring-[#0F3D2E]/20'
+                              : 'border-stone-300 focus:border-stone-900 focus:ring-stone-900'
                           }`}
                         />
                       </div>
@@ -721,10 +721,10 @@ export default function ContactPage() {
                           value={formData.message}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={`w-full resize-y rounded-2xl border bg-stone-50 px-5 py-3.5 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:ring-2 transition-all duration-200 ${
+                          className={`w-full resize-y rounded-none border bg-white px-5 py-3.5 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
                             formErrors.message
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-                              : 'border-stone-200 focus:border-[#0F3D2E] focus:ring-[#0F3D2E]/20'
+                              : 'border-stone-300 focus:border-stone-900 focus:ring-stone-900'
                           }`}
                         />
                       </div>
@@ -739,11 +739,11 @@ export default function ContactPage() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="inline-flex min-h-[48px] w-full items-center justify-center gap-3 rounded-2xl bg-[#0F3D2E] py-3.5 px-6 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-xs transition-all duration-300 hover:bg-[#16503D] hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                      className="inline-flex min-h-[46px] w-full items-center justify-center gap-3 rounded-none bg-[#0F3D2E] py-3 px-6 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-2xs transition-all duration-300 hover:bg-[#16503D] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]"
                     >
                       {isSubmitting ? (
                         <>
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <div className="h-4 w-4 animate-spin rounded-none border-2 border-white border-t-transparent" />
                           <span>Sending message...</span>
                         </>
                       ) : (
@@ -765,11 +765,11 @@ export default function ContactPage() {
                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                     className="flex flex-col items-center py-8 text-center sm:py-12"
                   >
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#FFF1C9] text-[#0F3D2E] shadow-inner">
-                      <CheckCircle2 size={44} className="stroke-[1.6]" />
+                    <div className="flex h-16 w-16 items-center justify-center rounded-none bg-stone-100 text-stone-900 border border-stone-200 shadow-2xs">
+                      <CheckCircle2 size={36} className="stroke-[1.6]" />
                     </div>
 
-                    <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-[#0F3D2E]">
+                    <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-stone-900">
                       Message Sent
                     </p>
                     <h3 className="mt-2 font-display text-4xl font-semibold text-stone-900">

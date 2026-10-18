@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --bg: #FAFAF8;
+  --bg: #FFFFFF;
   --surface: #FFFFFF;
   --ink: #111827;
   --muted: #6B7280;
-  --border: #E7E5E4;
+  --border: #E5E7EB;
   --hero: #0F3D2E;
   --brand: #0F3D2E;
   --brand-strong: #0A2B20;
@@ -15,13 +15,13 @@
   --tenant-primary: #0F3D2E;
   --tenant-accent: #FFF1C9;
 
-  /* Customer Menu Redesign Tokens (Butter & Deep Green Theme) */
-  --menu-bg: #FAFAF8;
+  /* Customer Menu Tokens (White & Square Theme) */
+  --menu-bg: #FFFFFF;
   --menu-ink: #0F3D2E;
   --menu-accent: #C93A1C;
   --menu-accent-text: #FFFFFF;
   --menu-card: #FFFFFF;
-  --menu-card-radius: 24px;
+  --menu-card-radius: 0px;
   --menu-veg: #16A34A;
   --menu-nonveg: #DC2626;
   --menu-butter: #FFF1C9;
@@ -114,29 +114,29 @@
   .btn-primary {
     background-color: var(--tenant-primary, #0F3D2E);
     color: #FFFFFF;
-    @apply font-sora font-bold px-6 py-3 rounded-full
+    @apply font-sora font-bold px-6 py-3 rounded-none
            hover:bg-[#16503D] active:scale-[0.98] transition-all duration-200
            disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] inline-flex items-center justify-center gap-2 shadow-sm;
   }
 
   .btn-secondary {
-    @apply border border-stone-200 bg-white text-stone-800 font-sora font-semibold px-5 py-2.5 rounded-full
-           hover:bg-stone-50 hover:border-stone-300 active:scale-[0.98] transition-all duration-200 min-h-[44px] inline-flex items-center justify-center gap-2 shadow-2xs;
+    @apply border border-stone-300 bg-white text-stone-800 font-sora font-semibold px-5 py-2.5 rounded-none
+           hover:bg-stone-50 hover:border-stone-400 active:scale-[0.98] transition-all duration-200 min-h-[44px] inline-flex items-center justify-center gap-2 shadow-2xs;
   }
 
   .btn-accent {
     background-color: var(--menu-accent, #C93A1C);
     color: #FFFFFF;
-    @apply font-sora font-bold px-6 py-3 rounded-full
+    @apply font-sora font-bold px-6 py-3 rounded-none
            hover:brightness-95 active:scale-[0.98] transition-all duration-200
            disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] inline-flex items-center justify-center gap-2 shadow-sm;
   }
 
   .card {
     background-color: #FFFFFF;
-    border-radius: 1.5rem;
-    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 1px 4px rgba(15, 23, 42, 0.02);
-    border: 1px solid var(--border, #E7E5E4);
+    border-radius: 0px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border, #E5E7EB);
     overflow: hidden;
     transition: all 200ms ease-out;
   }
@@ -146,28 +146,27 @@
     transition: all 200ms cubic-bezier(0.22, 1, 0.36, 1);
   }
   .card-interactive:hover {
-    box-shadow: 0 14px 30px -4px rgba(15, 23, 42, 0.08), 0 3px 8px rgba(15, 23, 42, 0.03);
+    box-shadow: 0 4px 12px rgba(15, 61, 46, 0.08);
     border-color: #0F3D2E;
   }
 
   .glass {
-    @apply bg-white/85 backdrop-blur-md border border-white/60 shadow-xs;
+    @apply bg-white border border-stone-200 shadow-xs rounded-none;
   }
 
   .glass-dark {
-    background-color: rgba(23, 17, 12, 0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #FAF6EF;
-    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.4);
+    background-color: #0F3D2E;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    border-radius: 0px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
   }
 
   .input-field {
     width: 100%;
     padding: 0.75rem 1rem;
-    border-radius: 0.875rem;
-    border: 1px solid var(--border, #E9E0D2);
+    border-radius: 0px;
+    border: 1px solid var(--border, #D1D5DB);
     background-color: #FFFFFF;
     color: var(--ink, #1C1612);
     min-height: 44px;
@@ -176,11 +175,11 @@
   }
   .input-field:focus {
     outline: none;
-    border-color: var(--brand, #C8963E);
-    box-shadow: 0 0 0 3px rgba(200, 150, 62, 0.2);
+    border-color: var(--brand, #0F3D2E);
+    box-shadow: 0 0 0 2px rgba(15, 61, 46, 0.15);
   }
   .input-field::placeholder {
-    color: var(--muted, #7A6F64);
+    color: var(--muted, #9CA3AF);
   }
   @media (min-width: 640px) {
     .input-field {
