@@ -7,7 +7,6 @@ import {
   Banknote,
   Loader2,
   AlertCircle,
-  Smartphone,
   ShieldCheck,
   User,
   Phone,
@@ -23,7 +22,6 @@ import api from '../../services/api';
 import useCartStore from '../../context/cartStore';
 import { useTenant } from '../../context/TenantContext';
 import { formatMoney } from '../../utils/money';
-import OtpLoginModal from '../../components/ui/OtpLoginModal';
 import usePageMeta from '../../hooks/usePageMeta';
 
 const loadRazorpay = () => {
@@ -73,7 +71,6 @@ export default function CheckoutPage() {
       return key;
     })()
   ));
-  const [showOtpLogin, setShowOtpLogin] = useState(false);
 
   const subtotal = items.reduce((s, i) => s + i.itemTotal, 0);
   const discount = appliedCoupon?.discount || 0;
@@ -125,14 +122,6 @@ export default function CheckoutPage() {
     if (!phone.trim() || !/^\d{10}$/.test(phone)) return 'Please enter a valid 10-digit phone number.';
     if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return 'Please enter a valid email address.';
     return null;
-  };
-
-  const handleOtpLoginSuccess = (user) => {
-    setShowOtpLogin(false);
-    if (user?.name) setName(user.name);
-    if (user?.phone) setPhone(user.phone);
-    if (user?.email) setEmail(user.email);
-    toast.success('Logged in successfully!');
   };
 
   const handleCashOrder = async () => {
@@ -415,14 +404,6 @@ export default function CheckoutPage() {
                     Customer Information
                   </h2>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowOtpLogin(true)}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0F3D2E] hover:bg-[#FFF1C9]/80 bg-[#FFF1C9]/50 border border-[#0F3D2E]/20 px-3 py-1 rounded-full transition"
-                >
-                  <Smartphone size={13} />
-                  <span>Login with OTP</span>
-                </button>
               </div>
 
               {/* Name Input */}
@@ -732,15 +713,6 @@ export default function CheckoutPage() {
           </motion.button>
         </div>
       </div>
-
-      {/* OTP Login Modal */}
-      {showOtpLogin && (
-        <OtpLoginModal
-          isOpen={showOtpLogin}
-          onClose={() => setShowOtpLogin(false)}
-          onLogin={handleOtpLoginSuccess}
-        />
-      )}
     </div>
   );
 }
