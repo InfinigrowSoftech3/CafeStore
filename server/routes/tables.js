@@ -25,8 +25,14 @@ const router = express.Router();
 router.get('/events', protect, ownerOrManager, (req, res) => openLiveStream(req, res, 'admin'));
 
 const getTrustedClientUrl = () => {
-  const configured = String(process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafe-client-app.vercel.app').trim();
-  if (!configured) throw new Error('CUSTOMER_APP_URL or CLIENT_URL is not configured.');
+  let configured = String(process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafe-client-app.vercel.app').trim();
+  if (
+    !configured ||
+    configured.includes('infinigrowsoftech.com') ||
+    configured.includes('client-ten-peach-93.vercel.app')
+  ) {
+    configured = 'https://cafe-client-app.vercel.app';
+  }
 
   const parsed = new URL(configured);
   if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password) {
@@ -60,6 +66,7 @@ const generateQR = async (table, tenantId = table.tenantId, tenantSlug = null) =
 };
 
 const refreshStaleQrCodes = async (tables, tenantId = null, tenantSlug = null) => {
+  const trustedClientUrl = getTrustedClientUrl();
   const refreshed = await Promise.all(tables.map(async (table) => {
     let existingClaims = null;
     let existingCafe = null;
@@ -79,7 +86,9 @@ const refreshStaleQrCodes = async (tables, tenantId = null, tenantSlug = null) =
     const expectedCafe = expectedSlug || String(effectiveTenantId);
     if (
       table.qrUrl &&
-      table.qrUrl.startsWith(getTrustedClientUrl()) &&
+      table.qrUrl.startsWith(trustedClientUrl) &&
+      !table.qrUrl.includes('infinigrowsoftech.com') &&
+      !table.qrUrl.includes('client-ten-peach-93') &&
       existingClaims?.tableId === String(table._id) &&
       String(existingClaims?.tenantId) === String(effectiveTenantId) &&
       existingCafe &&
@@ -143,15 +152,21 @@ router.get('/floor-plan', protect, ownerOrManager, async (req, res) => {
     if (branchId) filter.branchId = branchId;
     if (floor && floor !== 'ALL') filter.floor = floor;
 
-    const [tables, total, tenantDoc] = await Promise.all([
+    const [rawTables, total, tenantDoc] = await Promise.all([
       Table.find(filter)
         .populate('assignedWaiter', 'name email')
         .sort({ floor: 1, tableNumber: 1, _id: 1 })
         .skip(skip)
         .limit(limit),
       Table.countDocuments(filter),
-      Tenant.findById(req.tenantId).select('settings.tableSettings').lean(),
+      Tenant.findById(req.tenantId).select('settings.tableSettings slug').lean(),
     ]);
+
+    const tables = await refreshStaleQrCodes(
+      rawTables,
+      req.tenantId,
+      tenantDoc?.slug || req.tenant?.slug
+    );
 
     const tableSettings = tenantDoc?.settings?.tableSettings || {};
     const cleaningStepEnabled = tableSettings.cleaningStepEnabled !== false;

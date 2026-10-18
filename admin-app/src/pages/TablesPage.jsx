@@ -299,9 +299,12 @@ export default function TablesPage() {
 
   const handleRegenerateQr = async (table) => {
     try {
-      await api.post(`/tables/${table._id}/regenerate-qr`);
+      const res = await api.post(`/tables/${table._id}/regenerate-qr`);
       toast.success(`QR regenerated for Table ${table.tableNumber}`);
-      fetchFloorPlan();
+      if (res.data?.table) {
+        setActiveDrawerTable(res.data.table);
+      }
+      await fetchFloorPlan();
     } catch (error) {
       toast.error(error.message || 'QR generation failed');
     }

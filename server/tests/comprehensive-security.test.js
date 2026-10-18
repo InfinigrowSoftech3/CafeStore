@@ -394,7 +394,7 @@ test('real security integration suite', async (t) => {
       assert.equal((await request('/api/tables/not-a-number/validate')).status, 400);
       const qr = await json('/api/tables', { tableNumber: 13, baseUrl: 'https://attacker.example/phishing' }, { token: adminToken });
       assert.equal(qr.status, 201);
-      assert.match(qr.data.table.qrUrl, /^(https:\/\/client-[a-z0-9-]+\.vercel\.app|https:\/\/cafe\.infinigrowsoftech\.com)\/menu\?.*tableToken=[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/);
+      assert.match(qr.data.table.qrUrl, /^(https:\/\/(cafe-client-app|client-[a-z0-9-]+)\.vercel\.app|https:\/\/cafe\.infinigrowsoftech\.com)\/menu\?.*tableToken=[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/);
       assert.doesNotMatch(qr.data.table.qrUrl, /attacker\.example/);
       assert.equal((await request(`/api/tables/qr/validate?token=${encodeURIComponent(new URL(qr.data.table.qrUrl).searchParams.get('tableToken'))}`)).data.valid, true);
     });
