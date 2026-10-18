@@ -2,6 +2,7 @@ import { Component, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 import QuickCartPopup from './components/ui/QuickCartPopup';
 import WebPushPrompt from './components/ui/WebPushPrompt';
@@ -108,6 +109,7 @@ export default function App() {
       <QuickCartPopup />
       <WebPushPrompt />
       <Analytics />
+      <SpeedInsights dsn="CmYU8C4o7QrHziabP83DyQ2CEd" />
       <Toaster
         position="top-center"
         toastOptions={{

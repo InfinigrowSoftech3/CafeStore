@@ -1,5 +1,6 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useAuth } from './context/AuthContext';
 import AdminLayout from './layouts/AdminLayout';
 import LoginPage from './pages/LoginPage';
@@ -67,6 +68,7 @@ export default function App() {
   return (
     <>
       <Analytics />
+      <SpeedInsights dsn="CmYU8C4o7QrHziabP83DyQ2CEd" />
       <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
