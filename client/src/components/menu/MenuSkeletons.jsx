@@ -23,20 +23,28 @@ export function PopularSkeleton() {
 
 export function RowSkeleton() {
   return (
-    <div className="bg-white border border-stone-200 divide-y divide-stone-200 rounded-none shadow-2xs">
-      {Array.from({ length: 4 }).map((_, i) => (
+    <div className="space-y-4 sm:space-y-5">
+      {Array.from({ length: 3 }).map((_, i) => (
         <div
           key={i}
-          className="p-4 sm:p-5 flex items-start justify-between gap-4 animate-pulse bg-white"
+          className="bg-white border border-stone-200 rounded-none overflow-hidden animate-pulse shadow-2xs"
         >
-          <div className="flex-1 space-y-2.5 pr-2">
-            <div className="w-4 h-4 bg-stone-200 rounded-none" />
-            <div className="h-5 bg-stone-200 rounded-none w-1/2" />
-            <div className="h-4 bg-stone-200 rounded-none w-1/4" />
-            <div className="h-3.5 bg-stone-100 rounded-none w-4/5" />
-            <div className="h-3.5 bg-stone-100 rounded-none w-3/5" />
+          <div className="w-full h-44 sm:h-52 md:h-64 bg-stone-100 border-b border-stone-200" />
+          <div className="p-3.5 sm:p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-stone-200 rounded-none" />
+              <div className="w-20 h-4 bg-stone-200 rounded-none" />
+              <div className="w-14 h-4 bg-stone-200 rounded-none" />
+            </div>
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 space-y-2">
+                <div className="h-5 bg-stone-200 rounded-none w-1/3" />
+                <div className="h-4 bg-stone-200 rounded-none w-1/5" />
+                <div className="h-3.5 bg-stone-100 rounded-none w-4/5" />
+              </div>
+              <div className="w-20 h-9 bg-stone-200 rounded-none shrink-0" />
+            </div>
           </div>
-          <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 aspect-square bg-stone-100 border border-stone-200 rounded-none shrink-0" />
         </div>
       ))}
     </div>

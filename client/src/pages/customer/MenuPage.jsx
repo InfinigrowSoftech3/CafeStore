@@ -850,17 +850,17 @@ export default function MenuPage() {
                     id={`category-section-${section.id}`}
                     className="space-y-2.5 scroll-mt-20 sm:scroll-mt-24"
                   >
-                    <div className="flex items-center justify-between border-b-2 border-stone-200 pb-2 pt-1">
-                      <h2 className="font-sora font-extrabold text-xl sm:text-2xl text-[#0F3D2E] tracking-tight">
+                    <div className="flex items-center justify-between pb-2 pt-2">
+                      <h2 className="font-sora font-extrabold text-xl sm:text-2xl text-stone-900 tracking-tight">
                         {section.name}
                       </h2>
-                      <span className="text-xs font-sora font-bold text-stone-400 uppercase tracking-wider">
-                        {section.items.length} {section.items.length === 1 ? 'dish' : 'dishes'}
+                      <span className="text-xs font-sora font-bold text-stone-400 uppercase tracking-wider font-mono">
+                        {section.items.length} {section.items.length === 1 ? 'DISH' : 'DISHES'}
                       </span>
                     </div>
 
-                    {/* Connected Food Cards Spanning Full Page Left to Right on Pure White Base */}
-                    <div className="bg-white border border-stone-200 divide-y divide-stone-200 rounded-none shadow-2xs overflow-hidden">
+                    {/* Food Cards matching the exact screenshot layout */}
+                    <div className="space-y-4 sm:space-y-5">
                       {section.items.map((prod) => (
                         <MenuItemRow
                           key={prod._id}
