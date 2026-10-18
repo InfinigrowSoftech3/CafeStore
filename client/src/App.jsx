@@ -1,6 +1,7 @@
 import { Component, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { Analytics } from '@vercel/analytics/react';
 
 import QuickCartPopup from './components/ui/QuickCartPopup';
 import WebPushPrompt from './components/ui/WebPushPrompt';
@@ -106,6 +107,7 @@ export default function App() {
       <Navbar />
       <QuickCartPopup />
       <WebPushPrompt />
+      <Analytics />
       <Toaster
         position="top-center"
         toastOptions={{

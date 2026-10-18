@@ -1,4 +1,5 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { useAuth } from './context/AuthContext';
 import AdminLayout from './layouts/AdminLayout';
 import LoginPage from './pages/LoginPage';
@@ -64,7 +65,9 @@ function CafeAdminLayout() {
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <Analytics />
+      <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/setup-wizard" element={<ProtectedRoute allowedRoles={['owner']}><SetupWizardPage /></ProtectedRoute>} />
@@ -109,5 +112,6 @@ export default function App() {
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
+    </>
   );
 }
