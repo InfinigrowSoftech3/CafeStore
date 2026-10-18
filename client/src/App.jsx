@@ -63,12 +63,12 @@ class ChunkErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#17110C] text-[#FAF6EF] flex flex-col items-center justify-center p-6 text-center">
-          <div className="w-12 h-12 rounded-full border border-[#C8963E]/40 bg-[#C8963E]/10 flex items-center justify-center mb-4 text-2xl">
+        <div className="min-h-screen bg-[#FAFAF8] text-stone-900 flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-14 h-14 rounded-full border border-amber-200 bg-[#FFF1C9] flex items-center justify-center mb-4 text-2xl shadow-xs">
             ☕
           </div>
-          <h2 className="text-xl font-bold font-display mb-2 tracking-wide">Updated Version Available</h2>
-          <p className="text-sm text-[#E9E0D2] max-w-sm mb-6 leading-relaxed">
+          <h2 className="text-2xl font-bold font-display text-stone-900 mb-2 tracking-tight">Updated Version Available</h2>
+          <p className="text-sm text-stone-600 max-w-sm mb-6 leading-relaxed">
             A new version of the café site was just deployed. Please refresh to load the updated page.
           </p>
           <button
@@ -77,7 +77,7 @@ class ChunkErrorBoundary extends Component {
               sessionStorage.removeItem('chunk_boundary_reload');
               window.location.reload();
             }}
-            className="btn-primary min-h-[44px]"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[#0F3D2E] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#16503D] active:scale-95"
           >
             Refresh Now
           </button>
@@ -90,8 +90,8 @@ class ChunkErrorBoundary extends Component {
 
 function PageFallback() {
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-brew-500 border-t-transparent animate-spin" />
+    <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-2 border-[#0F3D2E] border-t-transparent animate-spin" />
     </div>
   );
 }
@@ -115,14 +115,15 @@ export default function App() {
         toastOptions={{
           duration: 3000,
           style: {
-            background: '#17110C',
-            color: '#FAF6EF',
-            border: '1px solid #E9E0D2',
-            borderRadius: '12px',
-            fontFamily: 'Inter, sans-serif',
+            background: '#0F3D2E',
+            color: '#FFFFFF',
+            border: '1px solid #16503D',
+            borderRadius: '16px',
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
             fontSize: '14px',
+            boxShadow: '0 10px 25px -5px rgba(15, 61, 46, 0.25)',
           },
-          success: { iconTheme: { primary: '#C8963E', secondary: '#17110C' } },
+          success: { iconTheme: { primary: '#FFF1C9', secondary: '#0F3D2E' } },
           error: { iconTheme: { primary: '#ef4444', secondary: '#ffffff' } },
         }}
       />

@@ -27,11 +27,11 @@ export default function TableServiceActions() {
 
   return (
     <div className="mx-auto flex max-w-2xl gap-2 px-4 py-3 sm:px-6">
-      <button type="button" onClick={() => requestService('waiter')} disabled={Boolean(requesting)} className="btn-secondary flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm">
+      <button type="button" onClick={() => requestService('waiter')} disabled={Boolean(requesting)} className="btn-secondary flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl text-sm">
         {requesting === 'waiter' ? <Loader2 size={16} className="animate-spin" /> : <BellRing size={16} />}
         Call waiter
       </button>
-      <button type="button" onClick={() => requestService('bill')} disabled={Boolean(requesting)} className="btn-primary flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm">
+      <button type="button" onClick={() => requestService('bill')} disabled={Boolean(requesting)} className="btn-primary flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl text-sm">
         {requesting === 'bill' ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
         Request bill
       </button>

@@ -48,24 +48,24 @@ export default function LegalPage() {
   });
 
   return (
-    <main className="min-h-[70vh] bg-cream px-4 py-10 text-espresso-900 sm:px-6">
-      <article className="mx-auto max-w-3xl rounded-3xl border border-foam bg-white p-6 shadow-sm sm:p-10">
+    <main className="min-h-[70vh] bg-[#FAFAF8] px-4 py-10 text-stone-900 sm:px-6">
+      <article className="mx-auto max-w-3xl rounded-3xl border border-stone-200/80 bg-white p-6 shadow-xs sm:p-10">
         <Link
           to="/menu"
-          className="inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-brew-700 underline-offset-4 hover:underline"
+          className="inline-flex min-h-[44px] items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0F3D2E] hover:text-[#16503D]"
         >
           <ArrowLeft size={16} />
           <span>Back to Menu</span>
         </Link>
-        <h1 className="mt-4 font-display text-3xl font-bold text-espresso-950 sm:text-4xl">
+        <h1 className="mt-4 font-display text-3xl font-bold text-[#0F3D2E] sm:text-4xl">
           {page.heading}
         </h1>
-        <p className="mt-2 text-xs text-stone-500">Last updated October 4, 2026</p>
+        <p className="mt-2 text-xs text-stone-400">Last updated October 4, 2026</p>
         <div className="mt-8 space-y-6">
           {page.sections.map(([heading, body]) => (
             <section key={heading}>
-              <h2 className="font-display text-xl font-bold text-espresso-900">{heading}</h2>
-              <p className="mt-2 text-sm sm:text-base leading-7 text-stone-700">{body}</p>
+              <h2 className="font-display text-xl font-bold text-stone-900">{heading}</h2>
+              <p className="mt-2 text-sm sm:text-base leading-7 text-stone-600">{body}</p>
             </section>
           ))}
         </div>

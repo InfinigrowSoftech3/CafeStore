@@ -75,22 +75,22 @@ export default function TrackOrderPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-cream/90 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-12 h-12 rounded-full border-2 border-brew-500 border-t-transparent animate-spin mb-3" />
-        <p className="font-display text-lg font-bold text-espresso-950">Connecting to kitchen stream...</p>
+      <div className="min-h-screen bg-[#FAFAF8] flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-12 h-12 rounded-full border-2 border-[#0F3D2E] border-t-transparent animate-spin mb-3" />
+        <p className="font-display text-lg font-bold text-[#0F3D2E]">Connecting to kitchen stream...</p>
       </div>
     );
   }
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-cream/90 flex items-center justify-center flex-col gap-4 p-6 text-center max-w-md mx-auto">
-        <div className="w-20 h-20 rounded-3xl bg-foam flex items-center justify-center text-4xl mb-2">
+      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center flex-col gap-4 p-6 text-center max-w-md mx-auto">
+        <div className="w-20 h-20 rounded-3xl bg-stone-100 flex items-center justify-center text-4xl mb-2">
           ❓
         </div>
-        <h1 className="font-display text-2xl font-bold text-espresso-950">Order not found</h1>
-        <p className="text-sm text-espresso-500">Please verify your order link or return to the menu.</p>
-        <Link to="/menu" className="btn-primary min-h-[46px] px-8 text-xs font-bold uppercase tracking-wider mt-2">
+        <h1 className="font-display text-2xl font-bold text-[#0F3D2E]">Order not found</h1>
+        <p className="text-sm text-stone-500">Please verify your order link or return to the menu.</p>
+        <Link to="/menu" className="btn-primary min-h-[46px] px-8 text-xs font-bold uppercase tracking-wider mt-2 rounded-full">
           Back to Menu
         </Link>
       </div>
@@ -100,33 +100,33 @@ export default function TrackOrderPage() {
   const currentIdx = STATUS_STEPS.indexOf(order.orderStatus);
 
   return (
-    <div className="min-h-screen bg-cream/90 flex flex-col pb-16">
+    <div className="min-h-screen bg-[#FAFAF8] flex flex-col pb-16">
       {/* Top Header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b border-foam/90 bg-white/95 backdrop-blur-md shadow-2xs">
+      <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b border-stone-200/80 bg-white/95 backdrop-blur-md shadow-2xs">
         <div className="flex items-center gap-3">
           <Link
             to="/menu"
             aria-label="Back to Menu"
-            className="min-h-[40px] min-w-[40px] rounded-full border border-espresso-200/80 flex items-center justify-center text-espresso-800 hover:bg-espresso-50 transition active:scale-95"
+            className="min-h-[40px] min-w-[40px] rounded-full border border-stone-200 flex items-center justify-center text-stone-700 hover:bg-stone-100 transition active:scale-95"
           >
             <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="font-display text-lg font-bold text-espresso-950 leading-none">
+            <h1 className="font-display text-lg font-bold text-[#0F3D2E] leading-none">
               Track Order
             </h1>
-            <p className="text-[11px] text-espresso-500 mt-0.5">#{order.orderNumber}</p>
+            <p className="text-[11px] text-stone-400 mt-0.5 font-mono">#{order.orderNumber}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border bg-white shadow-2xs">
+        <div className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border border-stone-200 bg-white shadow-2xs">
           {sseConnected ? (
             <span className="inline-flex items-center gap-1.5 text-emerald-700">
               <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
               <span>Live Updates</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-espresso-500">
+            <span className="inline-flex items-center gap-1 text-stone-500">
               <Clock size={12} />
               <span>Polling Active</span>
             </span>
@@ -137,27 +137,27 @@ export default function TrackOrderPage() {
       {/* Main Content */}
       <main className="mx-auto max-w-xl w-full p-4 sm:p-6 space-y-4">
         {/* Current State Hero Card */}
-        <div className="card p-6 text-center bg-white shadow-xs">
+        <div className="card p-6 text-center bg-white border border-stone-200/80 rounded-2xl shadow-2xs">
           <span className="text-5xl" role="img" aria-label="Status icon">
             {STATUS_ICONS[order.orderStatus] || '📋'}
           </span>
-          <h2 className="font-display text-2xl font-bold text-espresso-950 mt-3">
+          <h2 className="font-display text-2xl font-bold text-[#0F3D2E] mt-3">
             {STATUS_LABELS[order.orderStatus]}
           </h2>
-          <p className="text-espresso-500 text-xs sm:text-sm mt-1 max-w-sm mx-auto">
+          <p className="text-stone-600 text-xs sm:text-sm mt-1 max-w-sm mx-auto">
             {STATUS_DESCS[order.orderStatus] || 'Your order is progressing smoothly.'}
           </p>
 
-          <div className="mt-4 inline-flex items-center gap-2 rounded-xl bg-foam/70 px-3.5 py-1.5 text-xs font-bold text-espresso-900 border border-foam">
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#FFF1C9]/60 px-4 py-1.5 text-xs font-bold text-[#0F3D2E] border border-amber-200">
             <span>Table {String(order.tableNumber).padStart(2, '0')}</span>
-            <span className="text-espresso-300">•</span>
+            <span className="text-amber-400">•</span>
             <span className="font-mono">Order #{order.orderNumber}</span>
           </div>
         </div>
 
         {/* Timeline Stepper Card */}
-        <div className="card p-6 bg-white shadow-xs space-y-6">
-          <h3 className="font-display text-base font-bold text-espresso-950 border-b border-foam pb-3">
+        <div className="card p-6 bg-white border border-stone-200/80 rounded-2xl shadow-2xs space-y-6">
+          <h3 className="font-display text-base font-bold text-[#0F3D2E] border-b border-stone-100 pb-3">
             Preparation Timeline
           </h3>
 
@@ -173,7 +173,7 @@ export default function TrackOrderPage() {
                   {!isLast && (
                     <div
                       className={`absolute left-4 top-8 -bottom-6 w-0.5 transition-colors duration-500 ${
-                        i < currentIdx ? 'bg-espresso-900' : 'bg-foam'
+                        i < currentIdx ? 'bg-[#0F3D2E]' : 'bg-stone-200'
                       }`}
                     />
                   )}
@@ -182,8 +182,8 @@ export default function TrackOrderPage() {
                   <div
                     className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 shadow-2xs ${
                       done
-                        ? 'bg-espresso-900 text-cream'
-                        : 'bg-foam text-espresso-400 border border-espresso-200/50'
+                        ? 'bg-[#0F3D2E] text-white'
+                        : 'bg-stone-100 text-stone-400 border border-stone-200'
                     }`}
                   >
                     {done ? '✓' : i + 1}
@@ -193,18 +193,18 @@ export default function TrackOrderPage() {
                   <div className="flex-1 pt-0.5">
                     <div className="flex items-center justify-between gap-2">
                       <p className={`font-display text-sm font-bold ${
-                        done ? 'text-espresso-950' : 'text-espresso-400'
+                        done ? 'text-[#0F3D2E]' : 'text-stone-400'
                       }`}>
                         {STATUS_LABELS[step]}
                       </p>
                       {active && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brew-600 bg-brew-50 px-2 py-0.5 rounded-full border border-brew-200">
-                          <span className="w-1.5 h-1.5 rounded-full bg-brew-500 animate-pulse" />
+                        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#0F3D2E] bg-[#FFF1C9] px-2.5 py-0.5 rounded-full border border-amber-300">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#0F3D2E] animate-pulse" />
                           <span>Current</span>
                         </span>
                       )}
                     </div>
-                    <p className={`text-xs mt-0.5 ${done ? 'text-espresso-600' : 'text-espresso-400'}`}>
+                    <p className={`text-xs mt-0.5 ${done ? 'text-stone-600' : 'text-stone-400'}`}>
                       {STATUS_DESCS[step]}
                     </p>
                   </div>
@@ -218,7 +218,7 @@ export default function TrackOrderPage() {
         <div className="grid grid-cols-2 gap-3 pt-2">
           <Link
             to={`/receipt/${orderId}?accessToken=${encodeURIComponent(accessToken)}`}
-            className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider"
+            className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider rounded-full"
           >
             <Receipt size={16} />
             <span>Receipt</span>
@@ -226,7 +226,7 @@ export default function TrackOrderPage() {
 
           <Link
             to="/menu"
-            className="btn-primary min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider"
+            className="btn-primary min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider rounded-full shadow-sm"
           >
             <UtensilsCrossed size={16} />
             <span>Menu</span>

@@ -104,27 +104,27 @@ export default function QuickCartPopup() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 25, scale: 0.94 }}
             transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-            className="overflow-hidden rounded-[1.75rem] border border-[#E9E0D2] bg-white/95 text-espresso-950 shadow-[0_20px_50px_rgba(23,17,12,0.22)] backdrop-blur-xl ring-1 ring-espresso-950/5"
+            className="overflow-hidden rounded-3xl border border-stone-200 bg-white/95 text-stone-900 shadow-xl backdrop-blur-xl ring-1 ring-stone-900/5"
           >
             {/* Auto-dismiss progress indicator line */}
-            <div className="h-1 w-full bg-sand-100">
+            <div className="h-1 w-full bg-stone-100">
               <div
-                className="h-full bg-brew-500 transition-all duration-75 ease-linear"
+                className="h-full bg-[#0F3D2E] transition-all duration-75 ease-linear"
                 style={{ width: `${progress}%` }}
               />
             </div>
 
             {/* Popup Header */}
-            <div className="flex items-center justify-between border-b border-[#E9E0D2] bg-[#FAF6EF] px-4 py-3 sm:px-5">
+            <div className="flex items-center justify-between border-b border-stone-100 bg-[#FAFAF8] px-4 py-3 sm:px-5">
               <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brew-500 text-espresso-950 shadow-sm">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FFF1C9] text-[#0F3D2E] shadow-2xs">
                   <CheckCircle2 size={15} />
                 </span>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-espresso-950">
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-stone-900">
                     Added to Order
                   </p>
-                  <p className="text-[11px] text-espresso-500">
+                  <p className="text-[11px] text-stone-500">
                     {itemCount} {itemCount === 1 ? 'item' : 'items'} in cart
                     {tableNumber ? ` • Table ${String(tableNumber).padStart(2, '0')}` : ''}
                   </p>
@@ -135,7 +135,7 @@ export default function QuickCartPopup() {
                 type="button"
                 onClick={closeQuickCart}
                 aria-label="Dismiss quick cart popup"
-                className="flex h-7 w-7 items-center justify-center rounded-full text-espresso-400 transition hover:bg-sand-100 hover:text-espresso-900 active:scale-90"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-stone-400 transition hover:bg-stone-100 hover:text-stone-900 active:scale-90"
               >
                 <X size={15} />
               </button>
@@ -145,7 +145,7 @@ export default function QuickCartPopup() {
             {recentItem && (
               <div className="p-4 sm:p-5">
                 <div className="flex gap-3.5">
-                  <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-sand-100">
+                  <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-stone-100">
                     <img
                       src={recentItem.image || PLACEHOLDER}
                       alt={recentItem.name}
@@ -159,22 +159,22 @@ export default function QuickCartPopup() {
                   <div className="flex flex-1 flex-col justify-between min-w-0">
                     <div>
                       <div className="flex items-start justify-between gap-1">
-                        <h4 className="font-display text-base font-bold leading-tight text-espresso-950 line-clamp-1">
+                        <h4 className="font-display text-base font-bold leading-tight text-stone-900 line-clamp-1">
                           {recentItem.name}
                         </h4>
-                        <span className="price-tag text-sm font-bold text-brew-500 flex-shrink-0">
+                        <span className="price-tag text-sm font-bold text-[#0F3D2E] flex-shrink-0">
                           {formatMoney(recentItem.itemTotal, tenant.currency)}
                         </span>
                       </div>
 
                       {recentItem.variant && (
-                        <span className="mt-0.5 inline-block rounded-md bg-sand-100 px-1.5 py-0.2 text-[10px] font-semibold text-espresso-700">
+                        <span className="mt-0.5 inline-block rounded-md bg-stone-100 px-1.5 py-0.2 text-[10px] font-semibold text-stone-700">
                           {recentItem.variant.name}
                         </span>
                       )}
 
                       {recentItem.addons?.length > 0 && (
-                        <p className="text-[10px] text-espresso-500 line-clamp-1">
+                        <p className="text-[10px] text-stone-500 line-clamp-1">
                           + {recentItem.addons.map((a) => a.name).join(', ')}
                         </p>
                       )}
@@ -182,22 +182,22 @@ export default function QuickCartPopup() {
 
                     {/* Quantity controls inside popup */}
                     <div className="mt-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2 rounded-lg border border-[#E9E0D2] bg-[#FAF6EF] px-1.5 py-0.5">
+                      <div className="flex items-center gap-2 rounded-lg border border-stone-200 bg-stone-50 px-1.5 py-0.5">
                         <button
                           type="button"
                           onClick={() => updateQuantity(recentItem.key, recentItem.quantity - 1)}
-                          className="flex h-5 w-5 items-center justify-center rounded text-espresso-700 hover:bg-espresso-900 hover:text-white transition active:scale-90"
+                          className="flex h-5 w-5 items-center justify-center rounded text-stone-700 hover:bg-[#0F3D2E] hover:text-white transition active:scale-90"
                           aria-label="Decrease quantity"
                         >
                           <Minus size={10} />
                         </button>
-                        <span className="w-4 text-center text-xs font-bold text-espresso-950">
+                        <span className="w-4 text-center text-xs font-bold text-stone-900 font-mono">
                           {recentItem.quantity}
                         </span>
                         <button
                           type="button"
                           onClick={() => updateQuantity(recentItem.key, recentItem.quantity + 1)}
-                          className="flex h-5 w-5 items-center justify-center rounded text-espresso-700 hover:bg-espresso-900 hover:text-white transition active:scale-90"
+                          className="flex h-5 w-5 items-center justify-center rounded text-stone-700 hover:bg-[#0F3D2E] hover:text-white transition active:scale-90"
                           aria-label="Increase quantity"
                         >
                           <Plus size={10} />
@@ -207,7 +207,7 @@ export default function QuickCartPopup() {
                       <button
                         type="button"
                         onClick={() => removeItem(recentItem.key)}
-                        className="text-espresso-400 hover:text-rose-600 transition text-[11px] flex items-center gap-1"
+                        className="text-stone-400 hover:text-rose-600 transition text-[11px] flex items-center gap-1"
                         aria-label="Remove item"
                       >
                         <Trash2 size={12} />
@@ -219,11 +219,11 @@ export default function QuickCartPopup() {
 
                 {/* If multiple items exist in cart, allow expanding to view list */}
                 {items.length > 1 && (
-                  <div className="mt-3 border-t border-[#E9E0D2] pt-2">
+                  <div className="mt-3 border-t border-stone-100 pt-2">
                     <button
                       type="button"
                       onClick={() => setShowAllItems((prev) => !prev)}
-                      className="flex w-full items-center justify-between text-[11px] font-semibold text-brew-700 hover:text-espresso-950 transition py-0.5"
+                      className="flex w-full items-center justify-between text-[11px] font-semibold text-[#0F3D2E] hover:text-[#16503D] transition py-0.5"
                     >
                       <span>
                         {showAllItems ? 'Hide other items' : `View all ${items.length} items in cart`}
@@ -244,17 +244,17 @@ export default function QuickCartPopup() {
                             .map((item) => (
                               <div
                                 key={item.key}
-                                className="flex items-center justify-between rounded-xl bg-[#FAF6EF] p-2 text-xs border border-[#E9E0D2]/60"
+                                className="flex items-center justify-between rounded-xl bg-stone-50 p-2 text-xs border border-stone-200/70"
                               >
                                 <div className="min-w-0 flex-1 pr-2">
-                                  <p className="font-medium text-espresso-950 truncate">
+                                  <p className="font-medium text-stone-900 truncate">
                                     {item.name}
                                   </p>
-                                  <p className="text-[10px] text-espresso-500">
+                                  <p className="text-[10px] text-stone-500">
                                     Qty: {item.quantity} {item.variant ? `• ${item.variant.name}` : ''}
                                   </p>
                                 </div>
-                                <span className="font-mono font-bold text-brew-600">
+                                <span className="font-mono font-bold text-[#0F3D2E]">
                                   {formatMoney(item.itemTotal, tenant.currency)}
                                 </span>
                               </div>
@@ -268,10 +268,10 @@ export default function QuickCartPopup() {
             )}
 
             {/* Popup Actions & Total */}
-            <div className="border-t border-[#E9E0D2] bg-[#FAF6EF] p-4">
+            <div className="border-t border-stone-100 bg-[#FAFAF8] p-4">
               <div className="flex items-center justify-between pb-3 text-xs">
-                <span className="text-espresso-600 font-medium">Cart Total (incl. tax)</span>
-                <span className="price-tag text-lg font-bold text-brew-500">{formatMoney(total, tenant.currency)}</span>
+                <span className="text-stone-600 font-medium">Cart Total (incl. tax)</span>
+                <span className="price-tag text-lg font-bold text-[#0F3D2E]">{formatMoney(total, tenant.currency)}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -281,7 +281,7 @@ export default function QuickCartPopup() {
                     closeQuickCart();
                     navigate('/cart');
                   }}
-                  className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-sand-200 bg-white py-2.5 text-xs font-bold uppercase tracking-[0.1em] text-espresso-950 shadow-xs transition hover:bg-foam active:scale-95"
+                  className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-stone-200 bg-white py-2.5 text-xs font-bold uppercase tracking-[0.1em] text-stone-900 shadow-2xs transition hover:bg-stone-50 active:scale-95"
                 >
                   <ShoppingBag size={13} />
                   <span>View Cart</span>
@@ -293,7 +293,7 @@ export default function QuickCartPopup() {
                     closeQuickCart();
                     navigate('/checkout');
                   }}
-                  className="btn-primary min-h-[44px] text-xs font-bold uppercase tracking-[0.1em]"
+                  className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-[#0F3D2E] py-2.5 text-xs font-bold uppercase tracking-[0.1em] text-white shadow-2xs transition hover:bg-[#16503D] active:scale-95"
                 >
                   <span>Checkout</span>
                   <ArrowRight size={13} />

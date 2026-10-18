@@ -19,7 +19,7 @@ export default function Footer() {
   const address = tenant.address || '12 Connaught Circle, Heritage Block, New Delhi';
 
   return (
-    <footer className="border-t border-espresso-800 bg-[#0a1128] text-cream/70" aria-label="Site Footer">
+    <footer className="border-t border-stone-200 bg-white text-stone-600" aria-label="Site Footer">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand Info */}
@@ -27,7 +27,7 @@ export default function Footer() {
             <Link
               to="/"
               aria-label={`${tenant.name} - Home`}
-              className="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brew-500"
+              className="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
             >
               {tenant.logoUrl ? (
                 <img
@@ -38,55 +38,55 @@ export default function Footer() {
                   height={40}
                 />
               ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brew-500 text-white shadow-xs">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0F3D2E] text-white shadow-xs">
                   <Coffee size={22} className="stroke-[2.2]" />
                 </div>
               )}
-              <span className="font-display text-2xl font-bold tracking-[0.06em] text-cream">
+              <span className="font-display text-2xl font-bold tracking-[0.04em] text-[#0F3D2E]">
                 {tenant.name}
               </span>
             </Link>
-            <p className="text-xs uppercase tracking-[0.2em] text-brew-400 font-semibold">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#0F3D2E]/80 font-bold">
               Fine Coffee &amp; Artisanal Dining
             </p>
-            <p className="text-sm leading-relaxed text-cream/60">
-              Crafted with ethically sourced beans, artisanal extraction, and warm hospitality for your leisurely enjoyment.
+            <p className="text-sm leading-relaxed text-stone-500">
+              Crafted with ethically sourced ingredients, precision culinary standards, and warm hospitality for your dining enjoyment.
             </p>
           </div>
 
           {/* Explore Links */}
           <div>
-            <h2 className="font-display text-base font-semibold uppercase tracking-[0.16em] text-cream">
+            <h2 className="font-display text-xs font-bold uppercase tracking-[0.16em] text-[#0F3D2E]">
               Explore
             </h2>
             <ul className="mt-4 space-y-2.5 text-sm">
               <li>
-                <Link to="/menu" className="hover:text-cream transition-colors">
+                <Link to="/menu" className="hover:text-[#0F3D2E] transition-colors">
                   Menu
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="hover:text-cream transition-colors">
+                <Link to="/about" className="hover:text-[#0F3D2E] transition-colors">
                   About
                 </Link>
               </li>
               <li>
-                <Link to="/offers" className="hover:text-cream transition-colors">
+                <Link to="/offers" className="hover:text-[#0F3D2E] transition-colors">
                   Offers
                 </Link>
               </li>
               <li>
-                <Link to="/gallery" className="hover:text-cream transition-colors">
+                <Link to="/gallery" className="hover:text-[#0F3D2E] transition-colors">
                   Gallery
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-cream transition-colors">
+                <Link to="/contact" className="hover:text-[#0F3D2E] transition-colors">
                   Contact
                 </Link>
               </li>
               <li>
-                <Link to="/orders" className="hover:text-cream transition-colors">
+                <Link to="/orders" className="hover:text-[#0F3D2E] transition-colors">
                   Orders
                 </Link>
               </li>
@@ -95,58 +95,58 @@ export default function Footer() {
 
           {/* Contact Details with Clickable Links */}
           <div>
-            <h2 className="font-display text-base font-semibold uppercase tracking-[0.16em] text-cream">
+            <h2 className="font-display text-xs font-bold uppercase tracking-[0.16em] text-[#0F3D2E]">
               Contact &amp; Hours
             </h2>
             <ul className="mt-4 space-y-3 text-sm">
               <li className="flex items-start gap-2.5">
-                <MapPin size={17} className="mt-0.5 shrink-0 text-brew-400" />
+                <MapPin size={17} className="mt-0.5 shrink-0 text-[#0F3D2E]" />
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="hover:text-cream transition-colors text-xs leading-relaxed"
+                  className="hover:text-[#0F3D2E] transition-colors text-xs leading-relaxed text-stone-600"
                 >
                   {address}
                 </a>
               </li>
               <li className="flex items-center gap-2.5">
-                <Phone size={17} className="shrink-0 text-brew-400" />
+                <Phone size={17} className="shrink-0 text-[#0F3D2E]" />
                 <a
                   href={formatInternationalTel(phone)}
-                  className="hover:text-cream transition-colors font-medium text-xs tracking-wider"
+                  className="hover:text-[#0F3D2E] transition-colors font-medium text-xs tracking-wider text-stone-600"
                 >
                   {phone}
                 </a>
               </li>
               <li className="flex items-center gap-2.5">
-                <Mail size={17} className="shrink-0 text-brew-400" />
+                <Mail size={17} className="shrink-0 text-[#0F3D2E]" />
                 <a
                   href={`mailto:${email}`}
-                  className="hover:text-cream transition-colors font-medium text-xs break-all"
+                  className="hover:text-[#0F3D2E] transition-colors font-medium text-xs break-all text-stone-600"
                 >
                   {email}
                 </a>
               </li>
-              <li className="flex items-start gap-2.5 text-xs text-cream/50 pt-1">
-                <Clock size={16} className="mt-0.5 shrink-0 text-brew-400" />
+              <li className="flex items-start gap-2.5 text-xs text-stone-400 pt-1">
+                <Clock size={16} className="mt-0.5 shrink-0 text-[#0F3D2E]" />
                 <span>Open daily from 8:00 AM to 11:00 PM</span>
               </li>
             </ul>
           </div>
 
-          {/* Newsletter / Direct Access */}
+          {/* Table Ordering Access */}
           <div>
-            <h2 className="font-display text-base font-semibold uppercase tracking-[0.16em] text-cream">
+            <h2 className="font-display text-xs font-bold uppercase tracking-[0.16em] text-[#0F3D2E]">
               Visit The Café
             </h2>
-            <p className="mt-4 text-xs leading-relaxed text-cream/60">
+            <p className="mt-4 text-xs leading-relaxed text-stone-500">
               Order seamlessly from your table using our high-speed QR ordering system.
             </p>
             <div className="mt-4">
               <Link
                 to="/menu"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-brew-500 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-brew-400 active:scale-95"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0F3D2E] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-[#16503D] active:scale-95 shadow-2xs"
               >
                 <span>Browse Menu</span>
                 <ArrowRight size={14} />
@@ -156,19 +156,19 @@ export default function Footer() {
         </div>
 
         {/* Legal & Copyright */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-espresso-800/80 pt-8 sm:flex-row text-xs text-cream/50">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-stone-200 pt-8 sm:flex-row text-xs text-stone-400">
           <p>© {currentYear} {tenant.name}. All rights reserved.</p>
           <nav aria-label="Legal documents" className="flex flex-wrap gap-5">
-            <Link to="/privacy" className="hover:text-cream transition-colors">
+            <Link to="/privacy" className="hover:text-[#0F3D2E] transition-colors">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="hover:text-cream transition-colors">
+            <Link to="/terms" className="hover:text-[#0F3D2E] transition-colors">
               Terms of Service
             </Link>
-            <Link to="/refund-policy" className="hover:text-cream transition-colors">
+            <Link to="/refund-policy" className="hover:text-[#0F3D2E] transition-colors">
               Refund Policy
             </Link>
-            <Link to="/unsubscribe" className="hover:text-cream transition-colors">
+            <Link to="/unsubscribe" className="hover:text-[#0F3D2E] transition-colors">
               Preferences
             </Link>
           </nav>

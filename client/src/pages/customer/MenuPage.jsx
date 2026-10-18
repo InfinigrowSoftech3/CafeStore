@@ -458,14 +458,16 @@ export default function MenuPage() {
 
   return (
     <div
-      className="min-h-[100dvh] bg-[#FFF1C9] text-[#0F3D2E] font-jakarta selection:bg-[#0F3D2E] selection:text-[#FFF1C9]"
+      className="min-h-[100dvh] bg-[#FAFAF8] text-[#111827] font-jakarta selection:bg-[#0F3D2E] selection:text-[#FFF1C9]"
       style={{
-        '--menu-bg': '#FFF1C9',
+        '--menu-bg': '#FAFAF8',
         '--menu-ink': '#0F3D2E',
         '--menu-accent': accentColor,
         '--menu-accent-text': '#FFFFFF',
         '--menu-card': '#FFFFFF',
-        '--menu-veg': '#1B7A3E',
+        '--menu-veg': '#16A34A',
+        '--menu-nonveg': '#DC2626',
+        '--menu-butter': '#FFF1C9',
       }}
     >
       {/* 
@@ -661,7 +663,7 @@ export default function MenuPage() {
             {/* ─── 5. Category Chips ──────────────────────────────────────────────── */}
             <section
               aria-label="Category Selection"
-              className="py-1 sticky top-0 z-20 bg-[#FFF1C9]/95 backdrop-blur-xs transition-all"
+              className="py-1.5 sticky top-0 z-20 bg-[#FAFAF8]/95 backdrop-blur-md transition-all"
             >
               <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-fade-right -mx-4 px-4 min-[390px]:-mx-5 min-[390px]:px-5 sm:mx-0 sm:px-0 sm:overflow-visible sm:flex-wrap sm:mask-none py-1 snap-x snap-mandatory">
                 {/* "All" chip */}
@@ -670,16 +672,16 @@ export default function MenuPage() {
                   onClick={() => handleCategoryClick('all')}
                   className={`snap-start shrink-0 min-h-[44px] inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-sora font-bold border transition-all active:scale-95 ${
                     selectedCategory === 'all'
-                      ? 'bg-[#0F3D2E] text-[#FFF1C9] border-[#0F3D2E] shadow-sm'
-                      : 'bg-white text-[#0F3D2E] border-[#0F3D2E]/15 hover:border-[#0F3D2E]/40 shadow-2xs'
+                      ? 'bg-[#0F3D2E] text-white border-[#0F3D2E] shadow-sm'
+                      : 'bg-white text-stone-700 border-stone-200 hover:border-[#0F3D2E]/40 hover:text-[#0F3D2E] shadow-2xs'
                   }`}
                 >
                   <span>All</span>
                   <span
                     className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full ${
                       selectedCategory === 'all'
-                        ? 'bg-[#FFF1C9]/20 text-[#FFF1C9]'
-                        : 'bg-[#0F3D2E]/8 text-[#0F3D2E]'
+                        ? 'bg-white/20 text-[#FFF1C9]'
+                        : 'bg-stone-100 text-stone-600'
                     }`}
                   >
                     {categoryCounts.all || 0}
@@ -697,8 +699,8 @@ export default function MenuPage() {
                       onClick={() => handleCategoryClick(cat._id)}
                       className={`snap-start shrink-0 min-h-[44px] inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-sora font-bold border whitespace-nowrap transition-all active:scale-95 ${
                         isSelected
-                          ? 'bg-[#0F3D2E] text-[#FFF1C9] border-[#0F3D2E] shadow-sm'
-                          : 'bg-white text-[#0F3D2E] border-[#0F3D2E]/15 hover:border-[#0F3D2E]/40 shadow-2xs'
+                          ? 'bg-[#0F3D2E] text-white border-[#0F3D2E] shadow-sm'
+                          : 'bg-white text-stone-700 border-stone-200 hover:border-[#0F3D2E]/40 hover:text-[#0F3D2E] shadow-2xs'
                       }`}
                     >
                       {/* Clean SVG Lucide icon, strictly no emojis */}
@@ -708,8 +710,8 @@ export default function MenuPage() {
                         <span
                           className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full ${
                             isSelected
-                              ? 'bg-[#FFF1C9]/20 text-[#FFF1C9]'
-                              : 'bg-[#0F3D2E]/8 text-[#0F3D2E]'
+                              ? 'bg-white/20 text-[#FFF1C9]'
+                              : 'bg-stone-100 text-stone-600'
                           }`}
                         >
                           {count}

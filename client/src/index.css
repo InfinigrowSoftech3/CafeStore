@@ -3,27 +3,28 @@
 @tailwind utilities;
 
 :root {
-  --bg: #FAF6EF;
+  --bg: #FAFAF8;
   --surface: #FFFFFF;
-  --ink: #1C1612;
-  --muted: #7A6F64;
-  --border: #E9E0D2;
-  --hero: #17110C;
-  --brand: #C8963E;
-  --brand-strong: #A87420;
-  --brand-soft: #F6EBD5;
-  --tenant-primary: #C8963E;
-  --tenant-accent: #17110C;
+  --ink: #111827;
+  --muted: #6B7280;
+  --border: #E7E5E4;
+  --hero: #0F3D2E;
+  --brand: #0F3D2E;
+  --brand-strong: #0A2B20;
+  --brand-soft: #FFF1C9;
+  --tenant-primary: #0F3D2E;
+  --tenant-accent: #FFF1C9;
 
   /* Customer Menu Redesign Tokens (Butter & Deep Green Theme) */
-  --menu-bg: #FFF1C9;
+  --menu-bg: #FAFAF8;
   --menu-ink: #0F3D2E;
   --menu-accent: #C93A1C;
   --menu-accent-text: #FFFFFF;
   --menu-card: #FFFFFF;
-  --menu-card-radius: 26px;
-  --menu-veg: #1B7A3E;
-  --menu-nonveg: #C93A1C;
+  --menu-card-radius: 24px;
+  --menu-veg: #16A34A;
+  --menu-nonveg: #DC2626;
+  --menu-butter: #FFF1C9;
 }
 
 :focus-visible {
@@ -111,31 +112,31 @@
 
 @layer components {
   .btn-primary {
-    background-color: var(--tenant-primary, var(--brand, #C8963E));
-    color: #1C1612;
-    @apply font-body font-bold px-6 py-3 rounded-2xl
-           hover:brightness-95 active:scale-[0.98] transition-all duration-200
+    background-color: var(--tenant-primary, #0F3D2E);
+    color: #FFFFFF;
+    @apply font-sora font-bold px-6 py-3 rounded-full
+           hover:bg-[#16503D] active:scale-[0.98] transition-all duration-200
            disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] inline-flex items-center justify-center gap-2 shadow-sm;
   }
 
   .btn-secondary {
-    @apply border border-sand-200 bg-white text-espresso-950 font-body font-bold px-5 py-2.5 rounded-2xl
-           hover:bg-foam hover:border-brew-400 active:scale-[0.98] transition-all duration-200 min-h-[44px] inline-flex items-center justify-center gap-2 shadow-xs;
+    @apply border border-stone-200 bg-white text-stone-800 font-sora font-semibold px-5 py-2.5 rounded-full
+           hover:bg-stone-50 hover:border-stone-300 active:scale-[0.98] transition-all duration-200 min-h-[44px] inline-flex items-center justify-center gap-2 shadow-2xs;
   }
 
   .btn-accent {
-    background-color: var(--tenant-primary, var(--brand, #C8963E));
-    color: #1C1612;
-    @apply font-body font-bold px-6 py-3 rounded-2xl
+    background-color: var(--menu-accent, #C93A1C);
+    color: #FFFFFF;
+    @apply font-sora font-bold px-6 py-3 rounded-full
            hover:brightness-95 active:scale-[0.98] transition-all duration-200
-           disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] inline-flex items-center justify-center gap-2 shadow-md;
+           disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] inline-flex items-center justify-center gap-2 shadow-sm;
   }
 
   .card {
     background-color: #FFFFFF;
-    border-radius: 1.125rem;
-    box-shadow: 0 4px 20px -2px rgba(28, 22, 18, 0.05), 0 1px 4px rgba(28, 22, 18, 0.03);
-    border: 1px solid var(--border, #E9E0D2);
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 1px 4px rgba(15, 23, 42, 0.02);
+    border: 1px solid var(--border, #E7E5E4);
     overflow: hidden;
     transition: all 200ms ease-out;
   }
@@ -145,8 +146,8 @@
     transition: all 200ms cubic-bezier(0.22, 1, 0.36, 1);
   }
   .card-interactive:hover {
-    box-shadow: 0 14px 30px -4px rgba(28, 22, 18, 0.09), 0 3px 8px rgba(28, 22, 18, 0.04);
-    border-color: var(--brand, #C8963E);
+    box-shadow: 0 14px 30px -4px rgba(15, 23, 42, 0.08), 0 3px 8px rgba(15, 23, 42, 0.03);
+    border-color: #0F3D2E;
   }
 
   .glass {
@@ -206,7 +207,7 @@ canvas {
 
 .about-page,
 .contact-page {
-  background: linear-gradient(180deg, #FAF6EF 0%, #F6EBD5 52%, #FAF6EF 100%);
+  background: #FAFAF8;
 }
 
 .about-hero::after,

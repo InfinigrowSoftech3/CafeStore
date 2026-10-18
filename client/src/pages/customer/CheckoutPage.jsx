@@ -96,15 +96,15 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-cream/90 flex items-center justify-center flex-col gap-4 p-6 text-center">
-        <div className="w-20 h-20 rounded-3xl bg-foam flex items-center justify-center text-4xl mb-2 shadow-inner">
+      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center flex-col gap-4 p-6 text-center">
+        <div className="w-20 h-20 rounded-3xl bg-[#FFF1C9]/80 border border-[#FFF1C9] flex items-center justify-center text-4xl mb-2 shadow-xs">
           🛒
         </div>
-        <h1 className="font-display text-2xl font-bold text-espresso-950">Your cart is empty</h1>
-        <p className="text-espresso-500 text-sm max-w-sm">
+        <h1 className="font-sora text-2xl font-extrabold text-[#0F3D2E]">Your cart is empty</h1>
+        <p className="text-stone-500 text-sm max-w-sm">
           Please add items to your cart before proceeding to checkout.
         </p>
-        <Link to="/menu" className="btn-primary min-h-[46px] px-8 text-xs font-bold uppercase tracking-wider mt-2">
+        <Link to="/menu" className="btn-primary min-h-[48px] px-8 text-xs font-sora font-bold tracking-wider mt-2">
           Browse Menu
         </Link>
       </div>
@@ -260,27 +260,27 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-cream/90 flex flex-col">
+    <div className="min-h-screen bg-[#FAFAF8] flex flex-col">
       {/* Top Header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b border-foam/90 bg-white/95 backdrop-blur-md shadow-2xs">
+      <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3.5 border-b border-stone-200/80 bg-white/95 backdrop-blur-md shadow-2xs">
         <div className="flex items-center gap-3">
           <Link
             to="/cart"
             aria-label="Back to Cart"
-            className="min-h-[40px] min-w-[40px] rounded-full border border-espresso-200/80 flex items-center justify-center text-espresso-800 hover:bg-espresso-50 transition active:scale-95"
+            className="min-h-[40px] min-w-[40px] rounded-full border border-stone-200 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition active:scale-95"
           >
             <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="font-display text-lg sm:text-xl font-bold text-espresso-950 leading-none">
+            <h1 className="font-sora text-lg sm:text-xl font-bold text-[#0F3D2E] leading-none">
               Checkout
             </h1>
-            <p className="text-[11px] text-espresso-500 mt-0.5">{tenant.name}</p>
+            <p className="text-[11px] text-stone-500 mt-0.5">{tenant.name}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/70">
-          <ShieldCheck size={14} />
+        <div className="flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+          <ShieldCheck size={14} className="text-[#16A34A]" />
           <span className="font-semibold">Secure Checkout</span>
         </div>
       </header>
@@ -291,44 +291,44 @@ export default function CheckoutPage() {
           {/* Left Column: Table Details + Customer Details + Payment Method */}
           <div className="lg:col-span-7 space-y-4">
             {/* Table Badge Card */}
-            <div className="card p-4 bg-white flex items-center justify-between gap-3 shadow-2xs">
+            <div className="card p-4 bg-white border border-stone-200/80 flex items-center justify-between gap-3 shadow-2xs rounded-2xl">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-espresso-900 text-cream font-display font-bold text-base shadow-xs">
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-[#0F3D2E] text-white font-sora font-bold text-base shadow-xs">
                   {String(tableNumber || '—').padStart(2, '0')}
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-espresso-400">Dine-In Table</p>
-                  <p className="font-display text-base font-bold text-espresso-950">
+                  <p className="text-xs font-bold uppercase tracking-wider text-stone-400">Dine-In Table</p>
+                  <p className="font-sora text-base font-bold text-[#0F3D2E]">
                     {tableNumber ? `Table ${String(tableNumber).padStart(2, '0')}` : 'Table not selected'}
                   </p>
                 </div>
               </div>
 
               {tableNumber ? (
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                  <CheckCircle2 size={13} />
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                  <CheckCircle2 size={13} className="text-[#16A34A]" />
                   <span>Verified</span>
                 </div>
               ) : (
-                <Link to="/menu" className="text-xs font-bold text-amber-700 underline">
+                <Link to="/menu" className="text-xs font-bold text-[#C93A1C] underline">
                   Scan Table QR
                 </Link>
               )}
             </div>
 
             {/* Customer Details Card */}
-            <div className="card p-5 bg-white space-y-4 shadow-2xs">
-              <div className="flex items-center justify-between border-b border-foam pb-3">
+            <div className="card p-5 bg-white border border-stone-200/80 space-y-4 shadow-2xs rounded-3xl">
+              <div className="flex items-center justify-between border-b border-stone-100 pb-3">
                 <div className="flex items-center gap-2">
-                  <User size={18} className="text-brew-600" />
-                  <h2 className="font-display text-base font-bold text-espresso-950">
+                  <User size={18} className="text-[#0F3D2E]" />
+                  <h2 className="font-sora text-base font-bold text-[#0F3D2E]">
                     Customer Information
                   </h2>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowOtpLogin(true)}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-brew-700 hover:text-espresso-950 bg-brew-50 hover:bg-brew-100/70 border border-brew-200 px-3 py-1 rounded-full transition"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0F3D2E] hover:bg-[#FFF1C9]/80 bg-[#FFF1C9]/50 border border-[#0F3D2E]/20 px-3 py-1 rounded-full transition"
                 >
                   <Smartphone size={13} />
                   <span>Login with OTP</span>
@@ -337,17 +337,17 @@ export default function CheckoutPage() {
 
               {/* Name Input */}
               <div>
-                <label className="text-xs font-bold text-espresso-700 mb-1.5 block">
+                <label className="text-xs font-bold text-stone-700 mb-1.5 block">
                   Your Name <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-espresso-400 pointer-events-none" />
+                  <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
                   <input
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Enter your full name"
-                    className="input-field pl-10"
+                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-stone-200 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-[#0F3D2E] focus:ring-2 focus:ring-[#0F3D2E]/20 transition"
                     autoComplete="name"
                   />
                 </div>
@@ -355,11 +355,11 @@ export default function CheckoutPage() {
 
               {/* Mobile Phone Input */}
               <div>
-                <label className="text-xs font-bold text-espresso-700 mb-1.5 block">
+                <label className="text-xs font-bold text-stone-700 mb-1.5 block">
                   Mobile Number <span className="text-red-500">*</span>
                 </label>
                 <div className="relative flex items-center">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-espresso-500">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-stone-500">
                     +91
                   </span>
                   <input
@@ -367,44 +367,44 @@ export default function CheckoutPage() {
                     value={phone}
                     onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     placeholder="10-digit mobile number"
-                    className="input-field pl-12"
+                    className="w-full h-11 pl-12 pr-4 rounded-xl border border-stone-200 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-[#0F3D2E] focus:ring-2 focus:ring-[#0F3D2E]/20 transition"
                     autoComplete="tel"
                     inputMode="numeric"
                   />
                 </div>
-                <p className="text-[11px] text-espresso-400 mt-1">
+                <p className="text-[11px] text-stone-400 mt-1">
                   We will send order confirmation and kitchen updates via SMS/WhatsApp.
                 </p>
               </div>
 
               {/* Email (Optional) */}
               <div>
-                <label className="text-xs font-bold text-espresso-700 mb-1.5 block">
-                  Email Address <span className="text-espresso-400 font-normal">(Optional for invoice)</span>
+                <label className="text-xs font-bold text-stone-700 mb-1.5 block">
+                  Email Address <span className="text-stone-400 font-normal">(Optional for invoice)</span>
                 </label>
                 <div className="relative">
-                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-espresso-400 pointer-events-none" />
+                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
                   <input
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="you@domain.com"
-                    className="input-field pl-10"
+                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-stone-200 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-[#0F3D2E] focus:ring-2 focus:ring-[#0F3D2E]/20 transition"
                     autoComplete="email"
                   />
                 </div>
               </div>
 
               {/* Marketing Consent */}
-              <div className="pt-2 border-t border-foam">
-                <label className="flex items-start gap-2.5 cursor-pointer text-espresso-700 select-none group">
+              <div className="pt-2 border-t border-stone-100">
+                <label className="flex items-start gap-2.5 cursor-pointer text-stone-700 select-none group">
                   <input
                     type="checkbox"
                     checked={marketingConsent}
                     onChange={e => setMarketingConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-espresso-300 text-brew-600 focus:ring-brew-500 cursor-pointer transition accent-brew-600"
+                    className="mt-0.5 h-4 w-4 rounded border-stone-300 text-[#0F3D2E] focus:ring-[#0F3D2E] cursor-pointer transition accent-[#0F3D2E]"
                   />
-                  <span className="text-xs leading-relaxed text-espresso-600 group-hover:text-espresso-900 transition">
+                  <span className="text-xs leading-relaxed text-stone-600 group-hover:text-stone-900 transition">
                     Keep me updated with chef specials, seasonal brews, and promotions from {tenant.name}.
                   </span>
                 </label>
@@ -412,10 +412,10 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment Method Card */}
-            <div className="card p-5 bg-white space-y-4 shadow-2xs">
-              <div className="flex items-center gap-2 border-b border-foam pb-3">
-                <CreditCard size={18} className="text-brew-600" />
-                <h2 className="font-display text-base font-bold text-espresso-950">
+            <div className="card p-5 bg-white border border-stone-200/80 space-y-4 shadow-2xs rounded-3xl">
+              <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
+                <CreditCard size={18} className="text-[#0F3D2E]" />
+                <h2 className="font-sora text-base font-bold text-[#0F3D2E]">
                   Select Payment Method
                 </h2>
               </div>
@@ -427,26 +427,26 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod('razorpay')}
                   className={`p-4 rounded-2xl border-2 transition-all text-left flex flex-col justify-between min-h-[92px] ${
                     paymentMethod === 'razorpay'
-                      ? 'border-brew-600 bg-brew-50/80 shadow-xs'
-                      : 'border-espresso-200/90 bg-white hover:border-espresso-400 hover:bg-espresso-50/40'
+                      ? 'border-[#0F3D2E] bg-emerald-50/40 shadow-xs'
+                      : 'border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50/50'
                   }`}
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2.5">
-                      <div className={`p-2 rounded-xl ${paymentMethod === 'razorpay' ? 'bg-brew-600 text-white' : 'bg-foam text-espresso-700'}`}>
+                      <div className={`p-2 rounded-xl ${paymentMethod === 'razorpay' ? 'bg-[#0F3D2E] text-white' : 'bg-stone-100 text-stone-700'}`}>
                         <CreditCard size={18} />
                       </div>
-                      <span className="font-display font-bold text-sm text-espresso-950">
+                      <span className="font-sora font-bold text-sm text-[#0F3D2E]">
                         Online Payment
                       </span>
                     </div>
                     <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                      paymentMethod === 'razorpay' ? 'border-brew-600 bg-brew-600' : 'border-espresso-300'
+                      paymentMethod === 'razorpay' ? 'border-[#0F3D2E] bg-[#0F3D2E]' : 'border-stone-300'
                     }`}>
                       {paymentMethod === 'razorpay' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                     </div>
                   </div>
-                  <p className="text-[11px] text-espresso-500 mt-2">
+                  <p className="text-[11px] text-stone-500 mt-2">
                     Instant UPI (GPay, PhonePe), Cards & Net Banking
                   </p>
                 </button>
@@ -457,26 +457,26 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod('cash')}
                   className={`p-4 rounded-2xl border-2 transition-all text-left flex flex-col justify-between min-h-[92px] ${
                     paymentMethod === 'cash'
-                      ? 'border-brew-600 bg-brew-50/80 shadow-xs'
-                      : 'border-espresso-200/90 bg-white hover:border-espresso-400 hover:bg-espresso-50/40'
+                      ? 'border-[#0F3D2E] bg-emerald-50/40 shadow-xs'
+                      : 'border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50/50'
                   }`}
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2.5">
-                      <div className={`p-2 rounded-xl ${paymentMethod === 'cash' ? 'bg-brew-600 text-white' : 'bg-foam text-espresso-700'}`}>
+                      <div className={`p-2 rounded-xl ${paymentMethod === 'cash' ? 'bg-[#0F3D2E] text-white' : 'bg-stone-100 text-stone-700'}`}>
                         <Banknote size={18} />
                       </div>
-                      <span className="font-display font-bold text-sm text-espresso-950">
+                      <span className="font-sora font-bold text-sm text-[#0F3D2E]">
                         Cash at Counter
                       </span>
                     </div>
                     <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                      paymentMethod === 'cash' ? 'border-brew-600 bg-brew-600' : 'border-espresso-300'
+                      paymentMethod === 'cash' ? 'border-[#0F3D2E] bg-[#0F3D2E]' : 'border-stone-300'
                     }`}>
                       {paymentMethod === 'cash' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                     </div>
                   </div>
-                  <p className="text-[11px] text-espresso-500 mt-2">
+                  <p className="text-[11px] text-stone-500 mt-2">
                     Pay at the billing counter when leaving
                   </p>
                 </button>
@@ -500,27 +500,27 @@ export default function CheckoutPage() {
 
           {/* Right Column: Order Summary & Coupon Code & Pay Button */}
           <div className="lg:col-span-5">
-            <div className="card p-5 sm:p-6 bg-white space-y-5 shadow-xs sticky top-24">
-              <h2 className="font-display text-lg font-bold text-espresso-950 border-b border-foam pb-3">
+            <div className="card p-5 sm:p-6 bg-white border border-stone-200/80 space-y-5 shadow-xs rounded-3xl sticky top-24">
+              <h2 className="font-sora text-lg font-bold text-[#0F3D2E] border-b border-stone-100 pb-3">
                 Order Summary ({items.length} items)
               </h2>
 
               {/* Items List Snapshot */}
               <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
                 {items.map(item => (
-                  <div key={item.key} className="flex justify-between items-baseline text-xs">
+                  <div key={item.key} className="flex justify-between items-baseline text-xs font-jakarta">
                     <div className="pr-2 min-w-0">
-                      <p className="font-semibold text-espresso-900 truncate">
+                      <p className="font-semibold text-stone-900 truncate">
                         {item.name} × {item.quantity}
                       </p>
                       {item.variant && (
-                        <p className="text-[10px] text-espresso-500">{item.variant.name}</p>
+                        <p className="text-[10px] text-stone-500">{item.variant.name}</p>
                       )}
                       {item.addons?.length > 0 && (
-                        <p className="text-[10px] text-espresso-400">+{item.addons.map(a => a.name).join(', ')}</p>
+                        <p className="text-[10px] text-stone-400">+{item.addons.map(a => a.name).join(', ')}</p>
                       )}
                     </div>
-                    <span className="price-tag text-xs font-bold text-espresso-950 flex-shrink-0">
+                    <span className="font-sora text-xs font-bold text-[#0F3D2E] flex-shrink-0">
                       {formatMoney(item.itemTotal, tenant.currency)}
                     </span>
                   </div>
@@ -528,20 +528,20 @@ export default function CheckoutPage() {
               </div>
 
               {/* Coupon Code Input */}
-              <div className="border-t border-foam pt-3">
-                <label className="text-xs font-bold uppercase tracking-wider text-espresso-600 mb-1.5 block">
+              <div className="border-t border-stone-100 pt-3">
+                <label className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5 block">
                   Have a Coupon?
                 </label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <Tag size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-espresso-400 pointer-events-none" />
+                    <Tag size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
                     <input
                       value={couponInput}
                       onChange={(e) => {
                         setCouponInput(e.target.value.toUpperCase());
                         setAppliedCoupon(null);
                       }}
-                      className="input-field pl-9 py-2 text-xs uppercase font-mono tracking-wider"
+                      className="w-full h-10 pl-9 pr-3 rounded-xl border border-stone-200 bg-white text-xs uppercase font-mono tracking-wider text-stone-900 focus:outline-none focus:border-[#0F3D2E] focus:ring-2 focus:ring-[#0F3D2E]/20"
                       placeholder="ENTER CODE"
                       maxLength={32}
                     />
@@ -550,38 +550,38 @@ export default function CheckoutPage() {
                     type="button"
                     onClick={applyCoupon}
                     disabled={couponLoading || !couponInput.trim()}
-                    className="btn-secondary px-4 py-2 text-xs font-bold shrink-0 disabled:opacity-50"
+                    className="btn-secondary px-4 py-2 text-xs font-sora font-bold shrink-0 disabled:opacity-50 rounded-full"
                   >
                     {couponLoading ? 'Checking...' : appliedCoupon ? 'Applied' : 'Apply'}
                   </button>
                 </div>
                 {appliedCoupon && (
-                  <p className="mt-2 text-xs font-semibold text-emerald-700 flex items-center gap-1">
-                    <CheckCircle2 size={13} />
+                  <p className="mt-2 text-xs font-semibold text-emerald-800 flex items-center gap-1">
+                    <CheckCircle2 size={13} className="text-[#16A34A]" />
                     <span>{appliedCoupon.code} applied — saving {formatMoney(discount, tenant.currency)}</span>
                   </p>
                 )}
               </div>
 
               {/* Bill Details */}
-              <div className="border-t border-foam pt-3 space-y-2 text-xs">
-                <div className="flex justify-between text-espresso-600">
+              <div className="border-t border-stone-100 pt-3 space-y-2 text-xs font-jakarta">
+                <div className="flex justify-between text-stone-600">
                   <span>Subtotal</span>
-                  <span className="price-tag text-xs">{formatMoney(subtotal, tenant.currency)}</span>
+                  <span className="font-sora font-semibold text-stone-800">{formatMoney(subtotal, tenant.currency)}</span>
                 </div>
                 {discount > 0 && (
-                  <div className="flex justify-between text-emerald-700 font-semibold">
+                  <div className="flex justify-between text-emerald-800 font-semibold">
                     <span>Coupon Savings</span>
                     <span>−{formatMoney(discount, tenant.currency)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-espresso-600">
+                <div className="flex justify-between text-stone-600">
                   <span>GST &amp; Taxes ({tenant.taxRate}%)</span>
-                  <span className="price-tag text-xs">{formatMoney(tax, tenant.currency)}</span>
+                  <span className="font-sora font-semibold text-stone-800">{formatMoney(tax, tenant.currency)}</span>
                 </div>
-                <div className="flex justify-between border-t border-dashed border-espresso-200 pt-2.5 text-base font-bold text-espresso-950">
+                <div className="flex justify-between border-t border-dashed border-stone-200 pt-2.5 text-base font-bold text-stone-900">
                   <span>Final Total</span>
-                  <span className="price-tag text-xl text-espresso-950">{formatMoney(total, tenant.currency)}</span>
+                  <span className="font-sora text-xl font-extrabold text-[#0F3D2E]">{formatMoney(total, tenant.currency)}</span>
                 </div>
               </div>
 
@@ -590,7 +590,7 @@ export default function CheckoutPage() {
                 whileTap={{ scale: 0.985 }}
                 onClick={handleSubmit}
                 disabled={loading}
-                className="hidden lg:flex w-full btn-primary items-center justify-center gap-2 py-4 text-sm font-bold uppercase tracking-wider shadow-md"
+                className="hidden lg:flex w-full btn-primary items-center justify-center gap-2 py-3.5 text-sm font-sora font-bold shadow-md rounded-full"
               >
                 {loading ? (
                   <>
@@ -610,17 +610,17 @@ export default function CheckoutPage() {
       </main>
 
       {/* Floating Bottom Pay Bar for Mobile */}
-      <div className="lg:hidden bottom-safe fixed bottom-0 left-0 right-0 p-3.5 bg-white/95 backdrop-blur-xl border-t border-foam shadow-2xl z-20">
+      <div className="lg:hidden bottom-safe fixed bottom-0 left-0 right-0 p-3.5 bg-white/95 backdrop-blur-xl border-t border-stone-200 shadow-2xl z-20">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] text-espresso-500 uppercase tracking-wider font-semibold">Amount to Pay</p>
-            <p className="price-tag text-lg font-bold text-espresso-950">{formatMoney(total, tenant.currency)}</p>
+            <p className="text-[11px] text-stone-500 uppercase tracking-wider font-semibold">Amount to Pay</p>
+            <p className="font-sora text-lg font-extrabold text-[#0F3D2E]">{formatMoney(total, tenant.currency)}</p>
           </div>
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 min-h-[48px] btn-primary flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider"
+            className="flex-1 min-h-[48px] btn-primary flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-full"
           >
             {loading ? (
               <>

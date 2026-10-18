@@ -91,22 +91,22 @@ export default function BillPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <Loader2 className="animate-spin text-brew-600" size={32} />
+      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
+        <Loader2 className="animate-spin text-[#0F3D2E]" size={32} />
       </div>
     );
   }
 
   if (!diningSessionToken || !bill) {
     return (
-      <div className="min-h-screen bg-cream flex flex-col items-center justify-center gap-4 p-8 text-center">
-        <p className="font-display text-2xl font-bold text-espresso-900">
+      <div className="min-h-screen bg-[#FAFAF8] flex flex-col items-center justify-center gap-4 p-8 text-center">
+        <p className="font-display text-2xl font-bold text-[#0F3D2E]">
           Scan your table QR code to view your bill.
         </p>
         <p className="text-sm text-stone-600 max-w-sm">
           Your dining session starts automatically when you scan the QR code located on your table.
         </p>
-        <Link to="/menu" className="btn-primary min-h-[44px] inline-flex items-center justify-center mt-2 px-6">
+        <Link to="/menu" className="btn-primary min-h-[44px] inline-flex items-center justify-center mt-2 px-6 rounded-full shadow-sm">
           Back to Menu
         </Link>
       </div>
@@ -114,21 +114,21 @@ export default function BillPage() {
   }
 
   return (
-    <div className="min-h-screen bg-cream">
-      <header className="flex items-center gap-3 border-b border-foam bg-white p-4">
+    <div className="min-h-screen bg-[#FAFAF8]">
+      <header className="flex items-center gap-3 border-b border-stone-200/80 bg-white/95 backdrop-blur-md p-4">
         <Link
           to="/menu"
           aria-label="Back to menu"
-          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-foam text-espresso-700 hover:bg-espresso-50 transition-colors"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-stone-200 text-stone-700 hover:bg-stone-50 transition-colors"
         >
           <ArrowLeft size={18} />
         </Link>
-        <h1 className="font-display text-xl font-bold text-espresso-900">My Table Bill</h1>
+        <h1 className="font-display text-xl font-bold text-[#0F3D2E]">My Table Bill</h1>
         <button
           type="button"
           onClick={loadBill}
           aria-label="Refresh bill"
-          className="ml-auto flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-foam text-espresso-700 hover:bg-espresso-50 transition-colors"
+          className="ml-auto flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-stone-200 text-stone-700 hover:bg-stone-50 transition-colors"
           title="Refresh bill"
         >
           <RefreshCw size={16} />
@@ -137,20 +137,20 @@ export default function BillPage() {
 
       <main className="mx-auto max-w-2xl space-y-4 p-4 pb-12">
         <TableServiceActions />
-        <section className="card space-y-3 p-5">
+        <section className="card space-y-3 p-5 bg-white border border-stone-200/80 rounded-2xl shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-espresso-600">Table {bill.tableNumber || ''}</span>
-            <span className="rounded-full bg-brew-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brew-700">
+            <span className="text-sm font-semibold text-stone-700">Table {bill.tableNumber || ''}</span>
+            <span className="rounded-full bg-[#FFF1C9] border border-amber-300 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#0F3D2E]">
               {bill.status}
             </span>
           </div>
 
-          <div className="divide-y divide-foam">
+          <div className="divide-y divide-stone-100">
             {orders.map((order) => (
               <div key={order._id} className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
                 <div className="min-w-0">
-                  <span className="font-semibold text-espresso-900">{order.orderNumber}</span>
-                  <p className="text-xs text-espresso-500">
+                  <span className="font-semibold text-stone-900">{order.orderNumber}</span>
+                  <p className="text-xs text-stone-400">
                     {order.paymentStatus === 'paid'
                       ? 'Paid'
                       : order.paymentMethod === 'cash' && order.cashVerificationStatus === 'pending'
@@ -158,25 +158,25 @@ export default function BillPage() {
                       : 'Payment due'}
                   </p>
                 </div>
-                <span className="font-mono font-bold text-espresso-900">₹{order.total}</span>
+                <span className="font-mono font-bold text-[#0F3D2E]">₹{order.total}</span>
               </div>
             ))}
           </div>
 
-          <div className="space-y-1.5 border-t border-foam pt-3 text-sm">
-            <div className="flex justify-between text-espresso-600">
+          <div className="space-y-1.5 border-t border-stone-100 pt-3 text-sm">
+            <div className="flex justify-between text-stone-600">
               <span>Subtotal</span>
               <span>₹{bill.subtotal}</span>
             </div>
-            <div className="flex justify-between text-espresso-600">
+            <div className="flex justify-between text-stone-600">
               <span>GST</span>
               <span>₹{bill.taxTotal}</span>
             </div>
-            <div className="flex justify-between font-display text-lg font-bold text-espresso-950 pt-1">
+            <div className="flex justify-between font-display text-lg font-bold text-[#0F3D2E] pt-1">
               <span>Total Bill</span>
               <span>₹{bill.grandTotal}</span>
             </div>
-            <div className="flex justify-between font-semibold text-brew-700">
+            <div className="flex justify-between font-bold text-amber-800">
               <span>Amount Due</span>
               <span>₹{bill.dueAmount}</span>
             </div>
@@ -188,7 +188,7 @@ export default function BillPage() {
             Cash payment requested. Please see the cashier at the counter. Your bill will close after staff confirms payment.
           </div>
         ) : bill.status === 'PAYMENT_PENDING' ? (
-          <div className="rounded-2xl border border-brew-200 bg-brew-50 p-4 text-sm text-brew-800 leading-relaxed">
+          <div className="rounded-2xl border border-[#0F3D2E]/20 bg-emerald-50/60 p-4 text-sm text-[#0F3D2E] leading-relaxed">
             Online payment submitted. Waiting for secure payment provider confirmation…
           </div>
         ) : bill.dueAmount > 0 ? (
@@ -197,7 +197,7 @@ export default function BillPage() {
               type="button"
               onClick={payOnline}
               disabled={payingOnline}
-              className="btn-primary min-h-[44px] flex items-center justify-center gap-2 py-3.5"
+              className="btn-primary min-h-[46px] flex items-center justify-center gap-2 py-3.5 rounded-full shadow-sm"
             >
               {payingOnline ? <Loader2 size={18} className="animate-spin" /> : <CreditCard size={18} />}
               <span>Pay ₹{bill.dueAmount} Online</span>
@@ -206,7 +206,7 @@ export default function BillPage() {
               type="button"
               onClick={requestCash}
               disabled={requestingCash}
-              className="btn-secondary min-h-[44px] flex items-center justify-center gap-2 py-3.5"
+              className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 py-3.5 rounded-full"
             >
               {requestingCash ? <Loader2 size={18} className="animate-spin" /> : <Banknote size={18} />}
               <span>Pay Cash at Counter</span>
