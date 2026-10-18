@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Monitor, ShoppingBag, UtensilsCrossed, Tag,
   Users, Star, BadgePercent, Bell, Package, PackageCheck, Truck,
   TrendingDown, BarChart2, Settings, CreditCard, LogOut, ChevronLeft,
-  ChevronRight, Menu, RefreshCw, Store, Sparkles, Smartphone, Wifi,
+  ChevronRight, Menu, RefreshCw, Store, Smartphone, Wifi,
   WifiOff, Search, Clock, Shield, AlertTriangle, CheckCircle2, ChevronDown,
   Layers, ExternalLink
 } from 'lucide-react';
@@ -15,7 +15,6 @@ import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
 import { canAccessPos, canManageMenu, canManageTeam, canViewOrders } from '../utils/roles';
 import api from '../services/api';
-import AiAssistantModal from '../components/AiAssistantModal';
 import CommandPaletteModal from '../components/common/CommandPaletteModal';
 
 // 5 Grouped Navigation Modules
@@ -76,7 +75,6 @@ export default function AdminLayout({ children, title }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(() => localStorage.getItem('admin:sidebar_collapsed') === 'true' || localStorage.getItem('cafe_admin_sidebar_collapsed') === 'true');
   const [refreshing, setRefreshing] = useState(false);
-  const [showAiModal, setShowAiModal] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
 
   // Connectivity & Sync status
@@ -590,17 +588,6 @@ export default function AdminLayout({ children, title }) {
               </NavLink>
             )}
 
-            {/* AI Advisor Button */}
-            <button
-              type="button"
-              onClick={() => setShowAiModal(true)}
-              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-3 text-xs font-bold text-white shadow-xs transition bg-amber-600 hover:bg-amber-700"
-              title="Ask InfiniGrow AI Business Advisor"
-            >
-              <Sparkles size={13} className="text-amber-200 animate-pulse" />
-              <span className="hidden md:inline">AI Advisor</span>
-            </button>
-
             {/* Refresh Button */}
             <button
               type="button"
@@ -620,7 +607,6 @@ export default function AdminLayout({ children, title }) {
         </main>
 
         {/* Global Modals */}
-        <AiAssistantModal isOpen={showAiModal} onClose={() => setShowAiModal(false)} />
         <CommandPaletteModal isOpen={showCommandPalette} onClose={() => setShowCommandPalette(false)} />
       </div>
     </div>
