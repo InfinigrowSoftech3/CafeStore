@@ -48,6 +48,10 @@ const tenantSchema = new mongoose.Schema({
       cleaningStepEnabled: { type: Boolean, default: true },
       autoReleaseMinutes: { type: Number, min: 0, max: 120, default: 5 },
     },
+    wizardProgress: {
+      completedSteps: { type: [String], default: [] },
+      currentStep: { type: String, default: 'branding' },
+    },
   },
   paymentCredentialsEncrypted: { type: String, select: false, default: '' },
   razorpayWebhookSecret: { type: String, select: false, default: '' },

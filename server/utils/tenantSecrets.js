@@ -31,11 +31,15 @@ export const decryptTenantCredentials = (stored) => {
 
 export const publicTenantSettings = (tenant) => {
   if (!tenant) return null;
-  return {
-    id: String(tenant._id || ''),
-    slug: tenant.slug || '',
-    status: tenant.status || 'active',
-    name: tenant.settings?.cafeName || tenant.name || 'Café',
+  const cafeName = tenant.settings?.cafeName || tenant.name || 'Café';
+  const wizardProgress = {
+    completedSteps: Array.isArray(tenant.settings?.wizardProgress?.completedSteps)
+      ? tenant.settings.wizardProgress.completedSteps
+      : [],
+    currentStep: tenant.settings?.wizardProgress?.currentStep || 'branding',
+  };
+  const settingsObj = {
+    cafeName,
     logoUrl: tenant.settings?.logoUrl || '',
     heroImageUrl: tenant.settings?.heroImageUrl || '',
     tagline: tenant.settings?.tagline || '',
@@ -53,5 +57,29 @@ export const publicTenantSettings = (tenant) => {
       cleaningStepEnabled: tenant.settings?.tableSettings?.cleaningStepEnabled !== false,
       autoReleaseMinutes: Number(tenant.settings?.tableSettings?.autoReleaseMinutes ?? 5),
     },
+    wizardProgress,
+  };
+  return {
+    id: String(tenant._id || ''),
+    slug: tenant.slug || '',
+    status: tenant.status || 'active',
+    name: cafeName,
+    cafeName,
+    logoUrl: settingsObj.logoUrl,
+    heroImageUrl: settingsObj.heroImageUrl,
+    tagline: settingsObj.tagline,
+    primaryColor: settingsObj.primaryColor,
+    accentColor: settingsObj.accentColor,
+    currency: settingsObj.currency,
+    timezone: settingsObj.timezone,
+    gstNumber: settingsObj.gstNumber,
+    taxRate: settingsObj.taxRate,
+    address: settingsObj.address,
+    contactEmail: settingsObj.contactEmail,
+    contactPhone: settingsObj.contactPhone,
+    openingHours: settingsObj.openingHours,
+    tableSettings: settingsObj.tableSettings,
+    wizardProgress,
+    settings: settingsObj,
   };
 };

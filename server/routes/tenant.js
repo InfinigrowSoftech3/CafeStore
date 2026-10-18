@@ -98,11 +98,8 @@ router.get('/settings', protect, authorizeRoles('owner'), async (req, res, next)
     } catch {
       credentials = { keyId: '', keySecret: '', webhookSecret: '' };
     }
-    const keyId = credentials.keyId || (process.env.RAZORPAY_KEY_ID && !process.env.RAZORPAY_KEY_ID.includes('xxxx') ? process.env.RAZORPAY_KEY_ID : '');
-    const configured = Boolean(
-      (credentials.keyId && credentials.keySecret && credentials.webhookSecret) ||
-      (process.env.RAZORPAY_KEY_ID && !process.env.RAZORPAY_KEY_ID.includes('xxxx') && process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_KEY_SECRET !== 'your_razorpay_secret')
-    );
+    const keyId = credentials.keyId || '';
+    const configured = Boolean(credentials.keyId && credentials.keySecret && credentials.webhookSecret);
     res.json({
       tenant: publicTenantSettings(tenant),
       payment: { keyId, configured },
@@ -110,66 +107,214 @@ router.get('/settings', protect, authorizeRoles('owner'), async (req, res, next)
   } catch (error) { next(error); }
 });
 
-router.put('/settings', protect, authorizeRoles('owner'), async (req, res, next) => {
+const updateTenantSettings = async (req, res, next, { isPartial = false } = {}) => {
   try {
+    const patch = {};
+    const hasSettingsPayload = req.body?.settings !== undefined;
     const input = req.body?.settings || {};
-    const name = String(input.cafeName || '').trim();
-    const currency = String(input.currency || '').trim().toUpperCase();
-    const timezone = String(input.timezone || '').trim();
-    if (!name || name.length > 100) return res.status(400).json({ error: 'Café name is required and must be 100 characters or fewer.' });
-    if (!/^[A-Z]{3}$/.test(currency)) return res.status(400).json({ error: 'Currency must be a three-letter ISO code.' });
-    try { new Intl.NumberFormat('en', { style: 'currency', currency }); } catch { return res.status(400).json({ error: 'Currency code is not supported.' }); }
-    try { new Intl.DateTimeFormat('en', { timeZone: timezone }); } catch { return res.status(400).json({ error: 'A valid timezone is required.' }); }
-    const taxRate = Number(input.taxRate);
-    if (!Number.isFinite(taxRate) || taxRate < 0 || taxRate > 100) return res.status(400).json({ error: 'Tax rate must be between 0 and 100.' });
-    const primaryColor = String(input.primaryColor || '');
-    const accentColor = String(input.accentColor || '');
-    if (!/^#[0-9a-f]{6}$/i.test(primaryColor) || !/^#[0-9a-f]{6}$/i.test(accentColor)) return res.status(400).json({ error: 'Brand colors must be six-digit hex colors.' });
-    const logoUrl = String(input.logoUrl || '').trim();
-    if (logoUrl) { try { if (!['http:', 'https:'].includes(new URL(logoUrl).protocol)) throw new Error('invalid'); } catch { return res.status(400).json({ error: 'Logo URL must use HTTP or HTTPS.' }); } }
-    const heroImageUrl = String(input.heroImageUrl || '').trim();
-    if (heroImageUrl) { try { if (!['http:', 'https:'].includes(new URL(heroImageUrl).protocol)) throw new Error('invalid'); } catch { return res.status(400).json({ error: 'Hero image URL must use HTTP or HTTPS.' }); } }
-    const tagline = String(input.tagline || '').trim().slice(0, 200);
-    const contactEmail = String(input.contactEmail || '').trim().toLowerCase();
-    if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) return res.status(400).json({ error: 'Contact email is invalid.' });
-    const openingHours = input.openingHours && typeof input.openingHours === 'object' && !Array.isArray(input.openingHours) ? input.openingHours : {};
-    const patch = {
-      name,
-      'settings.cafeName': name,
-      'settings.logoUrl': logoUrl.slice(0, 2048),
-      'settings.heroImageUrl': heroImageUrl.slice(0, 2048),
-      'settings.tagline': tagline,
-      'settings.primaryColor': primaryColor,
-      'settings.accentColor': accentColor,
-      'settings.currency': currency,
-      'settings.timezone': timezone,
-      'settings.gstNumber': String(input.gstNumber || '').trim().slice(0, 32),
-      'settings.taxRate': taxRate,
-      'settings.address': String(input.address || '').trim().slice(0, 500),
-      'settings.contactEmail': contactEmail.slice(0, 254),
-      'settings.contactPhone': String(input.contactPhone || '').trim().slice(0, 32),
-      'settings.openingHours': openingHours,
-    };
+
+    // 1. Café Name Validation: only when settings payload is provided or when not partial
+    const rawName = input.cafeName !== undefined ? input.cafeName : input.name;
+    if (rawName !== undefined || (!isPartial && hasSettingsPayload)) {
+      const name = String(rawName || '').trim();
+      if (!name || name.length > 100) {
+        return res.status(400).json({
+          error: 'Café name is required and must be 100 characters or fewer.',
+          field: 'cafeName',
+        });
+      }
+      patch.name = name;
+      patch['settings.cafeName'] = name;
+    }
+
+    // 2. Settings fields validation
+    if (input.currency !== undefined || (!isPartial && hasSettingsPayload)) {
+      const currency = String(input.currency || '').trim().toUpperCase();
+      if (!/^[A-Z]{3}$/.test(currency)) {
+        return res.status(400).json({ error: 'Currency must be a three-letter ISO code.', field: 'currency' });
+      }
+      try { new Intl.NumberFormat('en', { style: 'currency', currency }); } catch {
+        return res.status(400).json({ error: 'Currency code is not supported.', field: 'currency' });
+      }
+      patch['settings.currency'] = currency;
+    }
+
+    if (input.timezone !== undefined || (!isPartial && hasSettingsPayload)) {
+      const timezone = String(input.timezone || '').trim();
+      try { new Intl.DateTimeFormat('en', { timeZone: timezone }); } catch {
+        return res.status(400).json({ error: 'A valid timezone is required.', field: 'timezone' });
+      }
+      patch['settings.timezone'] = timezone;
+    }
+
+    if (input.taxRate !== undefined || (!isPartial && hasSettingsPayload)) {
+      const taxRate = Number(input.taxRate);
+      if (!Number.isFinite(taxRate) || taxRate < 0 || taxRate > 100) {
+        return res.status(400).json({ error: 'Tax rate must be between 0 and 100.', field: 'taxRate' });
+      }
+      patch['settings.taxRate'] = taxRate;
+    }
+
+    if (input.primaryColor !== undefined || (!isPartial && hasSettingsPayload)) {
+      const primaryColor = String(input.primaryColor || '');
+      if (!/^#[0-9a-f]{6}$/i.test(primaryColor)) {
+        return res.status(400).json({ error: 'Brand colors must be six-digit hex colors.', field: 'primaryColor' });
+      }
+      patch['settings.primaryColor'] = primaryColor;
+    }
+
+    if (input.accentColor !== undefined || (!isPartial && hasSettingsPayload)) {
+      const accentColor = String(input.accentColor || '');
+      if (!/^#[0-9a-f]{6}$/i.test(accentColor)) {
+        return res.status(400).json({ error: 'Brand colors must be six-digit hex colors.', field: 'accentColor' });
+      }
+      patch['settings.accentColor'] = accentColor;
+    }
+
+    if (input.logoUrl !== undefined) {
+      const logoUrl = String(input.logoUrl || '').trim();
+      if (logoUrl) {
+        try {
+          if (!['http:', 'https:'].includes(new URL(logoUrl).protocol)) throw new Error('invalid');
+        } catch {
+          return res.status(400).json({ error: 'Logo URL must use HTTP or HTTPS.', field: 'logoUrl' });
+        }
+      }
+      patch['settings.logoUrl'] = logoUrl.slice(0, 2048);
+    }
+
+    if (input.heroImageUrl !== undefined) {
+      const heroImageUrl = String(input.heroImageUrl || '').trim();
+      if (heroImageUrl) {
+        try {
+          if (!['http:', 'https:'].includes(new URL(heroImageUrl).protocol)) throw new Error('invalid');
+        } catch {
+          return res.status(400).json({ error: 'Hero image URL must use HTTP or HTTPS.', field: 'heroImageUrl' });
+        }
+      }
+      patch['settings.heroImageUrl'] = heroImageUrl.slice(0, 2048);
+    }
+
+    if (input.tagline !== undefined) {
+      patch['settings.tagline'] = String(input.tagline || '').trim().slice(0, 200);
+    }
+
+    if (input.address !== undefined) {
+      patch['settings.address'] = String(input.address || '').trim().slice(0, 500);
+    }
+
+    if (input.contactEmail !== undefined) {
+      const contactEmail = String(input.contactEmail || '').trim().toLowerCase();
+      if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
+        return res.status(400).json({ error: 'Contact email is invalid.', field: 'contactEmail' });
+      }
+      patch['settings.contactEmail'] = contactEmail.slice(0, 254);
+    }
+
+    if (input.contactPhone !== undefined) {
+      patch['settings.contactPhone'] = String(input.contactPhone || '').trim().slice(0, 32);
+    }
+
+    if (input.gstNumber !== undefined) {
+      patch['settings.gstNumber'] = String(input.gstNumber || '').trim().slice(0, 32);
+    }
+
+    if (input.openingHours !== undefined) {
+      patch['settings.openingHours'] = (input.openingHours && typeof input.openingHours === 'object' && !Array.isArray(input.openingHours)) ? input.openingHours : {};
+    }
+
     if (input.tableSettings && typeof input.tableSettings === 'object') {
       const cleaningStepEnabled = input.tableSettings.cleaningStepEnabled !== false;
       const rawMins = Number(input.tableSettings.autoReleaseMinutes);
       const autoReleaseMinutes = Number.isFinite(rawMins) ? Math.max(0, Math.min(120, rawMins)) : 5;
       patch['settings.tableSettings'] = { cleaningStepEnabled, autoReleaseMinutes };
     }
+
+    // 3. Wizard Progress persistence
+    const wizardProgress = input.wizardProgress || req.body?.wizardProgress;
+    if (wizardProgress && typeof wizardProgress === 'object') {
+      if (Array.isArray(wizardProgress.completedSteps)) {
+        patch['settings.wizardProgress.completedSteps'] = wizardProgress.completedSteps.map(String);
+      }
+      if (wizardProgress.currentStep) {
+        patch['settings.wizardProgress.currentStep'] = String(wizardProgress.currentStep);
+      }
+    }
+
+    // 4. Payment Credentials Handling
     const payment = req.body?.payment;
-    if (payment && Object.keys(payment).length) {
+    if (payment !== undefined && payment !== null && typeof payment === 'object') {
       const keyId = String(payment.keyId || '').trim();
       const keySecret = String(payment.keySecret || '').trim();
       const webhookSecret = String(payment.webhookSecret || '').trim();
-      const clearing = payment.clear === true && !keyId && !keySecret && !webhookSecret;
-      if (!clearing && (!keyId || !keySecret || !webhookSecret)) return res.status(400).json({ error: 'Enter the Razorpay key ID, key secret, and webhook secret together.' });
-      if (!clearing) patch.paymentCredentialsEncrypted = encryptTenantCredentials({ keyId, keySecret, webhookSecret });
-      else patch.paymentCredentialsEncrypted = '';
+      const clearing = payment.clear === true || (!keyId && !keySecret && !webhookSecret);
+
+      if (clearing) {
+        // Optional Razorpay keys: saving empty/cleared is allowed
+        patch.paymentCredentialsEncrypted = '';
+      } else {
+        // Keys provided: enforce format & completeness
+        if (!keyId) {
+          return res.status(400).json({ error: 'Razorpay Key ID is required when configuring payments.', field: 'keyId' });
+        }
+        if (!/^rzp_(?:test|live)_[a-zA-Z0-9]+$/.test(keyId)) {
+          return res.status(400).json({ error: 'Razorpay Key ID must start with rzp_test_ or rzp_live_.', field: 'keyId' });
+        }
+        if (!keySecret) {
+          return res.status(400).json({ error: 'Razorpay Key Secret is required when configuring payments.', field: 'keySecret' });
+        }
+        if (!webhookSecret) {
+          return res.status(400).json({ error: 'Razorpay Webhook Secret is required when configuring payments.', field: 'webhookSecret' });
+        }
+
+        patch.paymentCredentialsEncrypted = encryptTenantCredentials({ keyId, keySecret, webhookSecret });
+      }
     }
-    const tenant = await Tenant.findByIdAndUpdate(req.tenantId, { $set: patch }, { new: true, runValidators: true }).select('+paymentCredentialsEncrypted').lean();
-    const credentials = decryptTenantCredentials(tenant.paymentCredentialsEncrypted);
-    res.json({ tenant: publicTenantSettings(tenant), payment: { keyId: credentials.keyId, configured: Boolean(credentials.keyId && credentials.keySecret && credentials.webhookSecret) } });
+
+    const tenant = Object.keys(patch).length > 0
+      ? await Tenant.findByIdAndUpdate(req.tenantId, { $set: patch }, { new: true, runValidators: true }).select('+paymentCredentialsEncrypted').lean()
+      : await Tenant.findById(req.tenantId).select('+paymentCredentialsEncrypted').lean();
+
+    let credentials;
+    try {
+      credentials = decryptTenantCredentials(tenant.paymentCredentialsEncrypted);
+    } catch {
+      credentials = { keyId: '', keySecret: '', webhookSecret: '' };
+    }
+    const keyId = credentials.keyId || '';
+    const configured = Boolean(credentials.keyId && credentials.keySecret && credentials.webhookSecret);
+
+    res.json({
+      tenant: publicTenantSettings(tenant),
+      payment: { keyId, configured },
+    });
   } catch (error) { next(error); }
+};
+
+router.put('/settings', protect, authorizeRoles('owner'), async (req, res, next) => {
+  return updateTenantSettings(req, res, next, { isPartial: false });
+});
+
+router.patch('/settings', protect, authorizeRoles('owner'), async (req, res, next) => {
+  return updateTenantSettings(req, res, next, { isPartial: true });
+});
+
+// Dedicated step-level endpoints for onboarding wizard
+router.patch('/settings/branding', protect, authorizeRoles('owner'), async (req, res, next) => {
+  const settings = req.body?.settings || req.body || {};
+  req.body = { settings };
+  return updateTenantSettings(req, res, next, { isPartial: true });
+});
+
+router.patch('/settings/payments', protect, authorizeRoles('owner'), async (req, res, next) => {
+  const payment = req.body?.payment || req.body || {};
+  const wizardProgress = req.body?.wizardProgress;
+  req.body = { payment, wizardProgress };
+  return updateTenantSettings(req, res, next, { isPartial: true });
+});
+
+router.patch('/settings/onboarding', protect, authorizeRoles('owner'), async (req, res, next) => {
+  return updateTenantSettings(req, res, next, { isPartial: true });
 });
 
 export default router;

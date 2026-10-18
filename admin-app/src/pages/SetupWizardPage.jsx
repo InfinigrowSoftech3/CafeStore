@@ -8,6 +8,13 @@ import {
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useTenant } from '../context/TenantContext';
+import {
+  validateBranding,
+  validatePayments,
+  buildBrandingPayload,
+  buildPaymentPayload,
+  restoreWizardState,
+} from '../utils/wizardValidation';
 
 const STEPS = [
   { id: 'branding', label: 'Branding', icon: Palette, desc: 'Colors & Style' },
@@ -22,9 +29,11 @@ export default function SetupWizardPage() {
   const tenant = useTenant();
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState(new Set());
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
 
   // Branding State
   const [cafeName, setCafeName] = useState('');
@@ -44,27 +53,55 @@ export default function SetupWizardPage() {
   const [keySecret, setKeySecret] = useState('');
   const [webhookSecret, setWebhookSecret] = useState('');
 
-  // Load existing café data
+  const clearErrors = () => {
+    setError('');
+    setFieldErrors({});
+  };
+
+  // Load existing café data & restore progress
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
+      clearErrors();
       try {
         const [settingsRes, productsRes, categoriesRes, tablesRes] = await Promise.all([
-          api.get('/tenant/settings').catch(() => ({ data: { tenant: {} } })),
+          api.get('/tenant/settings').catch(() => ({ data: { tenant: {}, payment: {} } })),
           api.get('/menu?limit=100').catch(() => ({ data: { products: [] } })),
           api.get('/categories?limit=100').catch(() => ({ data: { categories: [] } })),
           api.get('/tables?limit=100').catch(() => ({ data: { tables: [] } })),
         ]);
 
-        const settings = settingsRes.data?.tenant?.settings || {};
-        setCafeName(settings.cafeName || tenant.name || '');
-        if (settings.primaryColor) setPrimaryColor(settings.primaryColor);
-        if (settings.accentColor) setAccentColor(settings.accentColor);
-        if (settings.address) setAddress(settings.address);
+        const tenantSettings = settingsRes.data?.tenant?.settings || {};
+        const paymentData = settingsRes.data?.payment || {};
+        const prods = productsRes.data?.products || [];
+        const tbls = tablesRes.data?.tables || [];
 
-        setProducts(productsRes.data?.products || []);
+        const restored = restoreWizardState({
+          tenantSettings,
+          tenantName: settingsRes.data?.tenant?.name || tenant.name || '',
+          paymentData,
+          products: prods,
+          tables: tbls,
+        });
+
+        setCafeName(restored.cafeName);
+        setPrimaryColor(restored.primaryColor);
+        setAccentColor(restored.accentColor);
+        setAddress(restored.address);
+        if (restored.keyId) setKeyId(restored.keyId);
+
+        setProducts(prods);
         setCategories(categoriesRes.data?.categories || []);
-        setTables(tablesRes.data?.tables || []);
+        setTables(tbls);
+
+        setCompletedSteps(restored.completedSteps);
+
+        if (restored.savedStep) {
+          const stepIdx = STEPS.findIndex((s) => s.id === restored.savedStep);
+          if (stepIdx !== -1) {
+            setCurrentStepIndex(stepIdx);
+          }
+        }
       } catch (err) {
         setError('Failed to load initial café settings.');
       } finally {
@@ -76,43 +113,106 @@ export default function SetupWizardPage() {
   }, [tenant]);
 
   const handleNext = async () => {
-    setError('');
+    clearErrors();
     const step = STEPS[currentStepIndex].id;
 
     if (step === 'branding') {
+      const validation = validateBranding({ cafeName });
+      if (!validation.valid) {
+        setFieldErrors(validation.errors);
+        return;
+      }
+
       setSaving(true);
       try {
-        await api.put('/tenant/settings', {
-          settings: {
-            cafeName: cafeName || tenant.name,
-            primaryColor,
-            accentColor,
-            address,
-            currency: 'INR',
-            timezone: 'Asia/Kolkata',
-            taxRate: 5,
-          },
+        const payload = buildBrandingPayload({
+          cafeName,
+          primaryColor,
+          accentColor,
+          address,
+          completedSteps: Array.from(completedSteps),
         });
+
+        await api.patch('/tenant/settings', payload);
+        const updatedDone = new Set([...completedSteps, 'branding']);
+        setCompletedSteps(updatedDone);
+
+        if (tenant?.setBranding) {
+          tenant.setBranding({ name: cafeName.trim(), primaryColor, accentColor });
+        }
       } catch (err) {
-        setError(err.message || 'Could not save branding settings.');
+        const field = err.response?.data?.field;
+        const msg = err.response?.data?.error || err.message || 'Could not save branding settings.';
+        if (field) {
+          setFieldErrors({ [field]: msg });
+        } else {
+          setError(msg);
+        }
         setSaving(false);
         return;
       }
       setSaving(false);
+    } else if (step === 'menu') {
+      setSaving(true);
+      try {
+        const updatedDone = new Set([...completedSteps, 'menu']);
+        await api.patch('/tenant/settings', {
+          wizardProgress: {
+            completedSteps: Array.from(updatedDone),
+            currentStep: 'tables',
+          },
+        });
+        setCompletedSteps(updatedDone);
+      } catch {
+        // non-blocking progress save
+      }
+      setSaving(false);
+    } else if (step === 'tables') {
+      setSaving(true);
+      try {
+        const updatedDone = new Set([...completedSteps, 'tables']);
+        await api.patch('/tenant/settings', {
+          wizardProgress: {
+            completedSteps: Array.from(updatedDone),
+            currentStep: 'payments',
+          },
+        });
+        setCompletedSteps(updatedDone);
+      } catch {
+        // non-blocking progress save
+      }
+      setSaving(false);
     } else if (step === 'payments') {
-      if (keyId || keySecret || webhookSecret) {
-        setSaving(true);
-        try {
-          await api.put('/tenant/settings', {
-            payment: { keyId, keySecret, webhookSecret },
-          });
-        } catch (err) {
-          setError(err.message || 'Failed to update payment keys.');
-          setSaving(false);
-          return;
+      const validation = validatePayments({ keyId, keySecret, webhookSecret });
+      if (!validation.valid) {
+        setFieldErrors(validation.errors);
+        return;
+      }
+
+      setSaving(true);
+      try {
+        const payload = buildPaymentPayload({
+          keyId,
+          keySecret,
+          webhookSecret,
+          completedSteps: Array.from(completedSteps),
+        });
+
+        await api.patch('/tenant/settings', payload);
+        const updatedDone = new Set([...completedSteps, 'payments']);
+        setCompletedSteps(updatedDone);
+      } catch (err) {
+        const field = err.response?.data?.field;
+        const msg = err.response?.data?.error || err.message || 'Failed to update payment keys.';
+        if (field) {
+          setFieldErrors({ [field]: msg });
+        } else {
+          setError(msg);
         }
         setSaving(false);
+        return;
       }
+      setSaving(false);
     }
 
     if (currentStepIndex < STEPS.length - 1) {
@@ -123,9 +223,17 @@ export default function SetupWizardPage() {
   };
 
   const handlePrev = () => {
-    setError('');
+    clearErrors();
     if (currentStepIndex > 0) {
       setCurrentStepIndex(currentStepIndex - 1);
+    }
+  };
+
+  const handleStepClick = (index) => {
+    const targetStep = STEPS[index].id;
+    if (completedSteps.has(targetStep) || index <= currentStepIndex) {
+      clearErrors();
+      setCurrentStepIndex(index);
     }
   };
 
@@ -161,12 +269,18 @@ export default function SetupWizardPage() {
           <div className="grid grid-cols-5 gap-2 sm:gap-4">
             {STEPS.map((s, idx) => {
               const Icon = s.icon;
-              const isDone = idx < currentStepIndex;
+              const isDone = completedSteps.has(s.id) || idx < currentStepIndex;
               const isCurrent = idx === currentStepIndex;
+              const canClick = isDone || idx <= currentStepIndex;
               return (
-                <div
+                <button
+                  type="button"
                   key={s.id}
+                  onClick={() => handleStepClick(idx)}
+                  disabled={!canClick}
                   className={`flex flex-col items-center text-center p-2 rounded-2xl transition border ${
+                    canClick ? 'cursor-pointer hover:border-amber-300' : 'cursor-default'
+                  } ${
                     isCurrent
                       ? 'border-amber-500 bg-amber-50/50 shadow-sm'
                       : isDone
@@ -188,7 +302,7 @@ export default function SetupWizardPage() {
                   <span className={`text-xs font-semibold hidden sm:block ${isCurrent ? 'text-amber-900' : 'text-stone-600'}`}>
                     {s.label}
                   </span>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -234,10 +348,25 @@ export default function SetupWizardPage() {
                       <input
                         type="text"
                         value={cafeName}
-                        onChange={(e) => setCafeName(e.target.value)}
+                        onChange={(e) => {
+                          setCafeName(e.target.value);
+                          if (fieldErrors.cafeName) {
+                            setFieldErrors((prev) => ({ ...prev, cafeName: '' }));
+                          }
+                        }}
                         placeholder="Velvet Roast Coffee"
-                        className="w-full rounded-2xl border border-stone-200 px-4 py-3 text-sm focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-500/10"
+                        className={`w-full rounded-2xl border px-4 py-3 text-sm focus:outline-none focus:ring-4 ${
+                          fieldErrors.cafeName
+                            ? 'border-red-400 bg-red-50/20 focus:border-red-500 focus:ring-red-500/10'
+                            : 'border-stone-200 focus:border-amber-500 focus:ring-amber-500/10'
+                        }`}
                       />
+                      {fieldErrors.cafeName && (
+                        <p className="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                          <AlertCircle size={14} className="shrink-0" />
+                          <span>{fieldErrors.cafeName}</span>
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -446,10 +575,25 @@ export default function SetupWizardPage() {
                       <input
                         type="text"
                         value={keyId}
-                        onChange={(e) => setKeyId(e.target.value)}
+                        onChange={(e) => {
+                          setKeyId(e.target.value);
+                          if (fieldErrors.keyId) {
+                            setFieldErrors((prev) => ({ ...prev, keyId: '' }));
+                          }
+                        }}
                         placeholder="rzp_test_..."
-                        className="w-full rounded-2xl border border-stone-200 px-4 py-3 text-sm font-mono focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-500/10"
+                        className={`w-full rounded-2xl border px-4 py-3 text-sm font-mono focus:outline-none focus:ring-4 ${
+                          fieldErrors.keyId
+                            ? 'border-red-400 bg-red-50/20 focus:border-red-500 focus:ring-red-500/10'
+                            : 'border-stone-200 focus:border-amber-500 focus:ring-amber-500/10'
+                        }`}
                       />
+                      {fieldErrors.keyId && (
+                        <p className="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                          <AlertCircle size={14} className="shrink-0" />
+                          <span>{fieldErrors.keyId}</span>
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -459,10 +603,25 @@ export default function SetupWizardPage() {
                       <input
                         type="password"
                         value={keySecret}
-                        onChange={(e) => setKeySecret(e.target.value)}
+                        onChange={(e) => {
+                          setKeySecret(e.target.value);
+                          if (fieldErrors.keySecret) {
+                            setFieldErrors((prev) => ({ ...prev, keySecret: '' }));
+                          }
+                        }}
                         placeholder="••••••••••••••••"
-                        className="w-full rounded-2xl border border-stone-200 px-4 py-3 text-sm font-mono focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-500/10"
+                        className={`w-full rounded-2xl border px-4 py-3 text-sm font-mono focus:outline-none focus:ring-4 ${
+                          fieldErrors.keySecret
+                            ? 'border-red-400 bg-red-50/20 focus:border-red-500 focus:ring-red-500/10'
+                            : 'border-stone-200 focus:border-amber-500 focus:ring-amber-500/10'
+                        }`}
                       />
+                      {fieldErrors.keySecret && (
+                        <p className="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                          <AlertCircle size={14} className="shrink-0" />
+                          <span>{fieldErrors.keySecret}</span>
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -472,10 +631,25 @@ export default function SetupWizardPage() {
                       <input
                         type="password"
                         value={webhookSecret}
-                        onChange={(e) => setWebhookSecret(e.target.value)}
+                        onChange={(e) => {
+                          setWebhookSecret(e.target.value);
+                          if (fieldErrors.webhookSecret) {
+                            setFieldErrors((prev) => ({ ...prev, webhookSecret: '' }));
+                          }
+                        }}
                         placeholder="••••••••••••••••"
-                        className="w-full rounded-2xl border border-stone-200 px-4 py-3 text-sm font-mono focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-500/10"
+                        className={`w-full rounded-2xl border px-4 py-3 text-sm font-mono focus:outline-none focus:ring-4 ${
+                          fieldErrors.webhookSecret
+                            ? 'border-red-400 bg-red-50/20 focus:border-red-500 focus:ring-red-500/10'
+                            : 'border-stone-200 focus:border-amber-500 focus:ring-amber-500/10'
+                        }`}
                       />
+                      {fieldErrors.webhookSecret && (
+                        <p className="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                          <AlertCircle size={14} className="shrink-0" />
+                          <span>{fieldErrors.webhookSecret}</span>
+                        </p>
+                      )}
                     </div>
                   </div>
                 </motion.div>
