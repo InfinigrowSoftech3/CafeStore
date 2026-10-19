@@ -2,20 +2,27 @@
   "name": "brewhaus-cafe",
   "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "concurrently -n \"SERVER,CLIENT,ADMIN\" -c \"blue,green,magenta\" \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:admin\"",
+    "dev": "concurrently -n \"SERVER,CUSTOMER,POS,KDS,ADMIN\" -c \"blue,green,yellow,cyan,magenta\" \"npm run dev:server\" \"npm run dev:customer\" \"npm run dev:pos\" \"npm run dev:kds\" \"npm run dev:admin\"",
     "dev:server": "cd server && npm run dev",
-    "dev:client": "cd client && npm run dev",
-    "dev:admin": "cd admin-app && npm run dev",
-    "dev:all": "concurrently -n \"SERVER,CLIENT,ADMIN\" -c \"blue,green,magenta\" \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:admin\"",
-    "build": "npm run build:client",
-    "build:client": "cd client && npm run build",
-    "build:admin": "cd admin-app && npm run build",
-    "lint": "eslint server client/src admin-app/src client/*.js admin-app/*.js",
+    "dev:customer": "npm run dev --workspace=@cafe/customer",
+    "dev:pos": "npm run dev --workspace=@cafe/pos",
+    "dev:kds": "npm run dev --workspace=@cafe/kds",
+    "dev:admin": "npm run dev --workspace=@cafe/admin",
+    "dev:all": "npm run dev",
+    "build": "npm run build --workspaces --if-present",
+    "build:customer": "npm run build --workspace=@cafe/customer",
+    "build:pos": "npm run build --workspace=@cafe/pos",
+    "build:kds": "npm run build --workspace=@cafe/kds",
+    "build:admin": "npm run build --workspace=@cafe/admin",
+    "lint": "eslint server apps/*/src packages/*/src",
     "test": "cd server && npm test",
     "seed": "cd server && npm run seed",
-    "clean:db": "cd server && npm run clean:db",
-    "install:all": "npm install && cd server && npm install && cd ../client && npm install && cd ../admin-app && npm install"
+    "clean:db": "cd server && npm run clean:db"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

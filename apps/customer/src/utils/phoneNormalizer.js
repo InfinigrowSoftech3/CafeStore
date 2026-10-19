@@ -1,0 +1,1 @@
+export { normalizePhoneNumber } from '@cafe/shared';
