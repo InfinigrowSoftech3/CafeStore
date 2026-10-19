@@ -111,6 +111,8 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     ...[
       process.env.CLIENT_URL,
       process.env.CUSTOMER_APP_URL,
+      process.env.POS_APP_URL,
+      process.env.KDS_APP_URL,
       process.env.ADMIN_CLIENT_URL,
       process.env.ADMIN_APP_URL,
       process.env.CLIENT_URLS,
