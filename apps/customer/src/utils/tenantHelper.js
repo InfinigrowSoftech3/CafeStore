@@ -36,7 +36,7 @@ const EXCLUDED_PLATFORM_DOMAINS = [
 
 /**
  * Authoritative customer tenant slug resolver.
- * On customer routes, the café comes from URL query params, table QR tokens,
+ * On customer routes, the cafe comes from URL query params, table QR tokens,
  * active session storage, or verified custom tenant subdomains.
  */
 export function getResolvedTenantSlug() {
@@ -65,7 +65,7 @@ export function getResolvedTenantSlug() {
       return urlTenant.toLowerCase();
     }
 
-    // Check persistent active café slug in sessionStorage/localStorage
+    // Check persistent active cafe slug in sessionStorage/localStorage
     const storedSlug =
       sessionStorage.getItem('active_cafe_slug') ||
       localStorage.getItem('active_cafe_slug');
@@ -145,7 +145,7 @@ export function removeCustomerSessionItem(slug, key) {
 }
 
 /**
- * Clears any legacy or previous café storage keys when switching cafes
+ * Clears any legacy or previous cafe storage keys when switching cafes
  */
 export function cleanupPreviousTenantStorage(newSlug) {
   if (typeof window === 'undefined') return;
@@ -176,3 +176,17 @@ export function cleanupPreviousTenantStorage(newSlug) {
     // ignore
   }
 }
+
+const tenantHelper = {
+  extractTenantFromTableToken,
+  getResolvedTenantSlug,
+  getTenantSlug,
+  getCustomerStorageKey,
+  getCustomerSessionItem,
+  setCustomerSessionItem,
+  removeCustomerSessionItem,
+  cleanupPreviousTenantStorage,
+};
+
+export default tenantHelper;
+

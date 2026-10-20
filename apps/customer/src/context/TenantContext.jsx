@@ -9,7 +9,7 @@ import {
 import { clearClientCache } from '../utils/menuCache';
 
 const TenantContext = createContext(null);
-const fallback = { name: 'Café', currency: 'INR', taxRate: 5, primaryColor: '#0F3D2E', accentColor: '#FFF1C9' };
+const fallback = { name: 'Cafe', currency: 'INR', taxRate: 5, primaryColor: '#0F3D2E', accentColor: '#FFF1C9' };
 
 export function TenantProvider({ children }) {
   const [tenant, setTenant] = useState(fallback);
@@ -55,7 +55,7 @@ export function TenantProvider({ children }) {
       if (resolvedSlug) {
         return api.get(`/public/cafes/${encodeURIComponent(resolvedSlug)}`);
       }
-      // If no token or slug was provided in the URL or subdomain, resolve the default active café
+      // If no token or slug was provided in the URL or subdomain, resolve the default active cafe
       return api.get('/public/cafes/default');
     };
 
@@ -69,12 +69,12 @@ export function TenantProvider({ children }) {
         if (!cafeData) {
           setTenantState({
             status: 'not_found',
-            message: 'Café not found. Please scan your table QR code or check the URL.',
+            message: 'Cafe not found. Please scan your table QR code or check the URL.',
           });
           return;
         }
 
-        // Clean up previous café storage when switching tenants
+        // Clean up previous cafe storage when switching tenants
         clearClientCache();
         cleanupPreviousTenantStorage(cafeData.slug);
 
@@ -152,14 +152,14 @@ export function TenantProvider({ children }) {
         const errorMessage =
           typeof errObj === 'object'
             ? errObj?.message
-            : error.response?.data?.error || 'Café not found. Please scan your table QR code.';
+            : error.response?.data?.error || 'Cafe not found. Please scan your table QR code.';
 
         if (statusCode === 410 || errorCode === 'QR_EXPIRED' || statusCode === 423 || errorCode === 'TENANT_SUSPENDED') {
           setTenantState({ status: 'suspended', message: errorMessage });
-          document.title = 'Café Suspended | Online Ordering Paused';
+          document.title = 'Cafe Suspended | Online Ordering Paused';
         } else {
           setTenantState({ status: 'not_found', message: errorMessage });
-          document.title = 'Café Not Found | Please Scan QR';
+          document.title = 'Cafe Not Found | Please Scan QR';
         }
       });
 
