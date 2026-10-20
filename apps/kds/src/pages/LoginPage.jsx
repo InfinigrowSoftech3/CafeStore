@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Eye, EyeOff, Loader2, Sparkles, Flame, Coffee, ExternalLink, Monitor } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Loader2, Sparkles, ExternalLink, Monitor, ChefHat, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
 import { env } from '../config/env';
@@ -70,75 +70,77 @@ export default function LoginPage() {
   const isButtonDisabled = loading || rateLimitCountdown > 0;
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6 bg-stone-950 font-sans select-none overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(#292524_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none" />
+    <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6 bg-[#F8F6F2] text-[#1C1815] font-sans select-none overflow-hidden">
+      {/* Warm parchment dot texture */}
+      <div className="absolute inset-0 bg-[radial-gradient(#E5DED5_1.5px,transparent_1.5px)] [background-size:28px_28px] opacity-70 pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25 }}
-        className="relative z-10 w-full max-w-md rounded-2xl border border-stone-800 bg-stone-900/95 p-6 sm:p-8 shadow-2xl text-stone-100 backdrop-blur-md"
+        transition={{ duration: 0.2 }}
+        className="relative z-10 w-full max-w-md rounded-3xl border border-[#E5DED5] bg-white p-6 sm:p-8 shadow-xl text-[#1C1815]"
       >
         <div className="mb-6 text-center">
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 px-3 py-1 text-[11px] font-bold text-amber-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-[#F2EDE4] border border-amber-600/30 px-3.5 py-1 text-xs font-bold text-amber-700">
+            <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
             <span>Kitchen & Bar Display Station</span>
           </div>
 
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-stone-800 bg-amber-500 text-2xl font-extrabold text-stone-950 shadow-md overflow-hidden">
+          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#E5DED5] bg-amber-500 text-3xl font-black text-stone-950 shadow-sm overflow-hidden">
             🍳
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white">
-            {tenant?.name || 'Café'} Kitchen Display
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-[#1C1815]">
+            {tenant?.name || 'Café'} KDS
           </h1>
-          <p className="mt-1 text-xs text-stone-400 font-normal">
+          <p className="mt-1.5 text-xs text-[#6E645B] font-normal">
             Cook, Barista & Kitchen Staff Live Ticket Board
           </p>
         </div>
 
         {/* ── 1-Click Instant Demo / Preview Buttons ─────────── */}
-        <div className="mb-5 rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs space-y-2">
-          <div className="flex items-center gap-1.5 text-amber-400 font-bold text-[11px] uppercase tracking-wider">
-            <Sparkles size={13} />
-            <span>Instant Kitchen Access (1-Click)</span>
+        <div className="mb-6 rounded-2xl border border-[#E5DED5] bg-[#F8F6F2] p-3.5 text-xs space-y-2.5">
+          <div className="flex items-center gap-1.5 text-amber-700 font-bold text-[11px] uppercase tracking-wider">
+            <Sparkles size={14} />
+            <span>Quick Station Access (1-Click)</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => demoLogin('kitchen')}
-              className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs shadow-xs transition active:scale-98"
+              className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-amber-500 text-stone-950 font-bold text-xs shadow-xs hover:bg-amber-400 active:scale-98 transition min-h-[48px]"
             >
-              <Flame size={13} />
-              <span>Kitchen Lead / Chef</span>
+              <ChefHat size={16} />
+              <span>Chef / Cook</span>
             </button>
             <button
               type="button"
               onClick={() => demoLogin('manager')}
-              className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-amber-300 font-bold text-xs border border-amber-800/60 shadow-xs transition active:scale-98"
+              className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-white hover:bg-[#F2EDE4] text-[#1C1815] font-bold text-xs border border-[#E5DED5] shadow-xs active:scale-98 transition min-h-[48px]"
             >
-              <Coffee size={13} />
-              <span>Barista / Manager</span>
+              <ShieldCheck size={16} className="text-amber-600" />
+              <span>Store Manager</span>
             </button>
           </div>
         </div>
 
         {error && (
-          <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-xs text-red-300">
-            <AlertCircle size={15} className="shrink-0 mt-0.5 text-red-400" />
-            <span className="leading-relaxed font-medium">{error}</span>
+          <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs text-red-600">
+            <AlertCircle size={16} className="shrink-0 mt-0.5" />
+            <span className="leading-relaxed font-semibold">{error}</span>
           </div>
         )}
 
+        {/* ── Standard Staff Credentials Form ──────────────── */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-300">
-                Kitchen Staff Email
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#6E645B]">
+                Staff Email
               </label>
               <button
                 type="button"
-                onClick={() => handleFillCredentials('manager@sipstack-demo.com', 'Manager@123')}
-                className="text-[10px] text-amber-400 hover:text-amber-300 underline font-medium"
+                onClick={() => handleFillCredentials('kitchen@sipstack-demo.com', 'Kitchen@123')}
+                className="text-xs text-amber-700 hover:underline font-semibold"
               >
                 Auto-fill demo
               </button>
@@ -148,13 +150,13 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="kitchen@yourcafe.com"
-              className="w-full rounded-xl border border-stone-800 bg-stone-950 px-3.5 py-2.5 text-sm text-white placeholder-stone-600 outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+              placeholder="chef@yourcafe.com"
+              className="w-full rounded-xl border border-[#E5DED5] bg-[#FAF8F5] px-4 py-3 text-base text-[#1C1815] placeholder-[#6E645B]/60 outline-none transition focus:border-amber-600 focus:bg-white min-h-[48px]"
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-stone-300">
+            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[#6E645B]">
               Password
             </label>
             <div className="relative">
@@ -164,21 +166,22 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-stone-800 bg-stone-950 px-3.5 py-2.5 pr-10 text-sm text-white placeholder-stone-600 outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="w-full rounded-xl border border-[#E5DED5] bg-[#FAF8F5] px-4 py-3 pr-12 text-base text-[#1C1815] placeholder-[#6E645B]/60 outline-none transition focus:border-amber-600 focus:bg-white min-h-[48px]"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200 transition"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6E645B] hover:text-[#1C1815] p-2"
               >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </div>
 
           {requiresTwoFactor && (
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-amber-400">
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-amber-700">
                 2FA Verification Code
               </label>
               <input
@@ -188,7 +191,7 @@ export default function LoginPage() {
                 onChange={(e) => setTwoFactorCode(e.target.value)}
                 placeholder="6-digit code"
                 maxLength={6}
-                className="w-full rounded-xl border border-amber-500/50 bg-stone-950 px-3.5 py-2.5 text-sm text-white placeholder-stone-600 text-center tracking-widest font-mono outline-none"
+                className="w-full rounded-xl border border-amber-500 bg-[#FAF8F5] px-4 py-3 text-base text-[#1C1815] text-center tracking-widest font-mono outline-none min-h-[48px]"
               />
             </div>
           )}
@@ -196,43 +199,43 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isButtonDisabled}
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 px-4 py-3 text-sm font-bold shadow-md transition disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-98 px-5 py-3.5 text-base font-bold text-stone-950 shadow-md transition disabled:opacity-50 min-h-[48px]"
           >
-            {loading && <Loader2 size={16} className="animate-spin text-stone-950" />}
-            {loading ? 'Entering Station...' : 'Sign in to Kitchen Board'}
+            {loading && <Loader2 size={18} className="animate-spin" />}
+            {loading ? 'Connecting Board...' : 'Sign in to Kitchen Board'}
           </button>
         </form>
 
         {/* ── Cross-App Navigation Footer ───────────────────── */}
-        <div className="mt-6 pt-5 border-t border-stone-800 flex items-center justify-between text-xs text-stone-400">
-          <a
-            href={env.adminUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-amber-400 flex items-center gap-1 transition font-medium"
-          >
-            <span>Back Office</span>
-            <ExternalLink size={11} />
-          </a>
-          <span className="text-stone-700">·</span>
+        <div className="mt-6 pt-5 border-t border-[#E5DED5] flex items-center justify-between text-xs text-[#6E645B]">
           <a
             href={env.posUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-emerald-400 flex items-center gap-1 transition font-medium"
+            className="hover:text-amber-700 flex items-center gap-1 transition font-medium min-h-[32px] px-1"
           >
-            <Monitor size={11} />
-            <span>POS Terminal</span>
+            <Monitor size={12} />
+            <span>POS Register</span>
           </a>
-          <span className="text-stone-700">·</span>
+          <span className="text-[#E5DED5]">·</span>
+          <a
+            href={env.adminUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-amber-700 flex items-center gap-1 transition font-medium min-h-[32px] px-1"
+          >
+            <span>Back Office</span>
+            <ExternalLink size={12} />
+          </a>
+          <span className="text-[#E5DED5]">·</span>
           <a
             href={env.customerUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-amber-400 flex items-center gap-1 transition font-medium"
+            className="hover:text-amber-700 flex items-center gap-1 transition font-medium min-h-[32px] px-1"
           >
             <span>Storefront</span>
-            <ExternalLink size={11} />
+            <ExternalLink size={12} />
           </a>
         </div>
       </motion.div>
