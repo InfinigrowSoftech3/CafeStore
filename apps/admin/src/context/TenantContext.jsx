@@ -48,7 +48,7 @@ export function TenantProvider({ children }) {
     let active = true;
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
     const identifier = user?.tenantId || urlParams?.get('tenant') || urlParams?.get('cafe') || urlParams?.get('slug');
-    if (!identifier) return;
+    if (!identifier || String(identifier).startsWith('demo')) return;
     const queryParam = `?tenant=${encodeURIComponent(identifier)}`;
     api.get(`/tenant/public${queryParam}`).then(({ data }) => {
       if (!active) return;

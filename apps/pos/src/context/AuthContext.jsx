@@ -70,12 +70,21 @@ export function AuthProvider({ children }) {
       role: role,
       tenantName: 'Brewhaus Café',
       tenantId: 'demo-tenant',
+      tenant: {
+        name: 'Brewhaus Café',
+        currency: '₹',
+        primaryColor: '#0F3D2E',
+      },
     };
     setUser(demoUser);
     return demoUser;
   };
 
   const logout = async () => {
+    if (user?._id?.startsWith('demo')) {
+      setUser(null);
+      return;
+    }
     try {
       await api.post('/auth/logout');
     } catch {

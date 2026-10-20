@@ -1,1 +1,1 @@
-export { getAccessToken, setAccessToken } from '@cafe/shared';
+export { getAccessToken, setAccessToken, isTokenExpired } from '@cafe/shared';

@@ -26,8 +26,8 @@ export function TenantProvider({ children }) {
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
     const identifier = user?.tenantId || urlParams?.get('tenant') || urlParams?.get('cafe') || urlParams?.get('slug');
 
-    // Only query /tenant/public if a tenant identifier is present (avoids 404 when unauthenticated)
-    if (!identifier) {
+    // Only query /tenant/public if a real tenant identifier is present (avoids 404 when unauthenticated or demo)
+    if (!identifier || String(identifier).startsWith('demo')) {
       return;
     }
 
