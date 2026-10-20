@@ -719,10 +719,7 @@ html.light {
   font-variant-numeric: tabular-nums;
 }
 
-/* Prevent flash of wrong theme on initial load */
-html:not([data-theme]) {
-  visibility: hidden;
-}
-html[data-theme] {
-  visibility: visible;
+/* Ensure HTML document is always visible */
+html, body {
+  visibility: visible !important;
 }

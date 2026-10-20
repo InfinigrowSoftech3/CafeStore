@@ -7,7 +7,7 @@ export const ROLE_LABELS = {
   kitchen: 'Kitchen / Barista',
 };
 
-export const effectiveRole = (role) => ({ admin: 'owner', staff: 'manager' }[role] || role);
+export const effectiveRole = (role) => ({ admin: 'owner', staff: 'manager', super_admin: 'owner' }[role] || role);
 
 export const getRoleLabel = (role) => ROLE_LABELS[effectiveRole(role)] || role || 'User';
 
