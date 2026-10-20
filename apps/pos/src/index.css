@@ -3,21 +3,21 @@
 @tailwind utilities;
 
 :root {
-  /* Premium Touch-First Café POS Design System Tokens */
-  --pos-bg: #14110F;
-  --pos-surface: #1E1915;
-  --pos-raised: #28211B;
-  --pos-border: #3A3028;
-  --pos-border-focus: #D9A441;
-  --pos-text: #F5EDE0;
-  --pos-muted: #A89A88;
-  --pos-accent: #D9A441;
-  --pos-accent-hover: #E5B252;
-  --pos-success: #4CAF7A;
-  --pos-warning: #E8A33D;
-  --pos-danger: #E5594F;
+  /* Premium Touch-First Café POS Design System Tokens - White-Based Theme */
+  --pos-bg: #F8F6F2;
+  --pos-surface: #FFFFFF;
+  --pos-raised: #F2EDE4;
+  --pos-border: #E5DED5;
+  --pos-border-focus: #B87314;
+  --pos-text: #1C1815;
+  --pos-muted: #6E645B;
+  --pos-accent: #B87314;
+  --pos-accent-hover: #9C600E;
+  --pos-success: #16A34A;
+  --pos-warning: #D97706;
+  --pos-danger: #DC2626;
 
-  --focus-ring: #D9A441;
+  --focus-ring: #B87314;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -28,7 +28,7 @@
 }
 
 :focus-visible {
-  outline: 2px solid var(--pos-accent, #D9A441);
+  outline: 2px solid var(--pos-accent, #B87314);
   outline-offset: 2px;
 }
 
@@ -45,8 +45,8 @@ html, body, #root {
   min-height: 100%;
   height: 100%;
   margin: 0;
-  background-color: var(--pos-bg, #14110F);
-  color: var(--pos-text, #F5EDE0);
+  background-color: var(--pos-bg, #F8F6F2);
+  color: var(--pos-text, #1C1815);
 }
 
 * {
@@ -90,14 +90,14 @@ button, input, select, textarea {
   height: 6px;
 }
 .pos-scrollbar::-webkit-scrollbar-track {
-  background: #14110F;
+  background: #F8F6F2;
 }
 .pos-scrollbar::-webkit-scrollbar-thumb {
-  background: #3A3028;
+  background: #D5CCC0;
   border-radius: 9999px;
 }
 .pos-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #D9A441;
+  background: #B87314;
 }
 
 .no-scrollbar::-webkit-scrollbar {

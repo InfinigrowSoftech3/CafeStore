@@ -93,8 +93,8 @@ export default function ProductCard({
           <span
             className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
               quantity > 0
-                ? 'bg-pos-accent text-[#14110F]'
-                : 'bg-pos-raised text-pos-muted group-hover:bg-pos-accent group-hover:text-[#14110F]'
+                ? 'bg-pos-accent text-white shadow-xs'
+                : 'bg-pos-raised text-pos-muted group-hover:bg-pos-accent group-hover:text-white'
             }`}
           >
             <Plus size={16} strokeWidth={2.5} />

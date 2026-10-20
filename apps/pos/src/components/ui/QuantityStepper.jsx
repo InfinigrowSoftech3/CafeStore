@@ -20,7 +20,7 @@ export default function QuantityStepper({
         className={`touch-press flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl border transition ${
           isMin && showTrashOnMin
             ? 'border-pos-danger/40 bg-pos-danger/10 text-pos-danger hover:bg-pos-danger/20'
-            : 'border-pos-border bg-pos-raised text-pos-text hover:bg-[#342B23] active:border-pos-accent/50'
+            : 'border-pos-border bg-pos-raised text-pos-text hover:bg-pos-border active:border-pos-accent'
         }`}
       >
         {isMin && showTrashOnMin ? <Trash2 size={16} /> : <Minus size={16} />}
@@ -34,7 +34,7 @@ export default function QuantityStepper({
         type="button"
         onClick={onIncrease}
         aria-label="Increase quantity"
-        className="touch-press flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl border border-pos-border bg-pos-raised text-pos-text hover:bg-[#342B23] active:border-pos-accent/50 transition"
+        className="touch-press flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl border border-pos-border bg-pos-raised text-pos-text hover:bg-pos-border active:border-pos-accent transition"
       >
         <Plus size={16} />
       </button>

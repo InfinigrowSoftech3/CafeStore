@@ -54,7 +54,7 @@ export default function App() {
       {/* ── Premium Espresso POS Shell Header ──────────────────────── */}
       <header className="h-14 bg-pos-surface text-pos-text px-4 flex items-center justify-between border-b border-pos-border shrink-0 z-30 shadow-elevation1">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-pos-accent text-pos-bg font-extrabold text-sm shadow-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-pos-accent text-white font-extrabold text-sm shadow-sm">
             {tenant?.name ? tenant.name.charAt(0).toUpperCase() : <Coffee size={18} />}
           </div>
           <div className="flex items-center gap-2.5">

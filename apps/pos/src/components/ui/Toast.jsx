@@ -12,31 +12,31 @@ export function PosToaster() {
       toastOptions={{
         duration: 3500,
         style: {
-          background: '#1E1915',
-          color: '#F5EDE0',
-          border: '1px solid #3A3028',
+          background: '#FFFFFF',
+          color: '#1C1815',
+          border: '1px solid #E5DED5',
           borderRadius: '14px',
-          boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
           fontSize: '14px',
           fontWeight: 600,
           padding: '12px 16px',
         },
         success: {
           iconTheme: {
-            primary: '#4CAF7A',
-            secondary: '#14110F',
+            primary: '#16A34A',
+            secondary: '#FFFFFF',
           },
           style: {
-            borderLeft: '4px solid #4CAF7A',
+            borderLeft: '4px solid #16A34A',
           },
         },
         error: {
           iconTheme: {
-            primary: '#E5594F',
-            secondary: '#14110F',
+            primary: '#DC2626',
+            secondary: '#FFFFFF',
           },
           style: {
-            borderLeft: '4px solid #E5594F',
+            borderLeft: '4px solid #DC2626',
           },
         },
       }}

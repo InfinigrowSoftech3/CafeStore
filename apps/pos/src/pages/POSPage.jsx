@@ -804,7 +804,7 @@ export default function POSPage() {
           disabled={cart.length === 0 || processingOrder}
           className="w-full flex items-center justify-between px-5 font-bold tracking-wide"
         >
-          <span className="uppercase tracking-wider text-xs font-extrabold text-pos-bg/90">Pay Now</span>
+          <span className="uppercase tracking-wider text-xs font-extrabold text-white/90">Pay Now</span>
           <span className="text-lg font-bold tabular-nums">Charge {formatMoney(totalAmount, currency)} →</span>
         </Button>
 
@@ -883,7 +883,7 @@ export default function POSPage() {
                 onClick={() => setOrderType(type.id)}
                 className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap min-h-[36px] touch-press ${
                   orderType === type.id
-                    ? 'bg-pos-accent text-pos-bg shadow-sm'
+                    ? 'bg-pos-accent text-white shadow-sm'
                     : 'text-pos-muted hover:text-pos-text'
                 }`}
               >
@@ -897,7 +897,7 @@ export default function POSPage() {
             <button
               type="button"
               onClick={() => setShowHeldModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-pos-warning text-pos-bg shadow-sm hover:bg-pos-warning/90 transition min-h-[36px] touch-press shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-pos-warning text-white shadow-sm hover:bg-pos-warning/90 transition min-h-[36px] touch-press shrink-0"
             >
               <PauseCircle size={15} />
               <span>{heldOrders.length} Held</span>

@@ -75,14 +75,14 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6 bg-pos-bg text-pos-text font-sans select-none overflow-hidden">
-      {/* Espresso textured subtle background */}
-      <div className="absolute inset-0 bg-[radial-gradient(#28211B_1px,transparent_1px)] [background-size:28px_28px] opacity-40 pointer-events-none" />
+      {/* Warm parchment textured subtle background */}
+      <div className="absolute inset-0 bg-[radial-gradient(#E5DED5_1.5px,transparent_1.5px)] [background-size:28px_28px] opacity-70 pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
-        className="relative z-10 w-full max-w-md rounded-3xl border border-pos-border bg-pos-surface/95 p-6 sm:p-8 shadow-elevation2 text-pos-text backdrop-blur-md"
+        className="relative z-10 w-full max-w-md rounded-3xl border border-pos-border bg-pos-surface p-6 sm:p-8 shadow-elevation2 text-pos-text"
       >
         <div className="mb-6 text-center">
           <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-pos-raised border border-pos-accent/30 px-3.5 py-1 text-xs font-bold text-pos-accent">
@@ -90,7 +90,7 @@ export default function LoginPage() {
             <span>Counter POS Workstation</span>
           </div>
 
-          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl border border-pos-border bg-pos-accent text-pos-bg font-display text-2xl font-black shadow-elevation1 overflow-hidden">
+          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl border border-pos-border bg-pos-accent text-white font-display text-2xl font-black shadow-elevation1 overflow-hidden">
             {tenant?.logoUrl ? (
               <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
             ) : (
@@ -115,7 +115,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => demoLogin('cashier')}
-              className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-pos-accent text-pos-bg font-bold text-xs shadow-xs touch-press min-h-[48px] hover:bg-pos-accent-hover transition-colors"
+              className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-pos-accent text-white font-bold text-xs shadow-xs touch-press min-h-[48px] hover:bg-pos-accent-hover transition-colors"
             >
               <Monitor size={15} />
               <span>Cashier</span>

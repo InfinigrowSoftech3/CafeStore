@@ -25,16 +25,16 @@ export default function Button({
 
   const variantClasses = {
     primary:
-      'bg-pos-accent text-[#14110F] hover:bg-pos-accent-hover active:bg-[#C28E31] shadow-elevation1 border border-pos-accent/40',
+      'bg-pos-accent text-white hover:bg-pos-accent-hover active:bg-[#9C600E] shadow-elevation1 border border-pos-accent/40',
     secondary:
-      'bg-pos-raised text-pos-text hover:bg-[#342B23] border border-pos-border active:border-pos-accent/50 shadow-soft',
+      'bg-white text-pos-text hover:bg-pos-raised border border-pos-border active:border-pos-accent/50 shadow-soft',
     ghost:
-      'bg-transparent text-pos-muted hover:text-pos-text hover:bg-pos-raised/60 active:bg-pos-raised',
+      'bg-transparent text-pos-muted hover:text-pos-text hover:bg-pos-raised/70 active:bg-pos-raised',
     danger:
-      'bg-pos-danger/15 text-pos-danger hover:bg-pos-danger/25 border border-pos-danger/30 active:bg-pos-danger/35',
+      'bg-pos-danger/10 text-pos-danger hover:bg-pos-danger/20 border border-pos-danger/30 active:bg-pos-danger/30',
     outline:
       'bg-transparent text-pos-accent border border-pos-accent/50 hover:bg-pos-accent/10 active:bg-pos-accent/20',
-  }[variant] || 'bg-pos-accent text-[#14110F] hover:bg-pos-accent-hover';
+  }[variant] || 'bg-pos-accent text-white hover:bg-pos-accent-hover';
 
   return (
     <button
