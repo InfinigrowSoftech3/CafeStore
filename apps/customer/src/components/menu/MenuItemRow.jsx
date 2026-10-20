@@ -77,14 +77,14 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
   return (
     <article
       onClick={isAvailable ? () => onSelect(product) : undefined}
-      className={`group relative w-full bg-white border border-stone-200 rounded-none overflow-hidden select-none transition-all ${
+      className={`group relative w-full bg-white border border-stone-200 rounded-2xl overflow-hidden select-none transition-all shadow-2xs hover:shadow-md hover:border-stone-300 ${
         isAvailable
-          ? 'cursor-pointer hover:border-stone-400/80 shadow-2xs'
+          ? 'cursor-pointer'
           : 'opacity-60 grayscale-[40%] cursor-default'
       }`}
     >
       {/* ─── Top: Full-Width Food Image ─── */}
-      <div className="relative w-full h-44 sm:h-52 md:h-64 bg-stone-100 border-b border-stone-200 overflow-hidden">
+      <div className="relative w-full h-44 sm:h-52 md:h-64 bg-stone-100 border-b border-stone-100 overflow-hidden rounded-t-2xl">
         {product.image && !imgError ? (
           <img
             src={product.image}
@@ -103,7 +103,7 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
         {/* Sold Out Overlay */}
         {!isAvailable && (
           <div className="absolute inset-0 bg-stone-900/65 backdrop-blur-[1px] flex items-center justify-center p-2 text-center">
-            <span className="bg-stone-900 text-white text-xs font-sora font-extrabold px-3 py-1.5 uppercase tracking-wider rounded-none border border-white/20 shadow-xs">
+            <span className="bg-stone-900 text-white text-xs font-sora font-extrabold px-3 py-1.5 uppercase tracking-wider rounded-full border border-white/20 shadow-xs">
               Sold out
             </span>
           </div>
@@ -117,7 +117,7 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
           <VegMark isVeg={product.isVeg} size={15} />
 
           {product.popular && (
-            <span className="inline-flex items-center gap-1 rounded-none bg-[#FFF1C9] border border-amber-300 px-2 py-0.5 text-[10px] font-sora font-extrabold text-[#0F3D2E] tracking-wider uppercase">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF1C9] border border-amber-300 px-2.5 py-0.5 text-[10px] font-sora font-extrabold text-[#0F3D2E] tracking-wider uppercase">
               <Star size={9} fill="currentColor" />
               <span>BESTSELLER</span>
             </span>
@@ -164,29 +164,29 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
             )}
           </div>
 
-          {/* Right: Square Action Button */}
+          {/* Right: Rounded Action Button */}
           <div className="shrink-0 pt-0.5" onClick={(e) => e.stopPropagation()}>
             {!isAvailable ? null : totalQtyInCart > 0 && !hasCustomizations ? (
-              /* Square Quantity Stepper */
-              <div className="inline-flex items-center bg-white border border-[#0F3D2E] rounded-none shadow-2xs">
+              /* Rounded Quantity Stepper */
+              <div className="inline-flex items-center bg-white border border-[#0F3D2E] rounded-full shadow-2xs px-1">
                 <button
                   type="button"
                   onClick={handleDecrement}
                   aria-label={`Decrease quantity of ${product.name}`}
-                  className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-[#0F3D2E] hover:bg-stone-100 active:scale-95 transition"
+                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-[#0F3D2E] hover:bg-stone-100 active:scale-90 transition"
                 >
-                  <Minus size={14} strokeWidth={2.5} />
+                  <Minus size={13} strokeWidth={2.5} />
                 </button>
-                <span className="font-sora font-extrabold text-xs px-2 min-w-[24px] text-center text-[#0F3D2E]">
+                <span className="font-sora font-extrabold text-xs px-2 min-w-[22px] text-center text-[#0F3D2E]">
                   {totalQtyInCart}
                 </span>
                 <button
                   type="button"
                   onClick={handleIncrement}
                   aria-label={`Increase quantity of ${product.name}`}
-                  className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-[#0F3D2E] hover:bg-stone-100 active:scale-95 transition"
+                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-[#0F3D2E] hover:bg-stone-100 active:scale-90 transition"
                 >
-                  <Plus size={14} strokeWidth={2.5} />
+                  <Plus size={13} strokeWidth={2.5} />
                 </button>
               </div>
             ) : totalQtyInCart > 0 && hasCustomizations ? (
@@ -195,19 +195,20 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
                 type="button"
                 onClick={() => onSelect(product)}
                 aria-label={`Customize ${product.name}`}
-                className="h-8 sm:h-9 px-3.5 bg-[#0F3D2E] text-white font-sora font-bold text-xs uppercase tracking-wider shadow-2xs hover:bg-[#16503D] active:scale-95 transition rounded-none border border-[#0F3D2E] flex items-center gap-1"
+                className="h-8 sm:h-9 px-4 bg-[#0F3D2E] text-white font-sora font-bold text-xs uppercase tracking-wider shadow-2xs hover:bg-[#16503D] active:scale-95 transition rounded-full border border-[#0F3D2E] flex items-center gap-1"
               >
                 <span>{totalQtyInCart} IN CART</span>
               </button>
             ) : (
-              /* Crisp Square ADD + Button matching screenshot */
+              /* Crisp Rounded ADD + Button */
               <button
                 type="button"
                 onClick={handleQuickAdd}
                 aria-label={`Add ${product.name} to order`}
-                className="h-8 sm:h-9 px-5 sm:px-6 bg-white text-[#0F3D2E] font-sora font-bold text-xs uppercase tracking-wider shadow-2xs border border-[#0F3D2E] hover:bg-[#0F3D2E] hover:text-white active:scale-95 transition rounded-none flex items-center justify-center gap-1"
+                className="h-8 sm:h-9 px-5 sm:px-6 bg-white text-[#0F3D2E] font-sora font-bold text-xs uppercase tracking-wider shadow-2xs border border-[#0F3D2E] hover:bg-[#0F3D2E] hover:text-white active:scale-95 transition rounded-full flex items-center justify-center gap-1.5"
               >
-                <span>ADD +</span>
+                <span>ADD</span>
+                <Plus size={13} strokeWidth={2.8} />
               </button>
             )}
           </div>

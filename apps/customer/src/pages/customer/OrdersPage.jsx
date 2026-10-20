@@ -124,7 +124,7 @@ export default function OrdersPage() {
       <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-stone-200 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
         <Link
           to="/menu"
-          className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-none border border-stone-300 text-stone-700 hover:bg-stone-50 transition-colors"
+          className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-stone-300 text-stone-700 hover:bg-stone-50 transition-colors"
           title="Back to menu"
           aria-label="Back to menu"
         >
@@ -138,7 +138,7 @@ export default function OrdersPage() {
           type="button"
           onClick={() => loadOrders(true)}
           disabled={refreshing}
-          className="ml-auto flex min-h-[38px] min-w-[38px] items-center justify-center rounded-none border border-stone-300 text-stone-700 hover:bg-stone-50 transition-colors"
+          className="ml-auto flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-stone-300 text-stone-700 hover:bg-stone-50 transition-colors"
           title="Refresh orders"
           aria-label="Refresh orders"
         >
@@ -147,7 +147,7 @@ export default function OrdersPage() {
       </header>
 
       <main className="mx-auto max-w-2xl space-y-4 p-4 pb-10 sm:p-6">
-        <div className="flex items-center justify-between rounded-none border border-amber-300 bg-amber-50/60 p-4 text-stone-900">
+        <div className="flex items-center justify-between rounded-2xl border border-amber-300 bg-amber-50/60 p-4 text-stone-900">
           <div className="flex items-center gap-3">
             <Clock3 size={20} className="text-stone-900" />
             <div>
@@ -164,23 +164,23 @@ export default function OrdersPage() {
         <CustomerNotificationStatus />
 
         {orders.length === 0 ? (
-          <div className="rounded-none border border-stone-200 bg-white p-10 text-center shadow-2xs">
+          <div className="rounded-2xl border border-stone-200 bg-white p-10 text-center shadow-2xs">
             <ChefHat size={32} className="mx-auto text-stone-900" />
             <p className="mt-3 font-display text-lg font-bold text-stone-900">No orders yet</p>
             <p className="mt-1 text-sm text-stone-500">Scan a table QR code or order items from our menu.</p>
-            <Link to="/menu" className="btn-primary mt-4 inline-flex rounded-none shadow-2xs">Browse Menu</Link>
+            <Link to="/menu" className="btn-primary mt-4 inline-flex rounded-full shadow-2xs">Browse Menu</Link>
           </div>
         ) : (
           <>
             {diningSessionToken && (
               <div className="flex flex-wrap gap-2">
-                <Link to="/receipt" className="btn-secondary inline-flex items-center justify-center py-2 px-4 text-xs font-bold uppercase tracking-wider rounded-none border border-stone-300">
+                <Link to="/receipt" className="btn-secondary inline-flex items-center justify-center py-2 px-4 text-xs font-bold uppercase tracking-wider rounded-full border border-stone-300">
                   View Session Receipt
                 </Link>
                 <button
                   onClick={() => downloadReceipt(null, null)}
                   disabled={downloadingId === 'session'}
-                  className="btn-primary inline-flex items-center justify-center py-2 px-4 text-xs font-bold uppercase tracking-wider rounded-none disabled:opacity-60 shadow-2xs"
+                  className="btn-primary inline-flex items-center justify-center py-2 px-4 text-xs font-bold uppercase tracking-wider rounded-full disabled:opacity-60 shadow-2xs"
                 >
                   <Download size={15} className="mr-1.5" />
                   {downloadingId === 'session' ? 'Preparing...' : 'Download Session Receipt'}
@@ -194,15 +194,15 @@ export default function OrdersPage() {
               const orderToken = order.accessToken || recentOrders.find(r => r.orderId === order._id)?.accessToken;
 
               return (
-                <article key={order._id} className={`rounded-none border border-stone-200 bg-white p-4 shadow-2xs ${order.orderStatus === 'cancelled' ? 'opacity-75' : ''}`}>
+                <article key={order._id} className={`rounded-2xl border border-stone-200 bg-white p-4 shadow-2xs ${order.orderStatus === 'cancelled' ? 'opacity-75' : ''}`}>
                   <div className="flex items-start gap-3">
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-none border border-stone-200 ${order.orderStatus === 'ready' ? 'bg-emerald-100 text-stone-900' : 'bg-stone-900 text-white'}`}>
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 ${order.orderStatus === 'ready' ? 'bg-emerald-100 text-stone-900' : 'bg-stone-900 text-white'}`}>
                       <ChefHat size={18} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <h2 className="font-bold text-stone-900">{order.orderNumber}</h2>
-                        <span className={`rounded-none border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${status.tone}`}>
+                        <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${status.tone}`}>
                           {status.label}
                         </span>
                       </div>
@@ -213,7 +213,7 @@ export default function OrdersPage() {
                     <span className="price-tag text-sm font-bold text-stone-900">₹{Number(order.total || 0).toFixed(2)}</span>
                   </div>
 
-                  <p className={`mt-3 rounded-none border p-2.5 text-xs font-medium ${status.tone}`}>
+                  <p className={`mt-3 rounded-xl border p-2.5 text-xs font-medium ${status.tone}`}>
                     {cashPending ? 'Cash payment pending verification at counter before preparation can begin.' : status.detail}
                   </p>
 
@@ -226,7 +226,7 @@ export default function OrdersPage() {
                     <div className="mt-3 flex items-center justify-end gap-2 border-t border-stone-200 pt-2">
                       <Link
                         to={`/track/${order._id}?token=${encodeURIComponent(orderToken)}`}
-                        className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-bold text-stone-900 hover:underline focus:outline-none rounded-none"
+                        className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-bold text-stone-900 hover:underline focus:outline-none rounded-full"
                       >
                         Track Status
                       </Link>
@@ -234,7 +234,7 @@ export default function OrdersPage() {
                         type="button"
                         onClick={() => downloadReceipt(order._id, orderToken)}
                         disabled={downloadingId === order._id}
-                        className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-medium text-stone-600 hover:text-stone-900 disabled:opacity-50 focus:outline-none rounded-none border border-stone-300"
+                        className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-medium text-stone-600 hover:text-stone-900 disabled:opacity-50 focus:outline-none rounded-full border border-stone-300"
                         aria-label={`Download receipt for order ${order._id.slice(-6).toUpperCase()}`}
                       >
                         <Download size={14} className="mr-1.5" aria-hidden="true" />
@@ -263,20 +263,20 @@ export default function OrdersPage() {
                               ))}
                             </div>
                             <label className="sr-only" htmlFor={`rating-comment-${order._id}`}>Optional feedback</label>
-                            <textarea id={`rating-comment-${order._id}`} value={ratingComment} onChange={(event) => setRatingComment(event.target.value.slice(0, 500))} className="input-field min-h-20 w-full rounded-none" placeholder="Share feedback (optional)" maxLength={500} />
+                            <textarea id={`rating-comment-${order._id}`} value={ratingComment} onChange={(event) => setRatingComment(event.target.value.slice(0, 500))} className="input-field min-h-20 w-full rounded-xl" placeholder="Share feedback (optional)" maxLength={500} />
                             <div className="flex flex-wrap gap-2">
                               <button
                                 type="button"
                                 onClick={() => submitRating(order, orderToken)}
                                 disabled={ratingSaving}
-                                className="btn-primary min-h-[38px] px-4 py-2 text-xs font-medium disabled:opacity-60 rounded-none"
+                                className="btn-primary min-h-[38px] px-4 py-2 text-xs font-medium disabled:opacity-60 rounded-full"
                               >
                                 {ratingSaving ? 'Submitting…' : 'Submit rating'}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setRatingOrder(null)}
-                                className="btn-secondary min-h-[38px] px-4 py-2 text-xs font-medium rounded-none border border-stone-300"
+                                className="btn-secondary min-h-[38px] px-4 py-2 text-xs font-medium rounded-full border border-stone-300"
                               >
                                 Cancel
                               </button>
@@ -286,7 +286,7 @@ export default function OrdersPage() {
                           <button
                             type="button"
                             onClick={() => { setRatingOrder(order._id); setRatingScore(5); }}
-                            className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-semibold text-stone-900 hover:underline focus:outline-none rounded-none"
+                            className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-semibold text-stone-900 hover:underline focus:outline-none rounded-full"
                           >
                             Rate your order
                           </button>

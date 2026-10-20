@@ -77,14 +77,14 @@ export default function OrderConfirmPage() {
   if (!order) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4 p-8 text-center max-w-md mx-auto">
-        <div className="w-20 h-20 rounded-none border border-stone-200 bg-stone-50 flex items-center justify-center text-4xl mb-2">
+        <div className="w-20 h-20 rounded-2xl border border-stone-200 bg-stone-50 flex items-center justify-center text-4xl mb-2">
           ❓
         </div>
         <h1 className="font-display text-2xl font-bold text-[#0F3D2E]">Order not found</h1>
         <p className="text-stone-500 text-sm">
           We could not locate this order. Please verify your order link or return to the menu.
         </p>
-        <Link to="/menu" className="btn-primary min-h-[46px] px-8 text-xs font-bold uppercase tracking-wider mt-2 rounded-none">
+        <Link to="/menu" className="btn-primary min-h-[46px] px-8 text-xs font-bold uppercase tracking-wider mt-2 rounded-full">
           Back to Menu
         </Link>
       </div>
@@ -101,7 +101,7 @@ export default function OrderConfirmPage() {
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', damping: 14, stiffness: 300 }}
-          className="relative z-10 w-20 h-20 rounded-none bg-[#0F3D2E] flex items-center justify-center mx-auto mb-4 shadow-xl shadow-[#0F3D2E]/20 text-white"
+          className="relative z-10 w-20 h-20 rounded-full bg-[#0F3D2E] flex items-center justify-center mx-auto mb-4 shadow-xl shadow-[#0F3D2E]/20 text-white"
         >
           <CheckCircle2 size={42} strokeWidth={2.4} />
         </motion.div>
@@ -112,7 +112,7 @@ export default function OrderConfirmPage() {
           transition={{ delay: 0.15 }}
           className="relative z-10 max-w-lg mx-auto"
         >
-          <div className="inline-flex items-center gap-1.5 rounded-none bg-[#FFF1C9] px-3.5 py-1 text-xs font-bold text-[#0F3D2E] border border-amber-300 mb-2.5">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF1C9] px-3.5 py-1 text-xs font-bold text-[#0F3D2E] border border-amber-300 mb-2.5">
             <Sparkles size={13} />
             <span>{order.paymentStatus === 'paid' ? 'Payment Verified' : 'Order Placed'}</span>
           </div>
@@ -132,7 +132,7 @@ export default function OrderConfirmPage() {
       {/* Main Container */}
       <div className="mx-auto max-w-3xl p-4 sm:p-6 space-y-4">
         {/* Order Metadata Pills Card */}
-        <div className="card p-4 sm:p-5 bg-white border border-stone-200 rounded-none shadow-2xs">
+        <div className="card p-4 sm:p-5 bg-white border border-stone-200 rounded-2xl shadow-2xs">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: 'Order #', value: order.orderNumber },
@@ -140,7 +140,7 @@ export default function OrderConfirmPage() {
               { label: 'Payment', value: order.paymentMethod === 'razorpay' ? 'Online' : 'Cash at Counter' },
               { label: 'Total Paid', value: formatMoney(order.total, order.currency || tenant.currency) },
             ].map(row => (
-              <div key={row.label} className="bg-stone-50 rounded-none p-3 border border-stone-200">
+              <div key={row.label} className="bg-stone-50 rounded-xl p-3 border border-stone-200">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">{row.label}</p>
                 <p className="font-display font-bold text-[#0F3D2E] text-sm sm:text-base mt-0.5">{row.value}</p>
               </div>
@@ -149,13 +149,13 @@ export default function OrderConfirmPage() {
         </div>
 
         {/* Live Kitchen Preparation Progress */}
-        <div className={`card p-5 ${status.bg} border ${status.border} shadow-2xs rounded-none`}>
+        <div className={`card p-5 ${status.bg} border ${status.border} shadow-2xs rounded-2xl`}>
           <div className="flex items-center gap-3.5">
             <span className="text-3xl">{status.icon}</span>
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <p className={`font-display text-lg font-bold ${status.color}`}>{status.label}</p>
-                <span className="flex h-2 w-2 rounded-none bg-emerald-500 animate-pulse" />
+                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
               <p className="text-stone-600 text-xs flex items-center gap-1.5 mt-0.5 font-medium">
                 <Clock size={12} />
@@ -171,7 +171,7 @@ export default function OrderConfirmPage() {
               const done = i <= currentIdx;
               return (
                 <div key={s} className="flex-1 flex items-center">
-                  <div className={`flex-1 h-2 rounded-none transition-all duration-500 ${
+                  <div className={`flex-1 h-2 rounded-full transition-all duration-500 ${
                     done ? 'bg-[#0F3D2E]' : 'bg-stone-200'
                   }`} />
                 </div>
@@ -201,7 +201,7 @@ export default function OrderConfirmPage() {
         />
 
         {/* Itemized Order Breakdown */}
-        <div className="card p-5 bg-white border border-stone-200 rounded-none space-y-3.5 shadow-2xs">
+        <div className="card p-5 bg-white border border-stone-200 rounded-2xl space-y-3.5 shadow-2xs">
           <div className="flex items-center justify-between border-b border-stone-100 pb-3">
             <h2 className="font-display text-base font-bold text-[#0F3D2E]">
               Ordered Items
@@ -251,7 +251,7 @@ export default function OrderConfirmPage() {
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 pt-2">
           <Link
             to={`/receipt/${orderId}?accessToken=${encodeURIComponent(accessToken)}`}
-            className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider rounded-none"
+            className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider rounded-full"
           >
             <Receipt size={16} />
             <span>View Receipt</span>
@@ -259,7 +259,7 @@ export default function OrderConfirmPage() {
 
           <Link
             to={`/track/${orderId}?token=${encodeURIComponent(accessToken)}`}
-            className="min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider rounded-none bg-[#FFF1C9] hover:bg-[#fde68a] text-[#0F3D2E] border border-amber-300 transition-colors shadow-2xs"
+            className="min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider rounded-full bg-[#FFF1C9] hover:bg-[#fde68a] text-[#0F3D2E] border border-amber-300 transition-colors shadow-2xs"
           >
             <Clock size={16} />
             <span>Track Kitchen Live</span>
@@ -270,7 +270,7 @@ export default function OrderConfirmPage() {
               type="button"
               onClick={handleDownloadReceipt}
               disabled={downloading}
-              className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider sm:col-span-2 rounded-none"
+              className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider sm:col-span-2 rounded-full"
             >
               {downloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
               <span>{downloading ? 'Preparing Receipt PDF...' : 'Download PDF Receipt'}</span>
@@ -279,7 +279,7 @@ export default function OrderConfirmPage() {
 
           <Link
             to="/menu"
-            className="btn-primary min-h-[48px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider sm:col-span-2 shadow-sm rounded-none"
+            className="btn-primary min-h-[48px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider sm:col-span-2 shadow-sm rounded-full"
           >
             <UtensilsCrossed size={16} />
             <span>Back to Menu</span>

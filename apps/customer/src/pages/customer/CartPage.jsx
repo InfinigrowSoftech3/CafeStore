@@ -65,7 +65,7 @@ export default function CartPage() {
           <button
             type="button"
             onClick={() => navigate('/menu')}
-            className="min-h-[38px] min-w-[38px] rounded-none border border-stone-300 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition active:scale-95"
+            className="min-h-[38px] min-w-[38px] rounded-full border border-stone-300 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition active:scale-95"
             aria-label="Back to Menu"
           >
             <ArrowLeft size={18} />
@@ -75,7 +75,7 @@ export default function CartPage() {
 
         {/* Empty State Body */}
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto">
-          <div className="w-16 h-16 rounded-none bg-stone-100 border border-stone-200 flex items-center justify-center text-3xl mb-4 shadow-2xs">
+          <div className="w-16 h-16 rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-center text-3xl mb-4 shadow-2xs">
             ☕
           </div>
           <h2 className="font-sora text-2xl font-extrabold text-stone-900">Your cart is empty</h2>
@@ -84,7 +84,7 @@ export default function CartPage() {
           </p>
           <Link
             to="/menu"
-            className="mt-6 btn-primary min-h-[46px] px-8 text-xs font-sora font-bold tracking-wider rounded-none"
+            className="mt-6 btn-primary min-h-[46px] px-8 text-xs font-sora font-bold tracking-wider rounded-full shadow-xs"
           >
             Explore Menu
           </Link>
@@ -149,14 +149,14 @@ export default function CartPage() {
           {/* Left Column: Table Status & Cart Items */}
           <div className="lg:col-span-7 space-y-4">
             {/* Table Identification Card */}
-            <div className={`rounded-none p-4 border transition-all ${
+            <div className={`rounded-2xl p-4 border transition-all ${
               tableNumber
                 ? 'bg-white border-stone-300 text-stone-900 shadow-2xs'
                 : 'bg-amber-50/60 border-amber-300 text-amber-950 shadow-2xs'
             }`}>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-none font-bold ${
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl font-bold ${
                     tableNumber
                       ? 'bg-stone-900 text-white'
                       : 'bg-amber-500 text-white'
@@ -182,7 +182,7 @@ export default function CartPage() {
                 <button
                   type="button"
                   onClick={openScanner}
-                  className={`min-h-[38px] px-4 py-1 rounded-none text-xs font-sora font-bold tracking-wider transition active:scale-95 shadow-2xs ${
+                  className={`min-h-[38px] px-4 py-1 rounded-full text-xs font-sora font-bold tracking-wider transition active:scale-95 shadow-2xs ${
                     tableNumber
                       ? 'bg-white hover:bg-stone-50 text-stone-800 border border-stone-300'
                       : 'bg-stone-900 hover:bg-stone-800 text-white border border-stone-900'
@@ -202,7 +202,7 @@ export default function CartPage() {
                 </Link>
               </div>
 
-              <div className="bg-white border border-stone-200 divide-y divide-stone-200 rounded-none shadow-2xs overflow-hidden">
+              <div className="bg-white border border-stone-200 divide-y divide-stone-200 rounded-2xl shadow-2xs overflow-hidden">
                 <AnimatePresence initial={false}>
                   {items.map((item) => (
                     <motion.article
@@ -215,7 +215,7 @@ export default function CartPage() {
                       className="p-3.5 sm:p-4 flex gap-3.5 items-center bg-white hover:bg-stone-50/50 transition-colors"
                     >
                       {/* Item Thumbnail */}
-                      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-none bg-stone-100 border border-stone-200">
+                      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-stone-100 border border-stone-200">
                         <img
                           src={item.image || FALLBACK_IMAGE}
                           alt={item.name}
@@ -237,7 +237,7 @@ export default function CartPage() {
                             type="button"
                             onClick={() => removeItem(item.key)}
                             aria-label={`Remove ${item.name} from cart`}
-                            className="min-h-[32px] min-w-[32px] flex items-center justify-center text-stone-400 hover:text-red-600 transition rounded-none"
+                            className="min-h-[32px] min-w-[32px] flex items-center justify-center text-stone-400 hover:text-red-600 transition rounded-full"
                           >
                             <Trash2 size={16} />
                           </button>
@@ -246,7 +246,7 @@ export default function CartPage() {
                         {/* Variant and Add-ons */}
                         <div className="mt-1 flex flex-wrap gap-1 text-xs">
                           {item.variant && (
-                            <span className="rounded-none bg-stone-100 border border-stone-200 px-1.5 py-0.5 text-[11px] font-semibold text-stone-700">
+                            <span className="rounded-full bg-stone-100 border border-stone-200 px-2 py-0.5 text-[11px] font-semibold text-stone-700">
                               Size: {item.variant.name}
                             </span>
                           )}
@@ -265,11 +265,11 @@ export default function CartPage() {
 
                         {/* Quantity Stepper & Price */}
                         <div className="mt-3 flex items-center justify-between gap-2">
-                          <div className="inline-flex items-center rounded-none bg-white border border-stone-300 p-0.5">
+                          <div className="inline-flex items-center rounded-full bg-white border border-stone-300 p-0.5 shadow-2xs">
                             <button
                               type="button"
                               onClick={() => updateQuantity(item.key, item.quantity - 1)}
-                              className="flex h-7 w-7 items-center justify-center rounded-none text-stone-700 hover:bg-stone-100 transition active:scale-95"
+                              className="flex h-7 w-7 items-center justify-center rounded-full text-stone-700 hover:bg-stone-100 transition active:scale-95"
                               aria-label={`Decrease quantity of ${item.name}`}
                             >
                               <Minus size={12} strokeWidth={2.5} />
@@ -280,7 +280,7 @@ export default function CartPage() {
                             <button
                               type="button"
                               onClick={() => updateQuantity(item.key, item.quantity + 1)}
-                              className="flex h-7 w-7 items-center justify-center rounded-none text-stone-700 hover:bg-stone-100 transition active:scale-95"
+                              className="flex h-7 w-7 items-center justify-center rounded-full text-stone-700 hover:bg-stone-100 transition active:scale-95"
                               aria-label={`Increase quantity of ${item.name}`}
                             >
                               <Plus size={12} strokeWidth={2.5} />
@@ -301,7 +301,7 @@ export default function CartPage() {
 
           {/* Right Column: Order Bill Summary & Checkout Action */}
           <div className="lg:col-span-5">
-            <div className="p-5 sm:p-6 space-y-5 bg-white border border-stone-200 rounded-none shadow-2xs sticky top-24">
+            <div className="p-5 sm:p-6 space-y-5 bg-white border border-stone-200 rounded-2xl shadow-2xs sticky top-24">
               <h2 className="font-sora text-lg font-bold text-stone-900 border-b border-stone-200 pb-3">
                 Order Summary
               </h2>
@@ -323,7 +323,7 @@ export default function CartPage() {
               </div>
 
               {/* Trust Badge */}
-              <div className="flex items-center gap-2 rounded-none bg-stone-50 border border-stone-200 p-3 text-xs text-stone-700">
+              <div className="flex items-center gap-2 rounded-xl bg-stone-50 border border-stone-200 p-3 text-xs text-stone-700">
                 <ShieldCheck size={16} className="text-stone-900 shrink-0" />
                 <span>Orders are prepared fresh by {tenant.name} upon placement.</span>
               </div>
@@ -333,7 +333,7 @@ export default function CartPage() {
                 type="button"
                 whileTap={{ scale: 0.985 }}
                 onClick={handleProceedCheckout}
-                className="hidden lg:flex w-full min-h-[46px] !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white items-center justify-between px-6 py-3 text-sm font-sora font-bold rounded-none shadow-2xs transition active:scale-98"
+                className="hidden lg:flex w-full min-h-[46px] !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white items-center justify-between px-6 py-3 text-sm font-sora font-bold rounded-full shadow-2xs transition active:scale-98"
               >
                 <div className="flex items-center gap-2 text-white">
                   <ShoppingBag size={18} className="text-white" />
@@ -357,7 +357,7 @@ export default function CartPage() {
             type="button"
             whileTap={{ scale: 0.98 }}
             onClick={handleProceedCheckout}
-            className="flex-1 min-h-[46px] !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-none shadow-2xs transition active:scale-98"
+            className="flex-1 min-h-[46px] !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-full shadow-2xs transition active:scale-98"
           >
             <ShoppingBag size={17} className="text-white shrink-0" />
             <span className="text-white font-bold">Proceed to Checkout</span>

@@ -460,7 +460,7 @@ export default function MenuPage() {
 
   return (
     <div
-      className="min-h-[100dvh] bg-white text-[#111827] font-jakarta selection:bg-[#0F3D2E] selection:text-[#FFF1C9]"
+      className="min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-white text-[#111827] font-jakarta selection:bg-[#0F3D2E] selection:text-[#FFF1C9]"
       style={{
         '--menu-bg': '#FFFFFF',
         '--menu-ink': '#0F3D2E',
@@ -564,7 +564,7 @@ export default function MenuPage() {
 
             {/* Kitchen Closed Banner if applicable */}
             {!operatingStatus.isOpen && (
-              <div className="rounded-none bg-[#C93A1C]/10 border border-[#C93A1C]/25 p-3 text-[#C93A1C] text-xs font-jakarta font-semibold flex items-center gap-2.5">
+              <div className="rounded-2xl bg-[#C93A1C]/10 border border-[#C93A1C]/25 p-3.5 text-[#C93A1C] text-xs font-jakarta font-semibold flex items-center gap-2.5 shadow-2xs">
                 <AlertCircle size={18} className="shrink-0" />
                 <span>The kitchen is currently closed. You can browse the menu, but ordering is paused.</span>
               </div>
@@ -682,9 +682,9 @@ export default function MenuPage() {
             {/* ─── 5. Category Chips ──────────────────────────────────────────────── */}
             <section
               aria-label="Category Selection"
-              className="py-1.5 sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-stone-200 transition-all"
+              className="py-1.5 sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-stone-200 transition-all overflow-hidden"
             >
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-fade-right -mx-4 px-4 min-[390px]:-mx-5 min-[390px]:px-5 sm:mx-0 sm:px-0 sm:overflow-visible sm:flex-wrap sm:mask-none py-1 snap-x snap-mandatory">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-fade-right px-0.5 sm:overflow-visible sm:flex-wrap py-1 snap-x snap-mandatory overscroll-x-contain">
                 {/* "All" chip */}
                 <button
                   type="button"
@@ -779,7 +779,7 @@ export default function MenuPage() {
 
                 <div
                   ref={popularRef}
-                  className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-fade-right -mx-4 px-4 min-[390px]:-mx-5 min-[390px]:px-5 sm:mx-0 sm:px-0 sm:mask-none pb-2 pt-0.5 scroll-smooth"
+                  className="flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-3 pt-1 scroll-smooth overscroll-x-contain"
                 >
                   {popularItems.map((prod) => (
                     <PopularCard
@@ -799,7 +799,7 @@ export default function MenuPage() {
                 <RowSkeleton />
               ) : menuError ? (
                 /* Error State */
-                <div className="text-center py-16 px-4 bg-white rounded-none p-6 border border-stone-200 shadow-2xs">
+                <div className="text-center py-16 px-4 bg-white rounded-2xl p-6 border border-stone-200 shadow-2xs">
                   <div className="w-14 h-14 mx-auto rounded-full bg-red-50 flex items-center justify-center text-red-500 mb-3 border border-red-200">
                     <AlertCircle size={28} />
                   </div>
@@ -821,7 +821,7 @@ export default function MenuPage() {
                 </div>
               ) : products.length === 0 ? (
                 /* Empty Filter / Search State */
-                <div className="text-center py-16 px-4 bg-white rounded-none p-6 border border-stone-200 shadow-2xs">
+                <div className="text-center py-16 px-4 bg-white rounded-2xl p-6 border border-stone-200 shadow-2xs">
                   <div className="w-14 h-14 mx-auto rounded-full bg-[#FFF1C9] flex items-center justify-center text-[#0F3D2E] mb-3 border border-amber-300/60">
                     <Search size={24} />
                   </div>

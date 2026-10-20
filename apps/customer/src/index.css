@@ -15,13 +15,13 @@
   --tenant-primary: #0F3D2E;
   --tenant-accent: #FFF1C9;
 
-  /* Customer Menu Tokens (White & Square Theme) */
+  /* Customer Menu Tokens (Warm Luxury Rounded Theme) */
   --menu-bg: #FFFFFF;
   --menu-ink: #0F3D2E;
   --menu-accent: #C93A1C;
   --menu-accent-text: #FFFFFF;
   --menu-card: #FFFFFF;
-  --menu-card-radius: 0px;
+  --menu-card-radius: 16px;
   --menu-veg: #16A34A;
   --menu-nonveg: #DC2626;
   --menu-butter: #FFF1C9;
@@ -60,11 +60,21 @@
     }
   }
 
+  html,
   body {
     background-color: var(--bg, #FAF6EF);
     color: var(--ink, #1C1612);
     @apply font-body antialiased;
     overscroll-behavior: none;
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+  }
+
+  #root {
+    overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
   }
 
   ::-webkit-scrollbar {
@@ -114,27 +124,27 @@
   .btn-primary {
     background-color: var(--tenant-primary, #0F3D2E);
     color: #FFFFFF;
-    @apply font-sora font-bold px-6 py-3 rounded-none
+    @apply font-sora font-bold px-6 py-3 rounded-full
            hover:bg-[#16503D] active:scale-[0.98] transition-all duration-200
            disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] inline-flex items-center justify-center gap-2 shadow-sm;
   }
 
   .btn-secondary {
-    @apply border border-stone-300 bg-white text-stone-800 font-sora font-semibold px-5 py-2.5 rounded-none
+    @apply border border-stone-300 bg-white text-stone-800 font-sora font-semibold px-5 py-2.5 rounded-full
            hover:bg-stone-50 hover:border-stone-400 active:scale-[0.98] transition-all duration-200 min-h-[44px] inline-flex items-center justify-center gap-2 shadow-2xs;
   }
 
   .btn-accent {
     background-color: var(--menu-accent, #C93A1C);
     color: #FFFFFF;
-    @apply font-sora font-bold px-6 py-3 rounded-none
+    @apply font-sora font-bold px-6 py-3 rounded-full
            hover:brightness-95 active:scale-[0.98] transition-all duration-200
            disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] inline-flex items-center justify-center gap-2 shadow-sm;
   }
 
   .card {
     background-color: #FFFFFF;
-    border-radius: 0px;
+    border-radius: 16px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     border: 1px solid var(--border, #E5E7EB);
     overflow: hidden;
@@ -151,21 +161,21 @@
   }
 
   .glass {
-    @apply bg-white border border-stone-200 shadow-xs rounded-none;
+    @apply bg-white border border-stone-200 shadow-xs rounded-2xl;
   }
 
   .glass-dark {
     background-color: #0F3D2E;
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #FFFFFF;
-    border-radius: 0px;
+    border-radius: 16px;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
   }
 
   .input-field {
     width: 100%;
     padding: 0.75rem 1rem;
-    border-radius: 0px;
+    border-radius: 12px;
     border: 1px solid var(--border, #D1D5DB);
     background-color: #FFFFFF;
     color: var(--ink, #1C1612);

@@ -77,12 +77,12 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
   return (
     <div
       onClick={isAvailable ? () => onSelect(product) : undefined}
-      className={`group w-[180px] min-w-[180px] sm:w-[205px] sm:min-w-[205px] shrink-0 snap-start rounded-none bg-white border border-stone-200 overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all select-none ${
+      className={`group w-[185px] min-w-[185px] sm:w-[210px] sm:min-w-[210px] shrink-0 snap-start rounded-2xl bg-white border border-stone-200 overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all select-none ${
         isAvailable ? 'cursor-pointer' : 'opacity-60 grayscale-[40%] cursor-default'
       }`}
     >
       {/* ─── Top Square Image Section ─── */}
-      <div className="relative w-full aspect-square bg-stone-100 border-b border-stone-200 overflow-hidden">
+      <div className="relative w-full aspect-square bg-stone-100 border-b border-stone-100 overflow-hidden rounded-t-2xl">
         {product.image && !imgError ? (
           <img
             src={product.image}
@@ -99,13 +99,13 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
         )}
 
         {/* Top-Left: Veg Mark */}
-        <div className="absolute top-2 left-2 z-10">
+        <div className="absolute top-2.5 left-2.5 z-10">
           <VegMark isVeg={product.isVeg} size={14} />
         </div>
 
         {/* Top-Right: Prep Time Badge */}
         {product.prepTime && (
-          <div className="absolute top-2 right-2 z-10 inline-flex items-center gap-1 bg-black/75 px-1.5 py-0.5 rounded-none text-[10px] font-jakarta font-semibold text-white">
+          <div className="absolute top-2.5 right-2.5 z-10 inline-flex items-center gap-1 bg-black/75 px-2 py-0.5 rounded-full text-[10px] font-jakarta font-semibold text-white backdrop-blur-xs">
             <Clock size={10} className="text-white/80" />
             <span>{product.prepTime}m</span>
           </div>
@@ -114,7 +114,7 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
         {/* Sold Out Overlay */}
         {!isAvailable && (
           <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-[1px] flex items-center justify-center">
-            <span className="bg-stone-900 text-white text-[10px] font-sora font-extrabold px-2 py-0.5 uppercase tracking-wider rounded-none border border-white/20">
+            <span className="bg-stone-900 text-white text-[10px] font-sora font-extrabold px-2.5 py-1 uppercase tracking-wider rounded-full border border-white/20">
               Sold out
             </span>
           </div>
@@ -141,23 +141,23 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
 
           <div onClick={(e) => e.stopPropagation()}>
             {!isAvailable ? null : totalQtyInCart > 0 && !hasCustomizations ? (
-              <div className="inline-flex items-center bg-[#0F3D2E] text-white rounded-none border border-[#0F3D2E]">
+              <div className="inline-flex items-center bg-[#0F3D2E] text-white rounded-full border border-[#0F3D2E] px-1 shadow-2xs">
                 <button
                   type="button"
                   onClick={handleDecrement}
                   aria-label={`Decrease ${product.name}`}
-                  className="w-6 h-6 flex items-center justify-center hover:bg-white/20 active:scale-90"
+                  className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/20 active:scale-90"
                 >
                   <Minus size={11} strokeWidth={2.6} />
                 </button>
-                <span className="font-sora font-extrabold text-[11px] px-1 min-w-[16px] text-center">
+                <span className="font-sora font-extrabold text-[11px] px-1.5 min-w-[16px] text-center">
                   {totalQtyInCart}
                 </span>
                 <button
                   type="button"
                   onClick={handleIncrement}
                   aria-label={`Increase ${product.name}`}
-                  className="w-6 h-6 flex items-center justify-center hover:bg-white/20 active:scale-90"
+                  className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/20 active:scale-90"
                 >
                   <Plus size={11} strokeWidth={2.6} />
                 </button>
@@ -167,7 +167,7 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
                 type="button"
                 onClick={() => onSelect(product)}
                 aria-label={`Customize ${product.name}`}
-                className="h-6 px-2 bg-[#0F3D2E] text-[#FFF1C9] font-sora font-extrabold text-[10px] uppercase rounded-none border border-[#0F3D2E]"
+                className="h-7 px-3 bg-[#0F3D2E] text-[#FFF1C9] font-sora font-extrabold text-[10px] uppercase rounded-full border border-[#0F3D2E] shadow-2xs hover:bg-[#16503D] active:scale-95 transition"
               >
                 <span>{totalQtyInCart} IN</span>
               </button>
@@ -176,7 +176,7 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
                 type="button"
                 onClick={handleQuickAdd}
                 aria-label={`Add ${product.name}`}
-                className="h-6 px-2.5 bg-white text-[#0F3D2E] font-sora font-extrabold text-[10px] uppercase tracking-wider border border-[#0F3D2E] hover:bg-[#0F3D2E] hover:text-white rounded-none flex items-center gap-0.5"
+                className="h-7 px-3 bg-white text-[#0F3D2E] font-sora font-extrabold text-[10px] uppercase tracking-wider border border-[#0F3D2E] hover:bg-[#0F3D2E] hover:text-white rounded-full flex items-center gap-1 shadow-2xs active:scale-95 transition"
               >
                 <span>ADD</span>
                 <Plus size={11} strokeWidth={3} />

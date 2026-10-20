@@ -35,7 +35,7 @@ export default function OffersPage() {
         <div className="mb-6 flex items-center justify-between gap-3">
           <Link
             to="/menu"
-            className="btn-secondary inline-flex min-h-[40px] items-center gap-2 text-xs font-bold uppercase tracking-wider py-2 px-5 rounded-none border border-stone-300 shadow-2xs"
+            className="btn-secondary inline-flex min-h-[40px] items-center gap-2 text-xs font-bold uppercase tracking-wider py-2 px-5 rounded-full border border-stone-300 shadow-2xs"
           >
             <ArrowLeft size={16} />
             <span>Back to Menu</span>
@@ -48,7 +48,7 @@ export default function OffersPage() {
           </Link>
         </div>
 
-        <div className="rounded-none border border-stone-200 bg-white p-6 shadow-2xs sm:p-10">
+        <div className="rounded-3xl border border-stone-200 bg-white p-6 shadow-2xs sm:p-10">
           <div className="flex items-center gap-2">
             <Sparkles size={16} className="text-[#0F3D2E]" />
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0F3D2E]">
@@ -66,11 +66,11 @@ export default function OffersPage() {
             {offers.map((offer) => (
               <div
                 key={offer.title}
-                className="flex flex-col justify-between rounded-none border border-stone-200 bg-white p-6 shadow-2xs hover:border-stone-400 transition-all"
+                className="flex flex-col justify-between rounded-2xl border border-stone-200 bg-white p-6 shadow-2xs hover:border-stone-400 transition-all"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="inline-block rounded-none bg-stone-100 border border-stone-300 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-stone-900">
+                    <span className="inline-block rounded-full bg-stone-100 border border-stone-300 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-stone-900">
                       {offer.badge}
                     </span>
                     <span className="text-[11px] font-semibold text-stone-400">

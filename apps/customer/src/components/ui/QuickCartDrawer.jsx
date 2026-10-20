@@ -97,7 +97,7 @@ export default function QuickCartDrawer() {
               {/* Header */}
               <div className="flex items-center justify-between border-b border-stone-200 bg-white px-5 py-4 sm:px-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-none border border-amber-300 bg-[#FFF1C9] text-[#0F3D2E]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-300 bg-[#FFF1C9] text-[#0F3D2E]">
                     <ShoppingBag size={20} />
                   </div>
                   <div>
@@ -106,7 +106,7 @@ export default function QuickCartDrawer() {
                         Your Cart
                       </h2>
                       {itemCount > 0 && (
-                        <span className="rounded-none bg-[#FFF1C9] border border-amber-300 px-2 py-0.5 text-[11px] font-bold text-[#0F3D2E]">
+                        <span className="rounded-full bg-[#FFF1C9] border border-amber-300 px-2.5 py-0.5 text-[11px] font-bold text-[#0F3D2E]">
                           {itemCount} {itemCount === 1 ? 'item' : 'items'}
                         </span>
                       )}
@@ -125,7 +125,7 @@ export default function QuickCartDrawer() {
                   type="button"
                   onClick={closeQuickCart}
                   aria-label="Close cart"
-                  className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-none border border-stone-300 bg-stone-50 text-stone-700 transition hover:bg-stone-100 hover:text-stone-900 active:scale-90 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                  className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-stone-300 bg-stone-50 text-stone-700 transition hover:bg-stone-100 hover:text-stone-900 active:scale-90 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
                 >
                   <X size={18} aria-hidden="true" />
                 </button>
@@ -143,7 +143,7 @@ export default function QuickCartDrawer() {
               <div className="flex-1 overflow-y-auto px-5 py-4 sm:px-6">
                 {items.length === 0 ? (
                   <div className="flex h-full flex-col items-center justify-center py-12 text-center">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-none border border-stone-200 bg-stone-50 text-stone-400">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-stone-200 bg-stone-50 text-stone-400">
                       <UtensilsCrossed size={36} aria-hidden="true" />
                     </div>
                     <h3 className="mt-4 font-display text-2xl font-bold text-stone-900">
@@ -158,7 +158,7 @@ export default function QuickCartDrawer() {
                         closeQuickCart();
                         navigate('/menu');
                       }}
-                      className="mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-none bg-[#0F3D2E] px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#16503D]"
+                      className="mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#16503D]"
                     >
                       Browse Menu <ArrowRight size={14} aria-hidden="true" />
                     </button>
@@ -170,7 +170,7 @@ export default function QuickCartDrawer() {
                       <button
                         type="button"
                         onClick={clearCart}
-                        className="min-h-[44px] inline-flex items-center px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-700 transition focus:outline-none focus:ring-2 focus:ring-rose-400 rounded-none"
+                        className="min-h-[44px] inline-flex items-center px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-700 transition focus:outline-none focus:ring-2 focus:ring-rose-400 rounded-full"
                       >
                         Clear all
                       </button>
@@ -187,14 +187,14 @@ export default function QuickCartDrawer() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, height: 0, marginBottom: 0 }}
                             transition={{ duration: 0.2 }}
-                            className={`relative flex gap-3.5 rounded-none border p-3.5 transition-all ${
+                            className={`relative flex gap-3.5 rounded-2xl border p-3.5 transition-all ${
                               isRecentlyAdded
                                 ? 'border-[#0F3D2E] bg-white shadow-xs ring-1 ring-[#0F3D2E]/20'
                                 : 'border-stone-200 bg-white shadow-2xs hover:border-[#0F3D2E]/30'
                             }`}
                           >
                             {/* Product Thumbnail */}
-                            <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-none border border-stone-200 bg-stone-100">
+                            <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border border-stone-200 bg-stone-100">
                               <img
                                 src={item.image || PLACEHOLDER}
                                 alt={item.name}
@@ -219,14 +219,14 @@ export default function QuickCartDrawer() {
                                     type="button"
                                     onClick={() => removeItem(item.key)}
                                     aria-label={`Remove ${item.name}`}
-                                    className="min-h-[44px] min-w-[44px] flex items-center justify-center text-stone-400 hover:text-rose-600 transition focus:outline-none focus:ring-2 focus:ring-rose-400 rounded-none -mr-2 -mt-2"
+                                    className="min-h-[44px] min-w-[44px] flex items-center justify-center text-stone-400 hover:text-rose-600 transition focus:outline-none focus:ring-2 focus:ring-rose-400 rounded-full -mr-2 -mt-2"
                                   >
                                     <Trash2 size={16} aria-hidden="true" />
                                   </button>
                                 </div>
 
                                 {item.variant && (
-                                  <span className="mt-0.5 inline-block rounded-none border border-stone-200 bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold text-stone-700">
+                                  <span className="mt-0.5 inline-block rounded-full border border-stone-200 bg-stone-100 px-2 py-0.5 text-[10px] font-semibold text-stone-700">
                                     {item.variant.name}
                                   </span>
                                 )}
@@ -246,12 +246,12 @@ export default function QuickCartDrawer() {
 
                               <div className="mt-2.5 flex items-center justify-between">
                                 {/* Quantity Controls */}
-                                <div className="flex items-center gap-1 rounded-none border border-stone-300 bg-stone-50 p-0.5">
+                                <div className="flex items-center gap-1 rounded-full border border-stone-300 bg-stone-50 p-1 shadow-2xs">
                                   <button
                                     type="button"
                                     onClick={() => updateQuantity(item.key, item.quantity - 1)}
                                     aria-label={`Decrease quantity of ${item.name}`}
-                                    className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-none text-stone-700 hover:bg-[#0F3D2E] hover:text-white transition active:scale-90 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                                    className="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-full text-stone-700 hover:bg-[#0F3D2E] hover:text-white transition active:scale-90 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
                                   >
                                     <Minus size={14} aria-hidden="true" />
                                   </button>
@@ -262,7 +262,7 @@ export default function QuickCartDrawer() {
                                     type="button"
                                     onClick={() => updateQuantity(item.key, item.quantity + 1)}
                                     aria-label={`Increase quantity of ${item.name}`}
-                                    className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-none text-stone-700 hover:bg-[#0F3D2E] hover:text-white transition active:scale-90 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                                    className="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-full text-stone-700 hover:bg-[#0F3D2E] hover:text-white transition active:scale-90 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
                                   >
                                     <Plus size={14} aria-hidden="true" />
                                   </button>
@@ -311,7 +311,7 @@ export default function QuickCartDrawer() {
                         closeQuickCart();
                         navigate('/checkout');
                       }}
-                      className="inline-flex min-h-[48px] w-full items-center justify-between rounded-none bg-[#0F3D2E] px-6 py-3.5 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-xs transition hover:bg-[#16503D]"
+                      className="inline-flex min-h-[48px] w-full items-center justify-between rounded-full bg-[#0F3D2E] px-6 py-3.5 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-xs transition hover:bg-[#16503D]"
                     >
                       <div className="flex items-center gap-2">
                         <ShoppingBag size={15} aria-hidden="true" />
@@ -327,7 +327,7 @@ export default function QuickCartDrawer() {
                           closeQuickCart();
                           navigate('/cart');
                         }}
-                        className="flex-1 min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-none border border-stone-300 bg-white py-2.5 px-3 text-xs font-semibold text-stone-800 transition hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                        className="flex-1 min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-full border border-stone-300 bg-white py-2.5 px-3 text-xs font-semibold text-stone-800 transition hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
                       >
                         <span>View Full Cart</span>
                         <ChevronRight size={14} aria-hidden="true" />
@@ -336,7 +336,7 @@ export default function QuickCartDrawer() {
                       <button
                         type="button"
                         onClick={closeQuickCart}
-                        className="flex-1 min-h-[44px] inline-flex items-center justify-center rounded-none border border-stone-200 py-2.5 px-3 text-xs font-semibold text-stone-600 transition hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                        className="flex-1 min-h-[44px] inline-flex items-center justify-center rounded-full border border-stone-200 py-2.5 px-3 text-xs font-semibold text-stone-600 transition hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
                       >
                         Keep Browsing
                       </button>
