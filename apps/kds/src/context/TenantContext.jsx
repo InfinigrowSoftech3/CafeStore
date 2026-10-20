@@ -23,7 +23,15 @@ export function TenantProvider({ children }) {
 
   useEffect(() => {
     let active = true;
-    const queryParam = user?.tenantId ? `?tenant=${encodeURIComponent(user.tenantId)}` : '';
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const identifier = user?.tenantId || urlParams?.get('tenant') || urlParams?.get('cafe') || urlParams?.get('slug');
+
+    // Only query /tenant/public if a tenant identifier is present (avoids 404 when unauthenticated)
+    if (!identifier) {
+      return;
+    }
+
+    const queryParam = `?tenant=${encodeURIComponent(identifier)}`;
     api.get(`/tenant/public${queryParam}`).then(({ data }) => {
       if (!active) return;
       const t = data.tenant || fallback;

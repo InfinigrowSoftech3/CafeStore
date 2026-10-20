@@ -46,7 +46,10 @@ export function TenantProvider({ children }) {
   // 2. Fetch /tenant/public - scoped to user tenant if authenticated
   useEffect(() => {
     let active = true;
-    const queryParam = user?.tenantId ? `?tenant=${encodeURIComponent(user.tenantId)}` : '';
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const identifier = user?.tenantId || urlParams?.get('tenant') || urlParams?.get('cafe') || urlParams?.get('slug');
+    if (!identifier) return;
+    const queryParam = `?tenant=${encodeURIComponent(identifier)}`;
     api.get(`/tenant/public${queryParam}`).then(({ data }) => {
       if (!active) return;
       const t = data.tenant || fallback;

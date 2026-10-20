@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import api, { getOnce } from '../services/api';
-import { setAccessToken } from '../services/accessToken';
+import { getAccessToken, setAccessToken } from '../services/accessToken';
 
 const AuthContext = createContext(null);
 
@@ -11,6 +11,13 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const isSignup = typeof window !== 'undefined' && window.location.pathname.startsWith('/signup');
     if (isSignup) {
+      setLoading(false);
+      return;
+    }
+
+    const token = getAccessToken();
+    if (!token) {
+      setUser(null);
       setLoading(false);
       return;
     }

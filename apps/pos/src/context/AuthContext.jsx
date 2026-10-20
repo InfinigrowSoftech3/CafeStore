@@ -29,19 +29,20 @@ export function AuthProvider({ children }) {
     }
 
     const token = getAccessToken();
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     getOnce('/auth/me')
       .then((res) => {
         if (active) setUser(res.data.user);
       })
       .catch(() => {
         if (active) {
-          // If we had a token that failed, clear it
-          if (!token) {
-            setUser(null);
-          } else {
-            setAccessToken(null);
-            setUser(null);
-          }
+          setAccessToken(null);
+          setUser(null);
         }
       })
       .finally(() => {
