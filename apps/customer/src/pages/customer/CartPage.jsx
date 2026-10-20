@@ -101,7 +101,7 @@ export default function CartPage() {
           <button
             type="button"
             onClick={() => navigate('/menu')}
-            className="min-h-[38px] min-w-[38px] rounded-none border border-stone-300 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition active:scale-95"
+            className="min-h-[38px] min-w-[38px] rounded-full border border-stone-300 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition active:scale-95"
             aria-label="Back to Menu"
           >
             <ArrowLeft size={18} />
@@ -111,7 +111,7 @@ export default function CartPage() {
               <h1 className="font-sora text-lg sm:text-xl font-bold text-stone-900 leading-none">
                 Your Order
               </h1>
-              <span className="flex h-5 items-center justify-center rounded-none bg-stone-900 text-white px-1.5 text-[11px] font-sora font-bold">
+              <span className="flex h-5 items-center justify-center rounded-full bg-stone-900 text-white px-2 text-[11px] font-sora font-bold">
                 {itemCount}
               </span>
             </div>
@@ -124,7 +124,7 @@ export default function CartPage() {
             <button
               type="button"
               onClick={clearCart}
-              className="min-h-[36px] px-3 py-1 text-xs font-sora font-semibold text-stone-600 hover:text-red-600 hover:bg-red-50 border border-stone-300 rounded-none transition"
+              className="min-h-[36px] px-3.5 py-1 text-xs font-sora font-semibold text-stone-600 hover:text-red-600 hover:bg-red-50 border border-stone-300 rounded-full transition"
             >
               Clear All
             </button>
@@ -135,9 +135,10 @@ export default function CartPage() {
             type="button"
             onClick={openNavDrawer}
             aria-label="Open navigation menu - show all pages"
-            className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-none border border-stone-300 bg-white text-stone-900 shadow-2xs hover:bg-stone-50 active:scale-95 transition-all"
+            className="min-h-[38px] min-w-[38px] px-2.5 sm:px-3 flex items-center justify-center gap-1.5 rounded-full border border-stone-300 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all"
           >
             <Menu size={18} strokeWidth={2.4} />
+            <span className="hidden sm:inline text-xs font-sora font-bold tracking-wide">All Pages</span>
           </button>
         </div>
       </header>

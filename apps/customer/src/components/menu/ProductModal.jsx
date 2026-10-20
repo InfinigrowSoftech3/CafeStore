@@ -133,7 +133,7 @@ export default function ProductModal({ product, onClose }) {
             type="button"
             onClick={onClose}
             aria-label="Close product modal"
-            className="absolute top-3.5 right-3.5 min-h-[36px] min-w-[36px] w-9 h-9 bg-white hover:bg-stone-100 text-stone-900 rounded-none flex items-center justify-center shadow-sm border border-stone-300 transition-all active:scale-95 focus:outline-none focus:ring-1 focus:ring-stone-900"
+            className="absolute top-3.5 right-3.5 min-h-[36px] min-w-[36px] w-9 h-9 bg-white hover:bg-stone-100 text-stone-900 rounded-full flex items-center justify-center shadow-sm border border-stone-300 transition-all active:scale-95 focus:outline-none focus:ring-1 focus:ring-stone-900"
           >
             <X size={18} strokeWidth={2.4} aria-hidden="true" />
           </button>

@@ -67,7 +67,7 @@ export default function Navbar() {
               <Link
                 key={link.to}
                 to={link.to}
-                className={`relative px-4 py-2 text-xs font-bold tracking-wide rounded-none transition-all duration-200 ${
+                className={`relative px-4 py-2 text-xs font-bold tracking-wide rounded-full transition-all duration-200 ${
                   isActive
                     ? 'text-stone-900 bg-stone-100 border border-stone-300 shadow-2xs font-bold'
                     : 'text-stone-600 hover:text-stone-900 hover:bg-stone-50 font-medium'
@@ -87,11 +87,11 @@ export default function Navbar() {
               type="button"
               onClick={openScanner}
               title="Tap to change table"
-              className="inline-flex min-h-[38px] items-center gap-1.5 px-3.5 py-1.5 rounded-none text-xs font-bold border border-emerald-300 bg-emerald-50 text-emerald-950 hover:bg-emerald-100 transition-all active:scale-95 shadow-2xs"
+              className="inline-flex min-h-[38px] items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border border-emerald-300 bg-emerald-50 text-emerald-950 hover:bg-emerald-100 transition-all active:scale-95 shadow-2xs"
             >
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-none h-2 w-2 bg-emerald-500" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
               <span className="tracking-wide">Table {String(tableNumber).padStart(2, '0')}</span>
             </button>
@@ -100,9 +100,9 @@ export default function Navbar() {
               type="button"
               onClick={openScanner}
               aria-label="Scan Table QR Code"
-              className="min-h-[38px] inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-none text-xs font-bold border border-stone-300 bg-white text-stone-800 hover:bg-stone-50 hover:border-stone-400 transition-all active:scale-95 shadow-2xs"
+              className="min-h-[38px] inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-bold bg-[#0F3D2E] text-white hover:bg-[#16503D] transition-all active:scale-95 shadow-2xs"
             >
-              <ScanLine size={15} className="text-[#0F3D2E]" />
+              <ScanLine size={15} className="text-white" />
               <span className="hidden sm:inline">Scan Table</span>
             </button>
           )}
@@ -111,7 +111,7 @@ export default function Navbar() {
           <Link
             to="/cart"
             aria-label={`Open Cart (${itemCount} items)`}
-            className="relative min-h-[38px] min-w-[38px] flex items-center justify-center rounded-none border border-stone-300 bg-white text-stone-900 hover:bg-stone-50 shadow-2xs transition-all active:scale-95"
+            className="relative min-h-[38px] min-w-[38px] flex items-center justify-center rounded-full border border-stone-300 bg-white text-stone-900 hover:bg-stone-50 shadow-2xs transition-all active:scale-95"
           >
             <ShoppingBag size={18} className="stroke-[2.2]" />
             <AnimatePresence>
@@ -122,7 +122,7 @@ export default function Navbar() {
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.4, opacity: 0 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                  className="absolute -top-1.5 -right-1.5 flex h-4.5 min-w-[18px] px-1 items-center justify-center rounded-none bg-stone-900 text-[10px] font-bold text-white shadow-sm ring-1 ring-white"
+                  className="absolute -top-1.5 -right-1.5 flex h-4.5 min-w-[18px] px-1 items-center justify-center rounded-full bg-stone-900 text-[10px] font-bold text-white shadow-sm ring-1 ring-white"
                 >
                   {itemCount}
                 </motion.span>
@@ -135,7 +135,7 @@ export default function Navbar() {
             type="button"
             onClick={openNavDrawer}
             aria-label="Open navigation menu - show all pages"
-            className="min-h-[38px] min-w-[38px] px-2.5 sm:px-3 flex items-center justify-center gap-1.5 rounded-none border border-stone-300 bg-white text-stone-900 hover:bg-stone-50 shadow-2xs transition-all active:scale-95"
+            className="min-h-[38px] min-w-[38px] px-2.5 sm:px-3.5 flex items-center justify-center gap-1.5 rounded-full border border-stone-300 bg-white text-[#0F3D2E] hover:bg-stone-50 shadow-2xs transition-all active:scale-95"
           >
             <Menu size={18} strokeWidth={2.4} />
             <span className="hidden xl:inline text-xs font-sora font-bold">All Pages</span>

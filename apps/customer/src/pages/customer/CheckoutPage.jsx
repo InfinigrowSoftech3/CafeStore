@@ -334,7 +334,7 @@ export default function CheckoutPage() {
           <Link
             to="/cart"
             aria-label="Back to Cart"
-            className="min-h-[38px] min-w-[38px] rounded-none border border-stone-300 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition active:scale-95"
+            className="min-h-[38px] min-w-[38px] rounded-full border border-stone-300 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition active:scale-95"
           >
             <ArrowLeft size={18} />
           </Link>
@@ -347,7 +347,7 @@ export default function CheckoutPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden min-[380px]:flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-none border border-emerald-300">
+          <div className="hidden min-[380px]:flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-300">
             <ShieldCheck size={14} className="text-[#16A34A]" />
             <span className="font-semibold">Secure Checkout</span>
           </div>
@@ -357,9 +357,10 @@ export default function CheckoutPage() {
             type="button"
             onClick={openNavDrawer}
             aria-label="Open navigation menu - show all pages"
-            className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-none border border-stone-300 bg-white text-stone-900 shadow-2xs hover:bg-stone-50 active:scale-95 transition-all"
+            className="min-h-[38px] min-w-[38px] px-2.5 sm:px-3 flex items-center justify-center gap-1.5 rounded-full border border-stone-300 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all"
           >
             <Menu size={18} strokeWidth={2.4} />
+            <span className="hidden sm:inline text-xs font-sora font-bold tracking-wide">All Pages</span>
           </button>
         </div>
       </header>

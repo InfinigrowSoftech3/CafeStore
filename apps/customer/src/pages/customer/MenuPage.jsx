@@ -485,7 +485,7 @@ export default function MenuPage() {
           {/* Café Name with small accent dot on left */}
           <div className="flex items-center gap-2.5 min-w-0">
             <span
-              className="w-2.5 h-2.5 rounded-none bg-[var(--menu-accent,#C93A1C)] shrink-0"
+              className="w-2.5 h-2.5 rounded-full bg-[var(--menu-accent,#C93A1C)] shrink-0"
               aria-hidden="true"
             />
             <span className="font-sora font-extrabold text-xl sm:text-2xl lg:text-3xl text-[#0F3D2E] tracking-tight truncate">
@@ -493,20 +493,20 @@ export default function MenuPage() {
             </span>
           </div>
 
-          {/* Right: Dark Table Pill + Square White Cart Button (cart button hidden on desktop since sidebar is visible) */}
+          {/* Right: Dark Table Pill + Round White Cart Button (cart button hidden on desktop since sidebar is visible) */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* Dark square button showing the table ("Table 1", from QR/session) */}
+            {/* Dark pill button showing the table ("Table 1", from QR/session) */}
             <button
               type="button"
               onClick={openScanner}
               aria-label={tableNumber ? `Current Table ${tableNumber}, tap to change table` : 'Scan table QR code'}
-              className="inline-flex min-h-[42px] items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-none bg-[#0F3D2E] text-white text-xs font-sora font-bold shadow-xs hover:bg-[#16503D] active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+              className="inline-flex min-h-[42px] items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-[#0F3D2E] text-white text-xs font-sora font-bold shadow-xs hover:bg-[#16503D] active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
             >
               {tableNumber ? (
                 <>
                   <span className="relative flex h-2 w-2 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-none h-2 w-2 bg-emerald-400" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
                   </span>
                   <span>Table {tableNumber}</span>
                 </>
@@ -518,15 +518,15 @@ export default function MenuPage() {
               )}
             </button>
 
-            {/* Square white cart button with item count - only on mobile/tablet */}
+            {/* Round white cart button with item count - only on mobile/tablet */}
             <Link
               to="/cart"
               aria-label={`View Cart with ${itemCount} items`}
-              className="relative lg:hidden w-[42px] h-[42px] min-w-[42px] min-h-[42px] rounded-none bg-white border border-stone-300 flex items-center justify-center text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+              className="relative lg:hidden w-[42px] h-[42px] min-w-[42px] min-h-[42px] rounded-full bg-white border border-stone-300 flex items-center justify-center text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
             >
               <ShoppingBag size={18} strokeWidth={2.4} />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 min-w-[18px] px-1 items-center justify-center rounded-none bg-[var(--menu-accent,#C93A1C)] text-white text-[10px] font-sora font-extrabold shadow-xs">
+                <span className="absolute -top-1 -right-1 flex h-4 min-w-[18px] px-1 items-center justify-center rounded-full bg-[var(--menu-accent,#C93A1C)] text-white text-[10px] font-sora font-extrabold shadow-xs">
                   {itemCount}
                 </span>
               )}
@@ -537,7 +537,7 @@ export default function MenuPage() {
               type="button"
               onClick={openNavDrawer}
               aria-label="Open navigation menu - show all pages"
-              className="min-h-[42px] min-w-[42px] px-2.5 sm:px-3.5 flex items-center justify-center gap-1.5 rounded-none border border-stone-300 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+              className="min-h-[42px] min-w-[42px] px-3 sm:px-4 flex items-center justify-center gap-1.5 rounded-full border border-stone-300 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
             >
               <MenuIcon size={19} strokeWidth={2.4} />
               <span className="hidden sm:inline text-xs font-sora font-bold tracking-wide">All Pages</span>
@@ -582,11 +582,11 @@ export default function MenuPage() {
               {/* ─── 4. Search Row ──────────────────────────────────────────────── */}
               <div className="w-full md:w-auto md:min-w-[340px] lg:min-w-[360px] space-y-2">
                 <div className="flex items-center gap-2">
-                  {/* Square search input with crisp border */}
+                  {/* Full-pill search input with crisp border */}
                   <div className="relative flex-1">
                     <Search
                       size={18}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none"
                     />
                     <input
                       ref={searchRef}
@@ -594,26 +594,26 @@ export default function MenuPage() {
                       placeholder="Search food, coffee & beverages..."
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      className="w-full h-11 min-h-[44px] pl-10 pr-9 rounded-none border border-stone-300 focus:border-[#0F3D2E] bg-white text-sm font-jakarta text-[#0F3D2E] placeholder:text-stone-400 focus:outline-none transition"
+                      className="w-full h-11 min-h-[44px] pl-11 pr-10 rounded-full border border-stone-300 focus:border-[#0F3D2E] bg-white text-sm font-jakarta text-[#0F3D2E] placeholder:text-stone-400 focus:outline-none transition shadow-2xs"
                     />
                     {search && (
                       <button
                         type="button"
                         onClick={() => setSearch('')}
                         aria-label="Clear search query"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-stone-400 hover:text-[#0F3D2E] rounded-none transition"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-stone-400 hover:text-[#0F3D2E] rounded-full transition"
                       >
                         <X size={15} />
                       </button>
                     )}
                   </div>
 
-                  {/* "Veg" toggle square button */}
+                  {/* "Veg" toggle rounded pill button */}
                   <button
                     type="button"
                     onClick={() => setVegOnly(!vegOnly)}
                     aria-pressed={vegOnly}
-                    className={`min-h-[44px] px-3.5 flex items-center gap-1.5 rounded-none text-xs font-sora font-bold border transition-all active:scale-95 shadow-2xs shrink-0 ${
+                    className={`min-h-[44px] px-4 flex items-center gap-1.5 rounded-full text-xs font-sora font-bold border transition-all active:scale-95 shadow-2xs shrink-0 ${
                       vegOnly
                         ? 'bg-[#0F3D2E] text-white border-[#0F3D2E]'
                         : 'bg-white text-stone-700 border-stone-300 hover:border-stone-400'
@@ -623,13 +623,13 @@ export default function MenuPage() {
                     <span>Veg</span>
                   </button>
 
-                  {/* Sort Filter Toggle square button */}
+                  {/* Sort Filter Toggle rounded pill button */}
                   <button
                     type="button"
                     onClick={() => setShowFilters(!showFilters)}
                     aria-expanded={showFilters}
                     aria-label="Toggle sort options"
-                    className={`min-h-[44px] px-3 flex items-center gap-1 rounded-none text-xs font-sora font-bold border transition-all active:scale-95 shadow-2xs shrink-0 ${
+                    className={`min-h-[44px] w-11 px-3 flex items-center justify-center rounded-full text-xs font-sora font-bold border transition-all active:scale-95 shadow-2xs shrink-0 ${
                       showFilters || sort
                         ? 'bg-[#0F3D2E] text-white border-[#0F3D2E]'
                         : 'bg-white text-stone-700 border-stone-300 hover:border-stone-400'
@@ -649,14 +649,14 @@ export default function MenuPage() {
                       transition={{ duration: 0.15 }}
                       className="overflow-hidden"
                     >
-                      <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-none bg-white border border-stone-200 shadow-xs">
+                      <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-2xl bg-white border border-stone-200 shadow-xs">
                         <span className="text-xs font-sora font-bold text-stone-700 px-1">Sort:</span>
                         <div className="flex-1 min-w-[140px]">
                           <select
                             value={sort}
                             onChange={(e) => setSort(e.target.value)}
                             aria-label="Sort dishes"
-                            className="w-full min-h-[38px] text-xs font-jakarta font-semibold rounded-none px-3 py-1.5 bg-white text-[#0F3D2E] border border-stone-300 focus:outline-none focus:border-[#0F3D2E]"
+                            className="w-full min-h-[38px] text-xs font-jakarta font-semibold rounded-full px-3 py-1.5 bg-white text-[#0F3D2E] border border-stone-300 focus:outline-none focus:border-[#0F3D2E]"
                           >
                             {SORT_OPTIONS.map((o) => (
                               <option key={o.value} value={o.value}>{o.label}</option>
@@ -689,7 +689,7 @@ export default function MenuPage() {
                 <button
                   type="button"
                   onClick={() => handleCategoryClick('all')}
-                  className={`snap-start shrink-0 min-h-[42px] inline-flex items-center gap-1.5 px-4 py-2 rounded-none text-xs font-sora font-bold uppercase tracking-wider border transition-all active:scale-95 ${
+                  className={`snap-start shrink-0 min-h-[42px] inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-sora font-bold uppercase tracking-wider border transition-all active:scale-95 ${
                     selectedCategory === 'all'
                       ? 'bg-[#0F3D2E] text-white border-[#0F3D2E] shadow-xs'
                       : 'bg-white text-stone-700 border-stone-300 hover:border-[#0F3D2E] hover:text-[#0F3D2E]'
@@ -697,7 +697,7 @@ export default function MenuPage() {
                 >
                   <span>All</span>
                   <span
-                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded-none ${
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                       selectedCategory === 'all'
                         ? 'bg-white/20 text-[#FFF1C9]'
                         : 'bg-stone-100 text-stone-600'
@@ -716,7 +716,7 @@ export default function MenuPage() {
                       key={cat._id}
                       type="button"
                       onClick={() => handleCategoryClick(cat._id)}
-                      className={`snap-start shrink-0 min-h-[42px] inline-flex items-center gap-1.5 px-4 py-2 rounded-none text-xs font-sora font-bold uppercase tracking-wider border whitespace-nowrap transition-all active:scale-95 ${
+                      className={`snap-start shrink-0 min-h-[42px] inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-sora font-bold uppercase tracking-wider border whitespace-nowrap transition-all active:scale-95 ${
                         isSelected
                           ? 'bg-[#0F3D2E] text-white border-[#0F3D2E] shadow-xs'
                           : 'bg-white text-stone-700 border-stone-300 hover:border-[#0F3D2E] hover:text-[#0F3D2E]'
@@ -727,7 +727,7 @@ export default function MenuPage() {
                       <span>{cat.name}</span>
                       {count > 0 && (
                         <span
-                          className={`text-[10px] font-bold px-1.5 py-0.5 rounded-none ${
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                             isSelected
                               ? 'bg-white/20 text-[#FFF1C9]'
                               : 'bg-stone-100 text-stone-600'
@@ -762,7 +762,7 @@ export default function MenuPage() {
                       type="button"
                       onClick={() => scrollPopular('left')}
                       aria-label="Previous popular dishes"
-                      className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-none bg-white border border-stone-300 flex items-center justify-center text-[#0F3D2E] shadow-2xs hover:bg-[#0F3D2E] hover:text-white active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+                      className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-white border border-stone-300 flex items-center justify-center text-[#0F3D2E] shadow-2xs hover:bg-[#0F3D2E] hover:text-white active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
                     >
                       <ChevronLeft size={18} strokeWidth={2.4} />
                     </button>
@@ -770,7 +770,7 @@ export default function MenuPage() {
                       type="button"
                       onClick={() => scrollPopular('right')}
                       aria-label="Next popular dishes"
-                      className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-none bg-white border border-stone-300 flex items-center justify-center text-[#0F3D2E] shadow-2xs hover:bg-[#0F3D2E] hover:text-white active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+                      className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-white border border-stone-300 flex items-center justify-center text-[#0F3D2E] shadow-2xs hover:bg-[#0F3D2E] hover:text-white active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
                     >
                       <ChevronRight size={18} strokeWidth={2.4} />
                     </button>
@@ -800,7 +800,7 @@ export default function MenuPage() {
               ) : menuError ? (
                 /* Error State */
                 <div className="text-center py-16 px-4 bg-white rounded-none p-6 border border-stone-200 shadow-2xs">
-                  <div className="w-14 h-14 mx-auto rounded-none bg-red-50 flex items-center justify-center text-red-500 mb-3 border border-red-200">
+                  <div className="w-14 h-14 mx-auto rounded-full bg-red-50 flex items-center justify-center text-red-500 mb-3 border border-red-200">
                     <AlertCircle size={28} />
                   </div>
                   <h2 className="font-sora text-xl font-bold text-stone-900">Unable to load menu</h2>
@@ -813,7 +813,7 @@ export default function MenuPage() {
                       setMenuError('');
                       setReloadKey((k) => k + 1);
                     }}
-                    className="mt-5 inline-flex min-h-[44px] items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-none text-xs font-sora font-bold shadow-2xs hover:bg-stone-800 active:scale-95 transition"
+                    className="mt-5 inline-flex min-h-[44px] items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-full text-xs font-sora font-bold shadow-2xs hover:bg-stone-800 active:scale-95 transition"
                   >
                     <RotateCcw size={14} />
                     <span>Try Again</span>
@@ -822,7 +822,7 @@ export default function MenuPage() {
               ) : products.length === 0 ? (
                 /* Empty Filter / Search State */
                 <div className="text-center py-16 px-4 bg-white rounded-none p-6 border border-stone-200 shadow-2xs">
-                  <div className="w-14 h-14 mx-auto rounded-none bg-[#FFF1C9] flex items-center justify-center text-[#0F3D2E] mb-3 border border-amber-300/60">
+                  <div className="w-14 h-14 mx-auto rounded-full bg-[#FFF1C9] flex items-center justify-center text-[#0F3D2E] mb-3 border border-amber-300/60">
                     <Search size={24} />
                   </div>
                   <h2 className="font-sora text-xl font-bold text-[#0F3D2E]">No matches found</h2>
@@ -837,7 +837,7 @@ export default function MenuPage() {
                       setSort('');
                       setSelectedCategory('all');
                     }}
-                    className="mt-5 inline-flex min-h-[44px] items-center gap-1.5 px-5 py-2.5 rounded-none bg-[#0F3D2E] text-[#FFF1C9] text-xs font-sora font-bold uppercase tracking-wider shadow-xs hover:bg-[#16503D] active:scale-95 transition"
+                    className="mt-5 inline-flex min-h-[44px] items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#0F3D2E] text-[#FFF1C9] text-xs font-sora font-bold uppercase tracking-wider shadow-xs hover:bg-[#16503D] active:scale-95 transition"
                   >
                     Clear all filters
                   </button>
@@ -896,7 +896,7 @@ export default function MenuPage() {
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="fixed bottom-3 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-[480px] z-40 pb-[env(safe-area-inset-bottom,0px)] pointer-events-auto lg:hidden"
           >
-            <div className="flex items-center justify-between gap-3 bg-[#0F3D2E] text-white rounded-none pl-5 pr-3 py-3 shadow-[0_16px_40px_rgba(15,61,46,0.35)] border border-[#0F3D2E]">
+            <div className="flex items-center justify-between gap-3 bg-[#0F3D2E] text-white rounded-[26px] pl-5 pr-3 py-3 shadow-[0_16px_40px_rgba(15,61,46,0.35)] border border-[#0F3D2E]">
               {/* Left: N items + Total in large text */}
               <div className="flex flex-col">
                 <span className="text-xs font-jakarta font-medium text-[#FFF1C9]/80 leading-none">
@@ -907,11 +907,11 @@ export default function MenuPage() {
                 </span>
               </div>
 
-              {/* Right: Square "View order" button */}
+              {/* Right: Rounded "View order" button */}
               <Link
                 to="/cart"
                 aria-label="View order"
-                className="inline-flex min-h-[44px] items-center gap-1.5 bg-[var(--menu-accent,#C93A1C)] text-white font-sora font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 rounded-none shadow-sm hover:brightness-105 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                className="inline-flex min-h-[44px] items-center gap-1.5 bg-[var(--menu-accent,#C93A1C)] text-white font-sora font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full shadow-sm hover:brightness-105 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 <span>View order</span>
                 <ArrowRight size={16} strokeWidth={2.5} />

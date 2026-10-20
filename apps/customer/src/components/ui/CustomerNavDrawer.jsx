@@ -144,10 +144,10 @@ export default function CustomerNavDrawer() {
                   <img
                     src={tenant.logoUrl}
                     alt={tenant.name || 'Café'}
-                    className="w-10 h-10 rounded-none object-cover border border-stone-200 flex-shrink-0"
+                    className="w-10 h-10 rounded-2xl object-cover border border-stone-200 flex-shrink-0"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-none bg-stone-900 text-white flex items-center justify-center font-sora font-extrabold text-base flex-shrink-0 shadow-2xs">
+                  <div className="w-10 h-10 rounded-2xl bg-[#0F3D2E] text-white flex items-center justify-center font-sora font-extrabold text-base flex-shrink-0 shadow-xs">
                     <Coffee size={20} strokeWidth={2.4} />
                   </div>
                 )}
@@ -166,7 +166,7 @@ export default function CustomerNavDrawer() {
                 type="button"
                 onClick={closeNavDrawer}
                 aria-label="Close navigation menu"
-                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-none border border-stone-300 bg-white flex items-center justify-center text-stone-700 hover:text-stone-900 hover:bg-stone-50 transition active:scale-95 shadow-2xs"
+                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full border border-stone-300 bg-white flex items-center justify-center text-stone-700 hover:text-stone-900 hover:bg-stone-50 transition active:scale-95 shadow-2xs"
               >
                 <X size={18} strokeWidth={2.4} />
               </button>
@@ -175,13 +175,13 @@ export default function CustomerNavDrawer() {
             {/* ─── Scrollable Content ───────────────────────────────────────── */}
             <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-4 space-y-4 bg-white">
               {/* Table Status Card */}
-              <div className="rounded-none border border-stone-200 bg-white p-3.5 shadow-2xs">
+              <div className="rounded-2xl border border-stone-200 bg-white p-3.5 shadow-2xs">
                 {tableNumber ? (
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
                       <div className="relative flex h-3 w-3 shrink-0">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-emerald-400 opacity-75" />
-                        <span className="relative inline-flex rounded-none h-3 w-3 bg-emerald-500" />
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-3 w-2 bg-emerald-500" />
                       </div>
                       <div>
                         <span className="text-[10px] uppercase tracking-wider font-extrabold text-emerald-800">
@@ -198,7 +198,7 @@ export default function CustomerNavDrawer() {
                         closeNavDrawer();
                         openScanner();
                       }}
-                      className="min-h-[36px] px-3 rounded-none border border-stone-300 bg-white hover:bg-stone-50 text-xs font-sora font-bold text-stone-800 transition active:scale-95 shadow-2xs"
+                      className="min-h-[36px] px-3.5 py-1 rounded-full border border-stone-300 bg-white hover:bg-stone-50 text-xs font-sora font-bold text-stone-800 transition active:scale-95 shadow-2xs"
                     >
                       Change Table
                     </button>
@@ -215,7 +215,7 @@ export default function CustomerNavDrawer() {
                         closeNavDrawer();
                         openScanner();
                       }}
-                      className="min-h-[38px] px-3.5 flex items-center gap-1.5 rounded-none bg-stone-900 text-white hover:bg-stone-800 text-xs font-sora font-bold transition active:scale-95 shadow-2xs shrink-0"
+                      className="min-h-[38px] px-4 flex items-center gap-1.5 rounded-full bg-[#0F3D2E] text-white hover:bg-[#16503D] text-xs font-sora font-bold transition active:scale-95 shadow-2xs shrink-0"
                     >
                       <ScanLine size={14} />
                       <span>Scan Table</span>
@@ -228,17 +228,17 @@ export default function CustomerNavDrawer() {
               <Link
                 to="/cart"
                 onClick={closeNavDrawer}
-                className="flex items-center justify-between p-3.5 rounded-none bg-stone-50 border border-stone-200 hover:bg-stone-100 transition group shadow-2xs"
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-stone-50 border border-stone-200 hover:bg-stone-100 transition group shadow-2xs"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-none bg-stone-900 text-white flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-stone-900 text-white flex items-center justify-center shrink-0">
                     <ShoppingBag size={18} strokeWidth={2.4} />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="font-sora text-sm font-bold text-stone-900">Your Cart</p>
                       {itemCount > 0 && (
-                        <span className="px-2 py-0.5 rounded-none bg-[var(--menu-accent,#C93A1C)] text-white text-[10px] font-extrabold font-sora">
+                        <span className="px-2 py-0.5 rounded-full bg-[var(--menu-accent,#C93A1C)] text-white text-[10px] font-extrabold font-sora">
                           {itemCount} {itemCount === 1 ? 'item' : 'items'}
                         </span>
                       )}
@@ -267,7 +267,7 @@ export default function CustomerNavDrawer() {
                         key={item.to}
                         to={item.to}
                         onClick={closeNavDrawer}
-                        className={`group flex items-center justify-between p-3 rounded-none border transition-all ${
+                        className={`group flex items-center justify-between p-3 rounded-2xl border transition-all ${
                           isActive
                             ? 'bg-stone-50 border-stone-900 shadow-2xs'
                             : 'bg-white border-stone-200 hover:border-stone-400 shadow-2xs'
@@ -275,7 +275,7 @@ export default function CustomerNavDrawer() {
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <div
-                            className={`w-10 h-10 rounded-none flex items-center justify-center shrink-0 border ${item.color} ${
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${item.color} ${
                               isActive ? 'ring-1 ring-stone-900' : ''
                             }`}
                           >
@@ -291,7 +291,7 @@ export default function CustomerNavDrawer() {
                                 {item.title}
                               </p>
                               {isActive && (
-                                <span className="px-1.5 py-0.5 rounded-none bg-stone-900 text-white text-[9px] font-sora font-extrabold uppercase tracking-wider">
+                                <span className="px-2 py-0.5 rounded-full bg-stone-900 text-white text-[9px] font-sora font-extrabold uppercase tracking-wider">
                                   Current
                                 </span>
                               )}
@@ -317,7 +317,7 @@ export default function CustomerNavDrawer() {
 
               {/* Direct Café Contact / Address Card */}
               {(tenant.address || tenant.contactPhone) && (
-                <div className="rounded-none border border-stone-200 bg-white p-3.5 space-y-2.5 shadow-2xs">
+                <div className="rounded-2xl border border-stone-200 bg-white p-3.5 space-y-2.5 shadow-2xs">
                   <p className="text-[11px] font-extrabold uppercase tracking-wider text-stone-500">
                     Visit or Call Us
                   </p>

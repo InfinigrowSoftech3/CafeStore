@@ -27,7 +27,7 @@ export default function DesktopOrderSidebar({ onOpenScanner, isKitchenOpen = tru
             Your Order
           </h2>
           {count > 0 && (
-            <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-none bg-[#0F3D2E] text-white text-[11px] font-sora font-bold">
+            <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full bg-[#0F3D2E] text-white text-[11px] font-sora font-bold">
               {count}
             </span>
           )}
@@ -38,11 +38,11 @@ export default function DesktopOrderSidebar({ onOpenScanner, isKitchenOpen = tru
           type="button"
           onClick={onOpenScanner}
           aria-label={tableNumber ? `Current Table ${tableNumber}, click to change` : 'Scan table QR code'}
-          className="inline-flex min-h-[36px] items-center gap-1.5 px-3 py-1 rounded-none bg-white hover:bg-stone-50 border border-stone-300 text-[#0F3D2E] text-xs font-sora font-bold transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+          className="inline-flex min-h-[36px] items-center gap-1.5 px-3 py-1 rounded-full bg-white hover:bg-stone-50 border border-stone-300 text-[#0F3D2E] text-xs font-sora font-bold transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
         >
           {tableNumber ? (
             <>
-              <span className="w-1.5 h-1.5 rounded-none bg-[#1B7A3E]" aria-hidden="true" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1B7A3E]" aria-hidden="true" />
               <span>Table {tableNumber}</span>
             </>
           ) : (

@@ -156,7 +156,7 @@ export default function QrScannerModal({ onClose, onTableFound }) {
             type="button"
             onClick={handleClose}
             aria-label="Close QR scanner"
-            className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-none border border-stone-300 text-stone-500 hover:bg-stone-50 hover:text-stone-900 transition focus:outline-none focus:ring-1 focus:ring-stone-900"
+            className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-stone-300 text-stone-500 hover:bg-stone-50 hover:text-stone-900 transition focus:outline-none focus:ring-1 focus:ring-stone-900"
           >
             <X size={18} aria-hidden="true" />
           </button>
