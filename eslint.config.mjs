@@ -3,7 +3,17 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['**/node_modules/**', '**/dist/**', 'server/all_menu_images/**', 'client/public/**', 'admin-app/public/**'],
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      'server/all_menu_images/**',
+      'client/public/**',
+      'admin-app/public/**',
+      'apps/*/public/**',
+      '**/public/**',
+      'scratch/**',
+      'scripts/**',
+    ],
   },
   {
     files: ['server/**/*.js', 'apps/**/*.{js,jsx}', 'packages/**/*.{js,jsx}'],
