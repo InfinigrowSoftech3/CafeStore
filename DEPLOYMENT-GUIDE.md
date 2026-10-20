@@ -11,11 +11,13 @@ date: 2026-10-05
 This guide walks through deploying the production-hardened version of the cafe ordering application.
 
 **Production URLs:**
-- Customer: https://cafe.infinigrowsoftech.com
-- Admin: https://admin-cafe.infinigrowsoftech.com
-- API: https://cafe-app-api.onrender.com
+- Customer: https://cafestore-customer.vercel.app
+- Admin: https://cafestore-admin.vercel.app
+- POS: https://cafestore-pos.vercel.app
+- KDS: https://cafestore-kds.vercel.app
+- API: https://cafestore-nmue.onrender.com
 
-**Last Updated:** 2026-10-05
+**Last Updated:** 2026-10-20
 
 ---
 

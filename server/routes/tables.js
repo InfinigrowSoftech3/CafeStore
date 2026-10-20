@@ -25,13 +25,13 @@ const router = express.Router();
 router.get('/events', protect, ownerOrManager, (req, res) => openLiveStream(req, res, 'admin'));
 
 const getTrustedClientUrl = () => {
-  let configured = String(process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafe-client-app.vercel.app').trim();
+  let configured = String(process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafestore-customer.vercel.app').trim();
   if (
     !configured ||
     configured.includes('infinigrowsoftech.com') ||
     configured.includes('client-ten-peach-93.vercel.app')
   ) {
-    configured = 'https://cafe-client-app.vercel.app';
+    configured = 'https://cafestore-customer.vercel.app';
   }
 
   const parsed = new URL(configured);

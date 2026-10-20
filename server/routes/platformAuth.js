@@ -490,7 +490,7 @@ router.post('/verify-email', async (req, res, next) => {
         }
 
         // 7. Send Welcome Email in background
-        const adminUrl = String(process.env.ADMIN_APP_URL || process.env.ADMIN_CLIENT_URL || 'https://admincafe-panel.vercel.app').replace(/\/$/, '');
+        const adminUrl = String(process.env.ADMIN_APP_URL || process.env.ADMIN_CLIENT_URL || 'https://cafestore-admin.vercel.app').replace(/\/$/, '');
         sendWelcomeEmail({
           to: pending.email,
           cafeName: pending.cafeName,

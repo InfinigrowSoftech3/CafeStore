@@ -6,4 +6,4 @@ Disallow: /order-confirm/
 Disallow: /receipt/
 Disallow: /orders
 
-Sitemap: https://cafe-client-app.vercel.app/sitemap.xml
+Sitemap: https://cafestore-customer.vercel.app/sitemap.xml

@@ -147,7 +147,7 @@ router.post('/cafes/:cafeId/tables/:tableId/qr', requireAdminCafeAuth, async (re
 
     const token = createTableQrToken(table._id, cafeId);
     const clientUrl =
-      process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafe-client-app.vercel.app';
+      process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafestore-customer.vercel.app';
     const qrUrl = `${clientUrl.replace(/\/$/, '')}/menu?token=${encodeURIComponent(token)}`;
 
     const qrDataUrl = await QRCode.toDataURL(qrUrl, {

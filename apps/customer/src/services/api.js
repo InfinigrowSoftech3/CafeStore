@@ -3,7 +3,7 @@ import { getResolvedTenantSlug, getCustomerStorageKey } from '../utils/tenantHel
 import useCartStore from '../context/cartStore';
 
 const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD
-  ? 'https://cafe-app-n8mn.onrender.com/api'
+  ? 'https://cafestore-nmue.onrender.com/api'
   : '/api');
 
 /**

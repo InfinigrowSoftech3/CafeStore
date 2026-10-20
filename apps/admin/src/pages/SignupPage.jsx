@@ -210,7 +210,7 @@ export default function SignupPage() {
                 </div>
                 <div className="mt-1 flex items-center justify-between text-[11px]">
                   <span className="text-slate-500 font-medium">
-                    Storefront: <span className="font-bold text-[#0F3D2E]">{slug ? `${slug}.cafe-client-app.vercel.app` : 'your-cafe.cafe-client-app.vercel.app'}</span>
+                    Storefront: <span className="font-bold text-[#0F3D2E]">{slug ? `cafestore-customer.vercel.app/menu?cafe=${slug}` : 'cafestore-customer.vercel.app/menu'}</span>
                   </span>
                   {slugIsReserved && (
                     <span className="font-bold text-rose-600">Reserved word</span>

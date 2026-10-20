@@ -20,7 +20,7 @@ export const subscribeToLiveStream = (path, options = {}) => {
   const defaultBaseUrl = typeof window !== 'undefined' && window.__API_URL__
     ? window.__API_URL__
     : (import.meta.env?.VITE_API_URL || (import.meta.env?.PROD
-      ? 'https://cafe-app-n8mn.onrender.com/api'
+      ? 'https://cafestore-nmue.onrender.com/api'
       : '/api'));
 
   const rawBase = customBaseUrl || defaultBaseUrl;

@@ -1,15 +1,9 @@
 import axios from 'axios';
 import { getAccessToken, setAccessToken } from '@cafe/shared';
-
-const defaultApiUrl = import.meta.env.PROD
-  ? 'https://cafe-app-n8mn.onrender.com/api'
-  : 'http://localhost:5000/api';
-
-const configuredApiUrl = String(import.meta.env.VITE_API_URL || defaultApiUrl).trim().replace(/\/+$/, '');
-const apiUrl = configuredApiUrl.endsWith('/api') ? configuredApiUrl : `${configuredApiUrl}/api`;
+import { env } from '../config/env';
 
 const api = axios.create({
-  baseURL: apiUrl,
+  baseURL: env.apiUrl,
   timeout: 35000,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,

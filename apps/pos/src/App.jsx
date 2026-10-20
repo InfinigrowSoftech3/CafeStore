@@ -4,9 +4,10 @@ import { canAccessPos } from '@cafe/shared';
 import { UnauthorizedScreen } from '@cafe/shared';
 import LoginPage from './pages/LoginPage';
 import POSPage from './pages/POSPage';
-import { LogOut, ExternalLink, User } from 'lucide-react';
+import { LogOut, ExternalLink, User, Clock } from 'lucide-react';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { env } from './config/env';
 
 export default function App() {
   const { isAuthenticated, loading, user, logout } = useAuth();
@@ -36,7 +37,8 @@ export default function App() {
     );
   }
 
-  const adminUrl = import.meta.env.VITE_ADMIN_APP_URL || import.meta.env.VITE_ADMIN_URL;
+  const adminUrl = env.adminUrl;
+  const kdsUrl = env.kdsUrl;
   const isManagerOrOwner = ['owner', 'manager'].includes(user?.role);
 
   return (
@@ -58,7 +60,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {/* Staff Info */}
           <div className="flex items-center gap-2 text-xs text-slate-300 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
             <User size={13} className="text-slate-400" />
@@ -67,6 +69,20 @@ export default function App() {
               {user?.role}
             </span>
           </div>
+
+          {/* Cross-App Link: Kitchen Display (KDS) */}
+          {kdsUrl && (
+            <a
+              href={kdsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/40 hover:bg-amber-900/60 text-xs font-semibold text-amber-300 border border-amber-800/50 transition"
+              title="Open Kitchen Display (KDS)"
+            >
+              <Clock size={12} className="text-amber-400" />
+              <span>Kitchen Display</span>
+            </a>
+          )}
 
           {/* Cross-App Link: Admin Console (only for owners/managers) */}
           {isManagerOrOwner && adminUrl && (

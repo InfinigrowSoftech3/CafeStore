@@ -16,13 +16,15 @@ services:
       - key: RAZORPAY_KEY_SECRET
         sync: false
       - key: CLIENT_URL
-        value: https://cafe-client-app.vercel.app
+        value: https://cafestore-customer.vercel.app
       - key: CUSTOMER_APP_URL
-        value: https://cafe-client-app.vercel.app
+        value: https://cafestore-customer.vercel.app
+      - key: POS_APP_URL
+        value: https://cafestore-pos.vercel.app
+      - key: KDS_APP_URL
+        value: https://cafestore-kds.vercel.app
       - key: ADMIN_APP_URL
-        value: https://admincafe-panel.vercel.app
-      - key: ADMIN_CLIENT_URL
-        value: https://admincafe-panel.vercel.app
+        value: https://cafestore-admin.vercel.app
       - key: SERVER_URL
         sync: false
       - key: NODE_ENV

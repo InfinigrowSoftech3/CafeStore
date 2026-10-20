@@ -22,19 +22,24 @@ cafe-app/
 
 ## 📱 Target Applications Matrix
 
-| App | Target Users / Role Gate | Dev Command | Port | Suggested Vercel Root | Suggested Production Domain | Key Environment Variables |
+| App | Target Users / Role Gate | Dev Command | Port | Vercel Root Directory | Production Domain | Key Environment Variables |
 |---|---|---|---|---|---|---|
-| **apps/customer** | Public (no login)<br>Mobile-first QR table ordering | `npm run dev:customer` | `5173` | `apps/customer` | `cafe.infinigrowsoftech.com` | `VITE_API_URL`<br>`VITE_RAZORPAY_KEY_ID`<br>`VITE_ADMIN_URL` |
-| **apps/pos** | Staff (`cashier`, `manager`, `owner`)<br>Touch register, offline queue, tabs | `npm run dev:pos` | `5174` | `apps/pos` | `pos-cafe.infinigrowsoftech.com` | `VITE_API_URL`<br>`VITE_ADMIN_URL`<br>`VITE_KDS_URL` |
-| **apps/kds** | Kitchen (`kitchen`, `manager`, `owner`)<br>Live ticket board, timers, chimes | `npm run dev:kds` | `5175` | `apps/kds` | `kds-cafe.infinigrowsoftech.com` | `VITE_API_URL`<br>`VITE_ADMIN_URL`<br>`VITE_POS_URL` |
-| **apps/admin** | Management (`owner`, `manager`)<br>Inventory, CRM, GST reports, Super Admin | `npm run dev:admin` | `5176` | `apps/admin` | `admin-cafe.infinigrowsoftech.com` | `VITE_API_URL`<br>`VITE_CUSTOMER_URL`<br>`VITE_POS_URL`<br>`VITE_KDS_URL` |
-| **server** | Backend API & SSE Engine | `npm run dev:server` | `5000` | Render / VPS | `api-cafe.infinigrowsoftech.com` | `MONGO_URI`<br>`JWT_SECRET`<br>`CUSTOMER_APP_URL`<br>`POS_APP_URL`<br>`KDS_APP_URL`<br>`ADMIN_APP_URL` |
+| **apps/customer** | Public (no login)<br>Mobile-first QR table ordering | `npm run dev:customer` | `5173` | `apps/customer` | `https://cafestore-customer.vercel.app` | `VITE_API_URL`<br>`VITE_RAZORPAY_KEY_ID`<br>`VITE_ADMIN_URL` |
+| **apps/pos** | Staff (`cashier`, `manager`, `owner`)<br>Touch register, offline queue, tabs | `npm run dev:pos` | `5174` | `apps/pos` | `https://cafestore-pos.vercel.app` | `VITE_API_URL`<br>`VITE_ADMIN_URL`<br>`VITE_KDS_URL` |
+| **apps/kds** | Kitchen (`kitchen`, `manager`, `owner`)<br>Live ticket board, timers, chimes | `npm run dev:kds` | `5175` | `apps/kds` | `https://cafestore-kds.vercel.app` | `VITE_API_URL`<br>`VITE_ADMIN_URL`<br>`VITE_POS_URL` |
+| **apps/admin** | Management (`owner`, `manager`)<br>Inventory, CRM, GST reports, Super Admin | `npm run dev:admin` | `5176` | `apps/admin` | `https://cafestore-admin.vercel.app` | `VITE_API_URL`<br>`VITE_CUSTOMER_URL`<br>`VITE_POS_URL`<br>`VITE_KDS_URL` |
+| **server** | Backend API & SSE Engine | `npm run dev:server` | `5000` | Render | `https://cafestore-nmue.onrender.com` | `MONGO_URI`<br>`JWT_SECRET`<br>`CUSTOMER_APP_URL`<br>`POS_APP_URL`<br>`KDS_APP_URL`<br>`ADMIN_APP_URL` |
 
 > [!IMPORTANT]
-> **Role Gating**: Each app strictly checks user roles against the authenticated token from `@cafe/shared`. Users with an unauthorized role see a dedicated `<UnauthorizedScreen>` ("Not authorized for this app") rather than a broken page.
+> **Vercel Root Directory Requirement**:
+> Each Vercel project MUST have its **Root Directory** configured in Project Settings:
+> - `cafestore-admin` ➔ `apps/admin`
+> - `cafestore-pos` ➔ `apps/pos`
+> - `cafestore-kds` ➔ `apps/kds`
+> - `cafestore-customer` ➔ `apps/customer`
 
 > [!NOTE]
-> **Cross-App Navigation**: No internal routes or dead imports are shared across apps. The admin panel sidebar and headers link to customer storefront, POS terminal, and KDS via external environment variables (`VITE_CUSTOMER_URL`, `VITE_POS_URL`, `VITE_KDS_URL`).
+> **Cross-App Navigation**: No internal routes or dead imports are shared across apps. The admin panel sidebar and headers link to customer storefront, POS terminal, and KDS via environment variables and production fallbacks (`VITE_CUSTOMER_URL`, `VITE_POS_URL`, `VITE_KDS_URL`). POS and KDS headers also link directly back to the Admin Back Office and each other.
 
 ---
 
@@ -128,9 +133,11 @@ Each app is independently deployable to Vercel with its own `vercel.json` SPA re
    - Admin: `apps/admin`
 3. Vercel automatically detects Vite with output directory `dist`.
 4. Configure the relevant environment variables in Vercel for each project:
-   - `VITE_API_URL=https://your-backend.onrender.com/api`
-   - `VITE_RAZORPAY_KEY_ID=rzp_live_...` (for customer)
-   - Cross-app URLs: `VITE_CUSTOMER_URL`, `VITE_POS_URL`, `VITE_KDS_URL`, `VITE_ADMIN_URL`
+   - `VITE_API_URL=https://cafestore-nmue.onrender.com/api`
+   - `VITE_CUSTOMER_URL=https://cafestore-customer.vercel.app`
+   - `VITE_POS_URL=https://cafestore-pos.vercel.app`
+   - `VITE_KDS_URL=https://cafestore-kds.vercel.app`
+   - `VITE_ADMIN_URL=https://cafestore-admin.vercel.app`
 5. Deploy each app independently.
 
 ---
@@ -138,10 +145,10 @@ Each app is independently deployable to Vercel with its own `vercel.json` SPA re
 ## 🔒 Security & CORS
 
 The backend server validates CORS against all configured app URLs:
-- `CUSTOMER_APP_URL` (`https://cafe.infinigrowsoftech.com`)
-- `POS_APP_URL` (`https://pos-cafe.infinigrowsoftech.com`)
-- `KDS_APP_URL` (`https://kds-cafe.infinigrowsoftech.com`)
-- `ADMIN_APP_URL` (`https://admin-cafe.infinigrowsoftech.com`)
+- `CUSTOMER_APP_URL` (`https://cafestore-customer.vercel.app`)
+- `POS_APP_URL` (`https://cafestore-pos.vercel.app`)
+- `KDS_APP_URL` (`https://cafestore-kds.vercel.app`)
+- `ADMIN_APP_URL` (`https://cafestore-admin.vercel.app`)
 - Local development origins (`http://localhost:5173`, `http://localhost:5174`, `http://localhost:5175`, `http://localhost:5176`, `http://localhost:5000`)
 - Vercel preview environments (`*.vercel.app`)
 

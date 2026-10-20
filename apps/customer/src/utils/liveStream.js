@@ -5,7 +5,7 @@ const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, mill
 export const subscribeToLiveStream = (path, { headers = {}, onEvent }) => {
   const controller = new AbortController();
   const baseUrl = String(import.meta.env.VITE_API_URL || (import.meta.env.PROD
-    ? 'https://cafe-app-n8mn.onrender.com/api'
+    ? 'https://cafestore-nmue.onrender.com/api'
     : '/api')).replace(/\/$/, '');
 
   const run = async () => {

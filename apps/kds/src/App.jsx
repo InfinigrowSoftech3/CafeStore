@@ -3,9 +3,10 @@ import { useTenant } from './context/TenantContext';
 import { canAccessKds, UnauthorizedScreen } from '@cafe/shared';
 import LoginPage from './pages/LoginPage';
 import KitchenDisplayPage from './pages/KitchenDisplayPage';
-import { LogOut, ExternalLink, ChefHat } from 'lucide-react';
+import { LogOut, ExternalLink, ChefHat, Monitor } from 'lucide-react';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { env } from './config/env';
 
 export default function App() {
   const { isAuthenticated, loading, user, logout } = useAuth();
@@ -35,7 +36,8 @@ export default function App() {
     );
   }
 
-  const adminUrl = import.meta.env.VITE_ADMIN_APP_URL || import.meta.env.VITE_ADMIN_URL;
+  const adminUrl = env.adminUrl;
+  const posUrl = env.posUrl;
   const isManagerOrOwner = ['owner', 'manager'].includes(user?.role);
 
   return (
@@ -57,7 +59,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {/* Staff Info */}
           <div className="flex items-center gap-2 text-xs text-stone-300 bg-stone-950 px-2.5 py-1 rounded-lg border border-stone-800">
             <ChefHat size={13} className="text-amber-400" />
@@ -66,6 +68,20 @@ export default function App() {
               {user?.role === 'kitchen' ? 'Kitchen/Barista' : user?.role}
             </span>
           </div>
+
+          {/* Cross-App Link: POS Register */}
+          {posUrl && (
+            <a
+              href={posUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 text-xs font-semibold text-emerald-300 border border-emerald-800/50 transition"
+              title="Open POS Terminal"
+            >
+              <Monitor size={12} className="text-emerald-400" />
+              <span>POS Terminal</span>
+            </a>
+          )}
 
           {/* Cross-App Link: Admin Console (only for owners/managers) */}
           {isManagerOrOwner && adminUrl && (
