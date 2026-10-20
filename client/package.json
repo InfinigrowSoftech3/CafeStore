@@ -1,0 +1,9 @@
+{
+  "name": "@cafe/client-compat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vercel backwards-compatibility bridge for @cafe/customer",
+  "scripts": {
+    "build": "node build.js"
+  }
+}
