@@ -6,24 +6,32 @@ export default function ProductCard({
   product,
   currency = '₹',
   inCartQty = 0,
+  cartQuantity = 0,
   onSelect,
+  onClick,
   className = '',
 }) {
   const isAvailable = product?.available !== false;
   const hasVariants = product?.variants && product.variants.length > 0;
   const price = product?.price || 0;
+  const quantity = inCartQty || cartQuantity || 0;
+  const handleAction = () => {
+    if (!isAvailable) return;
+    if (onClick) onClick(product);
+    else if (onSelect) onSelect(product);
+  };
 
   return (
     <button
       type="button"
-      onClick={() => isAvailable && onSelect && onSelect(product)}
+      onClick={handleAction}
       disabled={!isAvailable}
       aria-label={`${product?.name || 'Product'}, ${formatMoney(price, currency)}${
         !isAvailable ? ' - Out of stock' : ''
-      }${inCartQty > 0 ? `, ${inCartQty} in order` : ''}`}
+      }${quantity > 0 ? `, ${quantity} in order` : ''}`}
       className={`touch-press group relative flex flex-col justify-between w-full min-h-[170px] min-w-[150px] rounded-2xl bg-pos-surface border text-left overflow-hidden transition-all duration-140 select-none shadow-soft ${
         isAvailable
-          ? inCartQty > 0
+          ? quantity > 0
             ? 'border-pos-accent ring-1 ring-pos-accent/30 hover:border-pos-accent-hover'
             : 'border-pos-border hover:border-pos-accent/60 hover:bg-pos-raised'
           : 'border-pos-border/40 opacity-50 cursor-not-allowed'
@@ -84,7 +92,7 @@ export default function ProductCard({
 
           <span
             className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
-              inCartQty > 0
+              quantity > 0
                 ? 'bg-pos-accent text-[#14110F]'
                 : 'bg-pos-raised text-pos-muted group-hover:bg-pos-accent group-hover:text-[#14110F]'
             }`}
