@@ -10,7 +10,22 @@
     <title>POS Terminal · Counter & Cashier Register</title>
   </head>
   <body class="bg-stone-100 select-none">
-    <div id="root"></div>
+    <div id="root">
+      <!-- High-fidelity Instant Loading Shell (displayed until React mounts) -->
+      <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #020617; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; text-align: center; padding: 24px;">
+        <div style="display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 20px; background-color: #0F3D2E; color: white; font-size: 28px; font-weight: 800; margin-bottom: 20px; box-shadow: 0 10px 25px -5px rgba(15, 61, 46, 0.4);">
+          ☕
+        </div>
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; font-size: 11px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">
+          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 9999px; background-color: #10b981;"></span>
+          POS Terminal
+        </div>
+        <h2 style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0 0 6px 0; letter-spacing: -0.02em;">Starting Cashier Register...</h2>
+        <p style="font-size: 12px; color: #94a3b8; margin: 0 0 24px 0; max-width: 320px;">Synchronizing catalog, offline memory, and ticket system</p>
+        <div style="width: 36px; height: 36px; border: 3px solid rgba(16, 185, 129, 0.2); border-top-color: #10b981; border-radius: 50%; animation: posSpin 0.9s linear infinite;"></div>
+        <style>@keyframes posSpin { to { transform: rotate(360deg); } }</style>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

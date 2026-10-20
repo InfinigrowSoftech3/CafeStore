@@ -89,7 +89,7 @@ export default function LoginPage() {
             🍳
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-white">
-            {tenant.name || 'Café'} Kitchen Display
+            {tenant?.name || 'Café'} Kitchen Display
           </h1>
           <p className="mt-1 text-xs text-stone-400 font-normal">
             Cook, Barista & Kitchen Staff Live Ticket Board

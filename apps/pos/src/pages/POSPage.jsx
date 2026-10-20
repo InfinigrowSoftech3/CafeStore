@@ -154,32 +154,61 @@ export default function POSPage() {
         api.get('/pos/held-orders?limit=100').catch(() => ({ data: { orders: [] } })),
       ]);
 
-      const catList = catsRes.data?.categories || (Array.isArray(catsRes.data) ? catsRes.data : []);
-      const prodList = prodsRes.data?.products || (Array.isArray(prodsRes.data) ? prodsRes.data : []);
-      const tableList = tablesRes.data?.tables || (Array.isArray(tablesRes.data) ? tablesRes.data : []);
+      const catList = Array.isArray(catsRes.data?.categories)
+        ? catsRes.data.categories
+        : Array.isArray(catsRes.data)
+        ? catsRes.data
+        : [];
+      const prodList = Array.isArray(prodsRes.data?.products)
+        ? prodsRes.data.products
+        : Array.isArray(prodsRes.data)
+        ? prodsRes.data
+        : [];
+      const tableList = Array.isArray(tablesRes.data?.tables)
+        ? tablesRes.data.tables
+        : Array.isArray(tablesRes.data)
+        ? tablesRes.data
+        : [];
 
       const finalCats = catList.length > 0 ? catList : SAMPLE_CATEGORIES;
       const finalProds = prodList.length > 0 ? prodList : SAMPLE_PRODUCTS;
-      const finalTables = tableList.length > 0 ? tableList : SAMPLE_TABLES;
+      const rawTables = tableList.length > 0 ? tableList : SAMPLE_TABLES;
+
+      // Normalize tables so they have guaranteed valid numbers, labels and seat counts
+      const finalTables = rawTables.map((t, idx) => ({
+        _id: t._id || t.id || `table_${t.tableNumber || t.number || idx + 1}`,
+        tableNumber: Number(t.tableNumber || t.number || idx + 1),
+        label: t.label || t.name || `Table ${t.tableNumber || t.number || idx + 1}`,
+        seats: Number(t.seats || t.capacity || 4),
+        status: t.status || 'AVAILABLE',
+      }));
 
       setCategories(finalCats);
       setProducts(finalProds);
       setTables(finalTables);
-      setHeldOrders(heldRes.data?.orders || []);
+      setHeldOrders(Array.isArray(heldRes.data?.orders) ? heldRes.data.orders : []);
 
       // Cache for offline usage
       await cacheCatalog(finalCats, finalProds);
     } catch {
       const cached = await getCachedCatalog().catch(() => ({ products: [], categories: [] }));
+      const normalizedSampleTables = SAMPLE_TABLES.map((t, idx) => ({
+        _id: t._id || `table_${t.tableNumber || idx + 1}`,
+        tableNumber: Number(t.tableNumber || idx + 1),
+        label: `Table ${t.tableNumber || idx + 1}`,
+        seats: Number(t.capacity || 4),
+        status: t.status || 'AVAILABLE',
+      }));
+
       if (cached?.products?.length > 0) {
-        setCategories(cached.categories);
-        setProducts(cached.products);
-        setTables(SAMPLE_TABLES);
+        setCategories(cached.categories || SAMPLE_CATEGORIES);
+        setProducts(cached.products || SAMPLE_PRODUCTS);
+        setTables(normalizedSampleTables);
         toast('Loaded menu from offline cache', { icon: '📦' });
       } else {
         setCategories(SAMPLE_CATEGORIES);
         setProducts(SAMPLE_PRODUCTS);
-        setTables(SAMPLE_TABLES);
+        setTables(normalizedSampleTables);
         toast('Loaded workstation catalog', { icon: '📦' });
       }
     } finally {
@@ -193,8 +222,10 @@ export default function POSPage() {
 
   // Filtered Products
   const filteredProducts = useMemo(() => {
-    return products.filter((prod) => {
-      if (selectedCategory !== 'ALL' && String(prod.category?._id || prod.category) !== selectedCategory) {
+    return (products || []).filter((prod) => {
+      if (!prod) return false;
+      const catId = String(prod.category?._id || prod.category || '');
+      if (selectedCategory !== 'ALL' && catId !== selectedCategory) {
         return false;
       }
       if (selectedStation !== 'ALL' && prod.kitchenStation !== selectedStation) {
@@ -202,8 +233,8 @@ export default function POSPage() {
       }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchesName = prod.name.toLowerCase().includes(q);
-        const matchesSku = prod.sku?.toLowerCase().includes(q);
+        const matchesName = String(prod.name || '').toLowerCase().includes(q);
+        const matchesSku = String(prod.sku || '').toLowerCase().includes(q);
         return matchesName || matchesSku;
       }
       return true;
@@ -417,7 +448,7 @@ export default function POSPage() {
         name: customerName || 'Walk-in Customer',
         phone: customerPhone || '9999999999',
       },
-      customerGstin: customerGstin.trim().toUpperCase(),
+      customerGstin: (customerGstin || '').trim().toUpperCase(),
       items: cart.map(item => ({
         productId: item.productId,
         quantity: item.quantity,
@@ -616,13 +647,16 @@ export default function POSPage() {
               <span className="text-[10px] opacity-80">{products.length}</span>
             </button>
 
-            {categories.map(cat => {
-              const count = products.filter(p => String(p.category?._id || p.category) === String(cat._id)).length;
-              const isSelected = selectedCategory === String(cat._id);
+            {(categories || []).map(cat => {
+              if (!cat) return null;
+              const catId = String(cat._id || cat.id || cat);
+              const catName = cat.name || String(cat);
+              const count = (products || []).filter(p => String(p?.category?._id || p?.category || '') === catId).length;
+              const isSelected = selectedCategory === catId;
               return (
                 <button
-                  key={cat._id}
-                  onClick={() => setSelectedCategory(String(cat._id))}
+                  key={catId}
+                  onClick={() => setSelectedCategory(catId)}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
                     isSelected
                       ? 'bg-brew-500 text-white shadow-sm font-bold'
@@ -631,7 +665,7 @@ export default function POSPage() {
                 >
                   <div className="flex items-center gap-2 truncate">
                     <span>{cat.icon || '☕'}</span>
-                    <span className="truncate">{cat.name}</span>
+                    <span className="truncate">{catName}</span>
                   </div>
                   <span className="text-[10px] opacity-75 font-mono">{count}</span>
                 </button>
@@ -749,18 +783,21 @@ export default function POSPage() {
                     className="w-full bg-white rounded-xl border border-stone-300 py-1.5 px-2.5 text-xs font-bold text-stone-800 focus:outline-none focus:ring-1 focus:ring-brew-500"
                   >
                     <option value="">Select Table</option>
-                    {tables.map(t => (
-                      <option key={t._id || t.number} value={t.number}>
-                        Table {t.number} ({t.name || `Seats ${t.seats || 4}`})
-                      </option>
-                    ))}
+                    {(tables || []).map((t, idx) => {
+                      const num = t.tableNumber || t.number || (idx + 1);
+                      return (
+                        <option key={t._id || `tbl_${num}`} value={num}>
+                          {t.label || `Table ${num}`} ({`Seats ${t.seats || 4}`})
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
               ) : (
                 <div className="flex-1">
                   <label className="text-[10px] font-bold uppercase text-stone-500 block mb-0.5">Mode</label>
                   <div className="w-full bg-stone-200/80 rounded-xl py-1.5 px-2.5 text-xs font-bold text-stone-700 capitalize">
-                    {orderType.replace('_', ' ')} Order
+                    {(orderType || 'counter').replace('_', ' ')} Order
                   </div>
                 </div>
               )}
@@ -1095,13 +1132,13 @@ export default function POSPage() {
             </div>
 
             <div className="space-y-2">
-              {heldOrders.map((held) => (
-                <div key={held._id} className="p-3 rounded-2xl border border-stone-200 bg-stone-50 flex items-center justify-between gap-3">
+              {(heldOrders || []).map((held) => (
+                <div key={held._id || held.id || Math.random()} className="p-3 rounded-2xl border border-stone-200 bg-stone-50 flex items-center justify-between gap-3">
                   <div>
                     <div className="font-bold text-xs text-stone-900">
-                      {held.orderType.toUpperCase()} {held.tableNumber ? `· Table ${held.tableNumber}` : ''}
+                      {(held.orderType || 'counter').toUpperCase()} {held.tableNumber ? `· Table ${held.tableNumber}` : ''}
                     </div>
-                    <div className="text-[11px] text-stone-500">{held.items?.length} items · {held.customer?.name || 'Walk-in'}</div>
+                    <div className="text-[11px] text-stone-500">{(held.items || []).length} items · {held.customer?.name || 'Walk-in'}</div>
                   </div>
                   <button
                     onClick={() => handleResumeHeldOrder(held)}
@@ -1186,7 +1223,7 @@ export default function POSPage() {
             <div className="space-y-1.5 text-xs">
               <div className="flex justify-between text-stone-600">
                 <span>Total Paid:</span>
-                <span className="font-bold text-stone-900 font-mono">{formatMoney(lastReceipt.order?.total, currency)}</span>
+                <span className="font-bold text-stone-900 font-mono">{formatMoney(lastReceipt.order?.total || lastReceipt.order?.totalAmount || 0, currency)}</span>
               </div>
               <div className="flex justify-between text-stone-500 text-[11px]">
                 <span>Payment Mode:</span>

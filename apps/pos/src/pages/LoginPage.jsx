@@ -86,14 +86,14 @@ export default function LoginPage() {
           </div>
 
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-800 bg-[#0F3D2E] text-2xl font-extrabold text-white shadow-md overflow-hidden">
-            {tenant.logoUrl ? (
+            {tenant?.logoUrl ? (
               <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
             ) : (
-              (tenant.name || 'C').charAt(0).toUpperCase()
+              (tenant?.name || 'C').charAt(0).toUpperCase()
             )}
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-white">
-            {tenant.name || 'Café'} POS Terminal
+            {tenant?.name || 'Café'} POS Terminal
           </h1>
           <p className="mt-1 text-xs text-slate-400 font-normal">
             Cashier, Manager & Staff Touch Register

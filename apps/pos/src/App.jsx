@@ -1,9 +1,9 @@
 import { useAuth } from './context/AuthContext';
 import { useTenant } from './context/TenantContext';
-import { canAccessPos } from '@cafe/shared';
-import { UnauthorizedScreen } from '@cafe/shared';
+import { canAccessPos, UnauthorizedScreen } from '@cafe/shared';
 import LoginPage from './pages/LoginPage';
 import POSPage from './pages/POSPage';
+import ErrorBoundary from './components/ErrorBoundary';
 import { LogOut, ExternalLink, User, Clock } from 'lucide-react';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -15,8 +15,11 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-stone-900 text-stone-200">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-200">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
+          <span className="text-xs font-semibold text-slate-400">Connecting Station...</span>
+        </div>
       </div>
     );
   }
@@ -111,9 +114,11 @@ export default function App() {
         </div>
       </header>
 
-      {/* ── POS Main Page ─────────────────────────────────────────── */}
+      {/* ── POS Main Page with Inner ErrorBoundary ─────────────────── */}
       <main className="flex-1 min-h-0 overflow-hidden flex flex-col">
-        <POSPage />
+        <ErrorBoundary>
+          <POSPage />
+        </ErrorBoundary>
       </main>
     </div>
   );
