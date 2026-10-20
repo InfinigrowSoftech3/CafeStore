@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import api, { getOnce } from '../services/api';
-import { setAccessToken } from '@cafe/shared';
+import { getAccessToken, setAccessToken } from '@cafe/shared';
 
 const AuthContext = createContext(null);
 
@@ -10,14 +10,37 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let active = true;
+
+    // 1. Support seamless single sign-on from Admin Back Office
+    if (typeof window !== 'undefined') {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ssoToken = urlParams.get('sso') || urlParams.get('token');
+        if (ssoToken) {
+          setAccessToken(ssoToken);
+          urlParams.delete('sso');
+          urlParams.delete('token');
+          const cleanSearch = urlParams.toString() ? `?${urlParams.toString()}` : '';
+          window.history.replaceState({}, document.title, window.location.pathname + cleanSearch);
+        }
+      } catch {
+        // Ignore URL parsing errors
+      }
+    }
+
+    const token = getAccessToken();
     getOnce('/auth/me')
       .then((res) => {
         if (active) setUser(res.data.user);
       })
       .catch(() => {
         if (active) {
-          setUser(null);
-          setAccessToken(null);
+          if (!token) {
+            setUser(null);
+          } else {
+            setAccessToken(null);
+            setUser(null);
+          }
         }
       })
       .finally(() => {
@@ -35,6 +58,19 @@ export function AuthProvider({ children }) {
     setAccessToken(data.token);
     setUser(authUser);
     return authUser;
+  };
+
+  const demoLogin = (role = 'kitchen') => {
+    const demoUser = {
+      _id: 'demo-staff-kds',
+      name: role === 'kitchen' ? 'Chef Vikram (Kitchen Lead)' : 'Barista Arjun',
+      email: role === 'kitchen' ? 'chef@brewhaus.com' : 'barista@brewhaus.com',
+      role: role,
+      tenantName: 'Brewhaus Café',
+      tenantId: 'demo-tenant',
+    };
+    setUser(demoUser);
+    return demoUser;
   };
 
   const logout = async () => {
@@ -55,6 +91,7 @@ export function AuthProvider({ children }) {
     user,
     loading,
     login,
+    demoLogin,
     logout,
     updateUser,
     isAuthenticated: Boolean(user),

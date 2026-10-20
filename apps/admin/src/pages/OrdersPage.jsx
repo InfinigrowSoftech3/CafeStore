@@ -22,6 +22,7 @@ import {
 import toast from 'react-hot-toast';
 import api from '../services/api';
 import { env } from '../config/env';
+import { getAccessToken } from '@cafe/shared';
 import { useTenant } from '../context/TenantContext';
 import { formatMoney } from '../utils/money';
 import { subscribeToLiveStream } from '../utils/liveStream';
@@ -353,7 +354,7 @@ export default function OrdersPage() {
 
             {/* Kitchen Display link */}
             <a
-              href={env.kdsUrl}
+              href={getAccessToken() ? `${env.kdsUrl}?sso=${encodeURIComponent(getAccessToken())}` : env.kdsUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-xs transition"

@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../services/api';
 import { env } from '../config/env';
+import { getAccessToken } from '@cafe/shared';
 import { useTenant } from '../context/TenantContext';
 import { formatMoney } from '../utils/money';
 import PageHeader from '../components/common/PageHeader';
@@ -729,7 +730,11 @@ export default function TablesPage() {
                   <div className="grid grid-cols-2 gap-1.5">
                     <button
                       type="button"
-                      onClick={() => window.open(`${env.posUrl}?table=${table.tableNumber}`, '_blank')}
+                      onClick={() => {
+                        const token = getAccessToken();
+                        const ssoQuery = token ? `&sso=${encodeURIComponent(token)}` : '';
+                        window.open(`${env.posUrl}?table=${table.tableNumber}${ssoQuery}`, '_blank');
+                      }}
                       className="px-2.5 py-1.5 bg-stone-900 hover:bg-stone-800 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1 transition"
                     >
                       <Monitor size={12} /> Fast POS
@@ -864,7 +869,9 @@ export default function TablesPage() {
                 onClick={() => {
                   const num = activeDrawerTable.tableNumber;
                   setActiveDrawerTable(null);
-                  window.open(`${env.posUrl}?table=${num}`, '_blank');
+                  const token = getAccessToken();
+                  const ssoQuery = token ? `&sso=${encodeURIComponent(token)}` : '';
+                  window.open(`${env.posUrl}?table=${num}${ssoQuery}`, '_blank');
                 }}
                 className="btn-primary flex-1 rounded-xl py-2.5 text-xs font-semibold shadow-xs flex items-center justify-center gap-1.5"
               >

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Loader2, Sparkles, Flame, Coffee, ExternalLink, Monitor } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
+import { env } from '../config/env';
 
 export default function LoginPage() {
   const tenant = useTenant();
-  const { login } = useAuth();
+  const { login, demoLogin } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [twoFactorCode, setTwoFactorCode] = useState('');
@@ -60,6 +61,12 @@ export default function LoginPage() {
     }
   };
 
+  const handleFillCredentials = (demoEmail, demoPass) => {
+    setEmail(demoEmail);
+    setPassword(demoPass);
+    setError('');
+  };
+
   const isButtonDisabled = loading || rateLimitCountdown > 0;
 
   return (
@@ -70,7 +77,7 @@ export default function LoginPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.25 }}
-        className="relative z-10 w-full max-w-md rounded-2xl border border-stone-800 bg-stone-900 p-7 sm:p-9 shadow-2xl text-stone-100"
+        className="relative z-10 w-full max-w-md rounded-2xl border border-stone-800 bg-stone-900/95 p-6 sm:p-8 shadow-2xl text-stone-100 backdrop-blur-md"
       >
         <div className="mb-6 text-center">
           <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 px-3 py-1 text-[11px] font-bold text-amber-400">
@@ -85,8 +92,34 @@ export default function LoginPage() {
             {tenant.name || 'Café'} Kitchen Display
           </h1>
           <p className="mt-1 text-xs text-stone-400 font-normal">
-            Cook, Barista & Kitchen Staff Access
+            Cook, Barista & Kitchen Staff Live Ticket Board
           </p>
+        </div>
+
+        {/* ── 1-Click Instant Demo / Preview Buttons ─────────── */}
+        <div className="mb-5 rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs space-y-2">
+          <div className="flex items-center gap-1.5 text-amber-400 font-bold text-[11px] uppercase tracking-wider">
+            <Sparkles size={13} />
+            <span>Instant Kitchen Access (1-Click)</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => demoLogin('kitchen')}
+              className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs shadow-xs transition active:scale-98"
+            >
+              <Flame size={13} />
+              <span>Kitchen Lead / Chef</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => demoLogin('manager')}
+              className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-amber-300 font-bold text-xs border border-amber-800/60 shadow-xs transition active:scale-98"
+            >
+              <Coffee size={13} />
+              <span>Barista / Manager</span>
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -98,13 +131,21 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-stone-300">
-              Kitchen Staff Email
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-300">
+                Kitchen Staff Email
+              </label>
+              <button
+                type="button"
+                onClick={() => handleFillCredentials('manager@sipstack-demo.com', 'Manager@123')}
+                className="text-[10px] text-amber-400 hover:text-amber-300 underline font-medium"
+              >
+                Auto-fill demo
+              </button>
+            </div>
             <input
               type="email"
               required
-              autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="kitchen@yourcafe.com"
@@ -161,6 +202,39 @@ export default function LoginPage() {
             {loading ? 'Entering Station...' : 'Sign in to Kitchen Board'}
           </button>
         </form>
+
+        {/* ── Cross-App Navigation Footer ───────────────────── */}
+        <div className="mt-6 pt-5 border-t border-stone-800 flex items-center justify-between text-xs text-stone-400">
+          <a
+            href={env.adminUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-amber-400 flex items-center gap-1 transition font-medium"
+          >
+            <span>Back Office</span>
+            <ExternalLink size={11} />
+          </a>
+          <span className="text-stone-700">·</span>
+          <a
+            href={env.posUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-emerald-400 flex items-center gap-1 transition font-medium"
+          >
+            <Monitor size={11} />
+            <span>POS Terminal</span>
+          </a>
+          <span className="text-stone-700">·</span>
+          <a
+            href={env.customerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-amber-400 flex items-center gap-1 transition font-medium"
+          >
+            <span>Storefront</span>
+            <ExternalLink size={11} />
+          </a>
+        </div>
       </motion.div>
     </div>
   );

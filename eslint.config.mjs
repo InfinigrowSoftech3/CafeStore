@@ -6,7 +6,7 @@ export default [
     ignores: ['**/node_modules/**', '**/dist/**', 'server/all_menu_images/**', 'client/public/**', 'admin-app/public/**'],
   },
   {
-    files: ['server/**/*.js', 'client/src/**/*.{js,jsx}', 'client/*.js', 'admin-app/src/**/*.{js,jsx}', 'admin-app/*.js'],
+    files: ['server/**/*.js', 'apps/**/*.{js,jsx}', 'packages/**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',

@@ -16,7 +16,18 @@ import { useTenant } from '../context/TenantContext';
 import { canAccessPos, canManageMenu, canManageTeam, canViewOrders } from '../utils/roles';
 import api from '../services/api';
 import { env } from '../config/env';
+import { getAccessToken } from '@cafe/shared';
 import CommandPaletteModal from '../components/common/CommandPaletteModal';
+
+const getAppHref = (href) => {
+  if (!href) return '';
+  const token = getAccessToken();
+  if (token && (href.startsWith(env.posUrl) || href.startsWith(env.kdsUrl))) {
+    const sep = href.includes('?') ? '&' : '?';
+    return `${href}${sep}sso=${encodeURIComponent(token)}`;
+  }
+  return href;
+};
 
 // 5 Grouped Navigation Modules
 const NAV_GROUPS = [
@@ -249,7 +260,7 @@ export default function AdminLayout({ children, title }) {
                     return (
                       <a
                         key={label}
-                        href={href}
+                        href={getAppHref(href)}
                         target="_blank"
                         rel="noopener noreferrer"
                         title={isCollapsed ? label : undefined}
@@ -415,7 +426,7 @@ export default function AdminLayout({ children, title }) {
                         return (
                           <a
                             key={label}
-                            href={href}
+                            href={getAppHref(href)}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={() => setSidebarOpen(false)}
@@ -621,7 +632,7 @@ export default function AdminLayout({ children, title }) {
             {/* Quick "Open POS" CTA Button */}
             {canAccessPos(user?.role) && (
               <a
-                href={env.posUrl}
+                href={getAppHref(env.posUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-3.5 text-xs font-bold text-white shadow-xs hover:bg-[#165a44] active:scale-98 transition"
