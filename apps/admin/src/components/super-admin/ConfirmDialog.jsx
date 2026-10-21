@@ -82,7 +82,7 @@ export default function ConfirmDialog({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ duration: 0.18 }}
-          className="relative w-full max-w-lg rounded-2xl border p-6 shadow-2xl text-[var(--text-primary)] z-10"
+          className="relative w-full max-w-lg rounded-2xl border p-4 sm:p-6 shadow-2xl text-[var(--text-primary)] z-10"
           style={{
             backgroundColor: 'var(--bg-card)',
             borderColor: 'var(--border-primary)',

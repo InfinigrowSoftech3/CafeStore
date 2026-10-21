@@ -31,26 +31,27 @@ export default function Sidebar({
       {isMobileOpen && (
         <div
           onClick={onCloseMobile}
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-[#07123A]/80 backdrop-blur-sm lg:hidden animate-in fade-in duration-200"
+          aria-hidden="true"
         />
       )}
 
       {/* Sidebar Container: Sticky 100vh on desktop, fixed slide-over on mobile */}
       <aside
-        className="fixed inset-y-0 left-0 z-40 flex flex-col h-screen shrink-0 border-r transition-all duration-300 lg:sticky lg:top-0 custom-scrollbar
-          bg-[var(--sidebar-bg)] border-[var(--sidebar-border)] text-[var(--sidebar-text)]
-          shadow-xl
-          ${isMobileOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0'}
-          ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}"
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col h-screen shrink-0 border-r transition-all duration-300 lg:sticky lg:top-0 lg:z-30 custom-scrollbar bg-[var(--sidebar-bg,#0B1B4D)] border-[var(--sidebar-border,rgba(227,232,245,0.12))] text-[var(--sidebar-text,#FFFFFF)] shadow-2xl lg:shadow-xl ${
+          isMobileOpen
+            ? 'translate-x-0 w-72 sm:w-80 max-w-[85vw]'
+            : '-translate-x-full lg:translate-x-0'
+        } ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}`}
       >
         {/* ── 1. Top Brand Header (h-16 pinned) ───────────────── */}
-        <div className="flex h-16 shrink-0 items-center justify-between px-4 border-b border-[var(--sidebar-border)]">
+        <div className="flex h-16 shrink-0 items-center justify-between px-4 border-b border-[var(--sidebar-border,rgba(227,232,245,0.12))]">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#1E3FAE]/30 to-[#0B1B4D] border border-[#D4AF37]/50 text-[#D4AF37] font-bold shadow-inner">
               <ShieldCheck size={20} />
             </div>
 
-            {!isCollapsed && (
+            {(!isCollapsed || isMobileOpen) && (
               <div className="truncate">
                 <span className="font-display text-sm font-bold tracking-tight text-white block truncate">
                   Brewhaus Core
@@ -65,7 +66,7 @@ export default function Sidebar({
           {/* Desktop collapse toggle */}
           <button
             onClick={onToggleCollapse}
-            className="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--sidebar-border)] text-[var(--sidebar-text-muted)] hover:bg-[var(--sidebar-hover-bg)] hover:text-white transition"
+            className="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--sidebar-border,rgba(227,232,245,0.12))] text-[var(--sidebar-text-muted,#8E9BBF)] hover:bg-[var(--sidebar-hover-bg,rgba(255,255,255,0.08))] hover:text-white transition"
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
           >
             {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
@@ -74,16 +75,17 @@ export default function Sidebar({
           {/* Mobile close button */}
           <button
             onClick={onCloseMobile}
-            className="lg:hidden p-1.5 text-[var(--sidebar-text-muted)] hover:text-white transition rounded-lg hover:bg-[var(--sidebar-hover-bg)]"
+            className="lg:hidden p-2 text-[var(--sidebar-text-muted,#8E9BBF)] hover:text-white transition rounded-lg hover:bg-[var(--sidebar-hover-bg,rgba(255,255,255,0.08))]"
+            aria-label="Close Sidebar"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
         {/* ── 2. Middle: Navigation Items List (Scrollable) ───── */}
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1 custom-scrollbar">
-          {!isCollapsed && (
-            <div className="px-2 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--sidebar-text-muted)]">
+          {(!isCollapsed || isMobileOpen) && (
+            <div className="px-2 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--sidebar-text-muted,#8E9BBF)]">
               Platform Modules
             </div>
           )}
@@ -92,6 +94,7 @@ export default function Sidebar({
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
+              const showText = !isCollapsed || isMobileOpen;
 
               return (
                 <button
@@ -100,7 +103,7 @@ export default function Sidebar({
                     onSelectTab(item.id);
                     if (onCloseMobile) onCloseMobile();
                   }}
-                  title={isCollapsed ? item.label : undefined}
+                  title={!showText ? item.label : undefined}
                   className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold transition group ${
                     isActive
                       ? 'bg-[#D4AF37]/14 text-white border-l-[3px] border-l-[#D4AF37] border-y-transparent border-r-transparent rounded-r-xl rounded-l-none pl-2.5 shadow-sm font-bold'
@@ -108,7 +111,7 @@ export default function Sidebar({
                   }`}
                 >
                   <Icon
-                    size={17}
+                    size={18}
                     className={`shrink-0 transition ${
                       isActive
                         ? 'text-[#D4AF37]'
@@ -116,7 +119,7 @@ export default function Sidebar({
                     }`}
                   />
 
-                  {!isCollapsed && (
+                  {showText && (
                     <div className="flex flex-1 items-center justify-between truncate">
                       <span className="truncate">{item.label}</span>
                       {item.badgeKey === 'tenantCount' && tenantCount > 0 && (
@@ -133,29 +136,29 @@ export default function Sidebar({
         </div>
 
         {/* ── 3. Bottom Section: Pinned at bottom of screen ────── */}
-        <div className="shrink-0 p-3 space-y-2 border-t border-[var(--sidebar-border)] bg-[var(--sidebar-hover-bg)]/60">
+        <div className="shrink-0 p-3 space-y-2 border-t border-[var(--sidebar-border,rgba(227,232,245,0.12))] bg-[var(--sidebar-hover-bg,rgba(255,255,255,0.08))]/60">
           {/* Workstation Launcher - Gold Outline Button */}
           <button
             onClick={() => {
               onOpenUserPanels();
               if (onCloseMobile) onCloseMobile();
             }}
-            title={isCollapsed ? 'User Panel Workstation' : undefined}
+            title={isCollapsed && !isMobileOpen ? 'User Panel Workstation' : undefined}
             className={`w-full flex items-center gap-2.5 rounded-xl border border-[#D4AF37] bg-transparent py-2.5 px-3 text-xs font-bold text-[#D4AF37] hover:bg-[#D4AF37]/10 transition ${
-              isCollapsed ? 'justify-center' : ''
+              isCollapsed && !isMobileOpen ? 'justify-center' : ''
             }`}
           >
             <Smartphone size={16} className="shrink-0 text-[#D4AF37]" />
-            {!isCollapsed && <span className="truncate font-bold">User Panel Workstation</span>}
+            {(!isCollapsed || isMobileOpen) && <span className="truncate font-bold">User Panel Workstation</span>}
           </button>
 
           {/* Admin User Profile Chip & Logout */}
-          <div className={`pt-2 border-t border-[var(--sidebar-border)]/80 flex items-center gap-2.5 ${isCollapsed ? 'justify-center' : ''}`}>
+          <div className={`pt-2 border-t border-[var(--sidebar-border,rgba(227,232,245,0.12))]/80 flex items-center gap-2.5 ${isCollapsed && !isMobileOpen ? 'justify-center' : ''}`}>
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#D4AF37] text-[#0B1B4D] font-black text-xs shadow-sm">
               SA
             </div>
 
-            {!isCollapsed && (
+            {(!isCollapsed || isMobileOpen) && (
               <div className="flex-1 truncate">
                 <div className="text-xs font-bold text-white truncate">
                   {adminUser?.name || 'Platform Admin'}
@@ -166,13 +169,13 @@ export default function Sidebar({
               </div>
             )}
 
-            {!isCollapsed && (
+            {(!isCollapsed || isMobileOpen) && (
               <button
                 onClick={onLogout}
-                className="p-1.5 text-[var(--sidebar-text-muted)] hover:text-red-400 transition rounded-lg hover:bg-white/10"
+                className="p-1.5 text-[var(--sidebar-text-muted,#8E9BBF)] hover:text-red-400 transition rounded-lg hover:bg-white/10"
                 title="Sign out of Super Admin"
               >
-                <LogOut size={15} />
+                <LogOut size={16} />
               </button>
             )}
           </div>

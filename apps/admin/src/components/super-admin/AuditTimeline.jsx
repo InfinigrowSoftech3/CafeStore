@@ -121,9 +121,9 @@ export default function AuditTimeline({ logs = [], loading = false }) {
   return (
     <div className="space-y-4">
       {/* Filter bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 kpi-card">
-        <div className="relative flex-1 max-w-md">
-          <Search size={15} className="absolute left-3.5 top-3 text-[var(--text-muted)]" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-card,#FFFFFF)] p-3 sm:p-4 shadow-xs">
+        <div className="relative flex-1 w-full max-w-md">
+          <Search size={15} className="absolute left-3.5 top-3 text-[var(--text-muted,#8E9BBF)]" />
           <input
             type="text"
             value={search}
@@ -132,18 +132,18 @@ export default function AuditTimeline({ logs = [], loading = false }) {
               setPage(1);
             }}
             placeholder="Search audit trail by actor, action, café or reason..."
-            className="input-field pl-10"
+            className="w-full rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--input-bg,#FFFFFF)] pl-10 pr-4 py-2 text-xs text-[var(--text-primary,#1B2559)] placeholder-[var(--text-muted,#8E9BBF)] focus:border-[#1E3FAE] focus:outline-none"
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
           <select
             value={categoryFilter}
             onChange={(e) => {
               setCategoryFilter(e.target.value);
               setPage(1);
             }}
-            className="input-field"
+            className="flex-1 sm:flex-none rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--input-bg,#FFFFFF)] px-3 py-2 text-xs text-[var(--text-primary,#1B2559)] focus:border-[#1E3FAE] focus:outline-none"
           >
             <option value="all">All Event Categories</option>
             <option value="status">Status & Suspension</option>
@@ -155,7 +155,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
 
           <button
             onClick={handleExportAudit}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)] transition"
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary,#3B4874)] hover:text-[var(--text-primary,#1B2559)] transition w-full sm:w-auto"
           >
             <Download size={13} /> Export CSV
           </button>
@@ -163,7 +163,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
       </div>
 
       {/* Timeline List Card */}
-      <div className="kpi-card p-6">
+      <div className="rounded-3xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-card,#FFFFFF)] p-4 sm:p-6 shadow-xs">
         {loading ? (
           <div className="py-12 text-center text-[var(--text-muted)] text-xs">
             Loading platform audit entries...
@@ -173,7 +173,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
             No audit records found matching your filters.
           </div>
         ) : (
-          <div className="relative pl-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-[var(--border-primary)] space-y-6">
+          <div className="relative pl-5 sm:pl-6 before:absolute before:left-2 sm:before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-[var(--border-primary,#E3E8F5)] space-y-4 sm:space-y-6">
             {paginatedLogs.map((log) => {
               const cat = getEventCategory(log.action);
               const badge = getEventBadge(cat);
@@ -183,7 +183,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
               return (
                 <div key={log._id || Math.random()} className="relative group">
                   {/* Timeline dot */}
-                  <div className="absolute -left-6 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--bg-surface)] border border-[var(--border-primary)] text-[var(--text-muted)] group-hover:border-[#1E3FAE] group-hover:text-[#1E3FAE] transition">
+                  <div className="absolute -left-5 sm:-left-6 top-1.5 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-[var(--bg-surface,#FFFFFF)] border border-[var(--border-primary,#E3E8F5)] text-[var(--text-muted,#8E9BBF)] group-hover:border-[#1E3FAE] group-hover:text-[#1E3FAE] transition">
                     <div className="h-1.5 w-1.5 rounded-full bg-current" />
                   </div>
 

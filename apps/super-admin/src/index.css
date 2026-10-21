@@ -209,3 +209,45 @@ button, input, select, textarea {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(142, 155, 191, 0.7);
 }
+
+/* Utility & Component Classes */
+.kpi-card {
+  background-color: var(--sa-card-bg, #FFFFFF);
+  border: 1px solid var(--sa-card-border, #E3E8F5);
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+  box-shadow: var(--sa-card-shadow, 0 4px 20px -2px rgba(11, 27, 77, 0.06));
+  transition: all 0.2s ease-in-out;
+}
+
+@media (min-width: 640px) {
+  .kpi-card {
+    padding: 1.5rem;
+  }
+}
+
+.input-field {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--sa-card-border, #E3E8F5);
+  background-color: #FFFFFF;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--sa-text-body, #1B2559);
+  transition: all 0.15s ease-in-out;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--sa-primary, #1E3FAE);
+  box-shadow: 0 0 0 1px var(--sa-primary, #1E3FAE);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

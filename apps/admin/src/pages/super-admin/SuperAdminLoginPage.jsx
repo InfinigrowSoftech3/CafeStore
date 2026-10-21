@@ -146,11 +146,11 @@ export default function SuperAdminLoginPage() {
       </div>
 
       {/* ── Right Side: Admin Authentication Card ── */}
-      <div className="flex flex-1 items-center justify-center p-6 sm:p-12 bg-slate-50">
+      <div className="flex flex-1 items-center justify-center p-4 sm:p-6 lg:p-12 bg-slate-50 min-h-screen">
         <motion.div
           animate={shake ? { x: [-10, 10, -8, 8, -4, 4, 0] } : {}}
           transition={{ duration: 0.4 }}
-          className="w-full max-w-md space-y-6 bg-white p-8 sm:p-10 rounded-none border border-slate-200 shadow-xl"
+          className="w-full max-w-md space-y-6 bg-white p-6 sm:p-10 rounded-2xl sm:rounded-none border border-slate-200 shadow-xl"
         >
           {/* Header */}
           <div>

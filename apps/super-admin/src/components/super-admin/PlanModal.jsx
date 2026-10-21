@@ -67,7 +67,7 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
           initial={{ opacity: 0, scale: 0.96, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 10 }}
-          className="relative w-full max-w-3xl rounded-3xl border p-6 sm:p-8 shadow-2xl text-[var(--text-primary)] z-10 max-h-[90vh] overflow-y-auto"
+          className="relative w-full max-w-3xl rounded-3xl border p-4 sm:p-8 shadow-2xl text-[var(--text-primary)] z-10 max-h-[90vh] overflow-y-auto"
           style={{
             backgroundColor: 'var(--bg-card)',
             borderColor: 'var(--border-primary)',

@@ -202,7 +202,8 @@ export default function DashboardPage() {
 
           setConfirmDialogProps((prev) => ({ ...prev, isOpen: false }));
           toast.success(`Switched to "${tenant.name}" owner session.`);
-          window.location.href = `${env.adminUrl}/dashboard`;
+          const targetAdminUrl = `${env.adminUrl}/dashboard`;
+          window.open(targetAdminUrl, '_blank', 'noopener,noreferrer');
         } catch (err) {
           toast.error(err.message || 'Failed to impersonate tenant.');
         }
@@ -294,30 +295,30 @@ export default function DashboardPage() {
         />
 
         {/* Main Body Container (max-w ~1400px) */}
-        <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+        <main className="flex-1 max-w-[1400px] w-full mx-auto p-3 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
           {/* ═════════════════════════════════════════════════════════════
               VIEW 1: OVERVIEW
               ═════════════════════════════════════════════════════════════ */}
           {activeTab === 'overview' && (
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               {/* Header with Date-Range Filter */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                 <div>
-                  <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+                  <h2 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
                     Executive SaaS Dashboard
                   </h2>
-                  <p className="text-xs text-slate-500 dark:text-stone-400 mt-1">
+                  <p className="text-xs text-slate-500 dark:text-stone-400 mt-0.5 sm:mt-1">
                     Multi-tenant business metrics, real-time activity, and health indicators
                   </p>
                 </div>
 
                 {/* Date-Range Selector */}
-                <div className="flex items-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-1 text-xs shadow-2xs">
+                <div className="flex items-center gap-1 rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-card,#FFFFFF)] p-1 text-xs shadow-2xs overflow-x-auto no-scrollbar w-full sm:w-auto justify-between sm:justify-start">
                   {['today', '7d', '30d', 'all'].map((range) => (
                     <button
                       key={range}
                       onClick={() => setDateRange(range)}
-                      className={`rounded-lg px-3 py-1 font-semibold transition ${
+                      className={`rounded-lg px-2.5 sm:px-3 py-1 font-semibold transition shrink-0 ${
                         dateRange === range
                           ? 'bg-[#D4AF37] text-[#0B1B4D] font-bold shadow-xs'
                           : 'text-[#5B6585] dark:text-stone-400 hover:text-[#0B1B4D] dark:hover:text-white'
@@ -330,7 +331,7 @@ export default function DashboardPage() {
               </div>
 
               {/* 5 KPI Metric Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                 <KpiCard
                   title="Total Cafés"
                   value={metrics?.totalTenants ?? tenants.length}
@@ -612,7 +613,7 @@ export default function DashboardPage() {
                     >
                       <div className="truncate pr-2">
                         <div className="font-bold text-slate-900 dark:text-white truncate">{t.name}</div>
-                        <div className="text-[11px] text-slate-500 dark:text-stone-500 font-mono truncate">{t.slug}.localhost</div>
+                        <div className="text-[11px] text-slate-500 dark:text-stone-500 font-mono truncate">{t.slug}</div>
                       </div>
                       <button
                         onClick={() => handleRequestImpersonate(t)}
