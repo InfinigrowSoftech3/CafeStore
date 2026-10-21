@@ -151,7 +151,6 @@ export default function CheckoutPage() {
         tableNumber,
         tableToken: effectiveTableToken,
         cafeSlug,
-        tenantId: activeTenantId,
         customer: {
           name: name.trim(),
           phone: phone.trim(),
@@ -225,7 +224,6 @@ export default function CheckoutPage() {
         tableNumber,
         tableToken: effectiveTableToken,
         cafeSlug,
-        tenantId: activeTenantId,
         customer: {
           name: name.trim(),
           phone: phone.trim(),
@@ -267,7 +265,7 @@ export default function CheckoutPage() {
 
       const rzpRes = await api.post(
         '/payment/create-order',
-        { orderId: order._id, accessToken, tenantId: activeTenantId, cafeSlug },
+        { orderId: order._id, accessToken, cafeSlug },
         {
           headers: {
             ...(cafeSlug && { 'X-Tenant-Slug': cafeSlug }),
@@ -295,7 +293,7 @@ export default function CheckoutPage() {
             setLoading(false);
             api.post(
               '/payment/cancel',
-              { orderId: order._id, accessToken, tenantId: activeTenantId, cafeSlug },
+              { orderId: order._id, accessToken, cafeSlug },
               {
                 headers: {
                   ...(cafeSlug && { 'X-Tenant-Slug': cafeSlug }),
