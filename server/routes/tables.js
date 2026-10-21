@@ -29,7 +29,8 @@ const getTrustedClientUrl = () => {
   if (
     !configured ||
     configured.includes('infinigrowsoftech.com') ||
-    configured.includes('client-ten-peach-93.vercel.app')
+    configured.includes('client-ten-peach-93.vercel.app') ||
+    configured.includes('cafe-client-app.vercel.app')
   ) {
     configured = 'https://cafestore-customer.vercel.app';
   }

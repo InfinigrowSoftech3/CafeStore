@@ -45,17 +45,50 @@ export function TenantProvider({ children }) {
 
     setTenantState({ status: 'loading', message: '' });
 
-    const resolveEndpoint = () => {
+    const resolveEndpoint = async () => {
+      // 1. If token is present, attempt QR resolve passing all parameters for maximum reliability
       if (token) {
-        return api.get('/public/cafes/resolve', { params: { token } });
+        try {
+          const res = await api.get('/public/cafes/resolve', {
+            params: {
+              token,
+              ...(resolvedSlug && { cafeSlug: resolvedSlug }),
+              ...(tableSlug && { tableSlug }),
+            },
+          });
+          if (res.data?.data?.cafe || res.data?.data) return res;
+        } catch (tokenErr) {
+          console.warn('QR token resolution failed, trying cafe+table fallback...', tokenErr);
+        }
       }
+
+      // 2. If cafeSlug (or resolvedSlug) and tableSlug exist, resolve by table and cafe
       if (resolvedSlug && tableSlug) {
-        return api.get('/public/cafes/resolve', { params: { cafeSlug: resolvedSlug, tableSlug } });
+        try {
+          const res = await api.get('/public/cafes/resolve', {
+            params: { cafeSlug: resolvedSlug, tableSlug },
+          });
+          if (res.data?.data?.cafe || res.data?.data) return res;
+        } catch (slugTableErr) {
+          console.warn('Cafe+table resolution failed, trying cafe slug...', slugTableErr);
+        }
       }
+
+      // 3. Try resolving by cafe slug alone
       if (resolvedSlug) {
-        return api.get(`/public/cafes/${encodeURIComponent(resolvedSlug)}`);
+        try {
+          const res = await api.get(`/public/cafes/${encodeURIComponent(resolvedSlug)}`);
+          if (res.data?.data || res.data?.tenant) return res;
+        } catch (slugErr) {
+          console.warn(`Cafe slug "${resolvedSlug}" not found, clearing storage and resolving default...`, slugErr);
+          sessionStorage.removeItem('active_cafe_slug');
+          sessionStorage.removeItem('active_tenant_id');
+          localStorage.removeItem('active_cafe_slug');
+          localStorage.removeItem('active_tenant_id');
+        }
       }
-      // If no token or slug was provided in the URL or subdomain, resolve the default active cafe
+
+      // 4. Default active cafe fallback - guarantees customer never gets blocked by 404
       return api.get('/public/cafes/default');
     };
 
@@ -130,6 +163,11 @@ export function TenantProvider({ children }) {
           setCustomerSessionItem(cafeData.slug, 'table_id', tableData.id);
           if (effectiveToken) {
             setCustomerSessionItem(cafeData.slug, 'table_token', effectiveToken);
+          }
+        } else if (tableSlug) {
+          const numMatch = String(tableSlug).match(/\d+/);
+          if (numMatch) {
+            setCustomerSessionItem(cafeData.slug, 'table_number', Number(numMatch[0]));
           }
         }
 

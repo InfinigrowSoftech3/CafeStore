@@ -28,8 +28,16 @@ export function TenantNotFoundScreen({ message }) {
           type="button"
           onClick={() => {
             try {
+              sessionStorage.removeItem('active_cafe_slug');
+              sessionStorage.removeItem('active_tenant_id');
               sessionStorage.removeItem('cafe_tenant_slug');
               sessionStorage.removeItem('cafe_tenant_id');
+              sessionStorage.removeItem('active_table_token');
+              localStorage.removeItem('active_cafe_slug');
+              localStorage.removeItem('active_tenant_id');
+              localStorage.removeItem('cafe_tenant_slug');
+              localStorage.removeItem('cafe_tenant_id');
+              localStorage.removeItem('active_table_token');
             } catch {
               /* ignore storage errors */
             }

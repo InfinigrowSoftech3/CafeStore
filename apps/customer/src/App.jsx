@@ -97,6 +97,12 @@ function PageFallback() {
   );
 }
 
+function RootRedirect() {
+  const [searchParams] = useSearchParams();
+  const search = searchParams.toString();
+  return <Navigate to={search ? `/menu?${search}` : '/menu'} replace />;
+}
+
 function MenuRouteWrapper() {
   const [searchParams] = useSearchParams();
   const slug = searchParams.get('cafeSlug') || searchParams.get('cafe') || searchParams.get('cafeId') || searchParams.get('slug') || searchParams.get('token') || searchParams.get('tableToken') || '';
@@ -133,7 +139,7 @@ export default function App() {
       <ChunkErrorBoundary>
         <Suspense fallback={<PageFallback />}>
           <Routes>
-            <Route path="/" element={<Navigate to="/menu" replace />} />
+            <Route path="/" element={<RootRedirect />} />
             <Route path="/menu" element={<MenuRouteWrapper />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/offers" element={<OffersPage />} />

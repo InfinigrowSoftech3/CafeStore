@@ -7,7 +7,7 @@ import { createTableQrToken } from '../utils/tableQr.js';
 import { runWithSystemTenantAccess } from '../utils/tenantContext.js';
 
 const getClientBaseUrl = () => {
-  const configured = String(process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafe-client-app.vercel.app').trim();
+  const configured = String(process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafestore-customer.vercel.app').trim();
   return configured.replace(/\/$/, '');
 };
 
