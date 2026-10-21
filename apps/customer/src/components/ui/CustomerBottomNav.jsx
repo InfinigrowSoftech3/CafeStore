@@ -1,7 +1,33 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { Home, UtensilsCrossed, ShoppingBag, Clock } from 'lucide-react';
+import {
+  Home,
+  UtensilsCrossed,
+  ShoppingBag,
+  Clock,
+  MoreHorizontal,
+  X,
+  Sparkles,
+  Info,
+  Phone,
+  Image,
+  FileText,
+  MailMinus,
+  Receipt,
+} from 'lucide-react';
 import useCartStore, { cartItemCount } from '../../context/cartStore';
+
+// Pages exposed in the "More" sheet
+const MORE_ITEMS = [
+  { label: 'Offers',      path: '/offers',      icon: Sparkles,  desc: 'Daily deals & specials'  },
+  { label: 'About',       path: '/about',       icon: Info,      desc: 'Our story & team'         },
+  { label: 'Contact',     path: '/contact',     icon: Phone,     desc: 'Location & hours'         },
+  { label: 'Gallery',     path: '/gallery',     icon: Image,     desc: 'Photos & guest moments'   },
+  { label: 'Receipt',     path: '/receipt',     icon: Receipt,   desc: 'View session receipt'     },
+  { label: 'Bill',        path: '/bill',        icon: FileText,  desc: 'Table bill & payment'     },
+  { label: 'Legal',       path: '/legal',       icon: FileText,  desc: 'Terms & privacy'          },
+  { label: 'Unsub',       path: '/unsubscribe', icon: MailMinus, desc: 'Manage notifications'     },
+];
 
 export default function CustomerBottomNav() {
   const location = useLocation();
@@ -9,6 +35,8 @@ export default function CustomerBottomNav() {
   const [searchParams] = useSearchParams();
   const itemCount = useCartStore(cartItemCount);
   const [menuView, setMenuView] = useState('home');
+  const [moreOpen, setMoreOpen] = useState(false);
+  const sheetRef = useRef(null);
 
   // Track active menu view (home vs category) via custom event
   useEffect(() => {
@@ -18,6 +46,23 @@ export default function CustomerBottomNav() {
     window.addEventListener('menu:viewchange', handleViewChange);
     return () => window.removeEventListener('menu:viewchange', handleViewChange);
   }, []);
+
+  // Close More sheet on route change
+  useEffect(() => {
+    setMoreOpen(false);
+  }, [location.pathname]);
+
+  // Close on outside tap
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onOutside = (e) => {
+      if (sheetRef.current && !sheetRef.current.contains(e.target)) {
+        setMoreOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', onOutside);
+    return () => document.removeEventListener('pointerdown', onOutside);
+  }, [moreOpen]);
 
   // Hidden on checkout, cart, or order confirmation flows
   const isHiddenRoute = useMemo(() => {
@@ -36,6 +81,7 @@ export default function CustomerBottomNav() {
 
   const handleHomeClick = (e) => {
     e.preventDefault();
+    setMoreOpen(false);
     if (location.pathname === '/menu') {
       window.dispatchEvent(new CustomEvent('nav:home'));
       setMenuView('home');
@@ -47,6 +93,7 @@ export default function CustomerBottomNav() {
 
   const handleMenuClick = (e) => {
     e.preventDefault();
+    setMoreOpen(false);
     if (location.pathname === '/menu') {
       window.dispatchEvent(new CustomEvent('nav:menu'));
       setMenuView('category');
@@ -57,87 +104,176 @@ export default function CustomerBottomNav() {
 
   const handleOrdersClick = (e) => {
     e.preventDefault();
+    setMoreOpen(false);
     navigate(`/orders${currentSearch}`);
   };
 
   const handleCartClick = (e) => {
     e.preventDefault();
+    setMoreOpen(false);
     navigate(`/cart${currentSearch}`);
   };
 
-  const isHomeActive = location.pathname === '/menu' && menuView === 'home';
-  const isMenuActive = location.pathname === '/menu' && menuView === 'category';
+  const handleMoreNav = (path) => {
+    setMoreOpen(false);
+    navigate(`${path}${currentSearch}`);
+  };
+
+  const isHomeActive   = location.pathname === '/menu' && menuView === 'home';
+  const isMenuActive   = location.pathname === '/menu' && menuView === 'category';
   const isOrdersActive = location.pathname === '/orders';
+  const isMoreActive   = MORE_ITEMS.some((item) => location.pathname.startsWith(item.path));
 
   return (
-    <nav
-      aria-label="Bottom Navigation"
-      className="md:hidden fixed left-4 right-4 z-40 max-w-md mx-auto"
-      style={{ bottom: 'calc(14px + env(safe-area-inset-bottom, 0px))' }}
-    >
-      <div className="relative flex items-center justify-between px-3 py-2 bg-[#FFFDF9]/95 backdrop-blur-md border border-[#EFE4D6] rounded-[28px] shadow-[0_10px_30px_rgba(90,50,20,0.12)]">
-        {/* Home Tab */}
-        <button
-          type="button"
-          onClick={handleHomeClick}
-          aria-label="Go to Home"
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-200 min-w-[56px] min-h-[44px] ${
-            isHomeActive
-              ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'
-              : 'text-[#7B6B5F] hover:text-[#2B1810]'
-          }`}
-        >
-          <Home size={18} strokeWidth={isHomeActive ? 2.5 : 2} />
-          <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Home</span>
-        </button>
+    <>
+      {/* ── More sheet backdrop ── */}
+      {moreOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-30 bg-[#2B1810]/30 backdrop-blur-xs"
+          aria-hidden="true"
+        />
+      )}
 
-        {/* Menu Tab */}
-        <button
-          type="button"
-          onClick={handleMenuClick}
-          aria-label="Browse Menu Categories"
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-200 min-w-[56px] min-h-[44px] ${
-            isMenuActive
-              ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'
-              : 'text-[#7B6B5F] hover:text-[#2B1810]'
-          }`}
+      {/* ── More sheet (slides up above nav bar) ── */}
+      {moreOpen && (
+        <div
+          ref={sheetRef}
+          className="md:hidden fixed left-4 right-4 z-40 max-w-md mx-auto rounded-[24px] bg-[#FFFDF9] border border-[#EFE4D6] shadow-[0_-8px_32px_rgba(90,50,20,0.14)] overflow-hidden"
+          style={{ bottom: 'calc(82px + env(safe-area-inset-bottom, 0px))' }}
+          role="dialog"
+          aria-label="More options"
         >
-          <UtensilsCrossed size={18} strokeWidth={isMenuActive ? 2.5 : 2} />
-          <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Menu</span>
-        </button>
+          {/* Sheet header */}
+          <div className="flex items-center justify-between px-4 pt-3.5 pb-3 border-b border-[#EFE4D6]">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#7B6B5F]">More pages</p>
+            <button
+              type="button"
+              onClick={() => setMoreOpen(false)}
+              aria-label="Close more menu"
+              className="flex items-center justify-center w-7 h-7 rounded-full bg-[#F3E9DC] text-[#7B6B5F] hover:bg-[#EFE4D6] transition"
+            >
+              <X size={14} />
+            </button>
+          </div>
 
-        {/* Center Raised Cart Button */}
-        <div className="relative -mt-7 flex flex-col items-center justify-center">
+          {/* 4-column grid of icon links */}
+          <div className="grid grid-cols-4 gap-1.5 p-3">
+            {MORE_ITEMS.map(({ label, path, icon: Icon, desc }) => {
+              const active = location.pathname.startsWith(path);
+              return (
+                <button
+                  key={path}
+                  type="button"
+                  onClick={() => handleMoreNav(path)}
+                  aria-label={desc}
+                  className={`flex flex-col items-center gap-1.5 rounded-2xl py-3 px-1 transition-all active:scale-95 ${
+                    active
+                      ? 'bg-[#7A3316] text-[#FFFDF9]'
+                      : 'bg-[#F3E9DC] text-[#2B1810] hover:bg-[#EFE4D6]'
+                  }`}
+                >
+                  <Icon size={19} strokeWidth={1.8} />
+                  <span className="text-[9px] font-bold tracking-tight leading-none text-center">
+                    {label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Bottom nav bar ── */}
+      <nav
+        aria-label="Bottom Navigation"
+        className="md:hidden fixed left-4 right-4 z-40 max-w-md mx-auto"
+        style={{ bottom: 'calc(14px + env(safe-area-inset-bottom, 0px))' }}
+      >
+        <div className="relative flex items-center justify-between px-2 py-2 bg-[#FFFDF9]/95 backdrop-blur-md border border-[#EFE4D6] rounded-[28px] shadow-[0_10px_30px_rgba(90,50,20,0.12)]">
+
+          {/* Home Tab */}
           <button
             type="button"
-            onClick={handleCartClick}
-            aria-label={`View Cart (${itemCount} items)`}
-            className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#7A3316] text-[#FFFDF9] shadow-[0_10px_22px_rgba(122,51,22,0.38)] border-4 border-[#FFFDF9] active:scale-95 transition-transform"
+            onClick={handleHomeClick}
+            aria-label="Go to Home"
+            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all duration-200 min-w-[48px] min-h-[44px] ${
+              isHomeActive
+                ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'
+                : 'text-[#7B6B5F] hover:text-[#2B1810]'
+            }`}
           >
-            <ShoppingBag size={22} strokeWidth={2.4} />
-            {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full bg-[#E23B2E] text-white text-[10px] font-black border-2 border-white shadow-xs animate-in zoom-in-50">
-                {itemCount > 99 ? '99+' : itemCount}
-              </span>
-            )}
+            <Home size={18} strokeWidth={isHomeActive ? 2.5 : 2} />
+            <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Home</span>
           </button>
-        </div>
 
-        {/* Orders Tab */}
-        <button
-          type="button"
-          onClick={handleOrdersClick}
-          aria-label="View My Orders"
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-200 min-w-[56px] min-h-[44px] ${
-            isOrdersActive
-              ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'
-              : 'text-[#7B6B5F] hover:text-[#2B1810]'
-          }`}
-        >
-          <Clock size={18} strokeWidth={isOrdersActive ? 2.5 : 2} />
-          <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Orders</span>
-        </button>
-      </div>
-    </nav>
+          {/* Menu Tab */}
+          <button
+            type="button"
+            onClick={handleMenuClick}
+            aria-label="Browse Menu Categories"
+            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all duration-200 min-w-[48px] min-h-[44px] ${
+              isMenuActive
+                ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'
+                : 'text-[#7B6B5F] hover:text-[#2B1810]'
+            }`}
+          >
+            <UtensilsCrossed size={18} strokeWidth={isMenuActive ? 2.5 : 2} />
+            <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Menu</span>
+          </button>
+
+          {/* Center Raised Cart Button */}
+          <div className="relative -mt-7 flex flex-col items-center justify-center">
+            <button
+              type="button"
+              onClick={handleCartClick}
+              aria-label={`View Cart (${itemCount} items)`}
+              className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#7A3316] text-[#FFFDF9] shadow-[0_10px_22px_rgba(122,51,22,0.38)] border-4 border-[#FFFDF9] active:scale-95 transition-transform"
+            >
+              <ShoppingBag size={22} strokeWidth={2.4} />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full bg-[#E23B2E] text-white text-[10px] font-black border-2 border-white shadow-xs animate-in zoom-in-50">
+                  {itemCount > 99 ? '99+' : itemCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Orders Tab */}
+          <button
+            type="button"
+            onClick={handleOrdersClick}
+            aria-label="View My Orders"
+            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all duration-200 min-w-[48px] min-h-[44px] ${
+              isOrdersActive
+                ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'
+                : 'text-[#7B6B5F] hover:text-[#2B1810]'
+            }`}
+          >
+            <Clock size={18} strokeWidth={isOrdersActive ? 2.5 : 2} />
+            <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Orders</span>
+          </button>
+
+          {/* More Tab */}
+          <button
+            type="button"
+            onClick={() => setMoreOpen((prev) => !prev)}
+            aria-label="More pages"
+            aria-expanded={moreOpen}
+            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all duration-200 min-w-[48px] min-h-[44px] ${
+              moreOpen || isMoreActive
+                ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'
+                : 'text-[#7B6B5F] hover:text-[#2B1810]'
+            }`}
+          >
+            {moreOpen
+              ? <X size={18} strokeWidth={2.5} />
+              : <MoreHorizontal size={18} strokeWidth={2} />
+            }
+            <span className="text-[10px] font-semibold mt-0.5 tracking-tight">More</span>
+          </button>
+
+        </div>
+      </nav>
+    </>
   );
 }
