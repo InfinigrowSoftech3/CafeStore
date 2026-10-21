@@ -54,7 +54,7 @@ export default function DashboardPage() {
         api.get('/tables/all?limit=100').catch(() => ({ data: { tables: [] } })),
         api.get('/inventory/dashboard').catch(() => ({ data: null })),
         api.get('/menu?limit=100').catch(() => ({ data: { products: [] } })),
-        api.get('/tenant/users?limit=100').catch(() => ({ data: { users: [] } })),
+        api.get('/users?limit=100').catch(() => ({ data: { users: [] } })),
       ]);
 
       const ordList = ordersRes.data.orders || [];

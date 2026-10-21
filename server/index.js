@@ -334,10 +334,12 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     '/api/platform/auth',
     '/api/platform/admin',
     '/api/users',
+    '/api/tenant/users',
   ], noStorePrivateCache);
 
   app.use('/api/auth', authRoutes);
   app.use('/api/users', userRoutes);
+  app.use('/api/tenant/users', userRoutes);
   app.use('/api/menu', menuRoutes);
   app.use('/api/categories', categoryRoutes);
   app.use('/api/orders', orderRoutes);

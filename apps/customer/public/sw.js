@@ -1,5 +1,5 @@
 // Production service worker for the Brewhaus customer PWA and push notifications.
-const SHELL_CACHE = 'brewhaus-customer-shell-v1';
+const SHELL_CACHE = 'brewhaus-customer-shell-v2';
 const SHELL_FILES = ['/', '/offline.html', '/manifest.webmanifest', '/app-icon.svg'];
 
 self.addEventListener('install', (event) => {
