@@ -192,18 +192,28 @@ export default function InventoryItemsPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[180px]">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
-          <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search items..."
-            className="w-full rounded-xl border border-stone-200 bg-white py-2 pl-8 pr-3 text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-espresso-300" />
+        <div className="relative flex-1 min-w-[180px] group">
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-[#0F3D2E] pointer-events-none transition-colors" />
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search items..."
+            className="w-full rounded-xl border border-stone-200 bg-stone-50/70 hover:bg-white py-2 pl-10 pr-3 text-xs sm:text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-[#0F3D2E] focus:ring-2 focus:ring-[#0F3D2E]/15 transition"
+          />
         </div>
-        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}
-          className="rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:outline-none">
+        <select
+          value={categoryFilter}
+          onChange={e => setCategoryFilter(e.target.value)}
+          className="rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:outline-none focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E]"
+        >
           <option value="">All Categories</option>
           {categories.map(c => <option key={c._id} value={c._id}>{c.icon} {c.name}</option>)}
         </select>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-          className="rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:outline-none">
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value)}
+          className="rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:outline-none focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E]"
+        >
           {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       </div>
@@ -459,7 +469,7 @@ export default function InventoryItemsPage() {
               </div>
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setShowWasteModal(null)} className="btn-secondary flex-1 py-2 text-sm">Cancel</button>
-                <button type="submit" disabled={saving} className="btn-primary flex-1 py-2 text-sm gap-2 bg-amber-600 hover:bg-amber-700">
+                <button type="submit" disabled={saving} className="btn-primary flex-1 py-2 text-sm gap-2 bg-[#0F3D2E] hover:bg-[#165a44]">
                   {saving && <Loader2 size={14} className="animate-spin" />} Record
                 </button>
               </div>

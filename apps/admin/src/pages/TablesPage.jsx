@@ -458,8 +458,8 @@ export default function TablesPage() {
               onClick={() => setSelectedFloor('ALL')}
               className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap ${
                 selectedFloor === 'ALL'
-                  ? 'bg-espresso-950 text-white shadow-xs'
-                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70'
+                  ? 'bg-[#0F3D2E] text-white shadow-xs'
+                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200/80 hover:text-stone-900'
               }`}
             >
               All Floors ({tables.length})
@@ -473,8 +473,8 @@ export default function TablesPage() {
                   onClick={() => setSelectedFloor(fl)}
                   className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap ${
                     selectedFloor === fl
-                      ? 'bg-espresso-950 text-white shadow-xs'
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70'
+                      ? 'bg-[#0F3D2E] text-white shadow-xs'
+                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200/80 hover:text-stone-900'
                   }`}
                 >
                   {fl} ({count})
@@ -490,7 +490,7 @@ export default function TablesPage() {
               onClick={() => setViewMode('canvas')}
               className={`rounded-lg px-3 py-1 text-xs font-semibold transition flex items-center gap-1.5 ${
                 viewMode === 'canvas'
-                  ? 'bg-white text-espresso-950 shadow-xs'
+                  ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                   : 'text-stone-500 hover:text-stone-800'
               }`}
             >
@@ -501,7 +501,7 @@ export default function TablesPage() {
               onClick={() => setViewMode('cards')}
               className={`rounded-lg px-3 py-1 text-xs font-semibold transition flex items-center gap-1.5 ${
                 viewMode === 'cards'
-                  ? 'bg-white text-espresso-950 shadow-xs'
+                  ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                   : 'text-stone-500 hover:text-stone-800'
               }`}
             >
@@ -512,7 +512,7 @@ export default function TablesPage() {
               onClick={() => setViewMode('qr')}
               className={`rounded-lg px-3 py-1 text-xs font-semibold transition flex items-center gap-1.5 ${
                 viewMode === 'qr'
-                  ? 'bg-white text-espresso-950 shadow-xs'
+                  ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                   : 'text-stone-500 hover:text-stone-800'
               }`}
             >
@@ -535,8 +535,8 @@ export default function TablesPage() {
                 onClick={() => setSelectedStatus(st)}
                 className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition flex items-center gap-1.5 whitespace-nowrap ${
                   selectedStatus === st
-                    ? 'bg-amber-600 text-white shadow-xs'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70'
+                    ? 'bg-[#0F3D2E] text-white shadow-xs'
+                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200/80 hover:text-stone-900'
                 }`}
               >
                 {!isAll && <span className={`h-1.5 w-1.5 rounded-full ${config.dot || 'bg-stone-400'}`} />}
@@ -551,7 +551,7 @@ export default function TablesPage() {
       {/* Main View Area */}
       {loading && tables.length === 0 ? (
         <div className="flex min-h-[300px] items-center justify-center text-stone-400">
-          <Loader2 className="animate-spin text-amber-600" size={32} />
+          <Loader2 className="animate-spin text-[#0F3D2E]" size={32} />
         </div>
       ) : filteredTables.length === 0 ? (
         <EmptyState
@@ -1038,7 +1038,7 @@ export default function TablesPage() {
                     value={tableNumber}
                     onChange={(e) => setTableNumber(e.target.value)}
                     placeholder="1, 2, 14..."
-                    className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+                    className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
                   />
                 </div>
                 <div>
@@ -1051,7 +1051,7 @@ export default function TablesPage() {
                     max="30"
                     value={seats}
                     onChange={(e) => setSeats(Number(e.target.value))}
-                    className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+                    className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
                   />
                 </div>
               </div>
@@ -1065,7 +1065,7 @@ export default function TablesPage() {
                   value={floor}
                   onChange={(e) => setFloor(e.target.value)}
                   placeholder="Ground Floor, Rooftop, Patio..."
-                  className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+                  className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
                 />
               </div>
 
@@ -1081,7 +1081,7 @@ export default function TablesPage() {
                       onClick={() => setShape(s)}
                       className={`rounded-xl border py-2 text-xs font-semibold capitalize transition ${
                         shape === s
-                          ? 'border-amber-500 bg-amber-50 text-amber-900'
+                          ? 'border-[#0F3D2E] bg-emerald-50 text-[#0F3D2E]'
                           : 'border-stone-200 bg-white text-stone-600 hover:bg-stone-50'
                       }`}
                     >
@@ -1100,7 +1100,7 @@ export default function TablesPage() {
                   value={label}
                   onChange={(e) => setLabel(e.target.value)}
                   placeholder="Window corner, Booth A..."
-                  className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+                  className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
                 />
               </div>
 
@@ -1152,7 +1152,7 @@ export default function TablesPage() {
               <select
                 value={targetTableNumber}
                 onChange={(e) => setTargetTableNumber(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
               >
                 <option value="">Select available table...</option>
                 {tables

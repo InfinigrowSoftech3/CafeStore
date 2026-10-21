@@ -14,6 +14,7 @@ import Drawer from '../components/common/Drawer';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import EmptyState from '../components/common/EmptyState';
 import KpiCard from '../components/common/KpiCard';
+import SearchInput from '../components/common/SearchInput';
 
 const CATEGORY_META = {
   raw_material: { label: 'Raw Ingredients / Groceries', icon: '🥛', color: '#10B981' },
@@ -268,7 +269,7 @@ export default function ExpensesPage() {
           subtext="Per recorded voucher / invoice"
           trend={{ direction: 'neutral', text: 'Avg per entry' }}
           icon={Receipt}
-          iconColor="text-brew-600 bg-brew-50"
+          iconColor="text-[#0F3D2E] bg-emerald-50"
         />
 
         <KpiCard
@@ -280,7 +281,7 @@ export default function ExpensesPage() {
               : 'No entries'
           }
           icon={PieChartIcon}
-          iconColor="text-amber-600 bg-amber-50"
+          iconColor="text-[#0F3D2E] bg-emerald-50"
         />
       </div>
 
@@ -362,7 +363,7 @@ export default function ExpensesPage() {
             <button
               onClick={() => applyPreset('ALL')}
               className={`px-3 py-1 rounded-lg transition ${
-                dateFilterPreset === 'ALL' ? 'bg-white text-espresso-900 font-semibold shadow-xs' : 'hover:text-stone-900'
+                dateFilterPreset === 'ALL' ? 'bg-white text-[#0F3D2E] font-bold shadow-xs' : 'hover:text-stone-900'
               }`}
             >
               All Time
@@ -370,7 +371,7 @@ export default function ExpensesPage() {
             <button
               onClick={() => applyPreset('TODAY')}
               className={`px-3 py-1 rounded-lg transition ${
-                dateFilterPreset === 'TODAY' ? 'bg-white text-espresso-900 font-semibold shadow-xs' : 'hover:text-stone-900'
+                dateFilterPreset === 'TODAY' ? 'bg-white text-[#0F3D2E] font-bold shadow-xs' : 'hover:text-stone-900'
               }`}
             >
               Today
@@ -378,7 +379,7 @@ export default function ExpensesPage() {
             <button
               onClick={() => applyPreset('WEEK')}
               className={`px-3 py-1 rounded-lg transition ${
-                dateFilterPreset === 'WEEK' ? 'bg-white text-espresso-900 font-semibold shadow-xs' : 'hover:text-stone-900'
+                dateFilterPreset === 'WEEK' ? 'bg-white text-[#0F3D2E] font-bold shadow-xs' : 'hover:text-stone-900'
               }`}
             >
               Last 7 Days
@@ -386,7 +387,7 @@ export default function ExpensesPage() {
             <button
               onClick={() => applyPreset('MONTH')}
               className={`px-3 py-1 rounded-lg transition ${
-                dateFilterPreset === 'MONTH' ? 'bg-white text-espresso-900 font-semibold shadow-xs' : 'hover:text-stone-900'
+                dateFilterPreset === 'MONTH' ? 'bg-white text-[#0F3D2E] font-bold shadow-xs' : 'hover:text-stone-900'
               }`}
             >
               This Month
@@ -397,7 +398,7 @@ export default function ExpensesPage() {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="rounded-xl border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-700 bg-white focus:outline-none focus:border-brew-500"
+            className="rounded-xl border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-700 bg-white focus:outline-none focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E]"
           >
             <option value="ALL">All Categories</option>
             {categories.map((cat) => (
@@ -445,17 +446,19 @@ export default function ExpensesPage() {
 
         {/* Search Input */}
         <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
-          <div className="relative">
-            <Search size={14} className="absolute left-3 top-2.5 text-stone-400" />
-            <input
-              type="text"
+          <div className="w-56 sm:w-64">
+            <SearchInput
+              size="sm"
               placeholder="Search vendor / description..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 pr-3 py-1.5 text-xs rounded-xl border border-stone-200 bg-stone-50 text-stone-800 placeholder-stone-400 focus:outline-none focus:border-brew-500 focus:bg-white transition"
+              onClear={() => setSearchQuery('')}
             />
           </div>
-          <button type="submit" className="btn-secondary rounded-xl px-3 py-1.5 text-xs font-semibold">
+          <button
+            type="submit"
+            className="rounded-xl bg-[#0F3D2E] hover:bg-[#16503D] text-white px-3.5 py-1.5 text-xs font-semibold shadow-xs transition"
+          >
             Search
           </button>
         </form>
@@ -465,7 +468,7 @@ export default function ExpensesPage() {
       <div className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden">
         {loading ? (
           <div className="flex min-h-[260px] flex-col items-center justify-center text-stone-400 gap-2">
-            <Loader2 className="animate-spin text-brew-500" size={28} />
+            <Loader2 className="animate-spin text-[#0F3D2E]" size={28} />
             <span className="text-xs">Loading operating expense records...</span>
           </div>
         ) : expenses.length === 0 ? (
@@ -533,7 +536,7 @@ export default function ExpensesPage() {
                             href={exp.receiptUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-brew-600 hover:text-brew-700 hover:underline"
+                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0F3D2E] hover:text-brew-700 hover:underline"
                           >
                             <span>View</span>
                             <ExternalLink size={11} />
@@ -608,7 +611,7 @@ export default function ExpensesPage() {
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-brew-500 focus:outline-none bg-stone-50"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none bg-stone-50"
             >
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
@@ -631,7 +634,7 @@ export default function ExpensesPage() {
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-brew-500 focus:outline-none font-mono"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none font-mono"
               />
             </div>
 
@@ -642,7 +645,7 @@ export default function ExpensesPage() {
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-brew-500 focus:outline-none bg-stone-50"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none bg-stone-50"
               >
                 <option value="cash">Cash</option>
                 <option value="upi">UPI / QR</option>
@@ -662,7 +665,7 @@ export default function ExpensesPage() {
               required
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-brew-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
 
@@ -675,7 +678,7 @@ export default function ExpensesPage() {
               placeholder="e.g. Milk & dairy weekly bill (Amul 20L), Electricity meter recharge"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-brew-500 focus:outline-none resize-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none resize-none"
             />
           </div>
 
@@ -688,7 +691,7 @@ export default function ExpensesPage() {
               placeholder="https://drive.google.com/... or image link"
               value={receiptUrl}
               onChange={(e) => setReceiptUrl(e.target.value)}
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-brew-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
             <p className="mt-1 text-[11px] text-stone-400">
               Attach bill image or GST invoice link for accountant reconciliation.

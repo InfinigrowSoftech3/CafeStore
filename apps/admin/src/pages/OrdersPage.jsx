@@ -32,6 +32,7 @@ import PageHeader from '../components/common/PageHeader';
 import StatusPill from '../components/common/StatusPill';
 import EmptyState from '../components/common/EmptyState';
 import ConfirmDialog from '../components/common/ConfirmDialog';
+import SearchInput from '../components/common/SearchInput';
 
 const STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'];
 const DATE_FILTERS = [
@@ -343,12 +344,12 @@ export default function OrdersPage() {
               }}
               className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold shadow-xs transition ${
                 audioEnabled
-                  ? 'border-amber-300 bg-amber-50 text-amber-900'
+                  ? 'border-emerald-300 bg-emerald-50 text-emerald-900'
                   : 'border-stone-200 bg-white text-stone-600 hover:bg-stone-50'
               }`}
               title={audioEnabled ? 'Audio alerts active' : 'Audio alerts muted'}
             >
-              {audioEnabled ? <Volume2 size={15} className="text-amber-600 animate-pulse" /> : <VolumeX size={15} />}
+              {audioEnabled ? <Volume2 size={15} className="text-[#0F3D2E] animate-pulse" /> : <VolumeX size={15} />}
               <span>{audioEnabled ? 'Sound On' : 'Sound Off'}</span>
             </button>
 
@@ -378,17 +379,17 @@ export default function OrdersPage() {
 
       {/* Table Service Requests Alert Banner */}
       {serviceRequests.length > 0 && (
-        <section className="rounded-2xl border border-amber-300 bg-amber-50/90 p-4 shadow-sm animate-in slide-in-from-top-2">
+        <section className="rounded-2xl border border-emerald-300 bg-emerald-50/90 p-4 shadow-sm animate-in slide-in-from-top-2">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-200 text-amber-900">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-200 text-[#0F3D2E]">
                 <BellRing size={16} className="animate-bounce" />
               </span>
-              <h2 className="text-sm font-bold text-amber-950">
+              <h2 className="text-sm font-bold text-emerald-950">
                 {serviceRequests.length} Live Table Service {serviceRequests.length === 1 ? 'Request' : 'Requests'}
               </h2>
             </div>
-            <span className="text-[11px] font-semibold text-amber-800 uppercase tracking-wider">
+            <span className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider">
               Immediate Attention
             </span>
           </div>
@@ -397,11 +398,11 @@ export default function OrdersPage() {
             {serviceRequests.map((request) => (
               <div
                 key={request._id}
-                className="flex items-center justify-between gap-3 rounded-xl border border-amber-200/90 bg-white p-3 shadow-xs"
+                className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200/90 bg-white p-3 shadow-xs"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-stone-900 text-[11px] font-bold text-white">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#0F3D2E] text-[11px] font-bold text-white">
                       T{request.tableNumber}
                     </span>
                     <span className="text-xs font-bold text-stone-900">
@@ -415,7 +416,7 @@ export default function OrdersPage() {
                 <button
                   type="button"
                   onClick={() => serveRequest(request._id)}
-                  className="rounded-lg bg-amber-900 hover:bg-amber-950 px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition"
+                  className="rounded-lg bg-[#0F3D2E] hover:bg-[#165a44] px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition"
                 >
                   Mark Served
                 </button>
@@ -429,24 +430,13 @@ export default function OrdersPage() {
       <div className="rounded-2xl border border-stone-200/80 bg-white p-3.5 shadow-xs space-y-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
-            <input
-              type="text"
+          <div className="flex-1 max-w-md">
+            <SearchInput
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onClear={() => setQuery('')}
               placeholder="Search by order #, guest name, phone, table..."
-              className="w-full rounded-xl border border-stone-200 bg-stone-50/50 py-2 pl-9.5 pr-8 text-xs sm:text-sm text-stone-900 placeholder-stone-400 focus:border-amber-500 focus:bg-white focus:outline-none transition"
             />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
-              >
-                <X size={14} />
-              </button>
-            )}
           </div>
 
           {/* View mode toggle (List vs Board) */}
@@ -457,7 +447,7 @@ export default function OrdersPage() {
                 onClick={() => setLayoutMode('list')}
                 className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
                   layoutMode === 'list'
-                    ? 'bg-white text-stone-900 shadow-xs'
+                    ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                     : 'text-stone-500 hover:text-stone-800'
                 }`}
               >
@@ -468,7 +458,7 @@ export default function OrdersPage() {
                 onClick={() => setLayoutMode('board')}
                 className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
                   layoutMode === 'board'
-                    ? 'bg-white text-stone-900 shadow-xs'
+                    ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                     : 'text-stone-500 hover:text-stone-800'
                 }`}
               >
@@ -490,8 +480,8 @@ export default function OrdersPage() {
                 onClick={() => setDateFilter(value)}
                 className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
                   dateFilter === value
-                    ? 'bg-espresso-950 text-white shadow-xs'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70'
+                    ? 'bg-[#0F3D2E] text-white shadow-xs'
+                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200/80 hover:text-stone-900'
                 }`}
               >
                 {label}
@@ -507,8 +497,8 @@ export default function OrdersPage() {
               onClick={() => setStatus('')}
               className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
                 status === ''
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70'
+                  ? 'bg-[#0F3D2E] text-white shadow-xs'
+                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200/80 hover:text-stone-900'
               }`}
             >
               All ({totalOrders})
@@ -520,8 +510,8 @@ export default function OrdersPage() {
                 onClick={() => setStatus(val)}
                 className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
                   status === val
-                    ? 'bg-amber-600 text-white shadow-xs'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70'
+                    ? 'bg-[#0F3D2E] text-white shadow-xs'
+                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200/80 hover:text-stone-900'
                 }`}
               >
                 {STATUS_LABELS[val] || val}
@@ -644,8 +634,8 @@ export default function OrdersPage() {
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {/* Table Badge */}
-                    <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-espresso-950 text-white shadow-xs">
-                      <span className="text-[9px] font-semibold uppercase tracking-wider text-amber-300 leading-none">Table</span>
+                    <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-[#0F3D2E] text-white shadow-xs">
+                      <span className="text-[9px] font-semibold uppercase tracking-wider text-emerald-200 leading-none">Table</span>
                       <span className="font-display text-sm font-bold leading-none mt-0.5">{order.tableNumber}</span>
                     </div>
 
@@ -925,7 +915,7 @@ export default function OrdersPage() {
                         max="99"
                         value={item.quantity}
                         onChange={(e) => setEditItems((cur) => cur.map((v, i) => i === index ? { ...v, quantity: Number(e.target.value) } : v))}
-                        className="w-16 rounded-lg border border-stone-200 bg-white px-2 py-1 text-center font-bold text-stone-900 focus:border-amber-500 focus:outline-none"
+                        className="w-16 rounded-lg border border-stone-200 bg-white px-2 py-1 text-center font-bold text-stone-900 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
                       />
                     </label>
                   </div>
@@ -936,7 +926,7 @@ export default function OrdersPage() {
                       maxLength={120}
                       value={item.specialInstructions}
                       onChange={(e) => setEditItems((cur) => cur.map((v, i) => i === index ? { ...v, specialInstructions: e.target.value } : v))}
-                      className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs text-stone-900 focus:border-amber-500 focus:outline-none"
+                      className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs text-stone-900 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
                     />
                   </div>
                 </div>

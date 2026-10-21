@@ -4,7 +4,38 @@ export default {
   content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
+      spacing: {
+        '9.5': '2.375rem',
+      },
       colors: {
+        brand: {
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22c55e',
+          600: '#16a34a',
+          700: '#15803d',
+          800: '#166534',
+          900: '#0F3D2E',
+          950: '#0A2B20',
+          DEFAULT: '#0F3D2E',
+        },
+        forest: {
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22c55e',
+          600: '#16a34a',
+          700: '#15803d',
+          800: '#166534',
+          900: '#0F3D2E',
+          950: '#0A2B20',
+          DEFAULT: '#0F3D2E',
+        },
         espresso: {
           50: '#f7f1eb',
           100: '#f0e6dc',

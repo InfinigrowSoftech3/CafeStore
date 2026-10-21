@@ -139,7 +139,7 @@ export default function BillingPage() {
   if (loading && !data) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-9 w-9 animate-spin rounded-full border-3 border-stone-200 border-t-amber-600" />
+        <div className="h-9 w-9 animate-spin rounded-full border-3 border-stone-200 border-t-[#0F3D2E]" />
       </div>
     );
   }
@@ -221,7 +221,7 @@ export default function BillingPage() {
               type="button"
               onClick={() => handleChangePlan('pro')}
               disabled={actionLoading}
-              className="rounded-xl bg-amber-600 hover:bg-amber-700 px-5 py-2.5 text-xs font-bold text-white shadow-md transition flex items-center justify-center gap-2 shrink-0"
+              className="rounded-xl bg-[#0F3D2E] hover:bg-[#165a44] px-5 py-2.5 text-xs font-bold text-white shadow-md transition flex items-center justify-center gap-2 shrink-0"
             >
               {actionLoading ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
               Upgrade to Pro (₹2,499/mo)
@@ -235,7 +235,7 @@ export default function BillingPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-stone-100">
           <div>
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-900 uppercase tracking-wider">
+              <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-950 border border-emerald-200 uppercase tracking-wider">
                 {subStatus === 'trial' ? '14-Day Free Trial' : subStatus.toUpperCase()}
               </span>
               {data?.deletionRequestedAt && (
@@ -279,7 +279,7 @@ export default function BillingPage() {
             <div className="h-2.5 w-full rounded-full bg-stone-200 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-300 ${
-                  usage.menuItems > limits.menuItems ? 'bg-red-500' : 'bg-amber-600'
+                  usage.menuItems > limits.menuItems ? 'bg-red-500' : 'bg-[#0F3D2E]'
                 }`}
                 style={{ width: `${Math.min(100, (usage.menuItems / limits.menuItems) * 100)}%` }}
               />
@@ -317,7 +317,7 @@ export default function BillingPage() {
             <div className="h-2.5 w-full rounded-full bg-stone-200 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-300 ${
-                  usage.tables > limits.tables ? 'bg-red-500' : 'bg-amber-600'
+                  usage.tables > limits.tables ? 'bg-red-500' : 'bg-[#0F3D2E]'
                 }`}
                 style={{ width: `${Math.min(100, (usage.tables / limits.tables) * 100)}%` }}
               />
@@ -337,7 +337,7 @@ export default function BillingPage() {
             </div>
             <div className="h-2.5 w-full rounded-full bg-stone-200 overflow-hidden">
               <div
-                className="h-full rounded-full bg-amber-600 transition-all duration-300"
+                className="h-full rounded-full bg-[#0F3D2E] transition-all duration-300"
                 style={{ width: `${Math.min(100, (usage.staffUsers / limits.staffUsers) * 100)}%` }}
               />
             </div>
@@ -367,7 +367,7 @@ export default function BillingPage() {
               onClick={() => setBillingCycle('monthly')}
               className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
                 billingCycle === 'monthly'
-                  ? 'bg-white text-espresso-950 shadow-xs'
+                  ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                   : 'text-stone-500 hover:text-stone-800'
               }`}
             >
@@ -378,7 +378,7 @@ export default function BillingPage() {
               onClick={() => setBillingCycle('annual')}
               className={`rounded-lg px-3 py-1 text-xs font-semibold transition flex items-center gap-1.5 ${
                 billingCycle === 'annual'
-                  ? 'bg-white text-espresso-950 shadow-xs'
+                  ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                   : 'text-stone-500 hover:text-stone-800'
               }`}
             >
@@ -400,12 +400,12 @@ export default function BillingPage() {
                 key={plan.id}
                 className={`relative flex flex-col justify-between rounded-3xl p-6 sm:p-7 transition border-2 ${
                   isCurrent
-                    ? 'border-amber-600 bg-white shadow-xl'
+                    ? 'border-[#0F3D2E] bg-white shadow-xl'
                     : 'border-stone-200 bg-white hover:border-stone-300 shadow-xs'
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3.5 right-6 rounded-full bg-gradient-to-r from-amber-600 to-orange-500 px-3.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-md">
+                  <div className="absolute -top-3.5 right-6 rounded-full bg-[#0F3D2E] px-3.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-md">
                     Most Popular
                   </div>
                 )}
@@ -435,7 +435,7 @@ export default function BillingPage() {
 
                 <div className="mt-8 pt-5 border-t border-stone-100">
                   {isCurrent ? (
-                    <div className="w-full rounded-xl bg-amber-50 border border-amber-200 py-2.5 text-center text-xs font-bold text-amber-900">
+                    <div className="w-full rounded-xl bg-emerald-50 border border-emerald-200 py-2.5 text-center text-xs font-bold text-[#0F3D2E]">
                       ✓ Active Plan
                     </div>
                   ) : (

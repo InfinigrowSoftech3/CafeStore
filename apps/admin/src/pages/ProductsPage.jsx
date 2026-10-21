@@ -27,6 +27,7 @@ import ImageUploader from '../components/common/ImageUploader';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import EmptyState from '../components/common/EmptyState';
 import Drawer from '../components/common/Drawer';
+import SearchInput from '../components/common/SearchInput';
 
 const EMPTY_FORM = {
   name: '',
@@ -203,24 +204,13 @@ export default function ProductsPage() {
       <div className="rounded-2xl border border-stone-200/80 bg-white p-3.5 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
-            <input
-              type="text"
+          <div className="flex-1 max-w-md">
+            <SearchInput
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onClear={() => setQuery('')}
               placeholder="Search dishes, drinks, bakery..."
-              className="w-full rounded-xl border border-stone-200 bg-stone-50/50 py-2 pl-9.5 pr-8 text-xs sm:text-sm text-stone-900 placeholder-stone-400 focus:border-amber-500 focus:bg-white focus:outline-none transition"
             />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
-              >
-                <X size={14} />
-              </button>
-            )}
           </div>
 
           {/* Category Dropdown & View Mode Switcher */}
@@ -228,7 +218,7 @@ export default function ProductsPage() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 focus:border-amber-500 focus:outline-none"
+              className="rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-stone-700 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
             >
               <option value="">All Categories ({products.length})</option>
               {categories.map((category) => (
@@ -244,7 +234,7 @@ export default function ProductsPage() {
                 onClick={() => setViewMode('grid')}
                 className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition flex items-center gap-1 ${
                   viewMode === 'grid'
-                    ? 'bg-white text-espresso-950 shadow-xs'
+                    ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                     : 'text-stone-500 hover:text-stone-800'
                 }`}
                 title="Grid View"
@@ -256,7 +246,7 @@ export default function ProductsPage() {
                 onClick={() => setViewMode('table')}
                 className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition flex items-center gap-1 ${
                   viewMode === 'table'
-                    ? 'bg-white text-espresso-950 shadow-xs'
+                    ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                     : 'text-stone-500 hover:text-stone-800'
                 }`}
                 title="Table View"
@@ -543,7 +533,7 @@ export default function ProductsPage() {
                 value={form.name}
                 onChange={(e) => setForm((cur) => ({ ...cur, name: e.target.value }))}
                 placeholder="e.g. Classic Cappuccino, Paneer Tikka Croissant..."
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
               />
             </div>
 
@@ -555,7 +545,7 @@ export default function ProductsPage() {
                 required
                 value={form.category}
                 onChange={(e) => setForm((cur) => ({ ...cur, category: e.target.value }))}
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
               >
                 <option value="">Select category...</option>
                 {categories.map((c) => (
@@ -578,7 +568,7 @@ export default function ProductsPage() {
                   value={form.price}
                   onChange={(e) => setForm((cur) => ({ ...cur, price: e.target.value }))}
                   placeholder="249"
-                  className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+                  className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
                 />
               </div>
               <div>
@@ -591,7 +581,7 @@ export default function ProductsPage() {
                   max="120"
                   value={form.prepTime}
                   onChange={(e) => setForm((cur) => ({ ...cur, prepTime: e.target.value }))}
-                  className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+                  className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
                 />
               </div>
             </div>
@@ -605,7 +595,7 @@ export default function ProductsPage() {
                 value={form.description}
                 onChange={(e) => setForm((cur) => ({ ...cur, description: e.target.value }))}
                 placeholder="Crispy artisan sourdough toast topped with spiced Hass avocado and pomegranate pearls..."
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
               />
             </div>
           </div>
@@ -619,7 +609,7 @@ export default function ProductsPage() {
               <button
                 type="button"
                 onClick={() => setForm((cur) => ({ ...cur, variants: [...cur.variants, { name: '', price: '' }] }))}
-                className="text-xs font-semibold text-amber-800 hover:text-amber-900"
+                className="text-xs font-bold text-[#0F3D2E] hover:underline"
               >
                 + Add size
               </button>
@@ -634,7 +624,7 @@ export default function ProductsPage() {
                     ...cur,
                     variants: cur.variants.map((it, idx) => idx === i ? { ...it, name: e.target.value } : it)
                   }))}
-                  className="flex-1 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs focus:border-amber-500 focus:outline-none"
+                  className="flex-1 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
                 />
                 <input
                   type="number"
@@ -644,7 +634,7 @@ export default function ProductsPage() {
                     ...cur,
                     variants: cur.variants.map((it, idx) => idx === i ? { ...it, price: e.target.value } : it)
                   }))}
-                  className="w-24 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs focus:border-amber-500 focus:outline-none"
+                  className="w-24 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
                 />
                 <button
                   type="button"
@@ -666,7 +656,7 @@ export default function ProductsPage() {
               <button
                 type="button"
                 onClick={() => setForm((cur) => ({ ...cur, addons: [...cur.addons, { name: '', price: '' }] }))}
-                className="text-xs font-semibold text-amber-800 hover:text-amber-900"
+                className="text-xs font-bold text-[#0F3D2E] hover:underline"
               >
                 + Add add-on
               </button>
@@ -681,7 +671,7 @@ export default function ProductsPage() {
                     ...cur,
                     addons: cur.addons.map((it, idx) => idx === i ? { ...it, name: e.target.value } : it)
                   }))}
-                  className="flex-1 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs focus:border-amber-500 focus:outline-none"
+                  className="flex-1 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
                 />
                 <input
                   type="number"
@@ -691,7 +681,7 @@ export default function ProductsPage() {
                     ...cur,
                     addons: cur.addons.map((it, idx) => idx === i ? { ...it, price: e.target.value } : it)
                   }))}
-                  className="w-24 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs focus:border-amber-500 focus:outline-none"
+                  className="w-24 rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
                 />
                 <button
                   type="button"
@@ -711,7 +701,7 @@ export default function ProductsPage() {
                 type="checkbox"
                 checked={form.available}
                 onChange={(e) => setForm((cur) => ({ ...cur, available: e.target.checked }))}
-                className="rounded border-stone-300 text-amber-600 focus:ring-amber-500"
+                className="rounded border-stone-300 text-[#0F3D2E] focus:ring-[#0F3D2E]"
               />
               Available for Ordering
             </label>
@@ -720,7 +710,7 @@ export default function ProductsPage() {
                 type="checkbox"
                 checked={form.popular}
                 onChange={(e) => setForm((cur) => ({ ...cur, popular: e.target.checked }))}
-                className="rounded border-stone-300 text-amber-600 focus:ring-amber-500"
+                className="rounded border-stone-300 text-[#0F3D2E] focus:ring-[#0F3D2E]"
               />
               Mark as Bestseller
             </label>

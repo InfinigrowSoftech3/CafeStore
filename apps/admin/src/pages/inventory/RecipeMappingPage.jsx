@@ -238,14 +238,14 @@ export default function RecipeMappingPage() {
         {/* Left Column: Menu Items Picker (5 cols) */}
         <div className="lg:col-span-4 xl:col-span-4 space-y-4">
           <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-soft">
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 text-stone-400" size={16} />
+            <div className="relative group">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-[#0F3D2E] pointer-events-none transition-colors" size={16} />
               <input
                 type="text"
                 placeholder="Search menu items..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 py-2 pl-9 pr-3 text-xs focus:border-brew-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 bg-stone-50/70 hover:bg-white py-2 pl-10 pr-3 text-xs text-stone-900 placeholder:text-stone-400 focus:border-[#0F3D2E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/15 transition"
               />
             </div>
 
@@ -261,8 +261,8 @@ export default function RecipeMappingPage() {
                   onClick={() => setFilterType(t.key)}
                   className={`flex-1 rounded-lg py-1 text-[11px] font-semibold transition ${
                     filterType === t.key
-                      ? 'bg-espresso-900 text-white shadow-sm'
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                      ? 'bg-[#0F3D2E] text-white shadow-xs'
+                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200/80 hover:text-stone-900'
                   }`}
                 >
                   {t.label}

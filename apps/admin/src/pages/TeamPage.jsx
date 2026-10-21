@@ -17,7 +17,7 @@ const ROLE_PERMISSIONS = {
   owner: {
     label: 'Owner',
     desc: 'Unrestricted full access across all outlets, billing, revenue analytics, and staff accounts.',
-    badge: 'bg-amber-100 text-amber-900 border-amber-200',
+    badge: 'bg-emerald-100 text-[#0F3D2E] border-emerald-200',
     perms: ['POS Terminal', 'Live Orders', 'Floor & Tables', 'Menu & Pricing', 'Refunds', 'All Analytics', 'Billing & Subscription', 'Staff Roles']
   },
   manager: {
@@ -286,7 +286,7 @@ export default function TeamPage() {
                     <tr key={user._id} className="hover:bg-stone-50/50 transition">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-espresso-950 font-display text-xs font-bold text-white shadow-2xs">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0F3D2E] font-display text-xs font-bold text-white shadow-2xs">
                             {user.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -312,7 +312,7 @@ export default function TeamPage() {
                           aria-label={`Role for ${user.name}`}
                           value={roleKey}
                           onChange={(e) => changeRole(user, e.target.value)}
-                          className="rounded-xl border border-stone-200 bg-white px-2.5 py-1 text-xs font-semibold text-stone-700 capitalize focus:border-amber-500 focus:outline-none"
+                          className="rounded-xl border border-stone-200 bg-white px-2.5 py-1 text-xs font-semibold text-stone-700 capitalize focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
                         >
                           {ROLES.map((role) => (
                             <option key={role} value={role}>{ROLE_PERMISSIONS[role]?.label || role}</option>
@@ -341,14 +341,14 @@ export default function TeamPage() {
 
         {/* Filter bar */}
         <div className="flex flex-wrap gap-2.5 pb-2 border-b border-stone-100">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+          <div className="relative flex-1 min-w-[200px] group">
+            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-[#0F3D2E] pointer-events-none transition-colors" />
             <input
               type="text"
               placeholder="Search action or keyword..."
               value={auditFilters.action}
               onChange={(e) => handleFilterChange('action', e.target.value)}
-              className="w-full rounded-xl border border-stone-200 bg-stone-50/50 pl-9 pr-3 py-1.5 text-xs focus:border-amber-500 focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 bg-stone-50/70 pl-10 pr-3 py-2 text-xs text-stone-900 placeholder:text-stone-400 focus:border-[#0F3D2E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/15 transition"
             />
           </div>
           <div className="relative flex-1 min-w-[200px]">
@@ -357,7 +357,7 @@ export default function TeamPage() {
               placeholder="Filter by staff email..."
               value={auditFilters.actorEmail}
               onChange={(e) => handleFilterChange('actorEmail', e.target.value)}
-              className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-3 py-1.5 text-xs focus:border-amber-500 focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 bg-stone-50/70 px-3 py-2 text-xs text-stone-900 placeholder:text-stone-400 focus:border-[#0F3D2E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/15 transition"
             />
           </div>
           {(auditFilters.action || auditFilters.actorEmail) && (
@@ -490,7 +490,7 @@ export default function TeamPage() {
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="e.g. Ramesh Kumar"
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
 
@@ -504,7 +504,7 @@ export default function TeamPage() {
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               placeholder="ramesh@brewhauscafe.com"
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
 
@@ -519,7 +519,7 @@ export default function TeamPage() {
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               placeholder="Minimum 8 characters"
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
 
@@ -530,7 +530,7 @@ export default function TeamPage() {
             <select
               value={form.role}
               onChange={(e) => setForm({ ...form, role: e.target.value })}
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             >
               {ROLES.map((r) => (
                 <option key={r} value={r}>

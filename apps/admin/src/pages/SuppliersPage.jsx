@@ -10,6 +10,7 @@ import PageHeader from '../components/common/PageHeader';
 import EmptyState from '../components/common/EmptyState';
 import Drawer from '../components/common/Drawer';
 import ConfirmDialog from '../components/common/ConfirmDialog';
+import SearchInput from '../components/common/SearchInput';
 
 export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState([]);
@@ -169,28 +170,17 @@ export default function SuppliersPage() {
       {/* Search Bar */}
       <div className="rounded-2xl border border-stone-200/80 bg-white p-3.5 shadow-xs">
         <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 max-w-md">
-          <div className="relative flex-1">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
-            <input
-              type="text"
-              placeholder="Search vendor name, contact person or phone..."
+          <div className="flex-1">
+            <SearchInput
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-stone-200 bg-stone-50/50 py-2 pl-9.5 pr-8 text-xs sm:text-sm text-stone-900 placeholder-stone-400 focus:border-amber-500 focus:bg-white focus:outline-none transition"
+              onClear={() => { setSearchQuery(''); fetchSuppliers(); }}
+              placeholder="Search vendor name, contact person or phone..."
             />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => { setSearchQuery(''); fetchSuppliers(); }}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
-              >
-                <X size={14} />
-              </button>
-            )}
           </div>
           <button
             type="submit"
-            className="rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition"
+            className="rounded-xl bg-[#0F3D2E] hover:bg-[#16503D] px-4 py-2.5 text-xs font-semibold text-white transition shadow-xs"
           >
             Search
           </button>
@@ -222,11 +212,11 @@ export default function SuppliersPage() {
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-100 font-display text-base font-bold text-amber-900 border border-amber-200/60">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 font-display text-base font-bold text-[#0F3D2E] border border-emerald-200/60">
                       {sup.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <h3 className="font-display text-base font-bold text-espresso-950 truncate">
+                      <h3 className="font-display text-base font-bold text-stone-900 truncate">
                         {sup.name}
                       </h3>
                       {sup.contactPerson && (
@@ -342,7 +332,7 @@ export default function SuppliersPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Blue Tokai Roasters, Amul Dairy Supply..."
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
 
@@ -356,7 +346,7 @@ export default function SuppliersPage() {
                 value={contactPerson}
                 onChange={(e) => setContactPerson(e.target.value)}
                 placeholder="Manager / Rep"
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
               />
             </div>
             <div>
@@ -368,7 +358,7 @@ export default function SuppliersPage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+91 98765 43210"
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
               />
             </div>
           </div>
@@ -383,7 +373,7 @@ export default function SuppliersPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="orders@vendor.com"
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
               />
             </div>
             <div>
@@ -395,7 +385,7 @@ export default function SuppliersPage() {
                 value={gstin}
                 onChange={(e) => setGstin(e.target.value.toUpperCase())}
                 placeholder="24ABCDE1234F1Z5"
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs font-mono uppercase focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs font-mono uppercase focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
               />
             </div>
           </div>
@@ -407,7 +397,7 @@ export default function SuppliersPage() {
             <select
               value={paymentTerms}
               onChange={(e) => setPaymentTerms(e.target.value)}
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             >
               <option value="immediate">Immediate / Cash on Delivery</option>
               <option value="net_15">Net 15 Days</option>
@@ -425,7 +415,7 @@ export default function SuppliersPage() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="Warehouse address, city, pin code..."
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
 
@@ -438,7 +428,7 @@ export default function SuppliersPage() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Deliveries before 9 AM on Tuesdays"
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
         </form>

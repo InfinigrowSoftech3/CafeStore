@@ -588,14 +588,14 @@ export default function InventoryDashboardPage() {
         <div className="space-y-4">
           {/* Filters Bar */}
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-stone-200 bg-white p-3 shadow-soft">
-            <div className="relative flex-1 min-w-[220px]">
-              <Search className="absolute left-3 top-2.5 text-stone-400" size={15} />
+            <div className="relative flex-1 min-w-[220px] group">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-[#0F3D2E] pointer-events-none transition-colors" size={15} />
               <input
                 type="text"
                 placeholder="Search consumables (e.g. Coca-Cola, Cup, Spoon, Bottle)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 py-1.5 pl-9 pr-3 text-xs focus:border-brew-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 py-2 pl-10 pr-3 text-xs sm:text-sm text-stone-900 placeholder:text-stone-400 focus:border-[#0F3D2E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/15 transition"
               />
             </div>
 
@@ -603,7 +603,7 @@ export default function InventoryDashboardPage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="rounded-xl border border-stone-200 px-3 py-1.5 text-xs text-stone-700 focus:border-brew-500 focus:outline-none bg-white"
+                className="rounded-xl border border-stone-200 px-3 py-2 text-xs text-stone-700 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E] bg-white"
               >
                 <option value="">All Categories</option>
                 {categories.map(c => (
@@ -614,7 +614,7 @@ export default function InventoryDashboardPage() {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="rounded-xl border border-stone-200 px-3 py-1.5 text-xs text-stone-700 focus:border-brew-500 focus:outline-none bg-white"
+                className="rounded-xl border border-stone-200 px-3 py-2 text-xs text-stone-700 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E] bg-white"
               >
                 <option value="">All Statuses</option>
                 <option value="in_stock">🟢 In Stock</option>
@@ -1002,7 +1002,7 @@ export default function InventoryDashboardPage() {
                   placeholder="e.g. Coca-Cola Can, Water Bottle, Ice Cream Cup"
                   value={itemForm.name}
                   onChange={(e) => setItemForm({ ...itemForm, name: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-brew-500 focus:outline-none"
+                  className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
                 />
               </div>
 
@@ -1013,7 +1013,7 @@ export default function InventoryDashboardPage() {
                   <select
                     value={itemForm.category}
                     onChange={(e) => setItemForm({ ...itemForm, category: e.target.value })}
-                    className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-brew-500 focus:outline-none bg-white"
+                    className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none bg-white"
                   >
                     {COMMON_CATEGORIES.map(c => (
                       <option key={c} value={c}>{c}</option>
@@ -1028,7 +1028,7 @@ export default function InventoryDashboardPage() {
                     placeholder="Enter custom category name..."
                     value={itemForm.customCategory}
                     onChange={(e) => setItemForm({ ...itemForm, customCategory: e.target.value })}
-                    className="mt-2 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-brew-500 focus:outline-none"
+                    className="mt-2 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
                   />
                 )}
               </div>
@@ -1040,7 +1040,7 @@ export default function InventoryDashboardPage() {
                   <select
                     value={itemForm.unit}
                     onChange={(e) => setItemForm({ ...itemForm, unit: e.target.value })}
-                    className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-brew-500 focus:outline-none bg-white"
+                    className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none bg-white"
                   >
                     {COMMON_UNITS.map(u => (
                       <option key={u} value={u}>{u}</option>
@@ -1055,7 +1055,7 @@ export default function InventoryDashboardPage() {
                     placeholder="e.g. Sachet, Tub, Wrapper..."
                     value={itemForm.customUnit}
                     onChange={(e) => setItemForm({ ...itemForm, customUnit: e.target.value })}
-                    className="mt-2 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-brew-500 focus:outline-none"
+                    className="mt-2 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
                   />
                 )}
               </div>
@@ -1072,7 +1072,7 @@ export default function InventoryDashboardPage() {
                       placeholder="e.g. 20"
                       value={itemForm.quantity}
                       onChange={(e) => setItemForm({ ...itemForm, quantity: e.target.value })}
-                      className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-brew-500 focus:outline-none"
+                      className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
                     />
                   </div>
                 ) : (
@@ -1093,7 +1093,7 @@ export default function InventoryDashboardPage() {
                     placeholder="e.g. 5"
                     value={itemForm.minimumStock}
                     onChange={(e) => setItemForm({ ...itemForm, minimumStock: e.target.value })}
-                    className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-brew-500 focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
                   />
                 </div>
               </div>
@@ -1106,7 +1106,7 @@ export default function InventoryDashboardPage() {
                   placeholder="e.g. 300ml red aluminum can"
                   value={itemForm.description}
                   onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-brew-500 focus:outline-none"
+                  className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
                 />
               </div>
 
@@ -1303,7 +1303,7 @@ export default function InventoryDashboardPage() {
                   disabled={Boolean(editingMapping)}
                   value={mappingForm.productId}
                   onChange={(e) => setMappingForm({ ...mappingForm, productId: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-brew-500 focus:outline-none bg-white disabled:bg-stone-100"
+                  className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none bg-white disabled:bg-stone-100"
                 >
                   <option value="">-- Choose Menu Item --</option>
                   {products.map(p => (
@@ -1319,7 +1319,7 @@ export default function InventoryDashboardPage() {
                   disabled={Boolean(editingMapping)}
                   value={mappingForm.inventoryItemId}
                   onChange={(e) => setMappingForm({ ...mappingForm, inventoryItemId: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-brew-500 focus:outline-none bg-white disabled:bg-stone-100"
+                  className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none bg-white disabled:bg-stone-100"
                 >
                   <option value="">-- Choose Consumable Item --</option>
                   {items.map(i => (
@@ -1340,7 +1340,7 @@ export default function InventoryDashboardPage() {
                   placeholder="e.g. 1"
                   value={mappingForm.quantityRequired}
                   onChange={(e) => setMappingForm({ ...mappingForm, quantityRequired: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-brew-500 focus:outline-none font-mono"
+                  className="mt-1 w-full rounded-xl border border-stone-200 px-3.5 py-2 text-sm focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none font-mono"
                 />
                 <p className="mt-1 text-[11px] text-stone-400">
                   Example: 1 Coca-Cola Can per Coca-Cola order.

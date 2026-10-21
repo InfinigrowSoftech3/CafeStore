@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :focus-visible {
-  outline: 2px solid var(--focus-ring, #c96b18);
+  outline: 2px solid var(--focus-ring, #0F3D2E);
   outline-offset: 2px;
 }
 
@@ -58,9 +58,9 @@ html.light {
   --sidebar-border: #e2e8f0;
   --sidebar-text: #0f172a;
   --sidebar-text-muted: #64748b;
-  --sidebar-active-bg: #fef3e7;
-  --sidebar-active-border: #f59e0b;
-  --sidebar-active-text: #92400e;
+  --sidebar-active-bg: #ecfdf5;
+  --sidebar-active-border: #0F3D2E;
+  --sidebar-active-text: #0F3D2E;
   --sidebar-hover-bg: #f1f5f9;
 
   /* Header */
@@ -78,24 +78,24 @@ html.light {
   /* Borders */
   --border-primary: #e2e8f0;
   --border-subtle: rgba(226, 232, 240, 0.8);
-  --border-focus: #c96b18;
+  --border-focus: #0F3D2E;
 
   /* Inputs */
   --input-bg: #ffffff;
   --input-border: #e2e8f0;
   --input-text: #0f172a;
   --input-placeholder: #94a3b8;
-  --input-focus-border: #c96b18;
-  --input-focus-ring: rgba(201, 107, 24, 0.2);
+  --input-focus-border: #0F3D2E;
+  --input-focus-ring: rgba(15, 61, 46, 0.2);
 
   /* Brand */
-  --brand-primary: #c96b18;
-  --brand-primary-hover: #b45a10;
-  --brand-primary-subtle: rgba(201, 107, 24, 0.12);
-  --brand-primary-border: rgba(201, 107, 24, 0.28);
-  --brand-accent: #d97706;
-  --brand-accent-hover: #b45309;
-  --brand-accent-subtle: rgba(217, 119, 6, 0.12);
+  --brand-primary: #0F3D2E;
+  --brand-primary-hover: #16503D;
+  --brand-primary-subtle: rgba(15, 61, 46, 0.12);
+  --brand-primary-border: rgba(15, 61, 46, 0.28);
+  --brand-accent: #0F3D2E;
+  --brand-accent-hover: #16503D;
+  --brand-accent-subtle: rgba(15, 61, 46, 0.12);
 
   /* Semantic Colors */
   --success: #059669;
@@ -120,9 +120,9 @@ html.light {
 
   /* Interactive States */
   --hover-bg: #f1f5f9;
-  --selected-bg: #fef3e7;
-  --active-bg: #fde68a;
-  --focus-ring: rgba(201, 107, 24, 0.3);
+  --selected-bg: #ecfdf5;
+  --active-bg: #d1fae5;
+  --focus-ring: rgba(15, 61, 46, 0.25);
 
   /* Tables */
   --table-header-bg: #f8fafc;
@@ -244,17 +244,17 @@ html.light {
   --status-draft-bg: #f3f4f6;
   --status-draft-text: #374151;
   --status-draft-border: #e5e7eb;
-  --status-draft-dot: #9ca3af.
+  --status-draft-dot: #9ca3af;
 
   --status-ordered-bg: #dbeafe;
   --status-ordered-text: #1e40af;
   --status-ordered-border: #bfdbfe;
-  --status-ordered-dot: #3b82f6.
+  --status-ordered-dot: #3b82f6;
 
   --status-received-bg: #dcfce7;
   --status-received-text: #166534;
-  --status-received-border: #bbf7d0.
-  --status-received-dot: #22c55e.
+  --status-received-border: #bbf7d0;
+  --status-received-dot: #22c55e;
 }
 
 /* ============================================================

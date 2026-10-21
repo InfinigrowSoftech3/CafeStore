@@ -199,8 +199,8 @@ export default function ReviewsPage() {
               onClick={() => setSelectedRating(star)}
               className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
                 selectedRating === star
-                  ? 'bg-espresso-950 text-white shadow-xs'
-                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70'
+                  ? 'bg-[#0F3D2E] text-white shadow-xs'
+                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200/80 hover:text-stone-900'
               }`}
             >
               {star === 'ALL' ? 'All Reviews' : `${star} ★`}
@@ -231,7 +231,7 @@ export default function ReviewsPage() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-espresso-950 font-display text-sm font-bold text-white">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0F3D2E] font-display text-sm font-bold text-white">
                     {review.customerName ? review.customerName.charAt(0).toUpperCase() : 'G'}
                   </div>
                   <div>
@@ -281,12 +281,12 @@ export default function ReviewsPage() {
 
               {/* Owner Reply bubble if already answered */}
               {review.ownerReply?.text && (
-                <div className="ml-4 rounded-xl border border-amber-200 bg-amber-50/60 p-3 space-y-1">
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900">
+                <div className="ml-4 rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 space-y-1">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-950">
                     <MessageCircle size={13} />
                     <span>Response from Brewhaus Team:</span>
                   </div>
-                  <p className="text-xs text-amber-800">
+                  <p className="text-xs text-emerald-900">
                     {review.ownerReply.text}
                   </p>
                 </div>
@@ -338,7 +338,7 @@ export default function ReviewsPage() {
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
               placeholder="Thank you so much for dining with us! We are thrilled you enjoyed the pour-over coffee..."
-              className="w-full rounded-xl border border-stone-200 p-3 text-xs focus:border-amber-500 focus:outline-none leading-relaxed"
+              className="w-full rounded-xl border border-stone-200 p-3 text-xs focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E] leading-relaxed"
             />
           </div>
 

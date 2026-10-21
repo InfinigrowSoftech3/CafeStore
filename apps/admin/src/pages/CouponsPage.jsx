@@ -155,7 +155,7 @@ export default function CouponsPage() {
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="rounded-xl bg-amber-100 px-3 py-1 font-mono text-xs font-bold tracking-wider text-amber-900 border border-amber-200/80">
+                      <span className="rounded-xl bg-emerald-100 px-3 py-1 font-mono text-xs font-bold tracking-wider text-[#0F3D2E] border border-emerald-200/80">
                         {coupon.code}
                       </span>
                       <StatusPill status={coupon.active ? 'active' : 'inactive'} size="xs" />
@@ -176,7 +176,7 @@ export default function CouponsPage() {
                   </div>
 
                   <div className="mt-3">
-                    <div className="font-display text-lg font-bold text-espresso-950">
+                    <div className="font-display text-lg font-bold text-stone-900">
                       {coupon.discountType === 'percent'
                         ? `${coupon.value}% OFF`
                         : `${formatMoney(coupon.value, currency)} FLAT OFF`}
@@ -216,7 +216,7 @@ export default function CouponsPage() {
                   {coupon.maxUses && (
                     <div className="h-1.5 w-full rounded-full bg-stone-100 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-amber-600 transition-all"
+                        className="h-full rounded-full bg-[#0F3D2E] transition-all"
                         style={{ width: `${usagePercent}%` }}
                       />
                     </div>
@@ -257,21 +257,21 @@ export default function CouponsPage() {
       >
         <form onSubmit={createCoupon} className="space-y-4">
           {/* Live Voucher Card Preview */}
-          <div className="rounded-2xl border border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50 p-4 shadow-2xs space-y-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
+          <div className="rounded-2xl border border-emerald-300 bg-gradient-to-br from-emerald-50 to-teal-50 p-4 shadow-2xs space-y-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
               Customer Live Voucher Preview
             </span>
             <div className="flex items-center justify-between">
-              <span className="font-mono text-base font-bold text-amber-950 bg-white/80 px-2.5 py-1 rounded-lg border border-amber-200">
+              <span className="font-mono text-base font-bold text-[#0F3D2E] bg-white/80 px-2.5 py-1 rounded-lg border border-emerald-200">
                 {form.code || 'CODE10'}
               </span>
-              <span className="font-display text-base font-extrabold text-amber-900">
+              <span className="font-display text-base font-extrabold text-[#0F3D2E]">
                 {form.discountType === 'percent'
                   ? `${form.value || '10'}% OFF`
                   : `${formatMoney(form.value || 50, currency)} OFF`}
               </span>
             </div>
-            <p className="text-xs text-amber-800">
+            <p className="text-xs text-emerald-800">
               {form.description || 'Special guest promo'} · Min order {formatMoney(form.minimumSubtotal || 0, currency)}
               {form.maximumDiscount && form.discountType === 'percent' ? ` (up to ${formatMoney(form.maximumDiscount, currency)})` : ''}
             </p>
@@ -288,7 +288,7 @@ export default function CouponsPage() {
               value={form.code}
               onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
               placeholder="e.g. BREW10, FIRSTORDER"
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs font-mono uppercase focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs font-mono uppercase focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
 
@@ -302,7 +302,7 @@ export default function CouponsPage() {
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="e.g. 10% discount on all artisan pour-overs"
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
 
@@ -314,7 +314,7 @@ export default function CouponsPage() {
               <select
                 value={form.discountType}
                 onChange={(e) => setForm({ ...form, discountType: e.target.value })}
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
               >
                 <option value="percent">Percentage (%)</option>
                 <option value="fixed">Fixed Amount ({currency})</option>
@@ -332,7 +332,7 @@ export default function CouponsPage() {
                 value={form.value}
                 onChange={(e) => setForm({ ...form, value: e.target.value })}
                 placeholder={form.discountType === 'percent' ? '15' : '100'}
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
               />
             </div>
           </div>
@@ -350,7 +350,7 @@ export default function CouponsPage() {
                 value={form.minimumSubtotal}
                 onChange={(e) => setForm({ ...form, minimumSubtotal: e.target.value })}
                 placeholder="199"
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
               />
             </div>
             <div>
@@ -364,7 +364,7 @@ export default function CouponsPage() {
                 value={form.maximumDiscount}
                 onChange={(e) => setForm({ ...form, maximumDiscount: e.target.value })}
                 placeholder="150"
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
               />
             </div>
           </div>
@@ -378,7 +378,7 @@ export default function CouponsPage() {
                 type="datetime-local"
                 value={form.startsAt}
                 onChange={(e) => setForm({ ...form, startsAt: e.target.value })}
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
               />
             </div>
             <div>
@@ -389,7 +389,7 @@ export default function CouponsPage() {
                 type="datetime-local"
                 value={form.endsAt}
                 onChange={(e) => setForm({ ...form, endsAt: e.target.value })}
-                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
               />
             </div>
           </div>
@@ -404,7 +404,7 @@ export default function CouponsPage() {
               value={form.maxUses}
               onChange={(e) => setForm({ ...form, maxUses: e.target.value })}
               placeholder="e.g. 50 (leave blank for unlimited)"
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
         </form>

@@ -280,9 +280,9 @@ export default function NotificationsPage() {
             <div className="font-display text-lg font-bold text-stone-900 mt-0.5">{stats?.totalCustomers || 1}</div>
           </div>
 
-          <div className="rounded-2xl border border-amber-200 bg-amber-50/40 p-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">Push Allowed</span>
-            <div className="font-display text-lg font-bold text-amber-900 mt-0.5">{subscribers}</div>
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">Push Allowed</span>
+            <div className="font-display text-lg font-bold text-[#0F3D2E] mt-0.5">{subscribers}</div>
           </div>
 
           <div className="rounded-2xl border border-blue-200 bg-blue-50/40 p-3">
@@ -442,7 +442,7 @@ export default function NotificationsPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Fresh Sourdough Pizzas now baking!"
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
 
@@ -457,7 +457,7 @@ export default function NotificationsPage() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="e.g. Try our new Truffle Mushroom & Paneer Tikka pizza with 15% off code PIZZA15."
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
 
@@ -470,7 +470,7 @@ export default function NotificationsPage() {
               value={pageUrl}
               onChange={(e) => setPageUrl(e.target.value)}
               placeholder="/offers or /menu"
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs font-mono focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-xs font-mono focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E] focus:outline-none"
             />
           </div>
 
@@ -512,7 +512,7 @@ export default function NotificationsPage() {
                 placeholder="Search guests by name or phone..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
               />
               <div className="space-y-1 max-h-36 overflow-y-auto">
                 {results.map((c) => (

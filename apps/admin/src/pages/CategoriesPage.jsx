@@ -203,16 +203,16 @@ export default function CategoriesPage() {
 
       {/* Near-duplicate resolution banner if found */}
       {nearDuplicates.length > 0 && (
-        <div className="rounded-2xl border border-amber-300 bg-amber-50/90 p-4 shadow-xs">
+        <div className="rounded-2xl border border-emerald-300 bg-emerald-50/90 p-4 shadow-xs">
           <div className="flex items-start gap-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-200 text-amber-900 shrink-0">
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-200 text-[#0F3D2E] shrink-0">
               <AlertTriangle size={18} />
             </span>
             <div className="space-y-1 flex-1">
-              <h4 className="text-xs font-bold text-amber-950 uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
                 Duplicate Categories Detected
               </h4>
-              <p className="text-xs text-amber-800">
+              <p className="text-xs text-emerald-800">
                 You have similar categories: <strong>"{nearDuplicates[0].source.name}"</strong> and <strong>"{nearDuplicates[0].target.name}"</strong>. Merge them to avoid confusing customers on the digital menu.
               </p>
               <div className="pt-2">
@@ -223,7 +223,7 @@ export default function CategoriesPage() {
                     source: nearDuplicates[0].source,
                     target: nearDuplicates[0].target
                   })}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-900 hover:bg-amber-950 px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#0F3D2E] hover:bg-[#165a44] px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition"
                 >
                   <Merge size={13} />
                   <span>Merge into "{nearDuplicates[0].target.name}"</span>
@@ -296,13 +296,13 @@ export default function CategoriesPage() {
                     </span>
 
                     {/* Icon */}
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-2xl border border-amber-200/60 shadow-2xs">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-2xl border border-emerald-200/60 shadow-2xs">
                       {category.icon || '☕'}
                     </div>
 
                     {/* Name */}
                     <div className="min-w-0">
-                      <h3 className="font-display text-base font-bold text-espresso-950 truncate">
+                      <h3 className="font-display text-base font-bold text-stone-900 truncate">
                         {category.name}
                       </h3>
                       <p className="text-[11px] text-stone-400">
@@ -389,7 +389,7 @@ export default function CategoriesPage() {
               value={form.name}
               onChange={(e) => setForm((cur) => ({ ...cur, name: e.target.value }))}
               placeholder="e.g. Hot Brews, Sourdough Pizzas, Artisan Teas..."
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
             />
           </div>
 
@@ -405,7 +405,7 @@ export default function CategoriesPage() {
                   onClick={() => setForm((cur) => ({ ...cur, icon }))}
                   className={`flex h-12 items-center justify-center rounded-2xl border text-2xl transition ${
                     form.icon === icon
-                      ? 'border-amber-500 bg-amber-50 shadow-xs'
+                      ? 'border-[#0F3D2E] bg-emerald-50 shadow-xs'
                       : 'border-stone-200 bg-stone-50/50 hover:bg-stone-100'
                   }`}
                 >
@@ -421,7 +421,7 @@ export default function CategoriesPage() {
                 type="checkbox"
                 checked={form.active}
                 onChange={(e) => setForm((cur) => ({ ...cur, active: e.target.checked }))}
-                className="rounded border-stone-300 text-amber-600 focus:ring-amber-500"
+                className="rounded border-stone-300 text-[#0F3D2E] focus:ring-[#0F3D2E]"
               />
               Visible to customers on QR menu
             </label>

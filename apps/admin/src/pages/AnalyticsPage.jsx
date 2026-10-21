@@ -16,8 +16,8 @@ import PageHeader from '../components/common/PageHeader';
 import KpiCard from '../components/common/KpiCard';
 
 const COLORS = {
-  amber: '#d97706',
-  espresso: '#451a03',
+  amber: '#0F3D2E',
+  espresso: '#165a44',
   emerald: '#10b981',
   blue: '#3b82f6',
   purple: '#8b5cf6',
@@ -85,7 +85,7 @@ export default function AnalyticsPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <div className="h-9 w-9 animate-spin rounded-full border-3 border-stone-200 border-t-amber-600" />
+        <div className="h-9 w-9 animate-spin rounded-full border-3 border-stone-200 border-t-[#0F3D2E]" />
         <p className="text-xs font-semibold text-stone-500">Compiling financial & sales metrics...</p>
       </div>
     );
@@ -165,7 +165,7 @@ export default function AnalyticsPage() {
                     onClick={() => downloadReport('/analytics/exports/sales.csv', `brewhaus-sales-${new Date().toISOString().slice(0, 10)}.csv`)}
                     className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-stone-700 hover:bg-stone-50 text-left transition"
                   >
-                    <Download size={14} className="text-amber-600" /> Sales Report (.CSV)
+                    <Download size={14} className="text-[#0F3D2E]" /> Sales Report (.CSV)
                   </button>
                   <button
                     type="button"
@@ -285,7 +285,7 @@ export default function AnalyticsPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`pb-3 border-b-2 font-bold transition whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'border-amber-600 text-espresso-950'
+                  ? 'border-[#0F3D2E] text-[#0F3D2E]'
                   : 'border-transparent text-stone-500 hover:text-stone-800'
               }`}
             >

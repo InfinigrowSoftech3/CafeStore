@@ -14,6 +14,7 @@ import PageHeader from '../components/common/PageHeader';
 import StatusPill from '../components/common/StatusPill';
 import EmptyState from '../components/common/EmptyState';
 import Drawer from '../components/common/Drawer';
+import SearchInput from '../components/common/SearchInput';
 
 export default function CustomersPage() {
   const tenant = useTenant();
@@ -277,12 +278,12 @@ export default function CustomersPage() {
           <p className="text-[10px] text-stone-400 mt-0.5">Transactional orders only</p>
         </div>
 
-        <div className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4 shadow-xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800">New This Month</span>
-          <div className="mt-1 text-2xl font-bold font-display text-amber-900">
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-4 shadow-xs">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">New This Month</span>
+          <div className="mt-1 text-2xl font-bold font-display text-emerald-950">
             {stats.newThisMonth || 0}
           </div>
-          <p className="text-[10px] text-amber-700 mt-0.5">First visit in last 30 days</p>
+          <p className="text-[10px] text-emerald-700 mt-0.5">First visit in last 30 days</p>
         </div>
       </div>
 
@@ -290,24 +291,13 @@ export default function CustomersPage() {
       <div className="rounded-2xl border border-stone-200/80 bg-white p-3.5 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           {/* Search Input */}
-          <div className="relative flex-1 max-w-md">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
-            <input
-              type="text"
+          <div className="flex-1 max-w-md">
+            <SearchInput
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              onClear={() => { setSearch(''); setPage(1); }}
               placeholder="Search by name, phone (+91), email..."
-              className="w-full rounded-xl border border-stone-200 bg-stone-50/50 py-2 pl-9.5 pr-8 text-xs sm:text-sm text-stone-900 placeholder-stone-400 focus:border-amber-500 focus:bg-white focus:outline-none transition"
             />
-            {search && (
-              <button
-                type="button"
-                onClick={() => setSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
-              >
-                <X size={14} />
-              </button>
-            )}
           </div>
 
           {/* Quick Filter Selectors */}
@@ -315,7 +305,7 @@ export default function CustomersPage() {
             <select
               value={consentFilter}
               onChange={(e) => { setConsentFilter(e.target.value); setPage(1); }}
-              className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 focus:border-amber-500 focus:outline-none"
+              className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
             >
               <option value="">All Consent States</option>
               <option value="true">Marketing Opted-In</option>
@@ -325,7 +315,7 @@ export default function CustomersPage() {
             <select
               value={frequencyFilter}
               onChange={(e) => { setFrequencyFilter(e.target.value); setPage(1); }}
-              className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 focus:border-amber-500 focus:outline-none"
+              className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
             >
               <option value="">All Frequencies</option>
               <option value="frequent">VIP (3+ Visits)</option>
@@ -550,7 +540,7 @@ export default function CustomersPage() {
                 value={editingNotes}
                 onChange={(e) => setEditingNotes(e.target.value)}
                 placeholder="e.g. Likes extra hot oat flat white, allergic to walnuts, preferred Table 4..."
-                className="w-full rounded-xl border border-stone-200 p-2.5 text-xs focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-stone-200 p-2.5 text-xs focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
               />
               <button
                 type="button"
@@ -569,7 +559,7 @@ export default function CustomersPage() {
               </h4>
               {profileLoading ? (
                 <div className="py-6 text-center text-xs text-stone-400">
-                  <Loader2 size={18} className="animate-spin mx-auto text-amber-600 mb-1" />
+                  <Loader2 size={18} className="animate-spin mx-auto text-[#0F3D2E] mb-1" />
                   Loading order history...
                 </div>
               ) : profileData?.orders?.length > 0 ? (

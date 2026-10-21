@@ -100,7 +100,7 @@ export default function CommandPaletteModal({ isOpen, onClose }) {
         <div className="flex items-center gap-3 px-4 py-3.5 border-b"
           style={{ borderColor: 'var(--border-primary)', backgroundColor: 'var(--hover-bg)/50' }}
         >
-          <Search size={18} className="text-amber-500 shrink-0" />
+          <Search size={18} className="text-[#0F3D2E] dark:text-emerald-400 shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -136,13 +136,13 @@ export default function CommandPaletteModal({ isOpen, onClose }) {
                   onMouseEnter={() => setSelectedIndex(idx)}
                   className={`w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-2xl text-left transition ${
                     isSelected
-                      ? 'bg-[var(--brand-primary-subtle)] text-amber-900 dark:text-white shadow-2xs font-semibold'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-[#0F3D2E] dark:text-emerald-300 shadow-2xs font-semibold'
                       : 'hover:bg-[var(--hover-bg)] text-[var(--text-secondary)]'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-                      isSelected ? 'bg-amber-500 text-white shadow-sm' : 'bg-[var(--hover-bg)] text-[var(--text-muted)]'
+                      isSelected ? 'bg-[#0F3D2E] text-white shadow-sm' : 'bg-[var(--hover-bg)] text-[var(--text-muted)]'
                     }`}>
                       <Icon size={16} />
                     </div>
@@ -158,7 +158,7 @@ export default function CommandPaletteModal({ isOpen, onClose }) {
                     >
                       {action.category}
                     </span>
-                    <ArrowRight size={13} className={`transition ${isSelected ? 'text-amber-500 translate-x-0.5' : 'text-[var(--text-muted)]'}`} />
+                    <ArrowRight size={13} className={`transition ${isSelected ? 'text-[#0F3D2E] dark:text-emerald-400 translate-x-0.5' : 'text-[var(--text-muted)]'}`} />
                   </div>
                 </button>
               );
@@ -174,7 +174,7 @@ export default function CommandPaletteModal({ isOpen, onClose }) {
             <span><kbd className="font-mono font-bold px-1.5 py-0.5 rounded border text-[10px]" style={{ borderColor: 'var(--border-primary)', backgroundColor: 'var(--bg-surface)', color: 'var(--text-secondary)' }}>↑↓</kbd> Navigate</span>
             <span><kbd className="font-mono font-bold px-1.5 py-0.5 rounded border text-[10px]" style={{ borderColor: 'var(--border-primary)', backgroundColor: 'var(--bg-surface)', color: 'var(--text-secondary)' }}>↵</kbd> Select</span>
           </div>
-          <span className="text-amber-600 dark:text-amber-500/80 font-mono font-bold">⌘K / Ctrl+K</span>
+          <span className="text-[#0F3D2E] dark:text-emerald-400 font-mono font-bold">⌘K / Ctrl+K</span>
         </div>
       </div>
     </div>
