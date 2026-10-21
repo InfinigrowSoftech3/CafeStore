@@ -3,7 +3,7 @@ import {
   Download, Eye, Loader2, Plus, QrCode, RefreshCw, Trash2,
   Users, Layers, ArrowRightLeft, Sparkles, AlertCircle, Clock,
   CheckCircle2, DollarSign, Edit, Printer, X, Monitor, Grid,
-  Maximize2, Move
+  Maximize2, Move, Copy, ExternalLink
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -386,7 +386,7 @@ export default function TablesPage() {
             <span>Total Tables</span>
             <Layers size={15} className="text-stone-400" />
           </div>
-          <div className="mt-2 text-2xl font-bold font-display text-espresso-950">
+          <div className="mt-2 text-2xl font-bold font-display text-stone-900">
             {metrics.total}
           </div>
           <p className="mt-0.5 text-[11px] text-stone-400">
@@ -434,11 +434,11 @@ export default function TablesPage() {
         </div>
 
         <div className="rounded-2xl border border-stone-200/80 bg-stone-50 p-4 shadow-xs col-span-2 sm:col-span-1">
-          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-espresso-800">
+          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-stone-700">
             <span>Active Bill Value</span>
-            <DollarSign size={15} className="text-amber-700" />
+            <DollarSign size={15} className="text-emerald-700" />
           </div>
-          <div className="mt-2 text-2xl font-bold font-display text-espresso-950 tabular-nums">
+          <div className="mt-2 text-2xl font-bold font-display text-stone-900 tabular-nums">
             {formatMoney(metrics.liveRevenue, currency)}
           </div>
           <p className="mt-0.5 text-[11px] text-stone-500">
@@ -617,7 +617,7 @@ export default function TablesPage() {
                   <span className={`absolute top-2.5 right-2.5 h-2 w-2 rounded-full ${statusCfg.dot}`} />
 
                   {/* Table Number */}
-                  <span className="font-display text-xl font-bold text-espresso-950">
+                  <span className="font-display text-xl font-bold text-stone-900">
                     T{table.tableNumber}
                   </span>
 
@@ -827,7 +827,7 @@ export default function TablesPage() {
                 )}
               </div>
 
-              <h3 className="font-display text-lg font-bold text-espresso-950">
+              <h3 className="font-display text-lg font-bold text-stone-900">
                 Table {String(table.tableNumber).padStart(2, '0')}
               </h3>
               <p className="text-xs text-stone-500 mt-0.5">
@@ -863,7 +863,7 @@ export default function TablesPage() {
         subtitle={activeDrawerTable ? `${activeDrawerTable.seats} Seats · ${activeDrawerTable.floor || 'Ground Floor'} ${activeDrawerTable.label ? `· "${activeDrawerTable.label}"` : ''}` : ''}
         footer={
           activeDrawerTable && (
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center justify-between gap-2.5">
               <button
                 type="button"
                 onClick={() => {
@@ -884,9 +884,10 @@ export default function TablesPage() {
                   setActiveDrawerTable(null);
                   handleEditClick(t);
                 }}
-                className="rounded-xl border border-stone-200 px-3 py-2.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-xs transition"
               >
-                Edit
+                <Edit size={13} className="text-stone-500" />
+                <span>Edit</span>
               </button>
             </div>
           )
@@ -903,20 +904,24 @@ export default function TablesPage() {
 
               {/* Status fast switcher */}
               <div className="flex flex-wrap gap-1.5 pt-2 border-t border-stone-200">
-                {['AVAILABLE', 'OCCUPIED', 'RESERVED', 'CLEANING'].map((st) => (
-                  <button
-                    key={st}
-                    type="button"
-                    onClick={() => handleStatusChange(activeDrawerTable._id, st)}
-                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
-                      activeDrawerTable.effectiveStatus === st
-                        ? 'bg-espresso-950 text-white'
-                        : 'bg-white text-stone-600 hover:bg-stone-100 border border-stone-200'
-                    }`}
-                  >
-                    {STATUS_CONFIG[st]?.label || st}
-                  </button>
-                ))}
+                {['AVAILABLE', 'OCCUPIED', 'RESERVED', 'CLEANING'].map((st) => {
+                  const isCurrent = activeDrawerTable.effectiveStatus === st;
+                  return (
+                    <button
+                      key={st}
+                      type="button"
+                      onClick={() => handleStatusChange(activeDrawerTable._id, st)}
+                      className={`rounded-xl px-3 py-1.5 text-xs font-bold transition flex items-center gap-1.5 ${
+                        isCurrent
+                          ? 'bg-[#0F3D2E] text-white shadow-xs'
+                          : 'bg-white text-stone-600 hover:bg-stone-100 border border-stone-200 hover:border-stone-300'
+                      }`}
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full ${isCurrent ? 'bg-emerald-300' : 'bg-stone-400'}`} />
+                      <span>{STATUS_CONFIG[st]?.label || st}</span>
+                    </button>
+                  );
+                })}
               </div>
 
               {activeDrawerTable.effectiveStatus === 'CLEANING' && (
@@ -936,7 +941,7 @@ export default function TablesPage() {
             <div className="rounded-2xl border border-stone-200 p-4 space-y-3 bg-white shadow-xs">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider">Live Tab Summary</h4>
-                <span className="font-display text-lg font-bold text-espresso-950 tabular-nums">
+                <span className="font-display text-lg font-bold text-[#0F3D2E] tabular-nums">
                   {formatMoney(activeDrawerTable.currentBillAmount, currency)}
                 </span>
               </div>
@@ -972,35 +977,74 @@ export default function TablesPage() {
             </div>
 
             {/* Acrylic Standee QR Code Preview */}
-            <div className="rounded-2xl border border-stone-200 p-4 space-y-3 text-center bg-stone-50/40">
-              <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider">
-                Table QR Standee
-              </h4>
-              <div className="flex justify-center">
-                {activeDrawerTable.qrCode ? (
-                  <img
-                    src={activeDrawerTable.qrCode}
-                    alt="QR Standee"
-                    className="h-36 w-36 rounded-xl border border-stone-200 bg-white p-2 shadow-xs"
-                  />
-                ) : (
-                  <QrCode size={64} className="text-stone-300" />
+            <div className="rounded-2xl border border-stone-200 p-4 space-y-3 bg-stone-50/50">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider">
+                  Table QR Standee
+                </h4>
+                {activeDrawerTable.qrUrl && (
+                  <a
+                    href={activeDrawerTable.qrUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0F3D2E] hover:underline"
+                  >
+                    <ExternalLink size={12} /> Test Menu
+                  </a>
                 )}
               </div>
-              <div className="flex justify-center gap-2 pt-1">
+
+              <div className="flex justify-center py-1">
+                {activeDrawerTable.qrCode ? (
+                  <div className="rounded-2xl border border-stone-200/90 bg-white p-3 shadow-xs">
+                    <img
+                      src={activeDrawerTable.qrCode}
+                      alt={`Table ${activeDrawerTable.tableNumber} QR`}
+                      className="h-40 w-40 rounded-xl"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex h-40 w-40 items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-stone-100 text-stone-400">
+                    <QrCode size={56} />
+                  </div>
+                )}
+              </div>
+
+              {activeDrawerTable.qrUrl && (
+                <p className="text-[11px] text-stone-500 font-mono text-center truncate px-2" title={activeDrawerTable.qrUrl}>
+                  {activeDrawerTable.qrUrl}
+                </p>
+              )}
+
+              <div className="grid grid-cols-3 gap-2 pt-1">
                 <button
                   type="button"
                   onClick={() => downloadQr(activeDrawerTable)}
-                  className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-stone-200 bg-white px-2.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-xs transition"
                 >
-                  Download PNG
+                  <Download size={13} className="text-stone-500" />
+                  <span>Download</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (activeDrawerTable.qrUrl) {
+                      navigator.clipboard.writeText(activeDrawerTable.qrUrl);
+                      toast.success('Table QR link copied to clipboard!');
+                    }
+                  }}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-stone-200 bg-white px-2.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-xs transition"
+                >
+                  <Copy size={13} className="text-stone-500" />
+                  <span>Copy</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleRegenerateQr(activeDrawerTable)}
-                  className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-stone-200 bg-white px-2.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 shadow-xs transition"
                 >
-                  Regenerate
+                  <RefreshCw size={13} className="text-stone-500" />
+                  <span>Regenerate</span>
                 </button>
               </div>
             </div>
@@ -1013,7 +1057,7 @@ export default function TablesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
           <section role="dialog" aria-modal="true" className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-display text-lg font-bold text-espresso-950">
+              <h3 className="font-display text-lg font-bold text-stone-900">
                 {editingTable ? `Edit Table ${editingTable.tableNumber}` : 'Add New Table'}
               </h3>
               <button
@@ -1130,7 +1174,7 @@ export default function TablesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
           <section role="dialog" aria-modal="true" className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-display text-lg font-bold text-espresso-950">
+              <h3 className="font-display text-lg font-bold text-stone-900">
                 Transfer Table {transferModalData.tableNumber}
               </h3>
               <button
