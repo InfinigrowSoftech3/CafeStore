@@ -61,15 +61,15 @@ export default function Drawer({
             }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b px-6 py-4.5"
+            <div className="flex items-center justify-between border-b px-6 py-5 shrink-0"
               style={{ borderColor: 'var(--border-primary)', backgroundColor: 'var(--hover-bg)/50' }}
             >
               <div>
-                <h2 className="font-display text-lg font-bold text-[var(--text-primary)]">
+                <h2 className="font-display text-lg font-bold text-[var(--text-primary)] tracking-tight">
                   {title}
                 </h2>
                 {subtitle && (
-                  <p className="mt-0.5 text-xs text-[var(--text-muted)] font-normal">
+                  <p className="mt-1 text-xs text-[var(--text-muted)] font-medium leading-relaxed">
                     {subtitle}
                   </p>
                 )}
@@ -77,7 +77,7 @@ export default function Drawer({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center rounded-xl text-[var(--text-muted)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-primary)] transition"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent text-[var(--text-muted)] hover:border-[var(--border-primary)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-primary)] transition active:scale-95 shrink-0"
                 aria-label="Close panel"
               >
                 <X size={18} />

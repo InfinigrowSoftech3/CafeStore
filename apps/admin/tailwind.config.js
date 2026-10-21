@@ -5,6 +5,7 @@ export default {
   theme: {
     extend: {
       spacing: {
+        '4.5': '1.125rem',
         '9.5': '2.375rem',
       },
       colors: {
@@ -60,8 +61,9 @@ export default {
         },
       },
       fontFamily: {
-        display: ['Georgia', 'serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+        body: ['Inter', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         soft: '0 10px 30px rgba(26,15,8,0.08)',
