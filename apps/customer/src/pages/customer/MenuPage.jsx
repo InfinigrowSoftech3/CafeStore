@@ -460,7 +460,7 @@ export default function MenuPage() {
 
   return (
     <div
-      className="min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-white text-[#111827] font-jakarta selection:bg-[#0F3D2E] selection:text-[#FFF1C9]"
+      className="min-h-screen w-full max-w-full bg-white text-[#111827] font-jakarta selection:bg-[#0F3D2E] selection:text-[#FFF1C9]"
       style={{
         '--menu-bg': '#FFFFFF',
         '--menu-ink': '#0F3D2E',
@@ -479,7 +479,7 @@ export default function MenuPage() {
         - Desktop (1024px+): Centered container max-width 1200px (1320px at 1440px+) with 32px side padding
         - Bottom padding matches floating order bar + safe-area inset on mobile, relaxes on desktop
       */}
-      <div className="mx-auto w-full sm:max-w-[720px] lg:max-w-[1200px] 2xl:max-w-[1320px] min-h-[100dvh] flex flex-col px-4 min-[390px]:px-5 lg:px-8 pt-3 pb-28 sm:pb-32 lg:pb-12">
+      <div className="mx-auto w-full sm:max-w-[720px] lg:max-w-[1200px] 2xl:max-w-[1320px] min-h-screen flex flex-col px-4 min-[390px]:px-5 lg:px-8 pt-3 pb-28 sm:pb-32 lg:pb-12">
         {/* ─── 1. Header ──────────────────────────────────────────────────────── */}
         <header className="flex items-center justify-between gap-3 py-2 border-b border-stone-200">
           {/* Café Name with small accent dot on left */}

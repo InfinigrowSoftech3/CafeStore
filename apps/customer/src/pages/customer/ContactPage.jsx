@@ -282,7 +282,7 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="contact-page min-h-screen overflow-hidden bg-white text-stone-900">
+    <main className="contact-page min-h-screen bg-white text-stone-900">
       {/* ========================================================================= */}
       {/* 1. HERO SECTION WITH CINEMATIC VIDEO & 3D FLOATING CUP */}
       {/* ========================================================================= */}
