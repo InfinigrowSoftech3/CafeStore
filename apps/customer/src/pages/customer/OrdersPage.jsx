@@ -11,10 +11,10 @@ import usePageMeta from '../../hooks/usePageMeta';
 
 const STATUS = {
   pending: { label: 'Order received', detail: 'Waiting for the cafe to confirm your order.', tone: 'border-amber-200 bg-amber-50 text-amber-800' },
-  confirmed: { label: 'Confirmed', detail: 'Your order is confirmed and queued for preparation.', tone: 'border-emerald-200 bg-emerald-50 text-[#0F3D2E]' },
-  preparing: { label: 'Being prepared', detail: 'The kitchen is preparing your order now.', tone: 'border-amber-200 bg-[#FFF1C9]/60 text-[#0F3D2E]' },
+  confirmed: { label: 'Confirmed', detail: 'Your order is confirmed and queued for preparation.', tone: 'border-emerald-200 bg-emerald-50 text-[#7A3316]' },
+  preparing: { label: 'Being prepared', detail: 'The kitchen is preparing your order now.', tone: 'border-amber-200 bg-[#F3E9DC]/60 text-[#7A3316]' },
   ready: { label: 'Ready to serve', detail: 'Your order is ready and coming to your table.', tone: 'border-emerald-200 bg-emerald-50 text-emerald-800' },
-  completed: { label: 'Served', detail: 'This order has been served.', tone: 'border-stone-200 bg-stone-100 text-stone-700' },
+  completed: { label: 'Served', detail: 'This order has been served.', tone: 'border-[#EFE4D6] bg-[#F3E9DC] text-stone-700' },
   cancelled: { label: 'Cancelled', detail: 'This order was cancelled.', tone: 'border-rose-200 bg-rose-50 text-rose-800' },
 };
 
@@ -113,32 +113,32 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-white">
-        <Loader2 className="h-8 w-8 animate-spin text-stone-900" />
+      <div className="flex min-h-[60vh] items-center justify-center bg-[#FBF6EF]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#2B1810]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20">
-      <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-stone-200 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
+    <div className="min-h-screen bg-[#FBF6EF] pb-20">
+      <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-[#EFE4D6] bg-[#FFFDF9]/95 px-4 py-3 backdrop-blur sm:px-6">
         <Link
           to="/menu"
-          className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-stone-300 text-stone-700 hover:bg-stone-50 transition-colors"
+          className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-[#EFE4D6] text-stone-700 hover:bg-[#FBF6EF] transition-colors"
           title="Back to menu"
           aria-label="Back to menu"
         >
           <ArrowLeft size={18} />
         </Link>
         <div className="min-w-0">
-          <h1 className="font-display text-xl font-bold text-stone-900">My Orders</h1>
+          <h1 className="font-display text-xl font-bold text-[#2B1810]">My Orders</h1>
           <p className="text-xs text-stone-500">Table {String(tableNumber || bill?.tableNumber || '-').padStart(2, '0')} · Live status</p>
         </div>
         <button
           type="button"
           onClick={() => loadOrders(true)}
           disabled={refreshing}
-          className="ml-auto flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-stone-300 text-stone-700 hover:bg-stone-50 transition-colors"
+          className="ml-auto flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-[#EFE4D6] text-stone-700 hover:bg-[#FBF6EF] transition-colors"
           title="Refresh orders"
           aria-label="Refresh orders"
         >
@@ -147,15 +147,15 @@ export default function OrdersPage() {
       </header>
 
       <main className="mx-auto max-w-2xl space-y-4 p-4 pb-10 sm:p-6">
-        <div className="flex items-center justify-between rounded-2xl border border-amber-300 bg-amber-50/60 p-4 text-stone-900">
+        <div className="flex items-center justify-between rounded-2xl border border-amber-300 bg-amber-50/60 p-4 text-[#2B1810]">
           <div className="flex items-center gap-3">
-            <Clock3 size={20} className="text-stone-900" />
+            <Clock3 size={20} className="text-[#2B1810]" />
             <div>
               <p className="font-semibold">Kitchen updates are live</p>
               <p className="text-xs text-stone-600">This page refreshes automatically every 10 seconds.</p>
             </div>
           </div>
-          <Link to="/menu" className="inline-flex items-center gap-1 text-xs font-bold text-stone-900 hover:underline">
+          <Link to="/menu" className="inline-flex items-center gap-1 text-xs font-bold text-[#2B1810] hover:underline">
             <UtensilsCrossed size={14} /> Order more
           </Link>
         </div>
@@ -164,9 +164,9 @@ export default function OrdersPage() {
         <CustomerNotificationStatus />
 
         {orders.length === 0 ? (
-          <div className="rounded-2xl border border-stone-200 bg-white p-10 text-center shadow-2xs">
-            <ChefHat size={32} className="mx-auto text-stone-900" />
-            <p className="mt-3 font-display text-lg font-bold text-stone-900">No orders yet</p>
+          <div className="rounded-2xl border border-[#EFE4D6] bg-[#FFFDF9] p-10 text-center shadow-2xs">
+            <ChefHat size={32} className="mx-auto text-[#2B1810]" />
+            <p className="mt-3 font-display text-lg font-bold text-[#2B1810]">No orders yet</p>
             <p className="mt-1 text-sm text-stone-500">Scan a table QR code or order items from our menu.</p>
             <Link to="/menu" className="btn-primary mt-4 inline-flex rounded-full shadow-2xs">Browse Menu</Link>
           </div>
@@ -174,7 +174,7 @@ export default function OrdersPage() {
           <>
             {diningSessionToken && (
               <div className="flex flex-wrap gap-2">
-                <Link to="/receipt" className="btn-secondary inline-flex items-center justify-center py-2 px-4 text-xs font-bold uppercase tracking-wider rounded-full border border-stone-300">
+                <Link to="/receipt" className="btn-secondary inline-flex items-center justify-center py-2 px-4 text-xs font-bold uppercase tracking-wider rounded-full border border-[#EFE4D6]">
                   View Session Receipt
                 </Link>
                 <button
@@ -194,14 +194,14 @@ export default function OrdersPage() {
               const orderToken = order.accessToken || recentOrders.find(r => r.orderId === order._id)?.accessToken;
 
               return (
-                <article key={order._id} className={`rounded-2xl border border-stone-200 bg-white p-4 shadow-2xs ${order.orderStatus === 'cancelled' ? 'opacity-75' : ''}`}>
+                <article key={order._id} className={`rounded-2xl border border-[#EFE4D6] bg-[#FFFDF9] p-4 shadow-2xs ${order.orderStatus === 'cancelled' ? 'opacity-75' : ''}`}>
                   <div className="flex items-start gap-3">
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 ${order.orderStatus === 'ready' ? 'bg-emerald-100 text-stone-900' : 'bg-stone-900 text-white'}`}>
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#EFE4D6] ${order.orderStatus === 'ready' ? 'bg-emerald-100 text-[#2B1810]' : 'bg-[#7A3316] text-white'}`}>
                       <ChefHat size={18} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="font-bold text-stone-900">{order.orderNumber}</h2>
+                        <h2 className="font-bold text-[#2B1810]">{order.orderNumber}</h2>
                         <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${status.tone}`}>
                           {status.label}
                         </span>
@@ -210,23 +210,23 @@ export default function OrdersPage() {
                         {new Date(order.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} · Table {String(order.tableNumber).padStart(2, '0')}
                       </p>
                     </div>
-                    <span className="price-tag text-sm font-bold text-stone-900">₹{Number(order.total || 0).toFixed(2)}</span>
+                    <span className="price-tag text-sm font-bold text-[#2B1810]">₹{Number(order.total || 0).toFixed(2)}</span>
                   </div>
 
                   <p className={`mt-3 rounded-xl border p-2.5 text-xs font-medium ${status.tone}`}>
                     {cashPending ? 'Cash payment pending verification at counter before preparation can begin.' : status.detail}
                   </p>
 
-                  <div className="mt-3 flex items-center justify-between gap-3 border-t border-stone-200 pt-3 text-xs text-stone-500">
+                  <div className="mt-3 flex items-center justify-between gap-3 border-t border-[#EFE4D6] pt-3 text-xs text-stone-500">
                     <span className="truncate">{order.items?.map((item) => `${item.name} ×${item.quantity}`).join(', ')}</span>
                     <span className="shrink-0 font-medium text-stone-700">{PAYMENT[order.paymentStatus] || order.paymentStatus}</span>
                   </div>
 
                   {orderToken && (
-                    <div className="mt-3 flex items-center justify-end gap-2 border-t border-stone-200 pt-2">
+                    <div className="mt-3 flex items-center justify-end gap-2 border-t border-[#EFE4D6] pt-2">
                       <Link
                         to={`/track/${order._id}?token=${encodeURIComponent(orderToken)}`}
-                        className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-bold text-stone-900 hover:underline focus:outline-none rounded-full"
+                        className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-bold text-[#2B1810] hover:underline focus:outline-none rounded-full"
                       >
                         Track Status
                       </Link>
@@ -234,7 +234,7 @@ export default function OrdersPage() {
                         type="button"
                         onClick={() => downloadReceipt(order._id, orderToken)}
                         disabled={downloadingId === order._id}
-                        className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-medium text-stone-600 hover:text-stone-900 disabled:opacity-50 focus:outline-none rounded-full border border-stone-300"
+                        className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-medium text-stone-600 hover:text-[#2B1810] disabled:opacity-50 focus:outline-none rounded-full border border-[#EFE4D6]"
                         aria-label={`Download receipt for order ${order._id.slice(-6).toUpperCase()}`}
                       >
                         <Download size={14} className="mr-1.5" aria-hidden="true" />
@@ -243,9 +243,9 @@ export default function OrdersPage() {
                     </div>
                   )}
                   {order.orderStatus === 'completed' && order.paymentStatus === 'paid' && (
-                    <div className="mt-3 border-t border-stone-200 pt-3">
+                    <div className="mt-3 border-t border-[#EFE4D6] pt-3">
                       {order.rating?.submittedAt ? (
-                        <p className="text-xs font-medium text-stone-900">You rated this order {order.rating.score}/5{order.rating.comment ? ` — ${order.rating.comment}` : ''}</p>
+                        <p className="text-xs font-medium text-[#2B1810]">You rated this order {order.rating.score}/5{order.rating.comment ? ` — ${order.rating.comment}` : ''}</p>
                       ) : orderToken ? (
                         ratingOrder === order._id ? (
                           <div className="space-y-2">
@@ -276,7 +276,7 @@ export default function OrdersPage() {
                               <button
                                 type="button"
                                 onClick={() => setRatingOrder(null)}
-                                className="btn-secondary min-h-[38px] px-4 py-2 text-xs font-medium rounded-full border border-stone-300"
+                                className="btn-secondary min-h-[38px] px-4 py-2 text-xs font-medium rounded-full border border-[#EFE4D6]"
                               >
                                 Cancel
                               </button>
@@ -286,7 +286,7 @@ export default function OrdersPage() {
                           <button
                             type="button"
                             onClick={() => { setRatingOrder(order._id); setRatingScore(5); }}
-                            className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-semibold text-stone-900 hover:underline focus:outline-none rounded-full"
+                            className="inline-flex min-h-[38px] items-center px-3 py-1.5 text-xs font-semibold text-[#2B1810] hover:underline focus:outline-none rounded-full"
                           >
                             Rate your order
                           </button>

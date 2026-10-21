@@ -77,12 +77,12 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
   return (
     <div
       onClick={isAvailable ? () => onSelect(product) : undefined}
-      className={`group w-[185px] min-w-[185px] sm:w-[210px] sm:min-w-[210px] shrink-0 snap-start rounded-2xl bg-white border border-stone-200 overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all select-none ${
+      className={`group w-[185px] min-w-[185px] sm:w-[210px] sm:min-w-[210px] shrink-0 snap-start rounded-2xl bg-[#FFFDF9] border border-[#EFE4D6] overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all select-none ${
         isAvailable ? 'cursor-pointer' : 'opacity-60 grayscale-[40%] cursor-default'
       }`}
     >
       {/* ─── Top Square Image Section ─── */}
-      <div className="relative w-full aspect-square bg-stone-100 border-b border-stone-100 overflow-hidden rounded-t-2xl">
+      <div className="relative w-full aspect-square bg-[#F3E9DC] border-b border-[#EFE4D6] overflow-hidden rounded-t-2xl">
         {product.image && !imgError ? (
           <img
             src={product.image}
@@ -93,7 +93,7 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-stone-100 text-stone-400">
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[#F3E9DC] text-stone-400">
             <Utensils size={28} strokeWidth={1.5} />
           </div>
         )}
@@ -114,7 +114,7 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
         {/* Sold Out Overlay */}
         {!isAvailable && (
           <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-[1px] flex items-center justify-center">
-            <span className="bg-stone-900 text-white text-[10px] font-sora font-extrabold px-2.5 py-1 uppercase tracking-wider rounded-full border border-white/20">
+            <span className="bg-[#7A3316] text-white text-[10px] font-sora font-extrabold px-2.5 py-1 uppercase tracking-wider rounded-full border border-white/20">
               Sold out
             </span>
           </div>
@@ -124,7 +124,7 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
       {/* ─── Bottom Info on Pure White ─── */}
       <div className="p-3 bg-white flex flex-col justify-between flex-1">
         <div>
-          <h4 className="font-sora font-bold text-xs sm:text-sm text-stone-900 leading-snug line-clamp-1 group-hover:text-[#0F3D2E] transition-colors">
+          <h4 className="font-sora font-bold text-xs sm:text-sm text-[#2B1810] leading-snug line-clamp-1 group-hover:text-[#7A3316] transition-colors">
             {product.name}
           </h4>
           {product.description && (
@@ -134,14 +134,14 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
           )}
         </div>
 
-        <div className="mt-2.5 flex items-center justify-between gap-2 pt-2 border-t border-stone-100">
-          <span className="font-sora font-extrabold text-xs sm:text-sm text-[#0F3D2E]">
+        <div className="mt-2.5 flex items-center justify-between gap-2 pt-2 border-t border-[#EFE4D6]">
+          <span className="font-sora font-extrabold text-xs sm:text-sm text-[#7A3316]">
             {formatMoney(product.price, tenant.currency)}
           </span>
 
           <div onClick={(e) => e.stopPropagation()}>
             {!isAvailable ? null : totalQtyInCart > 0 && !hasCustomizations ? (
-              <div className="inline-flex items-center bg-[#0F3D2E] text-white rounded-full border border-[#0F3D2E] px-1 shadow-2xs">
+              <div className="inline-flex items-center bg-[#7A3316] text-white rounded-full border border-[#7A3316] px-1 shadow-2xs">
                 <button
                   type="button"
                   onClick={handleDecrement}
@@ -167,7 +167,7 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
                 type="button"
                 onClick={() => onSelect(product)}
                 aria-label={`Customize ${product.name}`}
-                className="h-7 px-3 bg-[#0F3D2E] text-[#FFF1C9] font-sora font-extrabold text-[10px] uppercase rounded-full border border-[#0F3D2E] shadow-2xs hover:bg-[#16503D] active:scale-95 transition"
+                className="h-7 px-3 bg-[#7A3316] text-[#F3E9DC] font-sora font-extrabold text-[10px] uppercase rounded-full border border-[#7A3316] shadow-2xs hover:bg-[#5E2610] active:scale-95 transition"
               >
                 <span>{totalQtyInCart} IN</span>
               </button>
@@ -176,7 +176,7 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
                 type="button"
                 onClick={handleQuickAdd}
                 aria-label={`Add ${product.name}`}
-                className="h-7 px-3 bg-white text-[#0F3D2E] font-sora font-extrabold text-[10px] uppercase tracking-wider border border-[#0F3D2E] hover:bg-[#0F3D2E] hover:text-white rounded-full flex items-center gap-1 shadow-2xs active:scale-95 transition"
+                className="h-7 px-3 bg-[#FFFDF9] text-[#7A3316] font-sora font-extrabold text-[10px] uppercase tracking-wider border border-[#7A3316] hover:bg-[#7A3316] hover:text-white rounded-full flex items-center gap-1 shadow-2xs active:scale-95 transition"
               >
                 <span>ADD</span>
                 <Plus size={11} strokeWidth={3} />

@@ -119,7 +119,7 @@ export default function CustomerProductCard({
           className={`absolute top-2 right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all active:scale-90 ${
             isFavorite
               ? 'bg-[#E23B2E] text-white shadow-xs'
-              : 'bg-white/80 text-[#2B1810] hover:bg-white shadow-xs'
+              : 'bg-white/80 text-[#2B1810] hover:bg-[#FFFDF9] shadow-xs'
           }`}
         >
           <Heart size={15} fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={isFavorite ? 2.5 : 2} />
@@ -128,7 +128,7 @@ export default function CustomerProductCard({
         {/* Sold out overlay */}
         {!isAvailable && (
           <div className="absolute inset-0 bg-[#2B1810]/40 backdrop-blur-[1px] flex items-center justify-center">
-            <span className="px-2.5 py-1 rounded-full bg-stone-900/80 text-white text-[10px] font-bold uppercase tracking-wider">
+            <span className="px-2.5 py-1 rounded-full bg-[#7A3316]/80 text-white text-[10px] font-bold uppercase tracking-wider">
               Unavailable
             </span>
           </div>
@@ -162,7 +162,7 @@ export default function CustomerProductCard({
                 type="button"
                 onClick={handleDecrement}
                 aria-label={`Decrease ${product.name} quantity`}
-                className="w-7 h-7 rounded-full bg-white text-[#7A3316] flex items-center justify-center active:scale-90 shadow-2xs"
+                className="w-7 h-7 rounded-full bg-[#FFFDF9] text-[#7A3316] flex items-center justify-center active:scale-90 shadow-2xs"
               >
                 <Minus size={14} strokeWidth={2.5} />
               </button>

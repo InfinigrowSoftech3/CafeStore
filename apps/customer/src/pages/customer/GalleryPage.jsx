@@ -17,7 +17,7 @@ function Stars({ rating, interactive = false, onChange }) {
             key={value}
             type="button"
             onClick={() => onChange(value)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-1 transition hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md p-1 transition hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7A3316]"
             aria-label={`${value} star${value === 1 ? '' : 's'}`}
           >
             <Star size={22} fill={value <= rating ? 'currentColor' : 'none'} className={value <= rating ? 'text-amber-500' : 'text-stone-200'} />
@@ -104,17 +104,17 @@ export default function GalleryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-stone-900">
-      <div className="border-b border-stone-200 bg-white/95 backdrop-blur-md px-4 py-3 sm:px-6">
+    <div className="min-h-screen bg-[#FBF6EF] text-[#2B1810]">
+      <div className="border-b border-[#EFE4D6] bg-[#FFFDF9]/95 backdrop-blur-md px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <Link
             to="/menu"
-            className="inline-flex min-h-[38px] items-center gap-2 text-sm font-semibold text-stone-700 transition hover:text-stone-900"
+            className="inline-flex min-h-[38px] items-center gap-2 text-sm font-semibold text-stone-700 transition hover:text-[#2B1810]"
           >
             <ArrowLeft size={16} />
             <span>Back to menu</span>
           </Link>
-          <span className="text-xs uppercase tracking-widest text-stone-900 font-bold">
+          <span className="text-xs uppercase tracking-widest text-[#2B1810] font-bold">
             Guest Wall
           </span>
         </div>
@@ -123,17 +123,17 @@ export default function GalleryPage() {
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <section className="grid items-end gap-8 lg:grid-cols-[1fr_0.8fr]">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0F3D2E]">{tenant.name} community</p>
-            <h1 className="mt-3 max-w-2xl font-display text-4xl font-bold leading-[1.05] text-stone-900 sm:text-5xl lg:text-6xl">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#7A3316]">{tenant.name} community</p>
+            <h1 className="mt-3 max-w-2xl font-display text-4xl font-bold leading-[1.05] text-[#2B1810] sm:text-5xl lg:text-6xl">
               Good food looks better together.
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-stone-600">
               See the dishes, beverages, and warm moments our guests have shared. Add yours to the wall.
             </p>
           </div>
-          <div className="rounded-3xl bg-[#0F3D2E] p-6 text-white shadow-2xs sm:p-8">
+          <div className="rounded-3xl bg-[#7A3316] p-6 text-white shadow-2xs sm:p-8">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-stone-100 text-[#0F3D2E]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F3E9DC] text-[#7A3316]">
                 <Camera size={21} />
               </div>
               <div>
@@ -147,18 +147,18 @@ export default function GalleryPage() {
         <section className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {loading ? (
             <div className="col-span-full flex min-h-56 items-center justify-center text-stone-400">
-              <Loader2 size={28} className="animate-spin text-stone-900" />
+              <Loader2 size={28} className="animate-spin text-[#2B1810]" />
             </div>
           ) : items.length === 0 ? (
-            <div className="col-span-full rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-16 text-center shadow-2xs">
-              <ImagePlus className="mx-auto text-stone-900" size={32} />
-              <h2 className="mt-4 font-display text-2xl font-bold text-stone-900">Be the first on the wall</h2>
+            <div className="col-span-full rounded-2xl border border-dashed border-[#EFE4D6] bg-[#FFFDF9] px-6 py-16 text-center shadow-2xs">
+              <ImagePlus className="mx-auto text-[#2B1810]" size={32} />
+              <h2 className="mt-4 font-display text-2xl font-bold text-[#2B1810]">Be the first on the wall</h2>
               <p className="mt-2 text-sm text-stone-500">Share your {tenant.name} moment below.</p>
             </div>
           ) : (
             items.map((item) => (
-              <article key={item._id} className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xs transition hover:border-stone-400">
-                <div className="aspect-[4/3] overflow-hidden bg-stone-100">
+              <article key={item._id} className="group overflow-hidden rounded-2xl border border-[#EFE4D6] bg-[#FFFDF9] shadow-2xs transition hover:border-stone-400">
+                <div className="aspect-[4/3] overflow-hidden bg-[#F3E9DC]">
                   <img
                     src={item.imageUrl}
                     alt={`${tenant.name} moment shared by ${item.customerName}`}
@@ -182,10 +182,10 @@ export default function GalleryPage() {
           )}
         </section>
 
-        <section className="mt-14 grid gap-8 rounded-3xl border border-stone-200 bg-white p-6 shadow-2xs sm:p-8 lg:grid-cols-[0.85fr_1.15fr] lg:p-10">
+        <section className="mt-14 grid gap-8 rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] p-6 shadow-2xs sm:p-8 lg:grid-cols-[0.85fr_1.15fr] lg:p-10">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#0F3D2E]">Leave a little love</p>
-            <h2 className="mt-3 font-display text-4xl font-bold text-stone-900">Add your moment</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#7A3316]">Leave a little love</p>
+            <h2 className="mt-3 font-display text-4xl font-bold text-[#2B1810]">Add your moment</h2>
             <p className="mt-4 text-sm leading-7 text-stone-600">
               Tell the next guest what you ordered, who you came with, or what made you stay a little longer.
             </p>
@@ -193,7 +193,7 @@ export default function GalleryPage() {
 
           <form onSubmit={submitReview} className="space-y-5">
             <div className="grid gap-5 sm:grid-cols-2">
-              <label className="text-sm font-semibold text-stone-800">
+              <label className="text-sm font-semibold text-[#2B1810]">
                 Your name *
                 <input
                   required
@@ -206,14 +206,14 @@ export default function GalleryPage() {
                 />
               </label>
               <div>
-                <div className="text-sm font-semibold text-stone-800">Your rating</div>
+                <div className="text-sm font-semibold text-[#2B1810]">Your rating</div>
                 <div className="mt-2">
                   <Stars rating={form.rating} interactive onChange={(rating) => setForm({ ...form, rating })} />
                 </div>
               </div>
             </div>
 
-            <label className="block text-sm font-semibold text-stone-800">
+            <label className="block text-sm font-semibold text-[#2B1810]">
               Your review *
               <textarea
                 required
@@ -227,23 +227,23 @@ export default function GalleryPage() {
             </label>
 
             <div>
-              <div className="text-sm font-semibold text-stone-800">Your photo (optional)</div>
+              <div className="text-sm font-semibold text-[#2B1810]">Your photo (optional)</div>
               {preview ? (
-                <div className="relative mt-2 overflow-hidden rounded-2xl border border-stone-200 bg-stone-50">
+                <div className="relative mt-2 overflow-hidden rounded-2xl border border-[#EFE4D6] bg-[#FBF6EF]">
                   <img src={preview} alt="Selected preview" width={400} height={200} className="h-48 w-full object-cover" />
                   <button
                     type="button"
                     onClick={() => { setPhoto(null); setPreview(''); }}
-                    className="absolute right-3 top-3 inline-flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full bg-stone-900/90 text-white hover:bg-stone-900 transition"
+                    className="absolute right-3 top-3 inline-flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full bg-[#7A3316]/90 text-white hover:bg-[#7A3316] transition"
                     aria-label="Remove selected photo"
                   >
                     <X size={18} />
                   </button>
                 </div>
               ) : (
-                <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-8 text-center transition hover:border-stone-900 hover:bg-stone-100">
-                  <ImagePlus className="text-stone-900" size={26} />
-                  <span className="mt-2 text-sm font-semibold text-stone-800">Choose a photo</span>
+                <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#EFE4D6] bg-[#FBF6EF] px-4 py-8 text-center transition hover:border-stone-900 hover:bg-[#F3E9DC]">
+                  <ImagePlus className="text-[#2B1810]" size={26} />
+                  <span className="mt-2 text-sm font-semibold text-[#2B1810]">Choose a photo</span>
                   <span className="mt-1 text-xs text-stone-400">JPG, PNG, or WEBP up to 5MB</span>
                   <input type="file" accept="image/jpeg,image/png,image/webp" onChange={choosePhoto} className="sr-only" />
                 </label>

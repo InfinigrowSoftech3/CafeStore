@@ -118,14 +118,14 @@ export default function WebPushPrompt() {
           role="dialog"
           aria-live="polite"
           aria-label="Stay updated with website notifications"
-          className="fixed bottom-20 sm:bottom-6 left-4 right-4 sm:left-auto sm:w-80 z-40 rounded-2xl border border-stone-200 bg-white/95 p-4 shadow-lg backdrop-blur"
+          className="fixed bottom-20 sm:bottom-6 left-4 right-4 sm:left-auto sm:w-80 z-40 rounded-2xl border border-[#EFE4D6] bg-[#FFFDF9]/95 p-4 shadow-lg backdrop-blur"
         >
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FFF1C9] text-[#0F3D2E]" aria-hidden="true">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F3E9DC] text-[#7A3316]" aria-hidden="true">
               <Bell size={17} />
             </div>
             <div className="min-w-0">
-              <p className="font-display text-sm font-semibold text-stone-900">Stay updated</p>
+              <p className="font-display text-sm font-semibold text-[#2B1810]">Stay updated</p>
               <p className="mt-0.5 text-xs leading-relaxed text-stone-500">
                 Get important updates and offers directly from our website.
               </p>

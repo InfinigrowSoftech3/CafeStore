@@ -13,10 +13,10 @@ import usePageMeta from '../../hooks/usePageMeta';
 
 const STATUS_CONFIG = {
   pending:   { label: 'Order Received',    color: 'text-amber-800', bg: 'bg-amber-50/80', border: 'border-amber-200', icon: '📋' },
-  confirmed: { label: 'Order Confirmed',   color: 'text-[#0F3D2E]', bg: 'bg-emerald-50/80', border: 'border-emerald-200', icon: '✅' },
-  preparing: { label: 'Being Prepared',    color: 'text-[#0F3D2E]', bg: 'bg-[#FFF1C9]/60', border: 'border-amber-200', icon: '👨‍🍳' },
+  confirmed: { label: 'Order Confirmed',   color: 'text-[#7A3316]', bg: 'bg-emerald-50/80', border: 'border-emerald-200', icon: '✅' },
+  preparing: { label: 'Being Prepared',    color: 'text-[#7A3316]', bg: 'bg-[#F3E9DC]/60', border: 'border-amber-200', icon: '👨‍🍳' },
   ready:     { label: 'Ready to Serve!',   color: 'text-emerald-800',  bg: 'bg-emerald-50/80',  border: 'border-emerald-200',  icon: '🔔' },
-  completed: { label: 'Served & Enjoyed',  color: 'text-stone-800',   bg: 'bg-stone-100',   border: 'border-stone-200',   icon: '🎉' },
+  completed: { label: 'Served & Enjoyed',  color: 'text-[#2B1810]',   bg: 'bg-[#F3E9DC]',   border: 'border-[#EFE4D6]',   icon: '🎉' },
 };
 
 export default function OrderConfirmPage() {
@@ -67,20 +67,20 @@ export default function OrderConfirmPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-12 h-12 border-2 border-[#0F3D2E] border-t-transparent animate-spin mb-3" />
-        <p className="font-display text-lg font-bold text-[#0F3D2E]">Retrieving order details...</p>
+      <div className="min-h-screen bg-[#FBF6EF] flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-12 h-12 border-2 border-[#7A3316] border-t-transparent animate-spin mb-3" />
+        <p className="font-display text-lg font-bold text-[#7A3316]">Retrieving order details...</p>
       </div>
     );
   }
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4 p-8 text-center max-w-md mx-auto">
-        <div className="w-20 h-20 rounded-2xl border border-stone-200 bg-stone-50 flex items-center justify-center text-4xl mb-2">
+      <div className="min-h-screen bg-[#FBF6EF] flex flex-col items-center justify-center gap-4 p-8 text-center max-w-md mx-auto">
+        <div className="w-20 h-20 rounded-2xl border border-[#EFE4D6] bg-[#FBF6EF] flex items-center justify-center text-4xl mb-2">
           ❓
         </div>
-        <h1 className="font-display text-2xl font-bold text-[#0F3D2E]">Order not found</h1>
+        <h1 className="font-display text-2xl font-bold text-[#7A3316]">Order not found</h1>
         <p className="text-stone-500 text-sm">
           We could not locate this order. Please verify your order link or return to the menu.
         </p>
@@ -94,14 +94,14 @@ export default function OrderConfirmPage() {
   const status = STATUS_CONFIG[order.orderStatus] || STATUS_CONFIG.pending;
 
   return (
-    <div className="min-h-screen bg-white pb-16">
+    <div className="min-h-screen bg-[#FBF6EF] pb-16">
       {/* Celebration Header */}
-      <div className="relative bg-white border-b border-stone-200 px-6 py-10 sm:py-12 text-center overflow-hidden">
+      <div className="relative bg-[#FFFDF9] border-b border-[#EFE4D6] px-6 py-10 sm:py-12 text-center overflow-hidden">
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', damping: 14, stiffness: 300 }}
-          className="relative z-10 w-20 h-20 rounded-full bg-[#0F3D2E] flex items-center justify-center mx-auto mb-4 shadow-xl shadow-[#0F3D2E]/20 text-white"
+          className="relative z-10 w-20 h-20 rounded-full bg-[#7A3316] flex items-center justify-center mx-auto mb-4 shadow-xl shadow-[#7A3316]/20 text-white"
         >
           <CheckCircle2 size={42} strokeWidth={2.4} />
         </motion.div>
@@ -112,11 +112,11 @@ export default function OrderConfirmPage() {
           transition={{ delay: 0.15 }}
           className="relative z-10 max-w-lg mx-auto"
         >
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF1C9] px-3.5 py-1 text-xs font-bold text-[#0F3D2E] border border-amber-300 mb-2.5">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#F3E9DC] px-3.5 py-1 text-xs font-bold text-[#7A3316] border border-amber-300 mb-2.5">
             <Sparkles size={13} />
             <span>{order.paymentStatus === 'paid' ? 'Payment Verified' : 'Order Placed'}</span>
           </div>
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#0F3D2E] tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#7A3316] tracking-tight">
             Order #{order.orderNumber} Confirmed!
           </h1>
           <p className="text-stone-600 text-xs sm:text-sm mt-2 leading-relaxed">
@@ -132,7 +132,7 @@ export default function OrderConfirmPage() {
       {/* Main Container */}
       <div className="mx-auto max-w-3xl p-4 sm:p-6 space-y-4">
         {/* Order Metadata Pills Card */}
-        <div className="card p-4 sm:p-5 bg-white border border-stone-200 rounded-2xl shadow-2xs">
+        <div className="card p-4 sm:p-5 bg-[#FFFDF9] border border-[#EFE4D6] rounded-2xl shadow-2xs">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: 'Order #', value: order.orderNumber },
@@ -140,9 +140,9 @@ export default function OrderConfirmPage() {
               { label: 'Payment', value: order.paymentMethod === 'razorpay' ? 'Online' : 'Cash at Counter' },
               { label: 'Total Paid', value: formatMoney(order.total, order.currency || tenant.currency) },
             ].map(row => (
-              <div key={row.label} className="bg-stone-50 rounded-xl p-3 border border-stone-200">
+              <div key={row.label} className="bg-[#FBF6EF] rounded-xl p-3 border border-[#EFE4D6]">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">{row.label}</p>
-                <p className="font-display font-bold text-[#0F3D2E] text-sm sm:text-base mt-0.5">{row.value}</p>
+                <p className="font-display font-bold text-[#7A3316] text-sm sm:text-base mt-0.5">{row.value}</p>
               </div>
             ))}
           </div>
@@ -172,7 +172,7 @@ export default function OrderConfirmPage() {
               return (
                 <div key={s} className="flex-1 flex items-center">
                   <div className={`flex-1 h-2 rounded-full transition-all duration-500 ${
-                    done ? 'bg-[#0F3D2E]' : 'bg-stone-200'
+                    done ? 'bg-[#7A3316]' : 'bg-stone-200'
                   }`} />
                 </div>
               );
@@ -184,7 +184,7 @@ export default function OrderConfirmPage() {
               const isCurrent = i === currentIdx;
               return (
                 <span key={label} className={`text-[10px] uppercase tracking-wider flex-1 text-center font-bold ${
-                  isCurrent ? 'text-[#0F3D2E]' : 'text-stone-400'
+                  isCurrent ? 'text-[#7A3316]' : 'text-stone-400'
                 }`}>
                   {label}
                 </span>
@@ -201,9 +201,9 @@ export default function OrderConfirmPage() {
         />
 
         {/* Itemized Order Breakdown */}
-        <div className="card p-5 bg-white border border-stone-200 rounded-2xl space-y-3.5 shadow-2xs">
-          <div className="flex items-center justify-between border-b border-stone-100 pb-3">
-            <h2 className="font-display text-base font-bold text-[#0F3D2E]">
+        <div className="card p-5 bg-[#FFFDF9] border border-[#EFE4D6] rounded-2xl space-y-3.5 shadow-2xs">
+          <div className="flex items-center justify-between border-b border-[#EFE4D6] pb-3">
+            <h2 className="font-display text-base font-bold text-[#7A3316]">
               Ordered Items
             </h2>
             <span className="text-xs font-semibold text-stone-500">
@@ -215,7 +215,7 @@ export default function OrderConfirmPage() {
             {safeItems.map((item, i) => (
               <div key={i} className="flex justify-between items-baseline text-xs sm:text-sm">
                 <div className="flex-1 pr-3">
-                  <p className="font-semibold text-stone-900">
+                  <p className="font-semibold text-[#2B1810]">
                     {item.name} <span className="text-stone-400 font-normal">× {item.quantity}</span>
                   </p>
                   {item.addons?.length > 0 && (
@@ -224,14 +224,14 @@ export default function OrderConfirmPage() {
                     </p>
                   )}
                 </div>
-                <span className="price-tag text-xs sm:text-sm font-bold text-stone-900 flex-shrink-0">
+                <span className="price-tag text-xs sm:text-sm font-bold text-[#2B1810] flex-shrink-0">
                   {formatMoney(item.itemTotal, order.currency || tenant.currency)}
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="border-t border-stone-100 pt-3 space-y-1.5 text-xs">
+          <div className="border-t border-[#EFE4D6] pt-3 space-y-1.5 text-xs">
             <div className="flex justify-between text-stone-600">
               <span>Subtotal</span>
               <span className="price-tag text-xs">{formatMoney(order.subtotal, order.currency || tenant.currency)}</span>
@@ -240,9 +240,9 @@ export default function OrderConfirmPage() {
               <span>GST ({order.taxRate ?? tenant.taxRate}%)</span>
               <span className="price-tag text-xs">{formatMoney(order.tax, order.currency || tenant.currency)}</span>
             </div>
-            <div className="flex justify-between border-t border-dashed border-stone-200 pt-2 text-base font-bold text-[#0F3D2E]">
+            <div className="flex justify-between border-t border-dashed border-[#EFE4D6] pt-2 text-base font-bold text-[#7A3316]">
               <span>Grand Total</span>
-              <span className="price-tag text-lg text-[#0F3D2E] font-bold">{formatMoney(order.total, order.currency || tenant.currency)}</span>
+              <span className="price-tag text-lg text-[#7A3316] font-bold">{formatMoney(order.total, order.currency || tenant.currency)}</span>
             </div>
           </div>
         </div>
@@ -259,7 +259,7 @@ export default function OrderConfirmPage() {
 
           <Link
             to={`/track/${orderId}?token=${encodeURIComponent(accessToken)}`}
-            className="min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider rounded-full bg-[#FFF1C9] hover:bg-[#fde68a] text-[#0F3D2E] border border-amber-300 transition-colors shadow-2xs"
+            className="min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider rounded-full bg-[#F3E9DC] hover:bg-[#fde68a] text-[#7A3316] border border-amber-300 transition-colors shadow-2xs"
           >
             <Clock size={16} />
             <span>Track Kitchen Live</span>

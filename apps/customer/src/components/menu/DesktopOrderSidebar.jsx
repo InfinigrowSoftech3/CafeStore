@@ -18,16 +18,16 @@ export default function DesktopOrderSidebar({ onOpenScanner, isKitchenOpen = tru
   return (
     <aside
       aria-label="Your Order"
-      className="sticky top-6 w-full rounded-3xl bg-white border border-stone-200 p-5 shadow-xs flex flex-col"
+      className="sticky top-6 w-full rounded-3xl bg-[#FFFDF9] border border-[#EFE4D6] p-5 shadow-xs flex flex-col"
     >
       {/* ─── Panel Header ─────────────────────────────────────────── */}
-      <div className="flex items-center justify-between pb-3.5 border-b border-stone-200">
+      <div className="flex items-center justify-between pb-3.5 border-b border-[#EFE4D6]">
         <div className="flex items-center gap-2">
-          <h2 className="font-sora font-extrabold text-xl text-[#0F3D2E] tracking-tight">
+          <h2 className="font-sora font-extrabold text-xl text-[#7A3316] tracking-tight">
             Your Order
           </h2>
           {count > 0 && (
-            <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full bg-[#0F3D2E] text-white text-[11px] font-sora font-bold">
+            <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full bg-[#7A3316] text-white text-[11px] font-sora font-bold">
               {count}
             </span>
           )}
@@ -38,7 +38,7 @@ export default function DesktopOrderSidebar({ onOpenScanner, isKitchenOpen = tru
           type="button"
           onClick={onOpenScanner}
           aria-label={tableNumber ? `Current Table ${tableNumber}, click to change` : 'Scan table QR code'}
-          className="inline-flex min-h-[36px] items-center gap-1.5 px-3 py-1 rounded-full bg-white hover:bg-stone-50 border border-stone-300 text-[#0F3D2E] text-xs font-sora font-bold transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+          className="inline-flex min-h-[36px] items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFFDF9] hover:bg-[#FBF6EF] border border-[#EFE4D6] text-[#7A3316] text-xs font-sora font-bold transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7A3316]"
         >
           {tableNumber ? (
             <>
@@ -57,10 +57,10 @@ export default function DesktopOrderSidebar({ onOpenScanner, isKitchenOpen = tru
       {/* ─── Body: Empty State or Cart Items ────────────────────────── */}
       {items.length === 0 ? (
         <div className="py-12 px-4 flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 rounded-2xl bg-stone-50 border border-stone-200 flex items-center justify-center text-[#0F3D2E] mb-3.5 shadow-2xs">
+          <div className="w-16 h-16 rounded-2xl bg-[#FBF6EF] border border-[#EFE4D6] flex items-center justify-center text-[#7A3316] mb-3.5 shadow-2xs">
             <ShoppingBag size={26} strokeWidth={2.2} />
           </div>
-          <h3 className="font-sora font-bold text-base text-[#0F3D2E]">
+          <h3 className="font-sora font-bold text-base text-[#7A3316]">
             Your order is empty
           </h3>
           <p className="text-xs text-stone-500 font-jakarta mt-1 max-w-[220px] leading-relaxed">
@@ -70,13 +70,13 @@ export default function DesktopOrderSidebar({ onOpenScanner, isKitchenOpen = tru
       ) : (
         <>
           {/* Scrollable Items List */}
-          <div className="py-3.5 max-h-[340px] overflow-y-auto space-y-3 pr-1 no-scrollbar divide-y divide-stone-100">
+          <div className="py-3.5 max-h-[340px] overflow-y-auto space-y-3 pr-1 no-scrollbar divide-y divide-[#EFE4D6]">
             {items.map((item) => (
               <div key={item.key} className="pt-3 first:pt-0 flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     <VegMark isVeg={item.isVeg} size={13} />
-                    <span className="font-sora font-bold text-xs sm:text-sm text-stone-900 truncate">
+                    <span className="font-sora font-bold text-xs sm:text-sm text-[#2B1810] truncate">
                       {item.name}
                     </span>
                   </div>
@@ -95,23 +95,23 @@ export default function DesktopOrderSidebar({ onOpenScanner, isKitchenOpen = tru
 
                   {/* Quantity Stepper */}
                   <div className="mt-2 pl-5 flex items-center gap-2">
-                    <div className="inline-flex min-h-[32px] items-center rounded-full bg-white border border-stone-300 text-stone-900 px-1 shadow-2xs">
+                    <div className="inline-flex min-h-[32px] items-center rounded-full bg-[#FFFDF9] border border-[#EFE4D6] text-[#2B1810] px-1 shadow-2xs">
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.key, item.quantity - 1)}
                         aria-label={`Decrease ${item.name} quantity`}
-                        className="w-7 h-7 min-h-[28px] min-w-[28px] flex items-center justify-center rounded-full hover:bg-stone-100 active:scale-95 transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-stone-900"
+                        className="w-7 h-7 min-h-[28px] min-w-[28px] flex items-center justify-center rounded-full hover:bg-[#F3E9DC] active:scale-95 transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#7A3316]"
                       >
                         <Minus size={12} strokeWidth={2.8} />
                       </button>
-                      <span className="min-w-[20px] text-center font-sora text-xs font-bold text-stone-900">
+                      <span className="min-w-[20px] text-center font-sora text-xs font-bold text-[#2B1810]">
                         {item.quantity}
                       </span>
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.key, item.quantity + 1)}
                         aria-label={`Increase ${item.name} quantity`}
-                        className="w-7 h-7 min-h-[28px] min-w-[28px] flex items-center justify-center rounded-full hover:bg-stone-100 active:scale-95 transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-stone-900"
+                        className="w-7 h-7 min-h-[28px] min-w-[28px] flex items-center justify-center rounded-full hover:bg-[#F3E9DC] active:scale-95 transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#7A3316]"
                       >
                         <Plus size={12} strokeWidth={2.8} />
                       </button>
@@ -121,7 +121,7 @@ export default function DesktopOrderSidebar({ onOpenScanner, isKitchenOpen = tru
 
                 {/* Item Total */}
                 <div className="text-right shrink-0 pt-0.5">
-                  <span className="font-sora font-extrabold text-xs sm:text-sm text-stone-900">
+                  <span className="font-sora font-extrabold text-xs sm:text-sm text-[#2B1810]">
                     {formatMoney(item.itemTotal || item.price * item.quantity, tenant.currency)}
                   </span>
                 </div>
@@ -130,24 +130,24 @@ export default function DesktopOrderSidebar({ onOpenScanner, isKitchenOpen = tru
           </div>
 
           {/* ─── Subtotal & Summary ─────────────────────────────────── */}
-          <div className="pt-3.5 border-t border-stone-200 space-y-1.5 text-xs font-jakarta">
+          <div className="pt-3.5 border-t border-[#EFE4D6] space-y-1.5 text-xs font-jakarta">
             <div className="flex items-center justify-between text-stone-600">
               <span>Subtotal</span>
-              <span className="font-semibold text-stone-900">
+              <span className="font-semibold text-[#2B1810]">
                 {formatMoney(subtotal, tenant.currency)}
               </span>
             </div>
             {tax > 0 && (
               <div className="flex items-center justify-between text-stone-600">
                 <span>Taxes & charges ({tenant.taxRate || 5}%)</span>
-                <span className="font-semibold text-stone-900">
+                <span className="font-semibold text-[#2B1810]">
                   {formatMoney(tax, tenant.currency)}
                 </span>
               </div>
             )}
-            <div className="flex items-baseline justify-between pt-2 border-t border-stone-200">
-              <span className="font-sora font-bold text-sm text-stone-900">Total</span>
-              <span className="font-sora font-extrabold text-xl text-stone-900">
+            <div className="flex items-baseline justify-between pt-2 border-t border-[#EFE4D6]">
+              <span className="font-sora font-bold text-sm text-[#2B1810]">Total</span>
+              <span className="font-sora font-extrabold text-xl text-[#2B1810]">
                 {formatMoney(total, tenant.currency)}
               </span>
             </div>
@@ -156,7 +156,7 @@ export default function DesktopOrderSidebar({ onOpenScanner, isKitchenOpen = tru
           {/* ─── Place Order CTA ────────────────────────────────────── */}
           <div className="pt-4">
             {!isKitchenOpen ? (
-              <div className="w-full min-h-[44px] rounded-full bg-stone-100 border border-stone-300 text-stone-400 font-sora font-bold text-xs flex items-center justify-center gap-1.5 cursor-not-allowed">
+              <div className="w-full min-h-[44px] rounded-full bg-[#F3E9DC] border border-[#EFE4D6] text-stone-400 font-sora font-bold text-xs flex items-center justify-center gap-1.5 cursor-not-allowed">
                 <AlertCircle size={14} />
                 <span>Kitchen currently closed</span>
               </div>
@@ -164,7 +164,7 @@ export default function DesktopOrderSidebar({ onOpenScanner, isKitchenOpen = tru
               <Link
                 to="/cart"
                 aria-label={`View order and checkout, total ${formatMoney(total, tenant.currency)}`}
-                className="w-full min-h-[44px] rounded-full bg-[var(--menu-accent,#C93A1C)] text-white font-sora font-extrabold text-sm flex items-center justify-center gap-2 shadow-2xs hover:brightness-105 active:scale-98 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-900"
+                className="w-full min-h-[44px] rounded-full bg-[var(--menu-accent,#7A3316)] text-white font-sora font-extrabold text-sm flex items-center justify-center gap-2 shadow-2xs hover:brightness-105 active:scale-98 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7A3316]"
               >
                 <span>View order & checkout</span>
                 <ArrowRight size={16} strokeWidth={2.4} />

@@ -120,7 +120,7 @@ export function TenantProvider({ children }) {
             : '#7A3316';
         const accentColor =
           rawAccent &&
-          !['#1a0f08', '#0f172a', '#17110c', '#fff1c9'].includes(rawAccent.toLowerCase())
+          !['#1a0f08', '#0f172a', '#17110c', '#F3E9DC'].includes(rawAccent.toLowerCase())
             ? rawAccent
             : '#B5702F';
 

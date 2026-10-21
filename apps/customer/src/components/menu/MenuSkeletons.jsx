@@ -4,16 +4,16 @@ export function PopularSkeleton() {
       {Array.from({ length: 4 }).map((_, i) => (
         <div
           key={i}
-          className="w-[185px] min-w-[185px] sm:w-[210px] sm:min-w-[210px] shrink-0 rounded-2xl bg-white border border-stone-200 animate-pulse overflow-hidden flex flex-col justify-between shadow-2xs"
+          className="w-[185px] min-w-[185px] sm:w-[210px] sm:min-w-[210px] shrink-0 rounded-2xl bg-[#FFFDF9] border border-[#EFE4D6] animate-pulse overflow-hidden flex flex-col justify-between shadow-2xs"
         >
-          <div className="w-full aspect-square bg-stone-100 border-b border-stone-100 relative rounded-t-2xl">
+          <div className="w-full aspect-square bg-[#F3E9DC] border-b border-[#EFE4D6] relative rounded-t-2xl">
             <div className="absolute top-2.5 left-2.5 w-4 h-4 rounded-md bg-stone-200" />
             <div className="absolute top-2.5 right-2.5 w-12 h-4 rounded-full bg-stone-200" />
           </div>
           <div className="p-3 space-y-2">
             <div className="h-4 bg-stone-200 rounded-full w-3/4" />
             <div className="h-3.5 bg-stone-200 rounded-full w-1/3" />
-            <div className="h-3 bg-stone-100 rounded-full w-full" />
+            <div className="h-3 bg-[#F3E9DC] rounded-full w-full" />
           </div>
         </div>
       ))}
@@ -27,9 +27,9 @@ export function RowSkeleton() {
       {Array.from({ length: 3 }).map((_, i) => (
         <div
           key={i}
-          className="bg-white border border-stone-200 rounded-2xl overflow-hidden animate-pulse shadow-2xs"
+          className="bg-[#FFFDF9] border border-[#EFE4D6] rounded-2xl overflow-hidden animate-pulse shadow-2xs"
         >
-          <div className="w-full h-44 sm:h-52 md:h-64 bg-stone-100 border-b border-stone-100 rounded-t-2xl" />
+          <div className="w-full h-44 sm:h-52 md:h-64 bg-[#F3E9DC] border-b border-[#EFE4D6] rounded-t-2xl" />
           <div className="p-3.5 sm:p-4 space-y-3">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-stone-200 rounded-md" />
@@ -40,7 +40,7 @@ export function RowSkeleton() {
               <div className="flex-1 space-y-2">
                 <div className="h-5 bg-stone-200 rounded-full w-1/3" />
                 <div className="h-4 bg-stone-200 rounded-full w-1/5" />
-                <div className="h-3.5 bg-stone-100 rounded-full w-4/5" />
+                <div className="h-3.5 bg-[#F3E9DC] rounded-full w-4/5" />
               </div>
               <div className="w-20 h-9 bg-stone-200 rounded-full shrink-0" />
             </div>

@@ -89,16 +89,16 @@ export default function ReceiptPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <Loader2 className="animate-spin text-[#0F3D2E]" size={32} />
+      <div className="flex min-h-screen items-center justify-center bg-[#FBF6EF]">
+        <Loader2 className="animate-spin text-[#7A3316]" size={32} />
       </div>
     );
   }
 
   if (!receipt) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-white p-8 text-center">
-        <p className="font-display text-2xl font-bold text-[#0F3D2E]">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#FBF6EF] p-8 text-center">
+        <p className="font-display text-2xl font-bold text-[#7A3316]">
           Order receipt not found.
         </p>
         <p className="text-sm text-stone-600 max-w-sm">
@@ -112,11 +112,11 @@ export default function ReceiptPage() {
   }
 
   return (
-    <div className="receipt-page min-h-screen bg-white px-3 py-6 sm:px-6 sm:py-8">
+    <div className="receipt-page min-h-screen bg-[#FBF6EF] px-3 py-6 sm:px-6 sm:py-8">
       <div className="receipt-actions mx-auto mb-5 flex max-w-md flex-wrap items-center justify-between gap-2.5">
         <Link
           to="/orders"
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 transition shadow-2xs"
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-[#FBF6EF] transition shadow-2xs"
         >
           <ArrowLeft size={16} />
           <span>My Orders</span>
@@ -125,7 +125,7 @@ export default function ReceiptPage() {
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-stone-300 bg-white px-3.5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 transition shadow-2xs"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] px-3.5 py-2 text-sm font-semibold text-stone-700 hover:bg-[#FBF6EF] transition shadow-2xs"
           >
             <Printer size={16} />
             <span>Print</span>
@@ -134,7 +134,7 @@ export default function ReceiptPage() {
             type="button"
             onClick={handleDownload}
             disabled={downloading}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0F3D2E] px-4 py-2 text-sm font-bold text-white disabled:opacity-60 hover:bg-[#16503D] transition shadow-2xs"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#7A3316] px-4 py-2 text-sm font-bold text-white disabled:opacity-60 hover:bg-[#5E2610] transition shadow-2xs"
           >
             <Download size={16} />
             <span>{downloading ? 'Preparing...' : 'Download'}</span>
@@ -142,7 +142,7 @@ export default function ReceiptPage() {
           <button
             type="button"
             onClick={shareReceipt}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-stone-300 bg-white px-3.5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 transition shadow-2xs"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] px-3.5 py-2 text-sm font-semibold text-stone-700 hover:bg-[#FBF6EF] transition shadow-2xs"
           >
             <Share2 size={16} />
             <span>Share</span>
@@ -150,9 +150,9 @@ export default function ReceiptPage() {
         </div>
       </div>
 
-      <article className="receipt-sheet mx-auto max-w-md bg-white border border-stone-200 px-5 py-7 shadow-sm rounded-3xl sm:px-7 sm:py-8">
-        <header className="border-b border-stone-200 pb-6 text-center">
-          <p className="font-display text-3xl font-bold tracking-[0.08em] text-[#0F3D2E]">
+      <article className="receipt-sheet mx-auto max-w-md bg-[#FFFDF9] border border-[#EFE4D6] px-5 py-7 shadow-sm rounded-3xl sm:px-7 sm:py-8">
+        <header className="border-b border-[#EFE4D6] pb-6 text-center">
+          <p className="font-display text-3xl font-bold tracking-[0.08em] text-[#7A3316]">
             {receipt.tenant?.name || 'Café'}
           </p>
           <p className="mt-1 text-xs font-bold tracking-[0.2em] text-stone-400 uppercase">
@@ -162,19 +162,19 @@ export default function ReceiptPage() {
             {receipt.tenant?.address && <p>{receipt.tenant.address}</p>}
             <div className="flex flex-wrap items-center justify-center gap-2">
               {receipt.tenant?.contactPhone && (
-                <a href={formatInternationalTel(receipt.tenant.contactPhone)} className="text-[#0F3D2E] font-medium hover:underline">
+                <a href={formatInternationalTel(receipt.tenant.contactPhone)} className="text-[#7A3316] font-medium hover:underline">
                   {receipt.tenant.contactPhone}
                 </a>
               )}
               {receipt.tenant?.gstNumber && <span>· GSTIN: {receipt.tenant.gstNumber}</span>}
             </div>
           </div>
-          <p className="mt-5 font-mono text-sm font-bold text-stone-800 bg-stone-100 py-1 rounded-full inline-block px-3.5 border border-stone-200">
+          <p className="mt-5 font-mono text-sm font-bold text-[#2B1810] bg-[#F3E9DC] py-1 rounded-full inline-block px-3.5 border border-[#EFE4D6]">
             {receipt.receiptNumber}
           </p>
         </header>
 
-        <section className="grid gap-4 border-b border-stone-200 py-6 text-sm sm:grid-cols-2">
+        <section className="grid gap-4 border-b border-[#EFE4D6] py-6 text-sm sm:grid-cols-2">
           <div className="space-y-2">
             <Info label="Order" value={receipt.orderNumbers.join(', ')} />
             <Info label="Table" value={String(receipt.tableNumber || '-').padStart(2, '0')} />
@@ -189,42 +189,42 @@ export default function ReceiptPage() {
         </section>
 
         <section className="py-6 overflow-x-auto">
-          <div className="grid grid-cols-[1fr_2.5rem_5rem] border-b border-stone-200 pb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-stone-400">
+          <div className="grid grid-cols-[1fr_2.5rem_5rem] border-b border-[#EFE4D6] pb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-stone-400">
             <span>Item</span>
             <span className="text-center">Qty</span>
             <span className="text-right">Amount</span>
           </div>
-          <div className="divide-y divide-stone-100">
+          <div className="divide-y divide-[#EFE4D6]">
             {receipt.items.map((item, index) => (
               <div key={`${item.orderNumber}-${item.name}-${index}`} className="grid grid-cols-[1fr_2.5rem_5rem] gap-2 py-3 text-sm">
                 <div>
-                  <p className="font-semibold text-stone-900">{item.name}</p>
+                  <p className="font-semibold text-[#2B1810]">{item.name}</p>
                   {item.variant && <p className="mt-0.5 text-xs text-stone-500">+ Size: {item.variant.name}</p>}
                   {item.addons?.map((addon) => <p key={addon.name} className="text-xs text-stone-500">+ Add-on: {addon.name}</p>)}
                   {item.specialInstructions && <p className="text-xs italic text-stone-400">Note: {item.specialInstructions}</p>}
                 </div>
                 <span className="text-center text-stone-600 font-medium">{item.quantity}</span>
-                <span className="text-right font-bold text-stone-900">{money(item.itemTotal, receipt.tenant?.currency)}</span>
+                <span className="text-right font-bold text-[#2B1810]">{money(item.itemTotal, receipt.tenant?.currency)}</span>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="ml-auto max-w-sm border-t border-stone-200 pt-4 text-sm">
+        <section className="ml-auto max-w-sm border-t border-[#EFE4D6] pt-4 text-sm">
           <SummaryRow label="Subtotal" value={receipt.subtotal} currency={receipt.tenant?.currency} />
           {receipt.discount > 0 && <SummaryRow label="Discount" value={-receipt.discount} currency={receipt.tenant?.currency} />}
           <SummaryRow label="Taxable amount" value={receipt.taxableAmount} currency={receipt.tenant?.currency} />
           {receipt.taxRows.map((tax) => <SummaryRow key={tax.label} label={tax.label} value={tax.amount} currency={receipt.tenant?.currency} />)}
-          <div className="mt-3 flex items-center justify-between border-t-2 border-[#0F3D2E] pt-3 text-lg font-bold text-[#0F3D2E]">
+          <div className="mt-3 flex items-center justify-between border-t-2 border-[#7A3316] pt-3 text-lg font-bold text-[#7A3316]">
             <span>Total amount</span>
             <span>{money(receipt.grandTotal, receipt.tenant?.currency)}</span>
           </div>
         </section>
 
-        <section className="mt-7 grid gap-4 border-y border-stone-200 py-5 sm:grid-cols-2">
+        <section className="mt-7 grid gap-4 border-y border-[#EFE4D6] py-5 sm:grid-cols-2">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-stone-400">Payment method</p>
-            <p className="mt-1 font-semibold text-stone-900">{receipt.paymentMethod}</p>
+            <p className="mt-1 font-semibold text-[#2B1810]">{receipt.paymentMethod}</p>
           </div>
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-stone-400">Payment status</p>
@@ -247,13 +247,13 @@ export default function ReceiptPage() {
           </div>
         )}
 
-        <footer className="mt-8 border-t border-stone-200 pt-6 text-center">
-          <p className="font-display text-lg font-bold text-[#0F3D2E]">
+        <footer className="mt-8 border-t border-[#EFE4D6] pt-6 text-center">
+          <p className="font-display text-lg font-bold text-[#7A3316]">
             Thank you for visiting {receipt.tenant?.name || 'our café'}!
           </p>
           <p className="mt-1 text-sm text-stone-500">Please visit again. Have a wonderful day!</p>
           {receipt.tenant?.contactEmail && (
-            <a href={`mailto:${receipt.tenant.contactEmail}`} className="mt-3 inline-block text-xs text-[#0F3D2E] font-medium hover:underline">
+            <a href={`mailto:${receipt.tenant.contactEmail}`} className="mt-3 inline-block text-xs text-[#7A3316] font-medium hover:underline">
               {receipt.tenant.contactEmail}
             </a>
           )}
@@ -267,7 +267,7 @@ function Info({ label, value }) {
   return (
     <div className="flex justify-between gap-4">
       <span className="text-stone-500">{label}</span>
-      <span className="text-right font-semibold text-stone-900">{value}</span>
+      <span className="text-right font-semibold text-[#2B1810]">{value}</span>
     </div>
   );
 }
@@ -276,7 +276,7 @@ function SummaryRow({ label, value, currency }) {
   return (
     <div className="flex justify-between gap-6 py-1 text-stone-600">
       <span>{label}</span>
-      <span className="font-semibold text-stone-900">{money(value, currency)}</span>
+      <span className="font-semibold text-[#2B1810]">{money(value, currency)}</span>
     </div>
   );
 }

@@ -84,16 +84,16 @@ export default function OtpLoginModal({ isOpen, onClose, onLogin }) {
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
         >
-          <div className="w-full max-w-md rounded-[26px] bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-md rounded-[26px] bg-[#FFFDF9] p-6 shadow-2xl">
             <div className="mb-6 flex items-center justify-between">
-              <h2 className="font-display text-2xl font-bold text-stone-900">
+              <h2 className="font-display text-2xl font-bold text-[#2B1810]">
                 {step === 'phone' ? 'Login with Phone' : 'Enter OTP'}
               </h2>
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close login modal"
-                className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-stone-200 text-stone-500 hover:bg-stone-100 hover:text-stone-900 transition-colors"
+                className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[#EFE4D6] text-stone-500 hover:bg-[#F3E9DC] hover:text-[#2B1810] transition-colors"
               >
                 <X size={20} />
               </button>
@@ -132,7 +132,7 @@ export default function OtpLoginModal({ isOpen, onClose, onLogin }) {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                         placeholder="Enter 10-digit mobile number"
-                        className="w-full rounded-2xl border border-stone-200 bg-stone-50/70 pl-11 pr-4 py-3 text-base text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-[#0F3D2E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                        className="w-full rounded-2xl border border-[#EFE4D6] bg-[#FBF6EF]/70 pl-11 pr-4 py-3 text-base text-[#2B1810] outline-none transition placeholder:text-stone-400 focus:border-[#7A3316] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#7A3316]/20"
                         inputMode="numeric"
                         maxLength={10}
                       />
@@ -142,7 +142,7 @@ export default function OtpLoginModal({ isOpen, onClose, onLogin }) {
                   <button
                     type="submit"
                     disabled={loading || phone.length !== 10}
-                    className="w-full min-h-[48px] flex items-center justify-center gap-2 rounded-2xl bg-[#0F3D2E] hover:bg-[#16503D] text-white px-4 py-3 font-semibold text-sm disabled:opacity-60 disabled:cursor-not-allowed shadow-xs transition"
+                    className="w-full min-h-[48px] flex items-center justify-center gap-2 rounded-2xl bg-[#7A3316] hover:bg-[#5E2610] text-white px-4 py-3 font-semibold text-sm disabled:opacity-60 disabled:cursor-not-allowed shadow-xs transition"
                   >
                     {loading ? (
                       <>
@@ -168,7 +168,7 @@ export default function OtpLoginModal({ isOpen, onClose, onLogin }) {
                 >
                   <div className="text-center">
                     <p className="text-sm text-stone-600 mb-1">We sent a 6-digit code to</p>
-                    <p className="font-semibold text-stone-900">+91 {phone.slice(0,5)} {phone.slice(5)}</p>
+                    <p className="font-semibold text-[#2B1810]">+91 {phone.slice(0,5)} {phone.slice(5)}</p>
                   </div>
 
                   <div>
@@ -182,7 +182,7 @@ export default function OtpLoginModal({ isOpen, onClose, onLogin }) {
                       value={otp}
                       onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                       placeholder="000000"
-                      className="w-full text-center tracking-[0.5em] font-mono text-2xl font-bold rounded-2xl border border-stone-200 bg-stone-50/70 py-3 text-stone-900 focus:border-[#0F3D2E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0F3D2E]/10"
+                      className="w-full text-center tracking-[0.5em] font-mono text-2xl font-bold rounded-2xl border border-[#EFE4D6] bg-[#FBF6EF]/70 py-3 text-[#2B1810] focus:border-[#7A3316] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#7A3316]/10"
                       inputMode="numeric"
                       autoComplete="one-time-code"
                       autoFocus
@@ -192,7 +192,7 @@ export default function OtpLoginModal({ isOpen, onClose, onLogin }) {
                   <button
                     type="submit"
                     disabled={loading || otp.length !== 6}
-                    className="w-full min-h-[48px] flex items-center justify-center gap-2 rounded-2xl bg-[#0F3D2E] hover:bg-[#16503D] text-white px-4 py-3 font-semibold text-sm disabled:opacity-60 disabled:cursor-not-allowed shadow-xs transition"
+                    className="w-full min-h-[48px] flex items-center justify-center gap-2 rounded-2xl bg-[#7A3316] hover:bg-[#5E2610] text-white px-4 py-3 font-semibold text-sm disabled:opacity-60 disabled:cursor-not-allowed shadow-xs transition"
                   >
                     {loading ? (
                       <>
@@ -208,7 +208,7 @@ export default function OtpLoginModal({ isOpen, onClose, onLogin }) {
                     type="button"
                     onClick={handleBack}
                     disabled={loading}
-                    className="mt-4 w-full min-h-[44px] inline-flex items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white text-stone-700 hover:bg-stone-50 px-4 py-2.5 text-xs font-semibold transition"
+                    className="mt-4 w-full min-h-[44px] inline-flex items-center justify-center gap-2 rounded-2xl border border-[#EFE4D6] bg-white text-stone-700 hover:bg-[#FBF6EF] px-4 py-2.5 text-xs font-semibold transition"
                   >
                     Back to phone number
                   </button>
@@ -217,7 +217,7 @@ export default function OtpLoginModal({ isOpen, onClose, onLogin }) {
             </AnimatePresence>
 
             <div className="mt-6 text-center text-xs text-stone-500">
-              <p>By continuing, you agree to our <Link to="/terms" onClick={onClose} className="underline hover:text-[#0F3D2E]">Terms</Link> and <Link to="/privacy" onClick={onClose} className="underline hover:text-[#0F3D2E]">Privacy Policy</Link>.</p>
+              <p>By continuing, you agree to our <Link to="/terms" onClick={onClose} className="underline hover:text-[#7A3316]">Terms</Link> and <Link to="/privacy" onClick={onClose} className="underline hover:text-[#7A3316]">Privacy Policy</Link>.</p>
             </div>
           </div>
         </motion.div>

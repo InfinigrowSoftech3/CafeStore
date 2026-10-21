@@ -96,7 +96,7 @@ function SectionEyebrow({ children, light = false }) {
   return (
     <p
       className={`text-[11px] font-semibold uppercase tracking-[0.28em] ${
-        light ? 'text-[#FFF1C9]' : 'text-[#0F3D2E]'
+        light ? 'text-[#F3E9DC]' : 'text-[#7A3316]'
       }`}
     >
       {children}
@@ -282,7 +282,7 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="contact-page min-h-screen bg-white text-stone-900">
+    <main className="contact-page min-h-screen bg-[#FBF6EF] text-[#2B1810]">
       {/* ========================================================================= */}
       {/* 1. HERO SECTION WITH CINEMATIC VIDEO & 3D FLOATING CUP */}
       {/* ========================================================================= */}
@@ -292,7 +292,7 @@ export default function ContactPage() {
           event.currentTarget.style.setProperty('--contact-x', 0);
           event.currentTarget.style.setProperty('--contact-y', 0);
         }}
-        className="contact-hero relative isolate min-h-[720px] overflow-hidden bg-[#0F3D2E] text-white sm:min-h-[780px]"
+        className="contact-hero relative isolate min-h-[720px] overflow-hidden bg-[#7A3316] text-white sm:min-h-[780px]"
       >
         {/* Background Backdrop */}
         {tenant.slug === 'brewhaus' ? (
@@ -325,7 +325,7 @@ export default function ContactPage() {
             className="absolute inset-0 z-0 h-full w-full object-cover"
           />
         ) : (
-          <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#0F3D2E] via-[#16503D] to-[#0A261D]" />
+          <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#7A3316] via-[#5E2610] to-[#0A261D]" />
         )}
 
         {/* Ambient Gradient Overlays for Luxury Contrast */}
@@ -340,7 +340,7 @@ export default function ContactPage() {
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             className="w-full min-w-0 max-w-2xl"
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[#FFF1C9]">
+            <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[#F3E9DC]">
               Get in touch
             </p>
             <p className="mt-4 font-display text-3xl font-bold tracking-[0.16em] text-white sm:text-4xl">
@@ -357,7 +357,7 @@ export default function ContactPage() {
               <button
                 type="button"
                 onClick={scrollToContact}
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-stone-900 shadow-sm transition-all duration-300 hover:bg-stone-100 active:scale-95 focus:outline-none focus:ring-1 focus:ring-white"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#FFFDF9] px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[#2B1810] shadow-sm transition-all duration-300 hover:bg-[#F3E9DC] active:scale-95 focus:outline-none focus:ring-1 focus:ring-white"
               >
                 Reach out to us <ArrowDown size={15} />
               </button>
@@ -367,7 +367,7 @@ export default function ContactPage() {
                 rel="noreferrer"
                 className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/40 bg-white/10 px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md transition-all hover:bg-white/20 focus:outline-none focus:ring-1 focus:ring-white"
               >
-                <MapPin size={14} className="text-[#FFF1C9]" />
+                <MapPin size={14} className="text-[#F3E9DC]" />
                 <span>{tenant.address ? 'Visit Our Café' : 'View Location'}</span>
               </a>
             </div>
@@ -403,11 +403,11 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* 2. CONTACT INFORMATION EDITORIAL CARDS */}
       {/* ========================================================================= */}
-      <section ref={contactSectionRef} className="scroll-mt-8 px-4 py-20 sm:px-6 sm:py-28 lg:px-8 bg-white">
+      <section ref={contactSectionRef} className="scroll-mt-8 px-4 py-20 sm:px-6 sm:py-28 lg:px-8 bg-[#FBF6EF]">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
             <SectionEyebrow>Direct channels</SectionEyebrow>
-            <h2 className="mt-4 font-display text-4xl font-semibold leading-[1] text-stone-900 sm:text-5xl lg:text-6xl">
+            <h2 className="mt-4 font-display text-4xl font-semibold leading-[1] text-[#2B1810] sm:text-5xl lg:text-6xl">
               Every way to connect.
             </h2>
             <p className="mt-5 text-base leading-7 text-stone-600">
@@ -425,11 +425,11 @@ export default function ContactPage() {
                   key={item.id}
                   {...reveal}
                   transition={{ ...reveal.transition, delay: index * 0.08 }}
-                  className="group relative flex flex-col justify-between rounded-2xl border border-stone-200 bg-white p-7 shadow-2xs transition-all duration-300 hover:border-stone-400"
+                  className="group relative flex flex-col justify-between rounded-2xl border border-[#EFE4D6] bg-[#FFFDF9] p-7 shadow-2xs transition-all duration-300 hover:border-stone-400"
                 >
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-stone-100 text-stone-900 border border-stone-200 transition-colors duration-300 group-hover:bg-stone-900 group-hover:text-white">
+                      <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#F3E9DC] text-[#2B1810] border border-[#EFE4D6] transition-colors duration-300 group-hover:bg-[#7A3316] group-hover:text-white">
                         <Icon size={20} />
                       </span>
                       <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">
@@ -437,21 +437,21 @@ export default function ContactPage() {
                       </span>
                     </div>
 
-                    <h3 className="mt-6 font-display text-2xl font-bold text-stone-900">
+                    <h3 className="mt-6 font-display text-2xl font-bold text-[#2B1810]">
                       {item.label}
                     </h3>
-                    <p className="mt-2 text-sm font-medium leading-relaxed text-stone-800">
+                    <p className="mt-2 text-sm font-medium leading-relaxed text-[#2B1810]">
                       {item.value}
                     </p>
                     <p className="mt-1 text-xs text-stone-500">{item.subvalue}</p>
                   </div>
 
-                  <div className="mt-8 border-t border-stone-100 pt-5">
+                  <div className="mt-8 border-t border-[#EFE4D6] pt-5">
                     {item.action.type === 'copy' ? (
                       <button
                         type="button"
                         onClick={() => handleCopy(item.action.copyText, item.id)}
-                        className="inline-flex min-h-[44px] items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[#0F3D2E] transition hover:text-[#16503D] focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20 rounded-lg"
+                        className="inline-flex min-h-[44px] items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[#7A3316] transition hover:text-[#5E2610] focus:outline-none focus:ring-2 focus:ring-[#7A3316]/20 rounded-lg"
                       >
                         {copiedId === item.id ? (
                           <>
@@ -470,7 +470,7 @@ export default function ContactPage() {
                         href={item.action.href}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex min-h-[44px] items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[#0F3D2E] transition hover:text-[#16503D] focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20 rounded-lg"
+                        className="inline-flex min-h-[44px] items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[#7A3316] transition hover:text-[#5E2610] focus:outline-none focus:ring-2 focus:ring-[#7A3316]/20 rounded-lg"
                       >
                         <span>{item.action.text}</span>
                         <ExternalLink size={14} />
@@ -478,7 +478,7 @@ export default function ContactPage() {
                     ) : (
                       <a
                         href={item.action.href}
-                        className="inline-flex min-h-[44px] items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[#0F3D2E] transition hover:text-[#16503D] focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20 rounded-lg"
+                        className="inline-flex min-h-[44px] items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[#7A3316] transition hover:text-[#5E2610] focus:outline-none focus:ring-2 focus:ring-[#7A3316]/20 rounded-lg"
                       >
                         <span>{item.action.text}</span>
                         <ArrowRight size={14} />
@@ -495,14 +495,14 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* 3. CONTACT FORM & EDITORIAL DETAILS */}
       {/* ========================================================================= */}
-      <section className="border-t border-stone-200 bg-white px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+      <section className="border-t border-[#EFE4D6] bg-[#FBF6EF] px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
             {/* Left Context Column */}
             <motion.div {...reveal} className="flex flex-col justify-between">
               <div>
                 <SectionEyebrow>Write to {tenant.name}</SectionEyebrow>
-                <h2 className="mt-4 font-display text-4xl font-semibold leading-[1] text-stone-900 sm:text-5xl lg:text-6xl">
+                <h2 className="mt-4 font-display text-4xl font-semibold leading-[1] text-[#2B1810] sm:text-5xl lg:text-6xl">
                   Send us a direct message.
                 </h2>
                 <p className="mt-6 text-base leading-8 text-stone-600">
@@ -511,9 +511,9 @@ export default function ContactPage() {
                 </p>
 
                 <div className="mt-10 space-y-5">
-                  <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5 shadow-2xs">
-                    <div className="flex items-center gap-3 text-stone-900">
-                      <Clock size={18} className="text-[#0F3D2E]" />
+                  <div className="rounded-2xl border border-[#EFE4D6] bg-[#FBF6EF] p-5 shadow-2xs">
+                    <div className="flex items-center gap-3 text-[#2B1810]">
+                      <Clock size={18} className="text-[#7A3316]" />
                       <span className="text-xs font-bold uppercase tracking-[0.16em]">
                         Response Time
                       </span>
@@ -523,9 +523,9 @@ export default function ContactPage() {
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5 shadow-2xs">
-                    <div className="flex items-center gap-3 text-stone-900">
-                      <Coffee size={18} className="text-[#0F3D2E]" />
+                  <div className="rounded-2xl border border-[#EFE4D6] bg-[#FBF6EF] p-5 shadow-2xs">
+                    <div className="flex items-center gap-3 text-[#2B1810]">
+                      <Coffee size={18} className="text-[#7A3316]" />
                       <span className="text-xs font-bold uppercase tracking-[0.16em]">
                         Large Gatherings & Events
                       </span>
@@ -539,11 +539,11 @@ export default function ContactPage() {
               </div>
 
               {/* Direct Quote */}
-              <div className="mt-10 border-l-2 border-[#0F3D2E] pl-5">
-                <p className="font-display text-2xl font-medium italic text-stone-900">
+              <div className="mt-10 border-l-2 border-[#7A3316] pl-5">
+                <p className="font-display text-2xl font-medium italic text-[#2B1810]">
                   “A thoughtful cup, an easy meal, and conversations that need a little more room.”
                 </p>
-                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#0F3D2E]">
+                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#7A3316]">
                   {tenant.name} Hospitality
                 </p>
               </div>
@@ -552,7 +552,7 @@ export default function ContactPage() {
             {/* Right Contact Form / Success Container */}
             <motion.div
               {...reveal}
-              className="relative overflow-hidden rounded-3xl border border-stone-200 bg-white p-7 shadow-2xs sm:p-10 lg:p-12"
+              className="relative overflow-hidden rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] p-7 shadow-2xs sm:p-10 lg:p-12"
             >
               <AnimatePresence mode="wait">
                 {!isSuccess ? (
@@ -567,7 +567,7 @@ export default function ContactPage() {
                     className="space-y-6"
                   >
                     <div>
-                      <h3 className="font-display text-3xl font-semibold text-stone-900">
+                      <h3 className="font-display text-3xl font-semibold text-[#2B1810]">
                         Leave a message
                       </h3>
                       <p className="mt-1 text-xs text-stone-500">
@@ -618,10 +618,10 @@ export default function ContactPage() {
                           value={formData.name}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={`w-full rounded-full border bg-white px-5 py-3 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
+                          className={`w-full rounded-full border bg-[#FFFDF9] px-5 py-3 text-sm font-medium text-[#2B1810] placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
                             formErrors.name
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-                              : 'border-stone-300 focus:border-stone-900 focus:ring-stone-900'
+                              : 'border-[#EFE4D6] focus:border-stone-900 focus:ring-[#7A3316]'
                           }`}
                         />
                       </div>
@@ -651,10 +651,10 @@ export default function ContactPage() {
                           value={formData.contact}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={`w-full rounded-full border bg-white px-5 py-3 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
+                          className={`w-full rounded-full border bg-[#FFFDF9] px-5 py-3 text-sm font-medium text-[#2B1810] placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
                             formErrors.contact
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-                              : 'border-stone-300 focus:border-stone-900 focus:ring-stone-900'
+                              : 'border-[#EFE4D6] focus:border-stone-900 focus:ring-[#7A3316]'
                           }`}
                         />
                       </div>
@@ -683,10 +683,10 @@ export default function ContactPage() {
                           value={formData.subject}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={`w-full rounded-full border bg-white px-5 py-3 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
+                          className={`w-full rounded-full border bg-[#FFFDF9] px-5 py-3 text-sm font-medium text-[#2B1810] placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
                             formErrors.subject
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-                              : 'border-stone-300 focus:border-stone-900 focus:ring-stone-900'
+                              : 'border-[#EFE4D6] focus:border-stone-900 focus:ring-[#7A3316]'
                           }`}
                         />
                       </div>
@@ -721,10 +721,10 @@ export default function ContactPage() {
                           value={formData.message}
                           onChange={handleInputChange}
                           onBlur={handleBlur}
-                          className={`w-full resize-y rounded-2xl border bg-white px-5 py-3.5 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
+                          className={`w-full resize-y rounded-2xl border bg-[#FFFDF9] px-5 py-3.5 text-sm font-medium text-[#2B1810] placeholder:text-stone-400 focus:outline-none focus:ring-1 transition-all duration-200 ${
                             formErrors.message
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-200'
-                              : 'border-stone-300 focus:border-stone-900 focus:ring-stone-900'
+                              : 'border-[#EFE4D6] focus:border-stone-900 focus:ring-[#7A3316]'
                           }`}
                         />
                       </div>
@@ -739,7 +739,7 @@ export default function ContactPage() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="inline-flex min-h-[46px] w-full items-center justify-center gap-3 rounded-full bg-[#0F3D2E] py-3 px-6 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-2xs transition-all duration-300 hover:bg-[#16503D] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]"
+                      className="inline-flex min-h-[46px] w-full items-center justify-center gap-3 rounded-full bg-[#7A3316] py-3 px-6 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-2xs transition-all duration-300 hover:bg-[#5E2610] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#7A3316]"
                     >
                       {isSubmitting ? (
                         <>
@@ -765,14 +765,14 @@ export default function ContactPage() {
                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                     className="flex flex-col items-center py-8 text-center sm:py-12"
                   >
-                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-stone-100 text-stone-900 border border-stone-200 shadow-2xs">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F3E9DC] text-[#2B1810] border border-[#EFE4D6] shadow-2xs">
                       <CheckCircle2 size={36} className="stroke-[1.6]" />
                     </div>
 
-                    <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-stone-900">
+                    <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-[#2B1810]">
                       Message Sent
                     </p>
-                    <h3 className="mt-2 font-display text-4xl font-semibold text-stone-900">
+                    <h3 className="mt-2 font-display text-4xl font-semibold text-[#2B1810]">
                       Thank you for contacting {tenant.name}.
                     </h3>
                     <p className="mt-4 max-w-md text-sm leading-relaxed text-stone-600">
@@ -784,13 +784,13 @@ export default function ContactPage() {
                       <button
                         type="button"
                         onClick={handleResetForm}
-                        className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-stone-200 bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-stone-700 transition hover:bg-stone-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                        className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-stone-700 transition hover:bg-[#FBF6EF] active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#7A3316]/20"
                       >
                         Send another message
                       </button>
                       <Link
                         to="/menu"
-                        className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#16503D] active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                        className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#7A3316] px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white transition hover:bg-[#5E2610] active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#7A3316]/20"
                       >
                         Explore Menu <ArrowRight size={14} />
                       </Link>
@@ -806,7 +806,7 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* 4. CINEMATIC CAFÉ ATMOSPHERE SECTION */}
       {/* ========================================================================= */}
-      <section className="relative isolate overflow-hidden bg-[#0F3D2E] px-4 py-24 text-white sm:px-6 lg:px-8">
+      <section className="relative isolate overflow-hidden bg-[#7A3316] px-4 py-24 text-white sm:px-6 lg:px-8">
         {tenant.slug === 'brewhaus' ? (
           <>
             <img
@@ -839,7 +839,7 @@ export default function ContactPage() {
             loading="lazy"
           />
         ) : null}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#0F3D2E] via-[#0F3D2E]/70 to-[#0F3D2E]/85" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#7A3316] via-[#7A3316]/70 to-[#7A3316]/85" />
 
         <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
           <SectionEyebrow light>Come Say Hello</SectionEyebrow>
@@ -867,7 +867,7 @@ export default function ContactPage() {
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-2xl text-center">
             <SectionEyebrow>Our Location</SectionEyebrow>
-            <h2 className="mt-4 font-display text-4xl font-semibold text-stone-900 sm:text-5xl">
+            <h2 className="mt-4 font-display text-4xl font-semibold text-[#2B1810] sm:text-5xl">
               Finding {tenant.name}.
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-stone-600 sm:text-base">
@@ -877,7 +877,7 @@ export default function ContactPage() {
 
           <motion.div
             {...reveal}
-            className="relative mt-12 overflow-hidden rounded-[2.5rem] border border-stone-200 bg-stone-100 shadow-xs"
+            className="relative mt-12 overflow-hidden rounded-[2.5rem] border border-[#EFE4D6] bg-[#F3E9DC] shadow-xs"
           >
             {/* Map Frame */}
             <div className="relative h-[380px] w-full sm:h-[460px]">
@@ -893,20 +893,20 @@ export default function ContactPage() {
 
             {/* Floating Location Overlay Card */}
             <div className="pointer-events-auto absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-8 sm:right-auto sm:max-w-md">
-              <div className="rounded-3xl border border-stone-200 bg-white/95 p-6 text-stone-900 shadow-xl backdrop-blur-md">
-                <div className="flex items-center gap-2 text-[#0F3D2E]">
+              <div className="rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9]/95 p-6 text-[#2B1810] shadow-xl backdrop-blur-md">
+                <div className="flex items-center gap-2 text-[#7A3316]">
                   <Compass size={16} />
                   <span className="text-[11px] font-bold uppercase tracking-[0.2em]">
                     {tenant.name} Landmark
                   </span>
                 </div>
-                <h3 className="mt-2 font-display text-2xl font-bold text-stone-900">
+                <h3 className="mt-2 font-display text-2xl font-bold text-[#2B1810]">
                   {tenant.address || 'Address not provided'}
                 </h3>
                 {tenant.contactPhone && (
                   <a
                     href={`tel:${formatInternationalTel(tenant.contactPhone)}`}
-                    className="mt-1 inline-flex min-h-[44px] items-center text-xs text-stone-600 hover:text-[#0F3D2E] underline focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                    className="mt-1 inline-flex min-h-[44px] items-center text-xs text-stone-600 hover:text-[#7A3316] underline focus:outline-none focus:ring-2 focus:ring-[#7A3316]/20"
                   >
                     {tenant.contactPhone}
                   </a>
@@ -917,7 +917,7 @@ export default function ContactPage() {
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tenant.address || 'Cafe')}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0F3D2E] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-[#16503D] active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                    className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#7A3316] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-[#5E2610] active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#7A3316]/20"
                   >
                     <span>Get Directions</span>
                     <ExternalLink size={14} />
@@ -933,7 +933,7 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* 6. CALL TO ACTION SECTION */}
       {/* ========================================================================= */}
-      <section className="relative isolate overflow-hidden bg-[#0F3D2E] px-4 py-24 text-center text-white sm:px-6 sm:py-32 lg:px-8">
+      <section className="relative isolate overflow-hidden bg-[#7A3316] px-4 py-24 text-center text-white sm:px-6 sm:py-32 lg:px-8">
         {tenant.slug === 'brewhaus' ? (
           <img
             src="/images/about/brewhaus-story-cup.webp"
@@ -962,7 +962,7 @@ export default function ContactPage() {
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Link
               to="/menu"
-              className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#FFF1C9] px-7 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[#0F3D2E] transition hover:bg-[#FEE6A3] active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/40"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#F3E9DC] px-7 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[#7A3316] transition hover:bg-[#FEE6A3] active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/40"
             >
               View Menu <ArrowRight size={15} />
             </Link>

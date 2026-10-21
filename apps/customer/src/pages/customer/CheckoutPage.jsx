@@ -102,12 +102,12 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center flex-col gap-4 p-6 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-center text-3xl mb-2 shadow-2xs">
+      <div className="min-h-screen bg-[#FBF6EF] flex items-center justify-center flex-col gap-4 p-6 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-[#F3E9DC] border border-[#EFE4D6] flex items-center justify-center text-3xl mb-2 shadow-2xs">
           🛒
         </div>
-        <h1 className="font-sora text-2xl font-extrabold text-stone-900">Your cart is empty</h1>
-        <p className="text-stone-500 text-sm max-w-sm">
+        <h1 className="font-sora text-2xl font-extrabold text-[#2B1810]">Your cart is empty</h1>
+        <p className="text-[#7B6B5F] text-sm max-w-sm">
           Please add items to your cart before proceeding to checkout.
         </p>
         <Link to="/menu" className="btn-primary min-h-[46px] px-8 text-xs font-sora font-bold tracking-wider mt-2 rounded-full shadow-xs">
@@ -331,22 +331,22 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-[#FBF6EF] flex flex-col">
       {/* Top Header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3.5 border-b border-stone-200 bg-white/95 backdrop-blur-md shadow-2xs">
+      <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3.5 border-b border-[#EFE4D6] bg-[#FFFDF9]/95 backdrop-blur-md shadow-2xs">
         <div className="flex items-center gap-3">
           <Link
             to="/cart"
             aria-label="Back to Cart"
-            className="min-h-[38px] min-w-[38px] rounded-full border border-stone-300 flex items-center justify-center text-stone-700 hover:bg-stone-50 transition active:scale-95"
+            className="min-h-[38px] min-w-[38px] rounded-full border border-[#EFE4D6] flex items-center justify-center text-[#2B1810] hover:bg-[#F3E9DC]/40 transition active:scale-95"
           >
             <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="font-sora text-lg sm:text-xl font-bold text-stone-900 leading-none">
+            <h1 className="font-sora text-lg sm:text-xl font-bold text-[#2B1810] leading-none">
               Checkout
             </h1>
-            <p className="text-[11px] text-stone-500 mt-0.5">{tenant.name}</p>
+            <p className="text-[11px] text-[#7B6B5F] mt-0.5">{tenant.name}</p>
           </div>
         </div>
 
@@ -361,7 +361,7 @@ export default function CheckoutPage() {
             type="button"
             onClick={openNavDrawer}
             aria-label="Open navigation menu - show all pages"
-            className="min-h-[38px] min-w-[38px] px-2.5 sm:px-3 flex items-center justify-center gap-1.5 rounded-full border border-stone-300 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all"
+            className="min-h-[38px] min-w-[38px] px-2.5 sm:px-3 flex items-center justify-center gap-1.5 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#7A3316] shadow-2xs hover:bg-[#F3E9DC]/40 active:scale-95 transition-all"
           >
             <Menu size={18} strokeWidth={2.4} />
             <span className="hidden sm:inline text-xs font-sora font-bold tracking-wide">All Pages</span>
@@ -375,14 +375,14 @@ export default function CheckoutPage() {
           {/* Left Column: Table Details + Customer Details + Payment Method */}
           <div className="lg:col-span-7 space-y-4">
             {/* Table Badge Card */}
-            <div className="p-4 bg-white border border-stone-200 flex items-center justify-between gap-3 shadow-2xs rounded-2xl">
+            <div className="p-4 bg-[#FFFDF9] border border-[#EFE4D6] flex items-center justify-between gap-3 shadow-2xs rounded-2xl">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-stone-900 text-white font-sora font-bold text-sm shadow-2xs">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#7A3316] text-white font-sora font-bold text-sm shadow-2xs">
                   {String(tableNumber || '—').padStart(2, '0')}
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-stone-500">Dine-In Table</p>
-                  <p className="font-sora text-base font-bold text-stone-900">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#7B6B5F]">Dine-In Table</p>
+                  <p className="font-sora text-base font-bold text-[#2B1810]">
                     {tableNumber ? `Table ${String(tableNumber).padStart(2, '0')}` : 'Table not selected'}
                   </p>
                 </div>
@@ -394,18 +394,18 @@ export default function CheckoutPage() {
                   <span>Verified</span>
                 </div>
               ) : (
-                <Link to="/menu" className="text-xs font-bold text-[var(--menu-accent,#C93A1C)] underline">
+                <Link to="/menu" className="text-xs font-bold text-[#7A3316] underline">
                   Scan Table QR
                 </Link>
               )}
             </div>
 
             {/* Customer Details Card */}
-            <div className="p-5 bg-white border border-stone-200 space-y-4 shadow-2xs rounded-2xl">
-              <div className="flex items-center justify-between border-b border-stone-200 pb-3">
+            <div className="p-5 bg-[#FFFDF9] border border-[#EFE4D6] space-y-4 shadow-2xs rounded-2xl">
+              <div className="flex items-center justify-between border-b border-[#EFE4D6] pb-3">
                 <div className="flex items-center gap-2">
-                  <User size={18} className="text-stone-900" />
-                  <h2 className="font-sora text-base font-bold text-stone-900">
+                  <User size={18} className="text-[#2B1810]" />
+                  <h2 className="font-sora text-base font-bold text-[#2B1810]">
                     Customer Information
                   </h2>
                 </div>
@@ -413,17 +413,17 @@ export default function CheckoutPage() {
 
               {/* Name Input */}
               <div>
-                <label className="text-xs font-bold text-stone-700 mb-1.5 block">
+                <label className="text-xs font-bold text-[#2B1810] mb-1.5 block">
                   Your Name <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
+                  <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7B6B5F]/70 pointer-events-none" />
                   <input
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Enter your full name"
-                    className="w-full h-11 pl-10 pr-4 rounded-full border border-stone-300 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 transition"
+                    className="w-full h-11 pl-10 pr-4 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-sm font-jakarta text-[#2B1810] focus:outline-none focus:border-[#7A3316] focus:ring-1 focus:ring-[#7A3316] transition"
                     autoComplete="name"
                   />
                 </div>
@@ -431,11 +431,11 @@ export default function CheckoutPage() {
 
               {/* Mobile Phone Input */}
               <div>
-                <label className="text-xs font-bold text-stone-700 mb-1.5 block">
+                <label className="text-xs font-bold text-[#2B1810] mb-1.5 block">
                   Mobile Number <span className="text-red-500">*</span>
                 </label>
                 <div className="relative flex items-center">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-stone-500">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#7B6B5F]">
                     +91
                   </span>
                   <input
@@ -443,44 +443,44 @@ export default function CheckoutPage() {
                     value={phone}
                     onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     placeholder="10-digit mobile number"
-                    className="w-full h-11 pl-12 pr-4 rounded-full border border-stone-300 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 transition"
+                    className="w-full h-11 pl-12 pr-4 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-sm font-jakarta text-[#2B1810] focus:outline-none focus:border-[#7A3316] focus:ring-1 focus:ring-[#7A3316] transition"
                     autoComplete="tel"
                     inputMode="numeric"
                   />
                 </div>
-                <p className="text-[11px] text-stone-500 mt-1">
+                <p className="text-[11px] text-[#7B6B5F] mt-1">
                   We will send order confirmation and kitchen updates via SMS/WhatsApp.
                 </p>
               </div>
 
               {/* Email (Optional) */}
               <div>
-                <label className="text-xs font-bold text-stone-700 mb-1.5 block">
-                  Email Address <span className="text-stone-400 font-normal">(Optional for invoice)</span>
+                <label className="text-xs font-bold text-[#2B1810] mb-1.5 block">
+                  Email Address <span className="text-[#7B6B5F]/70 font-normal">(Optional for invoice)</span>
                 </label>
                 <div className="relative">
-                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
+                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7B6B5F]/70 pointer-events-none" />
                   <input
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="you@domain.com"
-                    className="w-full h-11 pl-10 pr-4 rounded-full border border-stone-300 bg-white text-sm font-jakarta text-stone-900 focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 transition"
+                    className="w-full h-11 pl-10 pr-4 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-sm font-jakarta text-[#2B1810] focus:outline-none focus:border-[#7A3316] focus:ring-1 focus:ring-[#7A3316] transition"
                     autoComplete="email"
                   />
                 </div>
               </div>
 
               {/* Marketing Consent */}
-              <div className="pt-2 border-t border-stone-200">
-                <label className="flex items-start gap-2.5 cursor-pointer text-stone-700 select-none group">
+              <div className="pt-2 border-t border-[#EFE4D6]">
+                <label className="flex items-start gap-2.5 cursor-pointer text-[#2B1810] select-none group">
                   <input
                     type="checkbox"
                     checked={marketingConsent}
                     onChange={e => setMarketingConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded-md border-stone-300 text-stone-900 focus:ring-stone-900 cursor-pointer transition accent-stone-900"
+                    className="mt-0.5 h-4 w-4 rounded-md border-[#EFE4D6] text-[#2B1810] focus:ring-[#7A3316] cursor-pointer transition accent-stone-900"
                   />
-                  <span className="text-xs leading-relaxed text-stone-600 group-hover:text-stone-900 transition">
+                  <span className="text-xs leading-relaxed text-[#7B6B5F] group-hover:text-[#2B1810] transition">
                     Keep me updated with chef specials, seasonal brews, and promotions from {tenant.name}.
                   </span>
                 </label>
@@ -488,10 +488,10 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment Method Card */}
-            <div className="p-5 bg-white border border-stone-200 space-y-4 shadow-2xs rounded-2xl">
-              <div className="flex items-center gap-2 border-b border-stone-200 pb-3">
-                <CreditCard size={18} className="text-stone-900" />
-                <h2 className="font-sora text-base font-bold text-stone-900">
+            <div className="p-5 bg-[#FFFDF9] border border-[#EFE4D6] space-y-4 shadow-2xs rounded-2xl">
+              <div className="flex items-center gap-2 border-b border-[#EFE4D6] pb-3">
+                <CreditCard size={18} className="text-[#2B1810]" />
+                <h2 className="font-sora text-base font-bold text-[#2B1810]">
                   Select Payment Method
                 </h2>
               </div>
@@ -503,26 +503,26 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod('razorpay')}
                   className={`p-4 rounded-2xl border transition-all text-left flex flex-col justify-between min-h-[92px] ${
                     paymentMethod === 'razorpay'
-                      ? 'border-stone-900 bg-stone-50 ring-1 ring-stone-900 shadow-2xs'
-                      : 'border-stone-200 bg-white hover:border-stone-300'
+                      ? 'border-stone-900 bg-[#F3E9DC]/40 ring-1 ring-[#7A3316] shadow-2xs'
+                      : 'border-[#EFE4D6] bg-[#FFFDF9] hover:border-[#EFE4D6]'
                   }`}
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2.5">
-                      <div className={`p-2 rounded-xl ${paymentMethod === 'razorpay' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-700'}`}>
+                      <div className={`p-2 rounded-xl ${paymentMethod === 'razorpay' ? 'bg-[#7A3316] text-white' : 'bg-[#F3E9DC] text-[#2B1810]'}`}>
                         <CreditCard size={18} />
                       </div>
-                      <span className="font-sora font-bold text-sm text-stone-900">
+                      <span className="font-sora font-bold text-sm text-[#2B1810]">
                         Online Payment
                       </span>
                     </div>
                     <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
-                      paymentMethod === 'razorpay' ? 'border-stone-900 bg-stone-900' : 'border-stone-300'
+                      paymentMethod === 'razorpay' ? 'border-[#7A3316] bg-[#7A3316]' : 'border-[#EFE4D6]'
                     }`}>
-                      {paymentMethod === 'razorpay' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      {paymentMethod === 'razorpay' && <span className="w-1.5 h-1.5 rounded-full bg-[#FFFDF9]" />}
                     </div>
                   </div>
-                  <p className="text-[11px] text-stone-500 mt-2">
+                  <p className="text-[11px] text-[#7B6B5F] mt-2">
                     Instant UPI (GPay, PhonePe), Cards & Net Banking
                   </p>
                 </button>
@@ -533,26 +533,26 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod('cash')}
                   className={`p-4 rounded-2xl border transition-all text-left flex flex-col justify-between min-h-[92px] ${
                     paymentMethod === 'cash'
-                      ? 'border-stone-900 bg-stone-50 ring-1 ring-stone-900 shadow-2xs'
-                      : 'border-stone-200 bg-white hover:border-stone-300'
+                      ? 'border-stone-900 bg-[#F3E9DC]/40 ring-1 ring-[#7A3316] shadow-2xs'
+                      : 'border-[#EFE4D6] bg-[#FFFDF9] hover:border-[#EFE4D6]'
                   }`}
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2.5">
-                      <div className={`p-2 rounded-xl ${paymentMethod === 'cash' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-700'}`}>
+                      <div className={`p-2 rounded-xl ${paymentMethod === 'cash' ? 'bg-[#7A3316] text-white' : 'bg-[#F3E9DC] text-[#2B1810]'}`}>
                         <Banknote size={18} />
                       </div>
-                      <span className="font-sora font-bold text-sm text-stone-900">
+                      <span className="font-sora font-bold text-sm text-[#2B1810]">
                         Cash at Counter
                       </span>
                     </div>
                     <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
-                      paymentMethod === 'cash' ? 'border-stone-900 bg-stone-900' : 'border-stone-300'
+                      paymentMethod === 'cash' ? 'border-[#7A3316] bg-[#7A3316]' : 'border-[#EFE4D6]'
                     }`}>
-                      {paymentMethod === 'cash' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      {paymentMethod === 'cash' && <span className="w-1.5 h-1.5 rounded-full bg-[#FFFDF9]" />}
                     </div>
                   </div>
-                  <p className="text-[11px] text-stone-500 mt-2">
+                  <p className="text-[11px] text-[#7B6B5F] mt-2">
                     Pay at the billing counter when leaving
                   </p>
                 </button>
@@ -576,27 +576,27 @@ export default function CheckoutPage() {
 
           {/* Right Column: Order Summary & Coupon Code & Pay Button */}
           <div className="lg:col-span-5">
-            <div className="p-5 sm:p-6 bg-white border border-stone-200 space-y-5 shadow-2xs rounded-2xl sticky top-24">
-              <h2 className="font-sora text-lg font-bold text-stone-900 border-b border-stone-200 pb-3">
+            <div className="p-5 sm:p-6 bg-[#FFFDF9] border border-[#EFE4D6] space-y-5 shadow-2xs rounded-2xl sticky top-24">
+              <h2 className="font-sora text-lg font-bold text-[#2B1810] border-b border-[#EFE4D6] pb-3">
                 Order Summary ({items.length} items)
               </h2>
 
               {/* Items List Snapshot */}
-              <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1 divide-y divide-stone-100">
+              <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1 divide-y divide-[#EFE4D6]">
                 {items.map(item => (
                   <div key={item.key} className="pt-2 first:pt-0 flex justify-between items-baseline text-xs font-jakarta">
                     <div className="pr-2 min-w-0">
-                      <p className="font-semibold text-stone-900 truncate">
+                      <p className="font-semibold text-[#2B1810] truncate">
                         {item.name} × {item.quantity}
                       </p>
                       {item.variant && (
-                        <p className="text-[10px] text-stone-500">{item.variant.name}</p>
+                        <p className="text-[10px] text-[#7B6B5F]">{item.variant.name}</p>
                       )}
                       {item.addons?.length > 0 && (
-                        <p className="text-[10px] text-stone-400">+{item.addons.map(a => a.name).join(', ')}</p>
+                        <p className="text-[10px] text-[#7B6B5F]/70">+{item.addons.map(a => a.name).join(', ')}</p>
                       )}
                     </div>
-                    <span className="font-sora text-xs font-bold text-stone-900 flex-shrink-0">
+                    <span className="font-sora text-xs font-bold text-[#2B1810] flex-shrink-0">
                       {formatMoney(item.itemTotal, tenant.currency)}
                     </span>
                   </div>
@@ -604,20 +604,20 @@ export default function CheckoutPage() {
               </div>
 
               {/* Coupon Code Input */}
-              <div className="border-t border-stone-200 pt-3">
-                <label className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5 block">
+              <div className="border-t border-[#EFE4D6] pt-3">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#7B6B5F] mb-1.5 block">
                   Have a Coupon?
                 </label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <Tag size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
+                    <Tag size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7B6B5F]/70 pointer-events-none" />
                     <input
                       value={couponInput}
                       onChange={(e) => {
                         setCouponInput(e.target.value.toUpperCase());
                         setAppliedCoupon(null);
                       }}
-                      className="w-full h-10 pl-9 pr-3 rounded-full border border-stone-300 bg-white text-xs uppercase font-mono tracking-wider text-stone-900 focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900"
+                      className="w-full h-10 pl-9 pr-3 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-xs uppercase font-mono tracking-wider text-[#2B1810] focus:outline-none focus:border-[#7A3316] focus:ring-1 focus:ring-[#7A3316]"
                       placeholder="ENTER CODE"
                       maxLength={32}
                     />
@@ -630,8 +630,8 @@ export default function CheckoutPage() {
                       appliedCoupon
                         ? 'bg-emerald-600 text-white'
                         : couponInput.trim()
-                          ? 'bg-stone-900 text-white hover:bg-stone-800'
-                          : 'bg-stone-100 text-stone-400 border border-stone-300 cursor-not-allowed'
+                          ? 'bg-[#7A3316] text-white hover:bg-[#7A3316]'
+                          : 'bg-[#F3E9DC] text-[#7B6B5F]/70 border border-[#EFE4D6] cursor-not-allowed'
                     }`}
                   >
                     {couponLoading ? 'Checking...' : appliedCoupon ? 'Applied ✓' : 'Apply'}
@@ -646,10 +646,10 @@ export default function CheckoutPage() {
               </div>
 
               {/* Bill Details */}
-              <div className="border-t border-stone-200 pt-3 space-y-2 text-xs font-jakarta">
-                <div className="flex justify-between text-stone-600">
+              <div className="border-t border-[#EFE4D6] pt-3 space-y-2 text-xs font-jakarta">
+                <div className="flex justify-between text-[#7B6B5F]">
                   <span>Subtotal</span>
-                  <span className="font-sora font-semibold text-stone-900">{formatMoney(subtotal, tenant.currency)}</span>
+                  <span className="font-sora font-semibold text-[#2B1810]">{formatMoney(subtotal, tenant.currency)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-emerald-800 font-semibold">
@@ -657,13 +657,13 @@ export default function CheckoutPage() {
                     <span>−{formatMoney(discount, tenant.currency)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-stone-600">
+                <div className="flex justify-between text-[#7B6B5F]">
                   <span>GST &amp; Taxes ({tenant.taxRate}%)</span>
-                  <span className="font-sora font-semibold text-stone-900">{formatMoney(tax, tenant.currency)}</span>
+                  <span className="font-sora font-semibold text-[#2B1810]">{formatMoney(tax, tenant.currency)}</span>
                 </div>
-                <div className="flex justify-between border-t border-dashed border-stone-200 pt-2.5 text-base font-bold text-stone-900">
+                <div className="flex justify-between border-t border-dashed border-[#EFE4D6] pt-2.5 text-base font-bold text-[#2B1810]">
                   <span>Final Total</span>
-                  <span className="font-sora text-xl font-extrabold text-stone-900">{formatMoney(total, tenant.currency)}</span>
+                  <span className="font-sora text-xl font-extrabold text-[#2B1810]">{formatMoney(total, tenant.currency)}</span>
                 </div>
               </div>
 
@@ -672,7 +672,7 @@ export default function CheckoutPage() {
                 whileTap={{ scale: 0.985 }}
                 onClick={handleSubmit}
                 disabled={loading}
-                className="hidden lg:flex w-full !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white items-center justify-center gap-2 py-3.5 text-sm font-sora font-bold shadow-2xs rounded-full transition active:scale-98 disabled:opacity-50"
+                className="hidden lg:flex w-full !bg-[#7A3316] hover:!bg-[#5E2610] !text-[#FFFDF9] items-center justify-center gap-2 py-3.5 text-sm font-sora font-bold shadow-2xs rounded-full transition active:scale-98 disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -692,17 +692,17 @@ export default function CheckoutPage() {
       </main>
 
       {/* Floating Bottom Pay Bar for Mobile */}
-      <div className="lg:hidden bottom-safe fixed bottom-0 left-0 right-0 p-3.5 bg-white border-t border-stone-200 shadow-xl z-20">
+      <div className="lg:hidden bottom-safe fixed bottom-0 left-0 right-0 p-3.5 bg-[#FFFDF9] border-t border-[#EFE4D6] shadow-xl z-20">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] text-stone-500 uppercase tracking-wider font-semibold">Amount to Pay</p>
-            <p className="font-sora text-lg font-extrabold text-stone-900">{formatMoney(total, tenant.currency)}</p>
+            <p className="text-[11px] text-[#7B6B5F] uppercase tracking-wider font-semibold">Amount to Pay</p>
+            <p className="font-sora text-lg font-extrabold text-[#2B1810]">{formatMoney(total, tenant.currency)}</p>
           </div>
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 min-h-[46px] !bg-[#0F3D2E] hover:!bg-[#16503D] !text-white flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-full shadow-2xs transition active:scale-98 disabled:opacity-50"
+            className="flex-1 min-h-[46px] !bg-[#7A3316] hover:!bg-[#5E2610] !text-[#FFFDF9] flex items-center justify-center gap-2 text-xs font-sora font-bold uppercase tracking-wider rounded-full shadow-2xs transition active:scale-98 disabled:opacity-50"
           >
             {loading ? (
               <>

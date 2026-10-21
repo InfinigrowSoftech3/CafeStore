@@ -60,14 +60,14 @@ export default function NotificationPermissionPrompt({
   }
 
   const content = (
-    <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-lg text-stone-900">
+    <div className="rounded-2xl border border-[#EFE4D6] bg-[#FFFDF9] p-5 shadow-lg text-[#2B1810]">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF1C9] text-[#0F3D2E]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F3E9DC] text-[#7A3316]">
             <span className="text-xl">☕</span>
           </div>
           <div>
-            <h3 className="font-display text-base font-bold text-stone-900 leading-tight">
+            <h3 className="font-display text-base font-bold text-[#2B1810] leading-tight">
               Stay Updated with the Café
             </h3>
             <p className="text-xs text-stone-500 mt-0.5">Get notified about:</p>
@@ -76,7 +76,7 @@ export default function NotificationPermissionPrompt({
         <button
           type="button"
           onClick={handleDismiss}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center text-stone-400 hover:text-stone-700 p-1 rounded-full transition focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center text-stone-400 hover:text-stone-700 p-1 rounded-full transition focus:outline-none focus:ring-2 focus:ring-[#7A3316]/20"
           aria-label="Dismiss notification prompt"
         >
           <X size={18} aria-hidden="true" />
@@ -94,24 +94,24 @@ export default function NotificationPermissionPrompt({
         <>
           <div className="mt-3 space-y-2 text-xs text-stone-700 pl-1">
             <div className="flex items-center gap-2">
-              <Check size={14} className="text-[#0F3D2E] shrink-0 font-bold" />
+              <Check size={14} className="text-[#7A3316] shrink-0 font-bold" />
               <span>Special offers & seasonal discounts</span>
             </div>
             <div className="flex items-center gap-2">
-              <Check size={14} className="text-[#0F3D2E] shrink-0 font-bold" />
+              <Check size={14} className="text-[#7A3316] shrink-0 font-bold" />
               <span>New menu items & handcrafted food</span>
             </div>
             <div className="flex items-center gap-2">
-              <Check size={14} className="text-[#0F3D2E] shrink-0 font-bold" />
+              <Check size={14} className="text-[#7A3316] shrink-0 font-bold" />
               <span>Weekend kitchen specials</span>
             </div>
             <div className="flex items-center gap-2">
-              <Check size={14} className="text-[#0F3D2E] shrink-0 font-bold" />
+              <Check size={14} className="text-[#7A3316] shrink-0 font-bold" />
               <span>Café updates & specials</span>
             </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2 pt-2 border-t border-stone-100">
+          <div className="mt-4 flex flex-wrap items-center gap-2 pt-2 border-t border-[#EFE4D6]">
             <button
               type="button"
               onClick={handleEnable}

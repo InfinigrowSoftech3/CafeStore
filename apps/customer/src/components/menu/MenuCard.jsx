@@ -99,14 +99,14 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
       whileHover={isAvailable ? { y: -3 } : {}}
       transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
       onClick={isAvailable ? onSelect : undefined}
-      className={`group flex flex-col justify-between rounded-2xl bg-white border border-stone-200 overflow-hidden transition-all duration-300 ${
+      className={`group flex flex-col justify-between rounded-2xl bg-[#FFFDF9] border border-[#EFE4D6] overflow-hidden transition-all duration-300 ${
         isAvailable
-          ? 'cursor-pointer shadow-xs hover:shadow-md hover:border-[#0F3D2E]/40 active:scale-[0.985]'
+          ? 'cursor-pointer shadow-xs hover:shadow-md hover:border-[#7A3316]/40 active:scale-[0.985]'
           : 'cursor-default opacity-85 shadow-2xs'
       }`}
     >
       {/* Top Image Section */}
-      <div className="relative aspect-square w-full overflow-hidden bg-stone-100">
+      <div className="relative aspect-square w-full overflow-hidden bg-[#F3E9DC]">
         {!imgLoaded && (
           <div className="absolute inset-0 skeleton" />
         )}
@@ -139,7 +139,7 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
           {/* Veg / Non-Veg Emblem */}
           {product.isVeg !== false ? (
             <span
-              className="inline-flex items-center justify-center w-4 h-4 rounded-[4px] border-[1.5px] border-emerald-600 bg-white/95 p-[2px] shadow-xs"
+              className="inline-flex items-center justify-center w-4 h-4 rounded-[4px] border-[1.5px] border-emerald-600 bg-[#FFFDF9]/95 p-[2px] shadow-xs"
               title="100% Vegetarian"
               aria-label="Vegetarian"
             >
@@ -147,7 +147,7 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
             </span>
           ) : (
             <span
-              className="inline-flex items-center justify-center w-4 h-4 rounded-[4px] border-[1.5px] border-rose-600 bg-white/95 p-[2px] shadow-xs"
+              className="inline-flex items-center justify-center w-4 h-4 rounded-[4px] border-[1.5px] border-rose-600 bg-[#FFFDF9]/95 p-[2px] shadow-xs"
               title="Non-Vegetarian"
               aria-label="Non-Vegetarian"
             >
@@ -157,7 +157,7 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
 
           {/* Refined Gold POPULAR Ribbon */}
           {product.popular && isAvailable && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF1C9] border border-amber-200/80 px-2.5 py-0.5 text-[10px] font-bold text-[#0F3D2E] shadow-2xs">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#F3E9DC] border border-amber-200/80 px-2.5 py-0.5 text-[10px] font-bold text-[#7A3316] shadow-2xs">
               <Star size={9} fill="currentColor" />
               <span>POPULAR</span>
             </span>
@@ -166,8 +166,8 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
 
         {/* Out of Stock Overlay */}
         {!isAvailable && (
-          <div className="absolute inset-0 bg-stone-900/60 backdrop-blur-[2px] flex flex-col items-center justify-center p-3 text-center">
-            <span className="rounded-full bg-stone-900/90 border border-white/20 px-3 py-1 text-xs font-semibold text-white shadow-md">
+          <div className="absolute inset-0 bg-[#7A3316]/60 backdrop-blur-[2px] flex flex-col items-center justify-center p-3 text-center">
+            <span className="rounded-full bg-[#7A3316]/90 border border-white/20 px-3 py-1 text-xs font-semibold text-white shadow-md">
               Sold Out
             </span>
             <span className="mt-1 text-[11px] text-stone-300">Check back later</span>
@@ -183,7 +183,7 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
           )}
           {product.prepTime && (
             <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-black/60 backdrop-blur-md px-2 py-0.5 text-[10px] font-medium text-white">
-              <Clock size={10} className="text-[#FFF1C9]" />
+              <Clock size={10} className="text-[#F3E9DC]" />
               <span>{product.prepTime}m</span>
             </span>
           )}
@@ -194,7 +194,7 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
       <div className="flex flex-1 flex-col justify-between p-3 sm:p-3.5">
         <div>
           <div className="flex items-start justify-between gap-1.5">
-            <h3 className="font-display text-sm sm:text-base font-bold text-stone-900 leading-snug line-clamp-1 group-hover:text-[#0F3D2E] transition-colors">
+            <h3 className="font-display text-sm sm:text-base font-bold text-[#2B1810] leading-snug line-clamp-1 group-hover:text-[#7A3316] transition-colors">
               {product.name}
             </h3>
           </div>
@@ -206,7 +206,7 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
           )}
 
           {hasCustomizations && (
-            <div className="mt-1.5 flex items-center gap-1 text-[10px] font-medium text-[#0F3D2E]">
+            <div className="mt-1.5 flex items-center gap-1 text-[10px] font-medium text-[#7A3316]">
               <SlidersHorizontal size={10} />
               <span>Customisable</span>
             </div>
@@ -214,10 +214,10 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
         </div>
 
         {/* Price & Action Row */}
-        <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-stone-100">
+        <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-[#EFE4D6]">
           <div className="flex flex-col">
             <div className="flex items-baseline gap-1.5">
-              <span className="price-tag text-base sm:text-lg font-bold text-[#0F3D2E]">
+              <span className="price-tag text-base sm:text-lg font-bold text-[#7A3316]">
                 {formatMoney(product.price, tenant.currency)}
               </span>
               {product.originalPrice && product.originalPrice > product.price && (
@@ -238,13 +238,13 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
               /* Inline Quantity Stepper for Simple Products */
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex min-h-[36px] items-center rounded-full bg-[#0F3D2E] text-white p-0.5 shadow-xs"
+                className="inline-flex min-h-[36px] items-center rounded-full bg-[#7A3316] text-white p-0.5 shadow-xs"
               >
                 <button
                   type="button"
                   onClick={handleDecrement}
                   aria-label={`Decrease quantity of ${product.name}`}
-                  className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#16503D] text-[#FFF1C9] hover:text-white transition active:scale-90"
+                  className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#5E2610] text-[#F3E9DC] hover:text-white transition active:scale-90"
                 >
                   <Minus size={13} strokeWidth={2.5} />
                 </button>
@@ -255,7 +255,7 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
                   type="button"
                   onClick={handleIncrement}
                   aria-label={`Increase quantity of ${product.name}`}
-                  className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#16503D] text-[#FFF1C9] hover:text-white transition active:scale-90"
+                  className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#5E2610] text-[#F3E9DC] hover:text-white transition active:scale-90"
                 >
                   <Plus size={13} strokeWidth={2.5} />
                 </button>
@@ -270,10 +270,10 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
                   onSelect();
                 }}
                 aria-label={`Item in cart, tap to customize ${product.name}`}
-                className="min-h-[36px] inline-flex items-center gap-1.5 rounded-full bg-[#0F3D2E] text-white px-3 py-1.5 text-xs font-bold shadow-xs transition hover:bg-[#16503D] focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                className="min-h-[36px] inline-flex items-center gap-1.5 rounded-full bg-[#7A3316] text-white px-3 py-1.5 text-xs font-bold shadow-xs transition hover:bg-[#5E2610] focus:outline-none focus:ring-2 focus:ring-[#7A3316]/20"
               >
-                <span className="text-[#FFF1C9]">{totalQtyInCart} in Cart</span>
-                <Plus size={12} strokeWidth={3} className="text-[#FFF1C9]" />
+                <span className="text-[#F3E9DC]">{totalQtyInCart} in Cart</span>
+                <Plus size={12} strokeWidth={3} className="text-[#F3E9DC]" />
               </motion.button>
             ) : (
               /* Circular + Add Button */
@@ -282,7 +282,7 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
                 whileTap={{ scale: 0.90 }}
                 onClick={handleQuickAdd}
                 aria-label={`Add ${product.name} to cart`}
-                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full flex items-center justify-center bg-[#0F3D2E] text-white shadow-xs hover:bg-[#16503D] active:scale-90 transition-all focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]/20"
+                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full flex items-center justify-center bg-[#7A3316] text-white shadow-xs hover:bg-[#5E2610] active:scale-90 transition-all focus:outline-none focus:ring-2 focus:ring-[#7A3316]/20"
               >
                 <Plus size={18} strokeWidth={2.8} />
               </motion.button>

@@ -70,11 +70,11 @@ class ChunkErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#FAFAF8] text-stone-900 flex flex-col items-center justify-center p-6 text-center">
-          <div className="w-14 h-14 rounded-full border border-amber-200 bg-[#FFF1C9] flex items-center justify-center mb-4 text-2xl shadow-xs">
+        <div className="min-h-screen bg-[#FAFAF8] text-[#2B1810] flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-14 h-14 rounded-full border border-amber-200 bg-[#F3E9DC] flex items-center justify-center mb-4 text-2xl shadow-xs">
             ☕
           </div>
-          <h2 className="text-2xl font-bold font-display text-stone-900 mb-2 tracking-tight">Updated Version Available</h2>
+          <h2 className="text-2xl font-bold font-display text-[#2B1810] mb-2 tracking-tight">Updated Version Available</h2>
           <p className="text-sm text-stone-600 max-w-sm mb-6 leading-relaxed">
             A new version of the café site was just deployed. Please refresh to load the updated page.
           </p>
@@ -84,7 +84,7 @@ class ChunkErrorBoundary extends Component {
               sessionStorage.removeItem('chunk_boundary_reload');
               window.location.reload();
             }}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[#0F3D2E] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#16503D] active:scale-95"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[#7A3316] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#5E2610] active:scale-95"
           >
             Refresh Now
           </button>
@@ -98,7 +98,7 @@ class ChunkErrorBoundary extends Component {
 function PageFallback() {
   return (
     <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-[#0F3D2E] border-t-transparent animate-spin" />
+      <div className="w-8 h-8 rounded-full border-2 border-[#7A3316] border-t-transparent animate-spin" />
     </div>
   );
 }

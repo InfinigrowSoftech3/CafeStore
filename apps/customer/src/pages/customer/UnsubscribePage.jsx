@@ -47,12 +47,12 @@ export default function UnsubscribePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-stone-900">
+    <div className="min-h-screen bg-[#FBF6EF] text-[#2B1810]">
       <main className="mx-auto max-w-xl px-4 py-12 sm:px-6">
         <div className="mb-6 flex items-center justify-between">
           <Link
             to="/menu"
-            className="btn-secondary min-h-[44px] text-xs font-bold uppercase tracking-wider py-2 px-4 inline-flex items-center gap-1.5 rounded-full border border-stone-300 shadow-2xs"
+            className="btn-secondary min-h-[44px] text-xs font-bold uppercase tracking-wider py-2 px-4 inline-flex items-center gap-1.5 rounded-full border border-[#EFE4D6] shadow-2xs"
           >
             <ArrowLeft size={16} />
             <span>Back to Menu</span>
@@ -60,23 +60,23 @@ export default function UnsubscribePage() {
           <Link
             to="/"
             aria-label={`${tenant.name} - Home`}
-            className="font-display font-bold text-lg text-[#0F3D2E] hover:text-[#16503D] transition-colors"
+            className="font-display font-bold text-lg text-[#7A3316] hover:text-[#5E2610] transition-colors"
           >
             {tenant.name}
           </Link>
         </div>
 
-        <div className="rounded-3xl border border-stone-200 bg-white p-6 shadow-xs sm:p-8">
+        <div className="rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] p-6 shadow-xs sm:p-8">
           {unsubscribed ? (
             <div role="status" aria-live="polite" className="text-center py-6 space-y-4">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-emerald-300 bg-emerald-50 text-emerald-600">
                 <CheckCircle2 size={32} />
               </div>
-              <h1 className="font-display text-2xl font-bold text-[#0F3D2E]">Unsubscribe Confirmed</h1>
+              <h1 className="font-display text-2xl font-bold text-[#7A3316]">Unsubscribe Confirmed</h1>
               <p className="text-sm leading-relaxed text-stone-600 max-w-md mx-auto">
                 You will no longer receive promotional offers, discounts, or marketing updates from {tenant.name}.
               </p>
-              <div className="rounded-2xl bg-stone-50 border border-stone-200 p-3.5 text-xs text-stone-500">
+              <div className="rounded-2xl bg-[#FBF6EF] border border-[#EFE4D6] p-3.5 text-xs text-stone-500">
                 ℹ️ Note: If you place future orders at {tenant.name}, you will still receive transactional receipts and order status updates.
               </div>
               <div className="pt-4">
@@ -88,11 +88,11 @@ export default function UnsubscribePage() {
           ) : (
             <form onSubmit={handleUnsubscribe} className="space-y-5">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-300 bg-[#FFF1C9] text-[#0F3D2E]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-300 bg-[#F3E9DC] text-[#7A3316]">
                   <ShieldOff size={20} />
                 </div>
                 <div>
-                  <h1 className="font-display text-xl font-bold text-[#0F3D2E]">Marketing Preferences</h1>
+                  <h1 className="font-display text-xl font-bold text-[#7A3316]">Marketing Preferences</h1>
                   <p className="text-xs text-stone-500">Opt-out of promotional communications</p>
                 </div>
               </div>
@@ -131,7 +131,7 @@ export default function UnsubscribePage() {
                       setError('');
                     }}
                     placeholder="9876543210"
-                    className="input-field pl-12 text-base rounded-full border-stone-300 focus:border-[#0F3D2E] focus:ring-[#0F3D2E]"
+                    className="input-field pl-12 text-base rounded-full border-[#EFE4D6] focus:border-[#7A3316] focus:ring-[#7A3316]"
                     required
                   />
                 </div>

@@ -135,20 +135,20 @@ export default function QrScannerModal({ onClose, onTableFound }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 p-4 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#7A3316]/60 p-4 backdrop-blur-md"
       onClick={handleClose}
     >
       <div
-        className="w-full max-w-md overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-2xl text-stone-900"
+        className="w-full max-w-md overflow-hidden rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] shadow-2xl text-[#2B1810]"
         onClick={event => event.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-stone-200 bg-white px-5 py-4">
+        <div className="flex items-center justify-between border-b border-[#EFE4D6] bg-white px-5 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-stone-100 text-stone-900 border border-stone-200 shadow-2xs">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#F3E9DC] text-[#2B1810] border border-[#EFE4D6] shadow-2xs">
               <QrCode size={19} />
             </div>
             <div>
-              <h2 className="font-display text-xl font-bold text-stone-900">Scan Table QR</h2>
+              <h2 className="font-display text-xl font-bold text-[#2B1810]">Scan Table QR</h2>
               <p className="text-[11px] text-stone-500">Required to add items & place orders</p>
             </div>
           </div>
@@ -156,7 +156,7 @@ export default function QrScannerModal({ onClose, onTableFound }) {
             type="button"
             onClick={handleClose}
             aria-label="Close QR scanner"
-            className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-stone-300 text-stone-500 hover:bg-stone-50 hover:text-stone-900 transition focus:outline-none focus:ring-1 focus:ring-stone-900"
+            className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-[#EFE4D6] text-stone-500 hover:bg-[#FBF6EF] hover:text-[#2B1810] transition focus:outline-none focus:ring-1 focus:ring-[#7A3316]"
           >
             <X size={18} aria-hidden="true" />
           </button>
@@ -169,7 +169,7 @@ export default function QrScannerModal({ onClose, onTableFound }) {
               <div className="flex items-start gap-3">
                 <AlertTriangle size={20} className="text-amber-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <p className="font-semibold text-stone-900 text-sm">Switch to Table {String(pendingTable.number).padStart(2, '0')}?</p>
+                  <p className="font-semibold text-[#2B1810] text-sm">Switch to Table {String(pendingTable.number).padStart(2, '0')}?</p>
                   <p className="text-xs text-stone-700 mt-1">
                     You have {items.length} item{items.length !== 1 ? 's' : ''} in your cart for Table {String(tableNumber).padStart(2, '0')}.
                     Switching tables will <strong>clear your current cart</strong>.
@@ -178,7 +178,7 @@ export default function QrScannerModal({ onClose, onTableFound }) {
                     <button
                       type="button"
                       onClick={handleCancelNewTable}
-                      className="flex-1 min-h-[40px] rounded-full border border-stone-300 bg-white py-2 px-3 text-xs font-bold text-stone-700 hover:bg-stone-50 transition focus:outline-none focus:ring-1 focus:ring-stone-900"
+                      className="flex-1 min-h-[40px] rounded-full border border-[#EFE4D6] bg-white py-2 px-3 text-xs font-bold text-stone-700 hover:bg-[#FBF6EF] transition focus:outline-none focus:ring-1 focus:ring-[#7A3316]"
                     >
                       Cancel
                     </button>
@@ -186,7 +186,7 @@ export default function QrScannerModal({ onClose, onTableFound }) {
                       type="button"
                       onClick={handleConfirmNewTable}
                       disabled={checking}
-                      className="flex-1 min-h-[40px] rounded-full bg-[#0F3D2E] py-2 px-3 text-xs font-bold text-white hover:bg-[#16503D] transition disabled:opacity-50 focus:outline-none focus:ring-1 focus:ring-stone-900"
+                      className="flex-1 min-h-[40px] rounded-full bg-[#7A3316] py-2 px-3 text-xs font-bold text-white hover:bg-[#5E2610] transition disabled:opacity-50 focus:outline-none focus:ring-1 focus:ring-[#7A3316]"
                     >
                       Switch to Table {String(pendingTable.number).padStart(2, '0')}
                     </button>
@@ -198,7 +198,7 @@ export default function QrScannerModal({ onClose, onTableFound }) {
 
           {!pendingTable && (
             <>
-              <div id="qr-reader" className="overflow-hidden rounded-2xl bg-stone-900 shadow-inner border border-stone-300" />
+              <div id="qr-reader" className="overflow-hidden rounded-2xl bg-[#7A3316] shadow-inner border border-[#EFE4D6]" />
               <p className="mt-3.5 text-center text-xs text-stone-600">
                 Point your camera at the QR code stand on your cafe table.
               </p>
@@ -211,7 +211,7 @@ export default function QrScannerModal({ onClose, onTableFound }) {
             </div>
           )}
           {checking && (
-            <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-2.5 text-center text-xs font-medium text-stone-900" role="status" aria-live="polite">
+            <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-2.5 text-center text-xs font-medium text-[#2B1810]" role="status" aria-live="polite">
               Validating table & starting dining session...
             </div>
           )}

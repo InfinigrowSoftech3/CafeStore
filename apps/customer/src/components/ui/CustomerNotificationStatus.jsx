@@ -39,14 +39,14 @@ export default function CustomerNotificationStatus() {
 
   if (permission === 'unsupported') {
     return (
-      <div className="rounded-2xl border border-foam bg-white p-4 shadow-sm">
+      <div className="rounded-2xl border border-foam bg-[#FFFDF9] p-4 shadow-sm">
         <p className="text-xs text-espresso-500">Web notifications aren&apos;t supported on this browser.</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-foam bg-white p-4 shadow-sm">
+    <div className="rounded-2xl border border-foam bg-[#FFFDF9] p-4 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
@@ -70,7 +70,7 @@ export default function CustomerNotificationStatus() {
                   <XCircle size={12} /> Notifications Blocked
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-semibold text-stone-600 border border-stone-200">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#F3E9DC] px-2.5 py-0.5 text-xs font-semibold text-stone-600 border border-[#EFE4D6]">
                   Notifications Disabled
                 </span>
               )}

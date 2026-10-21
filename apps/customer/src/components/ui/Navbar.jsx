@@ -26,14 +26,14 @@ export default function Navbar() {
   const itemCount = useCartStore(cartItemCount);
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl border-b border-stone-200/80 shadow-[0_2px_12px_-2px_rgba(15,61,46,0.04)] transition-all duration-200">
+    <header className="sticky top-0 z-40 w-full bg-[#FFFDF9]/95 backdrop-blur-xl border-b border-[#EFE4D6] shadow-[0_2px_12px_-2px_rgba(15,61,46,0.04)] transition-all duration-200">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-3.5 py-2.5 sm:px-6 sm:py-3 lg:px-8">
         {/* Brand Logo & Name */}
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <Link
             to="/menu"
             aria-label={`${tenant.name || 'Café'} - Homepage`}
-            className="group flex items-center gap-2.5 sm:gap-3 rounded-xl transition-transform active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E] min-w-0"
+            className="group flex items-center gap-2.5 sm:gap-3 rounded-xl transition-transform active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7A3316] min-w-0"
           >
             {tenant.logoUrl ? (
               <img
@@ -44,12 +44,12 @@ export default function Navbar() {
                 height={36}
               />
             ) : (
-              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-2xl bg-[#0F3D2E] text-white shadow-xs flex-shrink-0">
+              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-2xl bg-[#7A3316] text-[#FFFDF9] shadow-xs flex-shrink-0">
                 <Coffee size={20} className="stroke-[2.2]" />
               </div>
             )}
             <div className="flex flex-col min-w-0">
-              <span className="font-display text-base sm:text-lg font-bold tracking-tight leading-tight text-[#0F3D2E] group-hover:text-[#16503D] transition-colors truncate">
+              <span className="font-display text-base sm:text-lg font-bold tracking-tight leading-tight text-[#2B1810] group-hover:text-[#7A3316] transition-colors truncate">
                 {tenant.name || 'Café'}
               </span>
               <span className="text-[10px] uppercase tracking-wider text-stone-500 font-bold leading-none truncate">
@@ -69,8 +69,8 @@ export default function Navbar() {
                 to={link.to}
                 className={`relative px-4 py-2 text-xs font-bold tracking-wide rounded-full transition-all duration-200 ${
                   isActive
-                    ? 'text-stone-900 bg-stone-100 border border-stone-300 shadow-2xs font-bold'
-                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-50 font-medium'
+                    ? 'text-[#7A3316] bg-[#F3E9DC] border border-[#EFE4D6] shadow-2xs font-bold'
+                    : 'text-[#7B6B5F] hover:text-[#2B1810] hover:bg-[#F3E9DC]/60 font-medium'
                 }`}
               >
                 {link.label}
@@ -100,7 +100,7 @@ export default function Navbar() {
               type="button"
               onClick={openScanner}
               aria-label="Scan Table QR Code"
-              className="min-h-[38px] inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-bold bg-[#0F3D2E] text-white hover:bg-[#16503D] transition-all active:scale-95 shadow-2xs"
+              className="min-h-[38px] inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-bold bg-[#7A3316] text-[#FFFDF9] hover:bg-[#5E2610] transition-all active:scale-95 shadow-2xs"
             >
               <ScanLine size={15} className="text-white" />
               <span className="hidden sm:inline">Scan Table</span>
@@ -111,7 +111,7 @@ export default function Navbar() {
           <Link
             to="/cart"
             aria-label={`Open Cart (${itemCount} items)`}
-            className="relative min-h-[38px] min-w-[38px] flex items-center justify-center rounded-full border border-stone-300 bg-white text-stone-900 hover:bg-stone-50 shadow-2xs transition-all active:scale-95"
+            className="relative min-h-[38px] min-w-[38px] flex items-center justify-center rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#2B1810] hover:bg-[#F3E9DC] shadow-2xs transition-all active:scale-95"
           >
             <ShoppingBag size={18} className="stroke-[2.2]" />
             <AnimatePresence>
@@ -122,7 +122,7 @@ export default function Navbar() {
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.4, opacity: 0 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                  className="absolute -top-1.5 -right-1.5 flex h-4.5 min-w-[18px] px-1 items-center justify-center rounded-full bg-stone-900 text-[10px] font-bold text-white shadow-sm ring-1 ring-white"
+                  className="absolute -top-1.5 -right-1.5 flex h-4.5 min-w-[18px] px-1 items-center justify-center rounded-full bg-[#E23B2E] text-[10px] font-bold text-white shadow-sm ring-1 ring-white"
                 >
                   {itemCount}
                 </motion.span>
@@ -135,7 +135,7 @@ export default function Navbar() {
             type="button"
             onClick={openNavDrawer}
             aria-label="Open navigation menu - show all pages"
-            className="min-h-[38px] min-w-[38px] px-2.5 sm:px-3.5 flex items-center justify-center gap-1.5 rounded-full border border-stone-300 bg-white text-[#0F3D2E] hover:bg-stone-50 shadow-2xs transition-all active:scale-95"
+            className="min-h-[38px] min-w-[38px] px-2.5 sm:px-3.5 flex items-center justify-center gap-1.5 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#7A3316] hover:bg-[#FBF6EF] shadow-2xs transition-all active:scale-95"
           >
             <Menu size={18} strokeWidth={2.4} />
             <span className="hidden xl:inline text-xs font-sora font-bold">All Pages</span>

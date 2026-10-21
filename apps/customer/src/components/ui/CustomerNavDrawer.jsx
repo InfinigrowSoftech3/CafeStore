@@ -27,7 +27,7 @@ const NAV_ITEMS = [
     title: 'Food & Drinks Menu',
     subtitle: 'Browse all dishes, beverages & specials',
     icon: UtensilsCrossed,
-    color: 'bg-emerald-50 text-[#0F3D2E] border-emerald-200/60',
+    color: 'bg-emerald-50 text-[#7A3316] border-emerald-200/60',
   },
   {
     to: '/offers',
@@ -41,7 +41,7 @@ const NAV_ITEMS = [
     title: 'My Orders & History',
     subtitle: 'Live order tracking & digital bills',
     icon: Clock,
-    color: 'bg-stone-100 text-stone-900 border-stone-200',
+    color: 'bg-[#F3E9DC] text-[#2B1810] border-[#EFE4D6]',
   },
   {
     to: '/about',
@@ -121,7 +121,7 @@ export default function CustomerNavDrawer() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={closeNavDrawer}
-            className="fixed inset-0 bg-[#0F3D2E]/40 backdrop-blur-sm"
+            className="fixed inset-0 bg-[#7A3316]/40 backdrop-blur-sm"
             aria-hidden="true"
           />
 
@@ -135,24 +135,24 @@ export default function CustomerNavDrawer() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-            className="relative z-10 w-full sm:w-[420px] max-w-full h-full bg-white text-stone-900 shadow-2xl flex flex-col border-l border-stone-200 overflow-hidden"
+            className="relative z-10 w-full sm:w-[420px] max-w-full h-full bg-[#FFFDF9] text-[#2B1810] shadow-2xl flex flex-col border-l border-[#EFE4D6] overflow-hidden"
           >
             {/* ─── Drawer Top Header ────────────────────────────────────────── */}
-            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-stone-200 bg-white">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-[#EFE4D6] bg-white">
               <div className="flex items-center gap-3 min-w-0">
                 {tenant.logoUrl ? (
                   <img
                     src={tenant.logoUrl}
                     alt={tenant.name || 'Café'}
-                    className="w-10 h-10 rounded-2xl object-cover border border-stone-200 flex-shrink-0"
+                    className="w-10 h-10 rounded-2xl object-cover border border-[#EFE4D6] flex-shrink-0"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-2xl bg-[#0F3D2E] text-white flex items-center justify-center font-sora font-extrabold text-base flex-shrink-0 shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-[#7A3316] text-white flex items-center justify-center font-sora font-extrabold text-base flex-shrink-0 shadow-xs">
                     <Coffee size={20} strokeWidth={2.4} />
                   </div>
                 )}
                 <div className="min-w-0">
-                  <h2 className="font-sora font-extrabold text-lg text-stone-900 leading-tight truncate">
+                  <h2 className="font-sora font-extrabold text-lg text-[#2B1810] leading-tight truncate">
                     {tenant.name || 'APNA DOST'}
                   </h2>
                   <p className="text-[11px] font-semibold text-stone-500 truncate">
@@ -166,7 +166,7 @@ export default function CustomerNavDrawer() {
                 type="button"
                 onClick={closeNavDrawer}
                 aria-label="Close navigation menu"
-                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full border border-stone-300 bg-white flex items-center justify-center text-stone-700 hover:text-stone-900 hover:bg-stone-50 transition active:scale-95 shadow-2xs"
+                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full border border-[#EFE4D6] bg-[#FFFDF9] flex items-center justify-center text-stone-700 hover:text-[#2B1810] hover:bg-[#FBF6EF] transition active:scale-95 shadow-2xs"
               >
                 <X size={18} strokeWidth={2.4} />
               </button>
@@ -175,7 +175,7 @@ export default function CustomerNavDrawer() {
             {/* ─── Scrollable Content ───────────────────────────────────────── */}
             <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-4 space-y-4 bg-white">
               {/* Table Status Card */}
-              <div className="rounded-2xl border border-stone-200 bg-white p-3.5 shadow-2xs">
+              <div className="rounded-2xl border border-[#EFE4D6] bg-[#FFFDF9] p-3.5 shadow-2xs">
                 {tableNumber ? (
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
@@ -187,7 +187,7 @@ export default function CustomerNavDrawer() {
                         <span className="text-[10px] uppercase tracking-wider font-extrabold text-emerald-800">
                           Seated Session
                         </span>
-                        <p className="font-sora text-sm font-bold text-stone-900 leading-tight">
+                        <p className="font-sora text-sm font-bold text-[#2B1810] leading-tight">
                           Table {String(tableNumber).padStart(2, '0')}
                         </p>
                       </div>
@@ -198,7 +198,7 @@ export default function CustomerNavDrawer() {
                         closeNavDrawer();
                         openScanner();
                       }}
-                      className="min-h-[36px] px-3.5 py-1 rounded-full border border-stone-300 bg-white hover:bg-stone-50 text-xs font-sora font-bold text-stone-800 transition active:scale-95 shadow-2xs"
+                      className="min-h-[36px] px-3.5 py-1 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] hover:bg-[#FBF6EF] text-xs font-sora font-bold text-[#2B1810] transition active:scale-95 shadow-2xs"
                     >
                       Change Table
                     </button>
@@ -206,7 +206,7 @@ export default function CustomerNavDrawer() {
                 ) : (
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="font-sora text-xs font-bold text-stone-900">Ordering at table?</p>
+                      <p className="font-sora text-xs font-bold text-[#2B1810]">Ordering at table?</p>
                       <p className="text-[11px] text-stone-500 truncate">Scan table QR for instant ordering</p>
                     </div>
                     <button
@@ -215,7 +215,7 @@ export default function CustomerNavDrawer() {
                         closeNavDrawer();
                         openScanner();
                       }}
-                      className="min-h-[38px] px-4 flex items-center gap-1.5 rounded-full bg-[#0F3D2E] text-white hover:bg-[#16503D] text-xs font-sora font-bold transition active:scale-95 shadow-2xs shrink-0"
+                      className="min-h-[38px] px-4 flex items-center gap-1.5 rounded-full bg-[#7A3316] text-white hover:bg-[#5E2610] text-xs font-sora font-bold transition active:scale-95 shadow-2xs shrink-0"
                     >
                       <ScanLine size={14} />
                       <span>Scan Table</span>
@@ -228,17 +228,17 @@ export default function CustomerNavDrawer() {
               <Link
                 to="/cart"
                 onClick={closeNavDrawer}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-stone-50 border border-stone-200 hover:bg-stone-100 transition group shadow-2xs"
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-[#FBF6EF] border border-[#EFE4D6] hover:bg-[#F3E9DC] transition group shadow-2xs"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-stone-900 text-white flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#7A3316] text-white flex items-center justify-center shrink-0">
                     <ShoppingBag size={18} strokeWidth={2.4} />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-sora text-sm font-bold text-stone-900">Your Cart</p>
+                      <p className="font-sora text-sm font-bold text-[#2B1810]">Your Cart</p>
                       {itemCount > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-[var(--menu-accent,#C93A1C)] text-white text-[10px] font-extrabold font-sora">
+                        <span className="px-2 py-0.5 rounded-full bg-[var(--menu-accent,#7A3316)] text-white text-[10px] font-extrabold font-sora">
                           {itemCount} {itemCount === 1 ? 'item' : 'items'}
                         </span>
                       )}
@@ -250,7 +250,7 @@ export default function CustomerNavDrawer() {
                     </p>
                   </div>
                 </div>
-                <ChevronRight size={18} className="text-stone-900 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                <ChevronRight size={18} className="text-[#2B1810] shrink-0 group-hover:translate-x-0.5 transition-transform" />
               </Link>
 
               {/* Section Header */}
@@ -269,14 +269,14 @@ export default function CustomerNavDrawer() {
                         onClick={closeNavDrawer}
                         className={`group flex items-center justify-between p-3 rounded-2xl border transition-all ${
                           isActive
-                            ? 'bg-stone-50 border-stone-900 shadow-2xs'
-                            : 'bg-white border-stone-200 hover:border-stone-400 shadow-2xs'
+                            ? 'bg-[#FBF6EF] border-stone-900 shadow-2xs'
+                            : 'bg-[#FFFDF9] border-[#EFE4D6] hover:border-stone-400 shadow-2xs'
                         }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <div
                             className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${item.color} ${
-                              isActive ? 'ring-1 ring-stone-900' : ''
+                              isActive ? 'ring-1 ring-[#7A3316]' : ''
                             }`}
                           >
                             <Icon size={18} strokeWidth={2.4} />
@@ -285,13 +285,13 @@ export default function CustomerNavDrawer() {
                             <div className="flex items-center gap-2">
                               <p
                                 className={`font-sora text-sm font-bold truncate ${
-                                  isActive ? 'text-stone-900' : 'text-stone-900 group-hover:text-stone-900'
+                                  isActive ? 'text-[#2B1810]' : 'text-[#2B1810] group-hover:text-[#2B1810]'
                                 }`}
                               >
                                 {item.title}
                               </p>
                               {isActive && (
-                                <span className="px-2 py-0.5 rounded-full bg-stone-900 text-white text-[9px] font-sora font-extrabold uppercase tracking-wider">
+                                <span className="px-2 py-0.5 rounded-full bg-[#7A3316] text-white text-[9px] font-sora font-extrabold uppercase tracking-wider">
                                   Current
                                 </span>
                               )}
@@ -305,8 +305,8 @@ export default function CustomerNavDrawer() {
                           size={16}
                           className={`shrink-0 transition-transform ${
                             isActive
-                              ? 'text-stone-900'
-                              : 'text-stone-400 group-hover:text-stone-900 group-hover:translate-x-0.5'
+                              ? 'text-[#2B1810]'
+                              : 'text-stone-400 group-hover:text-[#2B1810] group-hover:translate-x-0.5'
                           }`}
                         />
                       </Link>
@@ -317,20 +317,20 @@ export default function CustomerNavDrawer() {
 
               {/* Direct Café Contact / Address Card */}
               {(tenant.address || tenant.contactPhone) && (
-                <div className="rounded-2xl border border-stone-200 bg-white p-3.5 space-y-2.5 shadow-2xs">
+                <div className="rounded-2xl border border-[#EFE4D6] bg-[#FFFDF9] p-3.5 space-y-2.5 shadow-2xs">
                   <p className="text-[11px] font-extrabold uppercase tracking-wider text-stone-500">
                     Visit or Call Us
                   </p>
                   {tenant.address && (
                     <div className="flex items-start gap-2.5 text-xs text-stone-600">
-                      <MapPin size={15} className="text-stone-900 shrink-0 mt-0.5" />
+                      <MapPin size={15} className="text-[#2B1810] shrink-0 mt-0.5" />
                       <span className="line-clamp-2">{tenant.address}</span>
                     </div>
                   )}
                   {tenant.contactPhone && (
                     <a
                       href={`tel:${tenant.contactPhone}`}
-                      className="inline-flex items-center gap-2 text-xs font-sora font-bold text-stone-900 hover:underline"
+                      className="inline-flex items-center gap-2 text-xs font-sora font-bold text-[#2B1810] hover:underline"
                     >
                       <Phone size={14} />
                       <span>{tenant.contactPhone}</span>
@@ -341,17 +341,17 @@ export default function CustomerNavDrawer() {
             </div>
 
             {/* ─── Footer: Legal Links ───────────────────────────────────────── */}
-            <div className="p-4 border-t border-stone-200/80 bg-white space-y-2">
+            <div className="p-4 border-t border-[#EFE4D6]/80 bg-white space-y-2">
               <div className="flex items-center justify-center gap-4 text-xs font-medium text-stone-500">
-                <Link to="/privacy" onClick={closeNavDrawer} className="hover:text-[#0F3D2E]">
+                <Link to="/privacy" onClick={closeNavDrawer} className="hover:text-[#7A3316]">
                   Privacy Policy
                 </Link>
                 <span>•</span>
-                <Link to="/terms" onClick={closeNavDrawer} className="hover:text-[#0F3D2E]">
+                <Link to="/terms" onClick={closeNavDrawer} className="hover:text-[#7A3316]">
                   Terms of Service
                 </Link>
                 <span>•</span>
-                <Link to="/refund-policy" onClick={closeNavDrawer} className="hover:text-[#0F3D2E]">
+                <Link to="/refund-policy" onClick={closeNavDrawer} className="hover:text-[#7A3316]">
                   Refunds
                 </Link>
               </div>
