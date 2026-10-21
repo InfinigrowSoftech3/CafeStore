@@ -247,6 +247,7 @@ export default function TenantSettingsPage() {
           keyId: payment.keyId.trim(),
           keySecret: payment.keySecret.trim(),
           webhookSecret: payment.webhookSecret.trim(),
+          preserveExisting: true,
         };
       }
 

@@ -63,7 +63,7 @@ export default function BillPage() {
       });
       checkout.open();
     } catch (error) {
-      toast.error(error.message || 'Final bill payment failed');
+      toast.error(error.response?.data?.error || error.response?.data?.message || error.message || 'Final bill payment failed');
     } finally {
       setPayingOnline(false);
     }

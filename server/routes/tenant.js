@@ -244,30 +244,43 @@ const updateTenantSettings = async (req, res, next, { isPartial = false } = {}) 
     // 4. Payment Credentials Handling
     const payment = req.body?.payment;
     if (payment !== undefined && payment !== null && typeof payment === 'object') {
+      const existingTenant = await Tenant.findById(req.tenantId).select('+paymentCredentialsEncrypted').lean();
+      let existingCredentials = {};
+      try {
+        existingCredentials = decryptTenantCredentials(existingTenant?.paymentCredentialsEncrypted) || {};
+      } catch {
+        existingCredentials = {};
+      }
+
       const keyId = String(payment.keyId || '').trim();
       const keySecret = String(payment.keySecret || '').trim();
       const webhookSecret = String(payment.webhookSecret || '').trim();
-      const clearing = payment.clear === true || (!keyId && !keySecret && !webhookSecret);
+      const clearing = payment.clear === true || (!keyId && !keySecret && !webhookSecret && !payment.preserveExisting);
 
       if (clearing) {
         // Optional Razorpay keys: saving empty/cleared is allowed
         patch.paymentCredentialsEncrypted = '';
       } else {
+        const finalKeyId = keyId || existingCredentials.keyId || '';
+        const finalKeySecret = keySecret || existingCredentials.keySecret || '';
+        const finalWebhookSecret = webhookSecret || existingCredentials.webhookSecret || crypto.randomBytes(24).toString('hex');
+
         // Keys provided: enforce format & completeness
-        if (!keyId) {
+        if (!finalKeyId) {
           return res.status(400).json({ error: 'Razorpay Key ID is required when configuring payments.', field: 'keyId' });
         }
-        if (!/^rzp_(?:test|live)_[a-zA-Z0-9]+$/.test(keyId)) {
+        if (!/^rzp_(?:test|live)_[a-zA-Z0-9]+$/.test(finalKeyId)) {
           return res.status(400).json({ error: 'Razorpay Key ID must start with rzp_test_ or rzp_live_.', field: 'keyId' });
         }
-        if (!keySecret) {
+        if (!finalKeySecret) {
           return res.status(400).json({ error: 'Razorpay Key Secret is required when configuring payments.', field: 'keySecret' });
         }
-        if (!webhookSecret) {
-          return res.status(400).json({ error: 'Razorpay Webhook Secret is required when configuring payments.', field: 'webhookSecret' });
-        }
 
-        patch.paymentCredentialsEncrypted = encryptTenantCredentials({ keyId, keySecret, webhookSecret });
+        patch.paymentCredentialsEncrypted = encryptTenantCredentials({
+          keyId: finalKeyId,
+          keySecret: finalKeySecret,
+          webhookSecret: finalWebhookSecret,
+        });
       }
     }
 

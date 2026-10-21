@@ -316,7 +316,13 @@ export default function CheckoutPage() {
 
       rzp.open();
     } catch (e) {
-      setError(e.message || 'Failed to process payment. Please try again.');
+      const errorMsg =
+        e.response?.data?.error ||
+        e.response?.data?.message ||
+        e.message ||
+        'Failed to process payment. Please try again.';
+      setError(errorMsg);
+      toast.error(errorMsg);
       setLoading(false);
     }
   };

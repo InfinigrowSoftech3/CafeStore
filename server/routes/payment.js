@@ -39,16 +39,9 @@ const getTenantPaymentConfig = async (req) => {
   if (
     !activeConfig.keyId ||
     !activeConfig.keySecret ||
-    !activeConfig.webhookSecret ||
-    activeConfig.keySecret === 'placeholder_secret' ||
-    (process.env.NODE_ENV === 'production' &&
-      activeConfig.keyId.startsWith('rzp_test_') &&
-      process.env.ALLOW_TEST_PAYMENTS !== 'true' &&
-      process.env.DEMO_PAYMENTS_ENABLED !== 'true' &&
-      !process.env.RENDER &&
-      !process.env.SERVER_URL?.includes('onrender.com'))
+    activeConfig.keySecret === 'placeholder_secret'
   ) {
-    const error = new Error('Online payments are not configured for this café.');
+    const error = new Error('Online payments are not configured for this café. Please configure your Razorpay Key ID and Secret in Café Admin Settings.');
     error.code = 'PAYMENT_CONFIG_INVALID';
     error.status = 503;
     throw error;
@@ -273,11 +266,11 @@ router.post('/create-order', async (req, res) => {
       keyId: config.keyId,
     });
   } catch (error) {
-    console.error('Razorpay create order error:', error.message);
+    console.error('Razorpay create order error:', error?.error || error.message);
     const status = error.status || (error.code === 'PAYMENT_CONFIG_INVALID' ? 503 : 502);
     const message = error.code === 'PAYMENT_CONFIG_INVALID'
       ? error.message
-      : 'Payment gateway could not initialize the order. Please try again.';
+      : (error?.error?.description || error?.message || 'Payment gateway could not initialize the order. Please check Razorpay keys in Admin Settings.');
     return res.status(status).json({ error: message, ...(error.code && { code: error.code }) });
   }
 });
