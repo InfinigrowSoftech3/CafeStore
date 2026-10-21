@@ -1,12 +1,18 @@
 import { useState } from 'react';
-import { Plus, Minus, Clock, Utensils, Star, SlidersHorizontal } from 'lucide-react';
+import { Plus, Minus, Clock, Utensils, Star, SlidersHorizontal, Heart } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useCartStore from '../../context/cartStore';
 import { useTenant } from '../../context/TenantContext';
 import { formatMoney } from '../../utils/money';
 import VegMark from './VegMark';
 
-export default function MenuItemRow({ product, onSelect, isKitchenOpen = true }) {
+export default function MenuItemRow({
+  product,
+  onSelect,
+  isFavorite = false,
+  onToggleFavorite,
+  isKitchenOpen = true,
+}) {
   const tenant = useTenant();
   const { items, addItem, updateQuantity, tableNumber, openScanner } = useCartStore();
   const [imgError, setImgError] = useState(false);
@@ -14,7 +20,7 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
   // Availability calculation
   const isAvailable =
     isKitchenOpen &&
-    product.available &&
+    product.available !== false &&
     product.scheduledAvailable !== false &&
     product.inventoryAvailable !== false;
 
@@ -74,17 +80,24 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
     }
   };
 
+  const handleHeartClick = (e) => {
+    e.stopPropagation();
+    if (onToggleFavorite) {
+      onToggleFavorite(product._id);
+    }
+  };
+
+  const isVeg = product.isVeg !== undefined ? product.isVeg : product.isVegetarian !== false;
+
   return (
     <article
       onClick={isAvailable ? () => onSelect(product) : undefined}
-      className={`group relative w-full bg-white border border-stone-200 rounded-2xl overflow-hidden select-none transition-all shadow-2xs hover:shadow-md hover:border-stone-300 ${
-        isAvailable
-          ? 'cursor-pointer'
-          : 'opacity-60 grayscale-[40%] cursor-default'
+      className={`group relative w-full bg-[#FFFDF9] border border-[#EFE4D6] rounded-2xl overflow-hidden select-none transition-all shadow-[0_4px_16px_rgba(90,50,20,0.05)] hover:shadow-[0_8px_24px_rgba(90,50,20,0.1)] hover:border-[#7A3316]/30 ${
+        isAvailable ? 'cursor-pointer' : 'opacity-60 grayscale-[40%] cursor-default'
       }`}
     >
       {/* ─── Top: Full-Width Food Image ─── */}
-      <div className="relative w-full h-44 sm:h-52 md:h-64 bg-stone-100 border-b border-stone-100 overflow-hidden rounded-t-2xl">
+      <div className="relative w-full h-44 sm:h-52 md:h-60 bg-[#F3E9DC] border-b border-[#EFE4D6] overflow-hidden rounded-t-2xl">
         {product.image && !imgError ? (
           <img
             src={product.image}
@@ -95,15 +108,31 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-stone-100 text-stone-400">
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[#F3E9DC] text-[#7B6B5F]">
             <Utensils size={36} strokeWidth={1.5} />
           </div>
         )}
 
+        {/* Top-Right: Translucent Heart Favorite Button */}
+        {onToggleFavorite && (
+          <button
+            type="button"
+            onClick={handleHeartClick}
+            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all active:scale-90 ${
+              isFavorite
+                ? 'bg-[#E23B2E] text-white shadow-xs'
+                : 'bg-white/80 text-[#2B1810] hover:bg-white shadow-xs'
+            }`}
+          >
+            <Heart size={15} fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={isFavorite ? 2.5 : 2} />
+          </button>
+        )}
+
         {/* Sold Out Overlay */}
         {!isAvailable && (
-          <div className="absolute inset-0 bg-stone-900/65 backdrop-blur-[1px] flex items-center justify-center p-2 text-center">
-            <span className="bg-stone-900 text-white text-xs font-sora font-extrabold px-3 py-1.5 uppercase tracking-wider rounded-full border border-white/20 shadow-xs">
+          <div className="absolute inset-0 bg-[#2B1810]/60 backdrop-blur-[1px] flex items-center justify-center p-2 text-center">
+            <span className="bg-[#2B1810] text-[#FFFDF9] text-xs font-bold px-3 py-1.5 uppercase tracking-wider rounded-full border border-white/20 shadow-xs">
               Sold out
             </span>
           </div>
@@ -111,21 +140,21 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
       </div>
 
       {/* ─── Bottom: Content Area (Badges, Title, Price, Description, ADD + button) ─── */}
-      <div className="p-3.5 sm:p-4 bg-white">
+      <div className="p-3.5 sm:p-4 bg-[#FFFDF9]">
         {/* Top Badges Row: Veg Mark + BESTSELLER Badge + Prep Time */}
         <div className="flex flex-wrap items-center gap-2 mb-2">
-          <VegMark isVeg={product.isVeg} size={15} />
+          <VegMark isVeg={isVeg} size={15} />
 
           {product.popular && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF1C9] border border-amber-300 px-2.5 py-0.5 text-[10px] font-sora font-extrabold text-[#0F3D2E] tracking-wider uppercase">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#F3E9DC] border border-[#EFE4D6] px-2.5 py-0.5 text-[10px] font-bold text-[#7A3316] tracking-wider uppercase">
               <Star size={9} fill="currentColor" />
               <span>BESTSELLER</span>
             </span>
           )}
 
           {product.prepTime && (
-            <span className="inline-flex items-center gap-1 text-[11px] font-jakarta font-medium text-stone-500">
-              <Clock size={12} className="text-stone-400" />
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#7B6B5F]">
+              <Clock size={12} className="text-[#7B6B5F]/70" />
               <span>{product.prepTime} mins</span>
             </span>
           )}
@@ -135,29 +164,29 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
         <div className="flex items-start justify-between gap-3 sm:gap-4">
           {/* Left: Product Information */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-sora font-bold text-base sm:text-lg text-stone-900 leading-snug group-hover:text-[#0F3D2E] transition-colors">
+            <h3 className="font-bold text-base sm:text-lg text-[#2B1810] leading-snug group-hover:text-[#7A3316] transition-colors">
               {product.name}
             </h3>
 
             <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="font-sora font-extrabold text-sm sm:text-base text-[#0F3D2E]">
+              <span className="font-display font-bold text-base sm:text-lg text-[#7A3316]">
                 {formatMoney(product.price, tenant.currency)}
               </span>
               {product.originalPrice && product.originalPrice > product.price && (
-                <span className="text-xs text-stone-400 line-through tabular-nums font-jakarta">
+                <span className="text-xs text-[#7B6B5F] line-through tabular-nums">
                   {formatMoney(product.originalPrice, tenant.currency)}
                 </span>
               )}
             </div>
 
             {product.description && (
-              <p className="mt-1 text-xs sm:text-sm text-stone-500 font-jakarta leading-relaxed line-clamp-2 sm:line-clamp-3">
+              <p className="mt-1 text-xs sm:text-sm text-[#7B6B5F] leading-relaxed line-clamp-2 sm:line-clamp-3">
                 {product.description}
               </p>
             )}
 
             {hasCustomizations && (
-              <div className="mt-2 inline-flex items-center gap-1 text-[11px] font-sora font-semibold text-[#0F3D2E]">
+              <div className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-[#7A3316]">
                 <SlidersHorizontal size={11} />
                 <span>Customisable</span>
               </div>
@@ -168,23 +197,23 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
           <div className="shrink-0 pt-0.5" onClick={(e) => e.stopPropagation()}>
             {!isAvailable ? null : totalQtyInCart > 0 && !hasCustomizations ? (
               /* Rounded Quantity Stepper */
-              <div className="inline-flex items-center bg-white border border-[#0F3D2E] rounded-full shadow-2xs px-1">
+              <div className="inline-flex items-center bg-[#FFFDF9] border border-[#7A3316] rounded-full shadow-2xs px-1">
                 <button
                   type="button"
                   onClick={handleDecrement}
                   aria-label={`Decrease quantity of ${product.name}`}
-                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-[#0F3D2E] hover:bg-stone-100 active:scale-90 transition"
+                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-[#7A3316] hover:bg-[#F3E9DC] active:scale-90 transition"
                 >
                   <Minus size={13} strokeWidth={2.5} />
                 </button>
-                <span className="font-sora font-extrabold text-xs px-2 min-w-[22px] text-center text-[#0F3D2E]">
+                <span className="font-bold text-xs px-2 min-w-[22px] text-center text-[#2B1810]">
                   {totalQtyInCart}
                 </span>
                 <button
                   type="button"
                   onClick={handleIncrement}
                   aria-label={`Increase quantity of ${product.name}`}
-                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-[#0F3D2E] hover:bg-stone-100 active:scale-90 transition"
+                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-[#7A3316] hover:bg-[#F3E9DC] active:scale-90 transition"
                 >
                   <Plus size={13} strokeWidth={2.5} />
                 </button>
@@ -195,7 +224,7 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
                 type="button"
                 onClick={() => onSelect(product)}
                 aria-label={`Customize ${product.name}`}
-                className="h-8 sm:h-9 px-4 bg-[#0F3D2E] text-white font-sora font-bold text-xs uppercase tracking-wider shadow-2xs hover:bg-[#16503D] active:scale-95 transition rounded-full border border-[#0F3D2E] flex items-center gap-1"
+                className="h-8 sm:h-9 px-4 bg-[#7A3316] text-[#FFFDF9] font-bold text-xs uppercase tracking-wider shadow-2xs hover:bg-[#5E2610] active:scale-95 transition rounded-full border border-[#7A3316] flex items-center gap-1"
               >
                 <span>{totalQtyInCart} IN CART</span>
               </button>
@@ -205,7 +234,7 @@ export default function MenuItemRow({ product, onSelect, isKitchenOpen = true })
                 type="button"
                 onClick={handleQuickAdd}
                 aria-label={`Add ${product.name} to order`}
-                className="h-8 sm:h-9 px-5 sm:px-6 bg-white text-[#0F3D2E] font-sora font-bold text-xs uppercase tracking-wider shadow-2xs border border-[#0F3D2E] hover:bg-[#0F3D2E] hover:text-white active:scale-95 transition rounded-full flex items-center justify-center gap-1.5"
+                className="h-8 sm:h-9 px-5 sm:px-6 bg-[#FFFDF9] text-[#7A3316] font-bold text-xs uppercase tracking-wider shadow-2xs border border-[#7A3316] hover:bg-[#7A3316] hover:text-[#FFFDF9] active:scale-95 transition rounded-full flex items-center justify-center gap-1.5"
               >
                 <span>ADD</span>
                 <Plus size={13} strokeWidth={2.8} />

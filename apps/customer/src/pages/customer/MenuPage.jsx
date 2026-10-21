@@ -19,10 +19,9 @@ import { getFavorites, toggleFavorite } from '../../utils/favorites';
 import CustomerScreenHeader from '../../components/menu/CustomerScreenHeader';
 import CustomerHero from '../../components/menu/CustomerHero';
 import CustomerCategoryCircles from '../../components/menu/CustomerCategoryCircles';
-import CustomerProductCard from '../../components/menu/CustomerProductCard';
+import MenuItemRow from '../../components/menu/MenuItemRow';
 import CustomerCategoryBanner from '../../components/menu/CustomerCategoryBanner';
 import CustomerSubcategoryTabs from '../../components/menu/CustomerSubcategoryTabs';
-import CustomerItemRow from '../../components/menu/CustomerItemRow';
 import CustomerBottomNav from '../../components/ui/CustomerBottomNav';
 
 const ProductModal = lazy(() => import('../../components/menu/ProductModal'));
@@ -425,10 +424,10 @@ export default function MenuPage() {
                     </button>
                   </div>
 
-                  {/* 2-Column Card Grid (Mobile) / 3-4 Column (Desktop) */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 min-[390px]:gap-3.5 sm:gap-4 lg:gap-5">
+                  {/* Responsive Grid of Food Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                     {popularItems.map((prod) => (
-                      <CustomerProductCard
+                      <MenuItemRow
                         key={prod._id}
                         product={prod}
                         onSelect={setSelectedProduct}
@@ -462,10 +461,10 @@ export default function MenuPage() {
                     </button>
                   </div>
 
-                  {/* 2-Column Card Grid (Mobile) / 3-4 Column (Desktop) */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 min-[390px]:gap-3.5 sm:gap-4 lg:gap-5">
+                  {/* Responsive Grid of Food Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                     {recommendedItems.map((prod) => (
-                      <CustomerProductCard
+                      <MenuItemRow
                         key={prod._id}
                         product={prod}
                         onSelect={setSelectedProduct}
@@ -498,11 +497,11 @@ export default function MenuPage() {
                 />
               )}
 
-              {/* Items List (Single-column on mobile, 2-column grid at 1024px+) */}
+              {/* Items List (Single-column on mobile, 2-column grid at 768px+) */}
               {categoryProducts.length > 0 ? (
-                <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                   {categoryProducts.map((prod) => (
-                    <CustomerItemRow
+                    <MenuItemRow
                       key={prod._id}
                       product={prod}
                       onSelect={setSelectedProduct}
