@@ -69,7 +69,7 @@ const cleanTenantError = (res, status, message) => res.status(status).json({ err
  */
 export const isCustomerPublicRoute = (req) => {
   const p = req.path;
-  if (p.startsWith('/api/public')) return true;
+  if (p.startsWith('/api/public') || p.startsWith('/public')) return true;
   if (p === '/api/menu' || p.startsWith('/api/menu/')) {
     return req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS';
   }
@@ -108,6 +108,7 @@ export const tenantResolver = async (req, res, next) => {
     req.path === '/api/auth/forgot-password' ||
     req.path === '/api/auth/reset-password' ||
     req.path.startsWith('/api/public') ||
+    req.path.startsWith('/public') ||
     req.path === '/api/cafes'
   ) {
     return next();

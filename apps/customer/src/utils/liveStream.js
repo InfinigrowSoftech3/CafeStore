@@ -4,9 +4,10 @@ const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, mill
 
 export const subscribeToLiveStream = (path, { headers = {}, onEvent }) => {
   const controller = new AbortController();
-  const baseUrl = String(import.meta.env.VITE_API_URL || (import.meta.env.PROD
+  const rawBase = String(import.meta.env.VITE_API_URL || (import.meta.env.PROD
     ? 'https://cafestore-nmue.onrender.com/api'
-    : '/api')).replace(/\/$/, '');
+    : '/api')).trim().replace(/\/+$/, '');
+  const baseUrl = rawBase.endsWith('/api') || rawBase.startsWith('/api') ? rawBase : `${rawBase}/api`;
 
   const run = async () => {
     while (!controller.signal.aborted) {

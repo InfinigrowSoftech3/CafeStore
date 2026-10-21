@@ -2,9 +2,14 @@ import axios from 'axios';
 import { getResolvedTenantSlug, getCustomerStorageKey } from '../utils/tenantHelper';
 import useCartStore from '../context/cartStore';
 
-const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD
+const defaultApiUrl = import.meta.env.PROD
   ? 'https://cafestore-nmue.onrender.com/api'
-  : '/api');
+  : '/api';
+
+const configuredApiUrl = String(import.meta.env.VITE_API_URL || defaultApiUrl).trim().replace(/\/+$/, '');
+const apiUrl = configuredApiUrl.endsWith('/api') || configuredApiUrl.startsWith('/api')
+  ? configuredApiUrl
+  : `${configuredApiUrl}/api`;
 
 /**
  * Dedicated Customer API Client

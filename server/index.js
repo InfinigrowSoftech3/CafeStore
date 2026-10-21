@@ -367,6 +367,7 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
   app.use('/api/billing', billingRoutes);
   app.use('/api/tenant/billing', billingRoutes);
   app.use('/api/public', publicCafesRoutes);
+  app.use('/public', publicCafesRoutes);
   app.use('/api/cafes', cafesRoutes);
   app.use('/api/admin', adminCafesRoutes);
   app.get('/api/tenant/export', (req, res, next) => res.redirect(307, '/api/tenant/billing/export'));
