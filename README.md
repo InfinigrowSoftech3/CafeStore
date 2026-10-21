@@ -121,7 +121,26 @@ Or build any individual app:
 
 ---
 
-## 🌐 Deployment to Vercel
+## 🌐 Deployment & Hosting
+
+### 1. Backend Deployment (Render)
+The backend is deployed as a Render Web Service (`brewhaus-cafe-api`).
+
+- **Blueprint**: Use the root [render.yaml](file:///c:/cafe-app-main/render.yaml) blueprint to spin up the web service and Redis.
+- **Health Check Path**: In Render Dashboard, navigate to **Settings > Health Check Path** and set it to `/health`.
+- **Region**: Deploy in **Singapore** (`singapore`), which is the closest Render region to India and Southeast Asia. Keep your MongoDB Atlas cluster in the nearest region (e.g. AWS `ap-south-1` Mumbai or `ap-southeast-1` Singapore) for minimal network latency.
+- **MongoDB Atlas Network Access**: Allow Render's outbound IP ranges, or allow access from anywhere (`0.0.0.0/0`) with a strong database user password.
+- **Image Storage (Cloudinary)**: Product and menu images are uploaded directly to Cloudinary (`CLOUDINARY_URL`). Render uses an ephemeral filesystem, so local disk writes are never used for production image persistence.
+- **Render Instance Types & Cold Starts**:
+  - **Free Web Service**: Spins down after 15 minutes of inactivity and takes ~1 minute to wake on the next incoming request. Do NOT add in-app self-ping or node-cron keep-alives (a sleeping free instance cannot execute code to wake itself).
+  - **Keep-Alive Monitor (UptimeRobot / cron-job.org)**:
+    1. Sign up for a free monitor on [UptimeRobot](https://uptimerobot.com) or [cron-job.org](https://cron-job.org).
+    2. Add a new **HTTP(s)** monitor pointing to `https://<your-backend-url>.onrender.com/health`.
+    3. Set the monitoring interval to **every 5 minutes**.
+    4. ⚠️ **Never monitor `/robots.txt`**: Render's edge CDN responds to `/robots.txt` directly without routing traffic to your container, meaning `/robots.txt` pings will NOT wake the service! Always monitor `/health`.
+  - **Production Recommendation**: Upgrade the backend to Render's **Starter tier ($7/month)** before onboarding paying cafés. Starter instances run 24/7 without spin-downs, completely eliminating cold starts.
+
+### 2. Frontend Applications (Vercel)
 
 Each app is independently deployable to Vercel with its own `vercel.json` SPA rewrite rules.
 
@@ -131,6 +150,7 @@ Each app is independently deployable to Vercel with its own `vercel.json` SPA re
    - POS: `apps/pos`
    - KDS: `apps/kds`
    - Admin: `apps/admin`
+   - Super Admin: `apps/super-admin`
 3. Vercel automatically detects Vite with output directory `dist`.
 4. Configure the relevant environment variables in Vercel for each project:
    - `VITE_API_URL=https://cafestore-nmue.onrender.com/api`
@@ -142,12 +162,18 @@ Each app is independently deployable to Vercel with its own `vercel.json` SPA re
 
 ---
 
-## 🔒 Security & CORS
+## 🔒 Security & Initial Platform Access
 
-The backend server validates CORS against all configured app URLs:
-- `CUSTOMER_APP_URL` (`https://cafestore-customer.vercel.app`)
-- `POS_APP_URL` (`https://cafestore-pos.vercel.app`)
-- `KDS_APP_URL` (`https://cafestore-kds.vercel.app`)
+- **No Hardcoded Super Admin Credentials**: There are zero seeded default super admin accounts or passwords in code.
+- **Environment Configuration**: Set `SUPER_ADMIN_EMAIL` and `SUPER_ADMIN_PASSWORD` in your server environment variables.
+- **Production Validation**: In production (`NODE_ENV=production`), the server verifies that `SUPER_ADMIN_EMAIL` and `SUPER_ADMIN_PASSWORD` are defined and sufficiently strong (minimum 8 characters, non-trivial). If missing or weak, the backend fails to start.
+- **CORS Validation**: The backend server validates CORS against all configured app URLs:
+  - `CUSTOMER_APP_URL` (`https://cafestore-customer.vercel.app`)
+  - `POS_APP_URL` (`https://cafestore-pos.vercel.app`)
+  - `KDS_APP_URL` (`https://cafestore-kds.vercel.app`)
+  - `ADMIN_APP_URL` (`https://cafestore-admin.vercel.app`)
+  - Local development origins (`http://localhost:5173`, `http://localhost:5174`, `http://localhost:5175`, `http://localhost:5176`, `http://localhost:5000`)
+  - Vercel preview environments (`*.vercel.app`)
 - `ADMIN_APP_URL` (`https://cafestore-admin.vercel.app`)
 - Local development origins (`http://localhost:5173`, `http://localhost:5174`, `http://localhost:5175`, `http://localhost:5176`, `http://localhost:5000`)
 - Vercel preview environments (`*.vercel.app`)

@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useTenant } from './context/TenantContext';
 import { canAccessKds, UnauthorizedScreen } from '@cafe/shared';
+import { wakeServer } from './services/api';
 import LoginPage from './pages/LoginPage';
 import KitchenDisplayPage from './pages/KitchenDisplayPage';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -12,6 +14,10 @@ import { env } from './config/env';
 export default function App() {
   const { isAuthenticated, loading, user, logout } = useAuth();
   const tenant = useTenant();
+
+  useEffect(() => {
+    wakeServer();
+  }, []);
 
   if (loading) {
     return (

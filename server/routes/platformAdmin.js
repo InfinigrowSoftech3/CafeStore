@@ -93,26 +93,27 @@ router.post('/login', async (req, res, next) => {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
 
-    // Auto-bootstrap super admin in development or if none exists
-    const superAdminCount = await SuperAdmin.countDocuments();
-    if (superAdminCount === 0) {
-      const defaultEmail = (process.env.SUPER_ADMIN_EMAIL || 'admin@brewhaus.com').toLowerCase();
-      const defaultPassword = process.env.SUPER_ADMIN_PASSWORD || 'SuperAdmin123!';
-      if (cleanEmail === defaultEmail && rawPassword === defaultPassword) {
-        await SuperAdmin.create({
-          name: 'Platform Super Admin',
-          email: defaultEmail,
-          password: defaultPassword,
-          role: 'super_admin',
-        });
-      }
-    }
-
-    const admin = await SuperAdmin.findOne({ email: cleanEmail }).select(
+    let admin = await SuperAdmin.findOne({ email: cleanEmail }).select(
       '+password +failedLoginAttempts +loginLockUntil +twoFactorSecretEncrypted +backupCodes'
     );
     if (!admin) {
-      return res.status(401).json({ error: 'Invalid platform credentials.' });
+      // Auto-bootstrap initial super admin ONLY if env vars are explicitly set and no super admin exists yet
+      const configuredEmail = process.env.SUPER_ADMIN_EMAIL ? process.env.SUPER_ADMIN_EMAIL.trim().toLowerCase() : null;
+      const configuredPassword = process.env.SUPER_ADMIN_PASSWORD || null;
+      if (configuredEmail && configuredPassword && cleanEmail === configuredEmail && rawPassword === configuredPassword) {
+        const superAdminCount = await SuperAdmin.countDocuments();
+        if (superAdminCount === 0) {
+          admin = await SuperAdmin.create({
+            name: 'Platform Super Admin',
+            email: configuredEmail,
+            password: configuredPassword,
+            role: 'super_admin',
+          });
+        }
+      }
+      if (!admin) {
+        return res.status(401).json({ error: 'Invalid platform credentials.' });
+      }
     }
 
     // Check account lockout
@@ -129,21 +130,21 @@ router.post('/login', async (req, res, next) => {
       admin.failedLoginAttempts = (admin.failedLoginAttempts || 0) + 1;
       if (admin.failedLoginAttempts >= 5) {
         admin.loginLockUntil = new Date(Date.now() + 15 * 60 * 1000); // 15-minute lock
-        await PlatformAuditEvent.create({
+        PlatformAuditEvent.create({
           actorId: admin._id,
           actorEmail: admin.email,
           action: 'auth.account_locked',
           ip: req.ip,
           details: { failedAttempts: admin.failedLoginAttempts },
-        });
+        }).catch((err) => console.error('[Audit] Super admin lockout log error:', err.message));
       }
-      await admin.save();
-      await PlatformAuditEvent.create({
+      admin.save().catch((err) => console.error('[SuperAdmin] Save error:', err.message));
+      PlatformAuditEvent.create({
         actorEmail: cleanEmail,
         action: 'auth.login_failed',
         ip: req.ip,
         details: { reason: 'bad_password', attempts: admin.failedLoginAttempts },
-      });
+      }).catch((err) => console.error('[Audit] Super admin login_failed log error:', err.message));
       return res.status(401).json({ error: 'Invalid platform credentials.' });
     }
 
@@ -178,13 +179,13 @@ router.post('/login', async (req, res, next) => {
 
       if (!codeValid) {
         admin.failedLoginAttempts = (admin.failedLoginAttempts || 0) + 1;
-        await admin.save();
-        await PlatformAuditEvent.create({
+        admin.save().catch((err) => console.error('[SuperAdmin] Save error:', err.message));
+        PlatformAuditEvent.create({
           actorEmail: cleanEmail,
           action: 'auth.login_failed_2fa',
           ip: req.ip,
           details: { attempts: admin.failedLoginAttempts },
-        });
+        }).catch((err) => console.error('[Audit] Super admin 2fa fail log error:', err.message));
         return res.status(401).json({ error: 'Invalid two-factor authentication code or backup code.' });
       }
     }
@@ -204,13 +205,13 @@ router.post('/login', async (req, res, next) => {
     admin.refreshTokenExpiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
     await admin.save();
 
-    await PlatformAuditEvent.create({
+    PlatformAuditEvent.create({
       actorId: admin._id,
       actorEmail: admin.email,
       action: 'auth.login',
       ip: req.ip,
       details: { userAgent: req.headers['user-agent'] },
-    });
+    }).catch((err) => console.error('[Audit] Super admin login log error:', err.message));
 
     const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('brewhaus_superadmin_token', accessToken, {

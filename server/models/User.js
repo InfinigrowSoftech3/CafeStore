@@ -43,5 +43,6 @@ userSchema.methods.toJSON = function () {
 };
 
 userSchema.plugin(tenantIsolationPlugin);
+userSchema.index({ email: 1 });
 userSchema.index({ tenantId: 1, email: 1 }, { unique: true });
 export default mongoose.model('User', userSchema);

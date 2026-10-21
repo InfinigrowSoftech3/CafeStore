@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Eye, EyeOff, Loader2, Sparkles, ExternalLink, Monitor, ChefHat, ShieldCheck } from 'lucide-react';
+import {
+  AlertCircle, Eye, EyeOff, Loader2, Sparkles, ExternalLink,
+  Monitor, ChefHat, ShieldCheck, Clock, RotateCw
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
 import { env } from '../config/env';
+import { wakeServer } from '../services/api';
 
 export default function LoginPage() {
   const tenant = useTenant();
@@ -16,6 +20,12 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
+  const [isWaking, setIsWaking] = useState(false);
+  const [isTimeoutError, setIsTimeoutError] = useState(false);
+
+  useEffect(() => {
+    wakeServer();
+  }, []);
 
   useEffect(() => {
     if (rateLimitCountdown <= 0) return;
@@ -32,7 +42,7 @@ export default function LoginPage() {
   }, [rateLimitCountdown]);
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    if (event && typeof event.preventDefault === 'function') event.preventDefault();
     if (loading || rateLimitCountdown > 0) return;
 
     if (!email || !password) {
@@ -41,22 +51,46 @@ export default function LoginPage() {
     }
 
     setLoading(true);
+    setIsWaking(false);
+    setIsTimeoutError(false);
     setError('');
+
+    const wakeTimer = setTimeout(() => {
+      setIsWaking(true);
+    }, 4000);
 
     try {
       await login(email, password, twoFactorCode);
+      clearTimeout(wakeTimer);
+      setIsWaking(false);
     } catch (err) {
+      clearTimeout(wakeTimer);
+      setIsWaking(false);
+
       if (err.code === 'TWO_FACTOR_REQUIRED') {
         setRequiresTwoFactor(true);
       }
+
+      const isTimeout =
+        err.isTimeout ||
+        err.code === 'ECONNABORTED' ||
+        Boolean(err.message && /timeout|taking too long|network\s*error/i.test(err.message)) ||
+        !err.response;
+
       if (err.status === 429 || err.code === 'RATE_LIMITED') {
+        setIsTimeoutError(false);
         const retrySec = Number(err.retryAfter) || 30;
         setRateLimitCountdown(retrySec);
         setError(`Too many login attempts. Please wait ${retrySec} seconds before trying again.`);
+      } else if (isTimeout) {
+        setIsTimeoutError(true);
+        setError('Server is taking too long. Please try again');
       } else {
+        setIsTimeoutError(false);
         setError(err.message || 'Unable to sign in. Please verify your credentials.');
       }
     } finally {
+      clearTimeout(wakeTimer);
       setLoading(false);
     }
   };
@@ -98,39 +132,91 @@ export default function LoginPage() {
         </div>
 
         {/* ── 1-Click Instant Demo / Preview Buttons ─────────── */}
-        <div className="mb-6 rounded-2xl border border-[#E5DED5] bg-[#F8F6F2] p-3.5 text-xs space-y-2.5">
-          <div className="flex items-center gap-1.5 text-amber-700 font-bold text-[11px] uppercase tracking-wider">
+        <div className="mb-6 p-4 rounded-2xl bg-[#FAF8F5] border border-[#E5DED5]">
+          <div className="flex items-center gap-2 mb-2 text-xs font-bold text-amber-700 uppercase tracking-wider">
             <Sparkles size={14} />
-            <span>Quick Station Access (1-Click)</span>
+            <span>Quick Display Login (1-Click)</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
+              disabled={loading}
               onClick={() => demoLogin('kitchen')}
-              className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-amber-500 text-stone-950 font-bold text-xs shadow-xs hover:bg-amber-400 active:scale-98 transition min-h-[48px]"
+              className="flex items-center justify-center gap-2 p-3 rounded-xl bg-white border border-[#E5DED5] hover:border-amber-500 text-xs font-bold text-[#1C1815] hover:text-amber-700 shadow-xs active:scale-98 transition cursor-pointer disabled:opacity-50"
             >
               <ChefHat size={16} />
-              <span>Chef / Cook</span>
+              <span>Kitchen Staff</span>
             </button>
             <button
               type="button"
+              disabled={loading}
               onClick={() => demoLogin('manager')}
-              className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-white hover:bg-[#F2EDE4] text-[#1C1815] font-bold text-xs border border-[#E5DED5] shadow-xs active:scale-98 transition min-h-[48px]"
+              className="flex items-center justify-center gap-2 p-3 rounded-xl bg-white border border-[#E5DED5] hover:border-amber-500 text-xs font-bold text-[#1C1815] hover:text-amber-700 shadow-xs active:scale-98 transition cursor-pointer disabled:opacity-50"
             >
-              <ShieldCheck size={16} className="text-amber-600" />
-              <span>Store Manager</span>
+              <ShieldCheck size={16} />
+              <span>Manager</span>
             </button>
+          </div>
+          <div className="mt-2 text-[11px] text-[#6E645B] text-center">
+            Instantly enters board with live kitchen staff privileges
           </div>
         </div>
 
-        {error && (
-          <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs text-red-600">
-            <AlertCircle size={16} className="shrink-0 mt-0.5" />
-            <span className="leading-relaxed font-semibold">{error}</span>
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-[#E5DED5]" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase tracking-wider font-bold">
+            <span className="bg-white px-3 text-[#6E645B]">Or sign in with email</span>
+          </div>
+        </div>
+
+        {/* Slow connection / cold start waking notice */}
+        {isWaking && loading && (
+          <div className="mb-4 flex items-center gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-950">
+            <Loader2 size={18} className="animate-spin shrink-0 text-amber-600" />
+            <span className="font-medium leading-relaxed">
+              Waking up the server, this can take up to a minute on first load…
+            </span>
           </div>
         )}
 
-        {/* ── Standard Staff Credentials Form ──────────────── */}
+        {/* ── Error Notification ────────────────────────────── */}
+        {error && (
+          <div className={`mb-5 flex flex-col gap-2 rounded-2xl border p-4 text-xs font-medium ${
+            rateLimitCountdown > 0
+              ? 'border-amber-400 bg-amber-50 text-amber-900'
+              : 'border-rose-300 bg-rose-50 text-rose-900'
+          }`}>
+            <div className="flex items-start gap-3">
+              {rateLimitCountdown > 0 ? (
+                <Clock size={18} className="shrink-0 mt-0.5 text-amber-700 animate-spin" />
+              ) : (
+                <AlertCircle size={18} className="shrink-0 mt-0.5 text-rose-600" />
+              )}
+              <div className="flex-1">
+                <span>{error}</span>
+                {rateLimitCountdown > 0 && (
+                  <div className="mt-1 text-[11px] opacity-80">
+                    Board will re-enable in <strong className="font-mono">{rateLimitCountdown}s</strong>.
+                  </div>
+                )}
+              </div>
+            </div>
+            {isTimeoutError && (
+              <button
+                type="button"
+                onClick={(e) => handleSubmit(e)}
+                className="mt-1 inline-flex items-center justify-center gap-1.5 self-start rounded-xl bg-amber-500 hover:bg-amber-400 px-3.5 py-1.5 text-xs font-bold text-stone-950 shadow-xs transition cursor-pointer"
+              >
+                <RotateCw size={13} />
+                <span>Retry</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* ── Email / Password Form ─────────────────────────── */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -139,7 +225,7 @@ export default function LoginPage() {
               </label>
               <button
                 type="button"
-                onClick={() => handleFillCredentials('kitchen@sipstack-demo.com', 'Kitchen@123')}
+                onClick={() => handleFillCredentials('manager@sipstack-demo.com', 'Manager@123')}
                 className="text-xs text-amber-700 hover:underline font-semibold"
               >
                 Auto-fill demo
@@ -199,10 +285,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isButtonDisabled}
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-98 px-5 py-3.5 text-base font-bold text-stone-950 shadow-md transition disabled:opacity-50 min-h-[48px]"
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-98 px-5 py-3.5 text-base font-bold text-stone-950 shadow-md transition disabled:opacity-50 min-h-[48px] cursor-pointer"
           >
             {loading && <Loader2 size={18} className="animate-spin" />}
-            {loading ? 'Connecting Board...' : 'Sign in to Kitchen Board'}
+            <span className="text-sm">
+              {loading
+                ? (isWaking ? 'Waking up the server, this can take up to a minute on first load…' : 'Connecting Board...')
+                : 'Sign in to Kitchen Board'}
+            </span>
           </button>
         </form>
 

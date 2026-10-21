@@ -2,14 +2,19 @@ services:
   - type: web
     name: brewhaus-cafe-api
     runtime: node
+    region: singapore
     rootDir: server
     buildCommand: npm ci
     startCommand: npm start
-    healthCheckPath: /api/readyz
+    healthCheckPath: /health
     envVars:
       - key: MONGO_URI
         sync: false
       - key: JWT_SECRET
+        sync: false
+      - key: SUPER_ADMIN_EMAIL
+        sync: false
+      - key: SUPER_ADMIN_PASSWORD
         sync: false
       - key: RAZORPAY_KEY_ID
         sync: false
@@ -45,6 +50,7 @@ services:
         value: "1"
   - type: redis
     name: brewhaus-redis
+    region: singapore
     ipAllowList: []
     plan: free
     maxmemoryPolicy: allkeys-lru

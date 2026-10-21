@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import { wakeServer } from './services/api';
 
 function ProtectedRoute({ children }) {
   const token = sessionStorage.getItem('brewhaus_superadmin_token');
@@ -11,6 +13,10 @@ function ProtectedRoute({ children }) {
 }
 
 export default function App() {
+  useEffect(() => {
+    wakeServer();
+  }, []);
+
   return (
     <Routes>
       <Route

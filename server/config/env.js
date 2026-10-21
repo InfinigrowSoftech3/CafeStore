@@ -34,14 +34,21 @@ export const validateEnv = (env = process.env) => {
     errors.push('TENANT_CREDENTIALS_ENCRYPTION_KEY cannot be the default placeholder value from .env.example.');
   }
 
-  // 4. SUPER_ADMIN_PASSWORD (only validated if supplied; auto-bootstrap disabled if omitted)
+  // 4. SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD (fail to start in production if missing or weak)
+  const superAdminEmail = env.SUPER_ADMIN_EMAIL || '';
   const superAdminPassword = env.SUPER_ADMIN_PASSWORD || '';
-  if (superAdminPassword) {
-    if (superAdminPassword.length < 8) {
-      errors.push('SUPER_ADMIN_PASSWORD must be at least 8 characters long.');
-    } else if (['password', 'admin', 'superadmin', '12345678', 'SuperAdminTestPass123!'].includes(superAdminPassword)) {
-      errors.push('SUPER_ADMIN_PASSWORD cannot be a weak or example default password.');
-    }
+  if (!superAdminEmail) {
+    errors.push('SUPER_ADMIN_EMAIL is required in production.');
+  } else if (!superAdminEmail.includes('@') || !superAdminEmail.includes('.')) {
+    errors.push('SUPER_ADMIN_EMAIL must be a valid email address.');
+  }
+
+  if (!superAdminPassword) {
+    errors.push('SUPER_ADMIN_PASSWORD is required in production.');
+  } else if (superAdminPassword.length < 8) {
+    errors.push('SUPER_ADMIN_PASSWORD must be at least 8 characters long.');
+  } else if (['password', 'admin', 'superadmin', '12345678', 'SuperAdmin123!', 'SuperAdminTestPass123!'].includes(superAdminPassword)) {
+    errors.push('SUPER_ADMIN_PASSWORD cannot be a weak or example default password.');
   }
 
   // 5. MONGO_URI

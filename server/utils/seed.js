@@ -157,7 +157,7 @@ const seed = async () => {
 
     console.log('\n🎉 Database seeded successfully!');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('Admin login: admin@brewhaus.com / admin123');
+    console.log('Initial accounts should be configured via environment variables or setup endpoint.');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     process.exit(0);
   } catch (error) {

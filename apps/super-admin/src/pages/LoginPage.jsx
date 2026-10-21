@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   ShieldCheck, Lock, Mail, Eye, EyeOff, Loader2, AlertCircle,
-  CheckCircle2, ArrowRight, Sparkles, Smartphone
+  CheckCircle2, ArrowRight, Sparkles, Smartphone, RotateCw
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api, { wakeServer } from '../services/api';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -17,9 +17,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [shake, setShake] = useState(false);
+  const [isWaking, setIsWaking] = useState(false);
+  const [isTimeoutError, setIsTimeoutError] = useState(false);
+
+  useEffect(() => {
+    wakeServer();
+  }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
     if (!email || !password) {
       setError('Please provide administrative email and password.');
       setShake(true);
@@ -28,7 +34,13 @@ export default function LoginPage() {
     }
 
     setLoading(true);
+    setIsWaking(false);
+    setIsTimeoutError(false);
     setError('');
+
+    const wakeTimer = setTimeout(() => {
+      setIsWaking(true);
+    }, 4000);
 
     try {
       const { data } = await api.post('/platform/admin/login', {
@@ -36,6 +48,9 @@ export default function LoginPage() {
         password,
         twoFactorCode: require2fa ? twoFactorCode : undefined,
       });
+
+      clearTimeout(wakeTimer);
+      setIsWaking(false);
 
       if (data.require2fa) {
         setRequire2fa(true);
@@ -49,11 +64,28 @@ export default function LoginPage() {
 
       navigate('/', { replace: true });
     } catch (err) {
-      const msg = (typeof err.response?.data?.error === 'string' ? err.response.data.error : err.response?.data?.error?.message) || err.message || 'Invalid platform admin credentials.';
-      setError(msg);
+      clearTimeout(wakeTimer);
+      setIsWaking(false);
+
+      const isTimeout =
+        err.isTimeout ||
+        err.code === 'ECONNABORTED' ||
+        Boolean(err.message && /timeout|taking too long|network\s*error/i.test(err.message)) ||
+        !err.response;
+
+      if (isTimeout) {
+        setIsTimeoutError(true);
+        setError('Server is taking too long. Please try again');
+      } else {
+        setIsTimeoutError(false);
+        const rawErr = err.response?.data?.error;
+        const msg = (typeof rawErr === 'string' ? rawErr : rawErr?.message) || err.response?.data?.message || err.message || 'Invalid platform admin credentials.';
+        setError(msg);
+      }
       setShake(true);
       setTimeout(() => setShake(false), 500);
     } finally {
+      clearTimeout(wakeTimer);
       setLoading(false);
     }
   };
@@ -168,11 +200,33 @@ export default function LoginPage() {
             </p>
           </div>
 
+          {/* Slow connection / cold start waking notice */}
+          {isWaking && loading && (
+            <div className="flex items-center gap-3 rounded-none border border-[#D4AF37]/50 bg-[#0B1B4D]/5 p-3.5 text-xs text-slate-800">
+              <Loader2 size={18} className="animate-spin shrink-0 text-[#D4AF37]" />
+              <span className="font-medium leading-relaxed">
+                Waking up the server, this can take up to a minute on first load…
+              </span>
+            </div>
+          )}
+
           {/* Error Message */}
           {error && (
-            <div className="flex items-start gap-2.5 rounded-none border border-red-200 bg-red-50 p-3.5 text-xs text-red-700">
-              <AlertCircle size={16} className="mt-0.5 shrink-0" />
-              <span>{error}</span>
+            <div className="flex flex-col gap-2.5 rounded-none border border-red-200 bg-red-50 p-3.5 text-xs text-red-700">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                <span className="flex-1 font-medium">{error}</span>
+              </div>
+              {isTimeoutError && (
+                <button
+                  type="button"
+                  onClick={(e) => handleSubmit(e)}
+                  className="mt-1 inline-flex items-center justify-center gap-1.5 self-start rounded-md bg-[#0B1B4D] hover:bg-[#152a70] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition cursor-pointer"
+                >
+                  <RotateCw size={13} />
+                  <span>Retry</span>
+                </button>
+              )}
             </div>
           )}
 
@@ -253,7 +307,12 @@ export default function LoginPage() {
             >
               {loading ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" /> Authenticating Core Session...
+                  <Loader2 size={16} className="animate-spin text-[#D4AF37]" />
+                  <span className="text-xs">
+                    {isWaking
+                      ? 'Waking up the server, this can take up to a minute on first load…'
+                      : 'Authenticating Core Session...'}
+                  </span>
                 </>
               ) : (
                 <>

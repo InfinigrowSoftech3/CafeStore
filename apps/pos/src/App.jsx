@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useTenant } from './context/TenantContext';
 import { canAccessPos, UnauthorizedScreen } from '@cafe/shared';
+import { wakeServer } from './services/api';
 import LoginPage from './pages/LoginPage';
 import POSPage from './pages/POSPage';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -13,6 +15,10 @@ import { PosToaster } from './components/ui';
 export default function App() {
   const { isAuthenticated, loading, user, logout } = useAuth();
   const tenant = useTenant();
+
+  useEffect(() => {
+    wakeServer();
+  }, []);
 
   if (loading) {
     return (

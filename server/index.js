@@ -188,6 +188,39 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     next();
   });
 
+  // ── Unauthenticated, un-rate-limited health & readiness probes ─────────────
+  // GET /health - Instant response, no DB check, unauthenticated, excluded from rate limiting
+  app.get(['/health', '/api/health'], (req, res) => {
+    res.status(200).json({
+      status: 'ok',
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  // GET /ready - MongoDB ping probe (returns 503 if ping fails), excluded from rate limiting
+  app.get(['/ready', '/api/ready'], async (req, res) => {
+    try {
+      if (mongoose.connection.readyState !== 1 || !mongoose.connection.db) {
+        return res.status(503).json({
+          status: 'unavailable',
+          database: 'disconnected',
+        });
+      }
+      await mongoose.connection.db.admin().ping();
+      return res.status(200).json({
+        status: 'ok',
+        database: 'connected',
+      });
+    } catch (err) {
+      return res.status(503).json({
+        status: 'unavailable',
+        database: 'disconnected',
+        error: err.message,
+      });
+    }
+  });
+
   // ── Rate limiting ──────────────────────────────────────────────────────────
   const appEnv = process.env.NODE_ENV || 'development';
   if (!['development', 'test'].includes(appEnv) || process.env.ENABLE_RATE_LIMITING === 'true') {
@@ -233,7 +266,7 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     const sensitiveStore = createRateLimitStore('rl:sensitive:');
 
     // Paths that have their own dedicated limiter, so the general apiLimiter skips them (no double counting)
-    const OWN_LIMITER = /^\/(auth|payment|contact|ai|platform\/auth|menu|categories|session|tables|gallery|public|tenant)(\/|$)/;
+    const OWN_LIMITER = /^\/(health|ready|livez|readyz|auth|payment|contact|ai|platform\/auth|menu|categories|session|tables|gallery|public|tenant)(\/|$)/;
 
     // General baseline for authenticated panel traffic (polling, dashboards, CRUD)
     // Fail-open when Redis is unavailable so administrative work is never interrupted
@@ -382,32 +415,6 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
       database: ready ? 'connected' : 'disconnected',
       health: '/api/health',
       timestamp: new Date().toISOString(),
-    });
-  });
-
-  app.get(['/health', '/api/health'], (req, res) => {
-    const ready = mongoose.connection.readyState === 1;
-    res.status(ready ? 200 : 503).json({
-      status: ready ? 'ok' : 'unavailable',
-      database: ready ? 'connected' : 'disconnected',
-      version: '1.0.0',
-      timestamp: new Date().toISOString(),
-      email: {
-        configured: isEmailConfigured(),
-        hasBrevoApiKey: Boolean(process.env.BREVO_API_KEY || process.env.SENDINBLUE_API_KEY),
-        brevoSender: process.env.BREVO_FROM || process.env.SMTP_USER || null,
-        hasResendApiKey: Boolean(process.env.RESEND_API_KEY),
-        hasSmtpCreds: Boolean((process.env.SMTP_USER || process.env.EMAIL_USER) && (process.env.SMTP_PASS || process.env.EMAIL_PASS)),
-      },
-    });
-  });
-
-  app.get(['/ready', '/api/ready'], (req, res) => {
-    const ready = mongoose.connection.readyState === 1;
-    res.status(ready ? 200 : 503).json({
-      status: ready ? 'ok' : 'not_ready',
-      database: ready ? 'connected' : 'disconnected',
-      version: '1.0.0',
     });
   });
 
@@ -622,6 +629,7 @@ export const startServer = async () => {
   const server = app.listen(port, () => {
     console.log(`Server running on port ${port}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log('Server ready');
   });
   setupGracefulShutdown(server);
   return server;

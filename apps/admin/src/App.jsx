@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useAuth } from './context/AuthContext';
 import { UnauthorizedScreen } from '@cafe/shared';
+import { wakeServer } from './services/api';
 import AdminLayout from './layouts/AdminLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -74,6 +76,10 @@ function CafeAdminLayout() {
 }
 
 export default function App() {
+  useEffect(() => {
+    wakeServer();
+  }, []);
+
   return (
     <>
       <Analytics />

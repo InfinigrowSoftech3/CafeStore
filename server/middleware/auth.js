@@ -38,13 +38,19 @@ export const checkLoginLockout = async (ip, account) => {
   if (!ip || ip === 'unknown') return false;
 
   const redis = getRedisClient();
-  if (!redis) return false;
+  if (!redis || redis.status !== 'ready') return false;
 
   const { attemptsKey, lockoutKey } = getLockoutKeys(ip, account);
   try {
-    const isLocked = await redis.get(lockoutKey);
+    const isLocked = await Promise.race([
+      redis.get(lockoutKey),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 500)),
+    ]);
     if (isLocked) return true;
-    const attempts = await redis.get(attemptsKey);
+    const attempts = await Promise.race([
+      redis.get(attemptsKey),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 500)),
+    ]);
     if (attempts && parseInt(attempts, 10) >= LOCKOUT_THRESHOLD) {
       return true;
     }

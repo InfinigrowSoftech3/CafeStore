@@ -27,23 +27,48 @@ const dropObsoleteTenantIndexes = async (db) => {
   }
 };
 
-export const connectDB = async () => {
-  try {
-    const mongoUri = process.env.MONGO_URI;
-    if (!mongoUri) throw new Error('MONGO_URI is not configured. Add your MongoDB Atlas connection string.');
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
-    const conn = await mongoose.connect(mongoUri, {
-      maxPoolSize: Number(process.env.MONGO_MAX_POOL_SIZE) || 20,
+export const connectDB = async () => {
+  if (cached.conn && mongoose.connection.readyState === 1) {
+    return cached.conn;
+  }
+
+  const mongoUri = process.env.MONGO_URI;
+  if (!mongoUri) throw new Error('MONGO_URI is not configured. Add your MongoDB Atlas connection string.');
+
+  if (!cached.promise) {
+    const startTime = Date.now();
+    const opts = {
+      maxPoolSize: Number(process.env.MONGO_MAX_POOL_SIZE) || 10,
       minPoolSize: Number(process.env.MONGO_MIN_POOL_SIZE) || 2,
-      serverSelectionTimeoutMS: Number(process.env.MONGO_CONNECT_TIMEOUT_MS) || 5000,
+      serverSelectionTimeoutMS: Number(process.env.MONGO_CONNECT_TIMEOUT_MS) || 10000,
       socketTimeoutMS: Number(process.env.MONGO_SOCKET_TIMEOUT_MS) || 45000,
       retryWrites: true,
       w: 'majority',
+    };
+
+    cached.promise = mongoose.connect(mongoUri, opts).then(async (conn) => {
+      const duration = Date.now() - startTime;
+      console.log(`DB connected in ${duration}ms`);
+      console.log(`✅ MongoDB Connected: ${conn.connection.host} (pool: ${conn.connection.client?.options?.maxPoolSize || 10})`);
+      await dropObsoleteTenantIndexes(conn.connection.db);
+      return conn;
+    }).catch((error) => {
+      cached.promise = null;
+      console.error('❌ MongoDB connection error:', error.message);
+      process.exit(1);
     });
-    console.log(`✅ MongoDB Connected: ${conn.connection.host} (pool: ${conn.connection.client?.options?.maxPoolSize || 20})`);
-    await dropObsoleteTenantIndexes(conn.connection.db);
+  }
+
+  try {
+    cached.conn = await cached.promise;
+    return cached.conn;
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error.message);
-    process.exit(1);
+    cached.promise = null;
+    throw error;
   }
 };

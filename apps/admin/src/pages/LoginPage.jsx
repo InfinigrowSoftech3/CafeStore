@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Eye, EyeOff, Loader2, Clock, ArrowRight } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Loader2, Clock, ArrowRight, RotateCw } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
 import { env } from '../config/env';
+import { wakeServer } from '../services/api';
 
 export default function LoginPage() {
   const tenant = useTenant();
@@ -18,6 +19,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
+  const [isWaking, setIsWaking] = useState(false);
+  const [isTimeoutError, setIsTimeoutError] = useState(false);
+
+  // Wake up server silently on page mount
+  useEffect(() => {
+    wakeServer();
+  }, []);
 
   // Active countdown timer when rate limited (429)
   useEffect(() => {
@@ -35,7 +43,7 @@ export default function LoginPage() {
   }, [rateLimitCountdown]);
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    if (event && typeof event.preventDefault === 'function') event.preventDefault();
     if (loading || rateLimitCountdown > 0) return; // Prevent double-submit or submission while in cooldown
 
     if (!email || !password) {
@@ -44,24 +52,47 @@ export default function LoginPage() {
     }
 
     setLoading(true);
+    setIsWaking(false);
+    setIsTimeoutError(false);
     setError('');
+
+    const wakeTimer = setTimeout(() => {
+      setIsWaking(true);
+    }, 4000);
 
     try {
       await login(email, password, twoFactorCode);
+      clearTimeout(wakeTimer);
+      setIsWaking(false);
       navigate('/dashboard', { replace: true });
     } catch (err) {
+      clearTimeout(wakeTimer);
+      setIsWaking(false);
+
       if (err.code === 'TWO_FACTOR_REQUIRED') {
         setRequiresTwoFactor(true);
       }
 
+      const isTimeout =
+        err.isTimeout ||
+        err.code === 'ECONNABORTED' ||
+        Boolean(err.message && /timeout|taking too long|network\s*error/i.test(err.message)) ||
+        !err.response;
+
       if (err.status === 429 || err.code === 'RATE_LIMITED') {
+        setIsTimeoutError(false);
         const retrySec = Number(err.retryAfter) || 30;
         setRateLimitCountdown(retrySec);
         setError(`Too many login attempts. Please wait ${retrySec} seconds before trying again.`);
+      } else if (isTimeout) {
+        setIsTimeoutError(true);
+        setError('Server is taking too long. Please try again');
       } else {
+        setIsTimeoutError(false);
         setError(err.message || 'Unable to sign in. Please try again.');
       }
     } finally {
+      clearTimeout(wakeTimer);
       setLoading(false);
     }
   };
@@ -99,6 +130,16 @@ export default function LoginPage() {
             Sign in to manage orders, kitchen flow, and live sales
           </p>
         </div>
+
+        {/* Slow connection / cold start waking notice */}
+        {isWaking && loading && (
+          <div className="mb-4 flex items-center gap-3 rounded-none border border-emerald-300 bg-emerald-50 p-3.5 text-xs text-emerald-950">
+            <Loader2 size={18} className="animate-spin shrink-0 text-[#0F3D2E]" />
+            <span className="font-medium leading-relaxed">
+              Waking up the server, this can take up to a minute on first load…
+            </span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -164,24 +205,36 @@ export default function LoginPage() {
           )}
 
           {error && (
-            <div className={`flex items-start gap-2.5 rounded-none border p-3 text-xs font-semibold ${
+            <div className={`flex flex-col gap-2 rounded-none border p-3 text-xs font-semibold ${
               rateLimitCountdown > 0
                 ? 'border-amber-300 bg-amber-50 text-amber-900'
                 : 'border-rose-200 bg-rose-50 text-rose-900'
             }`}>
-              {rateLimitCountdown > 0 ? (
-                <Clock size={16} className="mt-0.5 shrink-0 text-amber-700 animate-spin" />
-              ) : (
-                <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600" />
-              )}
-              <div className="flex-1">
-                <span>{error}</span>
-                {rateLimitCountdown > 0 && (
-                  <div className="mt-1 text-[11px] text-amber-800 font-normal">
-                    Button re-enables automatically in <strong className="font-mono">{rateLimitCountdown}s</strong>.
-                  </div>
+              <div className="flex items-start gap-2.5">
+                {rateLimitCountdown > 0 ? (
+                  <Clock size={16} className="mt-0.5 shrink-0 text-amber-700 animate-spin" />
+                ) : (
+                  <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600" />
                 )}
+                <div className="flex-1">
+                  <span>{error}</span>
+                  {rateLimitCountdown > 0 && (
+                    <div className="mt-1 text-[11px] text-amber-800 font-normal">
+                      Button re-enables automatically in <strong className="font-mono">{rateLimitCountdown}s</strong>.
+                    </div>
+                  )}
+                </div>
               </div>
+              {isTimeoutError && (
+                <button
+                  type="button"
+                  onClick={(e) => handleSubmit(e)}
+                  className="mt-1 inline-flex items-center justify-center gap-1.5 self-start rounded-md bg-[#0F3D2E] hover:bg-[#165a44] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition cursor-pointer"
+                >
+                  <RotateCw size={13} />
+                  <span>Retry</span>
+                </button>
+              )}
             </div>
           )}
 
@@ -193,7 +246,9 @@ export default function LoginPage() {
             {loading ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                <span>Signing in...</span>
+                <span className="text-xs">
+                  {isWaking ? 'Waking up the server, this can take up to a minute on first load…' : 'Signing in...'}
+                </span>
               </>
             ) : rateLimitCountdown > 0 ? (
               <span className="flex items-center gap-1.5">

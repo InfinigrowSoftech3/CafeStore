@@ -1,8 +1,9 @@
-import { Component, lazy, Suspense } from 'react';
+import { Component, lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { wakeServer } from './services/api';
 
 import QuickCartPopup from './components/ui/QuickCartPopup';
 import WebPushPrompt from './components/ui/WebPushPrompt';
@@ -110,6 +111,10 @@ function MenuRouteWrapper() {
 }
 
 export default function App() {
+  useEffect(() => {
+    wakeServer();
+  }, []);
+
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Navbar />

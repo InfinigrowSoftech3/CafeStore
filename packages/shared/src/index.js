@@ -4,5 +4,6 @@ export * from './accessToken.js';
 export * from './phoneNormalizer.js';
 export * from './download.js';
 export * from './liveStream.js';
+export * from './wakeServer.js';
 export { default as ImageWithFallback } from './ImageWithFallback.jsx';
 export { default as UnauthorizedScreen } from './UnauthorizedScreen.jsx';

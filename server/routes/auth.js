@@ -94,8 +94,8 @@ router.post('/login', async (req, res) => {
       return User.findOne({ email: normalizedEmail }).select('+password +failedLoginAttempts +loginLockUntil +twoFactorSecretEncrypted');
     });
     if (!user) {
-      await recordLoginAttemptForIp(clientIp, false, normalizedEmail);
-      await runWithSystemTenantAccess(async () => {
+      recordLoginAttemptForIp(clientIp, false, normalizedEmail).catch((err) => console.error('[Auth] Lockout record error:', err.message));
+      runWithSystemTenantAccess(async () => {
         try {
           const defaultTenant = await Tenant.findOne({ slug: String(process.env.TENANT_DEFAULT_SLUG || 'brewhaus').toLowerCase() }).select('_id');
           if (defaultTenant) {
@@ -111,12 +111,12 @@ router.post('/login', async (req, res) => {
             });
           }
         } catch { /* ignore audit failure for missing tenant */ }
-      });
+      }).catch((err) => console.error('[Audit] Log error:', err.message));
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
     if (user.loginLockUntil && user.loginLockUntil > new Date()) {
-      await recordLoginAttemptForIp(clientIp, false, normalizedEmail);
+      recordLoginAttemptForIp(clientIp, false, normalizedEmail).catch((err) => console.error('[Auth] Lockout record error:', err.message));
       return res.status(423).json({ error: 'Login is temporarily locked. Try again later.', code: 'LOGIN_LOCKED' });
     }
 
@@ -129,9 +129,9 @@ router.post('/login', async (req, res) => {
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      await recordLoginFailure(user);
-      await recordLoginAttemptForIp(clientIp, false, normalizedEmail);
-      await runWithSystemTenantAccess(async () => {
+      recordLoginFailure(user).catch((err) => console.error('[Auth] Record login failure error:', err.message));
+      recordLoginAttemptForIp(clientIp, false, normalizedEmail).catch((err) => console.error('[Auth] Lockout record error:', err.message));
+      runWithSystemTenantAccess(async () => {
         await AuditEvent.create({
           tenantId: user.tenantId,
           actorId: user._id,
@@ -142,16 +142,16 @@ router.post('/login', async (req, res) => {
           targetId: user._id,
           details: { ip: clientIp, reason: 'invalid_password' },
         });
-      });
+      }).catch((err) => console.error('[Audit] Log error:', err.message));
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
     if (user.twoFactorEnabled && effectiveRole(user) === 'owner') {
       const secret = decryptTwoFactorSecret(user.twoFactorSecretEncrypted);
       if (!verifyTotpCode(secret, req.body?.twoFactorCode)) {
-        await recordLoginFailure(user);
-        await recordLoginAttemptForIp(clientIp, false, normalizedEmail);
-        await runWithSystemTenantAccess(async () => {
+        recordLoginFailure(user).catch((err) => console.error('[Auth] Record login failure error:', err.message));
+        recordLoginAttemptForIp(clientIp, false, normalizedEmail).catch((err) => console.error('[Auth] Lockout record error:', err.message));
+        runWithSystemTenantAccess(async () => {
           await AuditEvent.create({
             tenantId: user.tenantId,
             actorId: user._id,
@@ -162,15 +162,19 @@ router.post('/login', async (req, res) => {
             targetId: user._id,
             details: { ip: clientIp, reason: 'invalid_2fa' },
           });
-        });
+        }).catch((err) => console.error('[Audit] Log error:', err.message));
         return res.status(401).json({ error: 'A valid authenticator code is required.', code: 'TWO_FACTOR_REQUIRED' });
       }
     }
 
-    await runWithSystemTenantAccess(async () => {
+    // Reset login lock & failed attempts on successful login (fire-and-forget save and audit)
+    runWithSystemTenantAccess(async () => {
       user.failedLoginAttempts = 0;
       user.loginLockUntil = null;
       await user.save();
+    }).catch((err) => console.error('[Auth] Reset failed attempts error:', err.message));
+
+    runWithSystemTenantAccess(async () => {
       await AuditEvent.create({
         tenantId: user.tenantId,
         actorId: user._id,
@@ -181,8 +185,9 @@ router.post('/login', async (req, res) => {
         targetId: user._id,
         details: { ip: clientIp },
       });
-    });
-    await recordLoginAttemptForIp(clientIp, true, normalizedEmail);
+    }).catch((err) => console.error('[Audit] Log login_success error:', err.message));
+
+    recordLoginAttemptForIp(clientIp, true, normalizedEmail).catch((err) => console.error('[Auth] Lockout record error:', err.message));
     const token = await issueSession(user, res);
     const tenant = user.tenantId
       ? await runWithSystemTenantAccess(async () => Tenant.findById(user.tenantId).lean())

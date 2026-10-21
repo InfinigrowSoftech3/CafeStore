@@ -4,12 +4,22 @@ import { env } from '../config/env';
 
 const api = axios.create({
   baseURL: env.apiUrl,
-  timeout: 35000,
+  timeout: 60000,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
 });
 
 let refreshPromise = null;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const isTimeoutOrNetworkError = (error) => {
+  if (error.response) return false;
+  return (
+    error.code === 'ECONNABORTED' ||
+    Boolean(error.message && /timeout|network\s*error/i.test(error.message))
+  );
+};
 
 api.interceptors.request.use((config) => {
   const token = getAccessToken();
@@ -26,6 +36,18 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const config = error.config;
+
+    // Retry interceptor: up to 2 retries (1.5s then 3s delay) ONLY for timeouts and network errors with NO response
+    if (config && isTimeoutOrNetworkError(error)) {
+      config._retryCount = (config._retryCount || 0) + 1;
+      if (config._retryCount <= 2) {
+        const delayMs = config._retryCount === 1 ? 1500 : 3000;
+        await sleep(delayMs);
+        return api(config);
+      }
+    }
+
     if (error.response?.status === 429) {
       const retryAfterHeader = error.response.headers?.['retry-after'];
       const retryAfterSec =
@@ -48,7 +70,6 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 401) {
-      const config = error.config;
       const requestUrl = String(config?.url || '');
       const isAuthRequest = ['/auth/login', '/auth/refresh', '/auth/logout', '/auth/me'].some((path) =>
         requestUrl.includes(path)
@@ -74,19 +95,43 @@ api.interceptors.response.use(
 
     const rawError = error.response?.data?.error;
     const rawMsg = error.response?.data?.message;
-    const message = (typeof rawError === 'string' ? rawError : rawError?.message) || (typeof rawMsg === 'string' ? rawMsg : null) || error.message || 'Request failed';
+    let message = (typeof rawError === 'string' ? rawError : rawError?.message) || (typeof rawMsg === 'string' ? rawMsg : null);
+
+    if (isTimeoutOrNetworkError(error)) {
+      message = 'Server is taking too long. Please try again';
+    } else if (!message) {
+      message = error.message || 'Request failed';
+    }
+
+    if (typeof message === 'string' && /timeout.*exceeded/i.test(message)) {
+      message = 'Server is taking too long. Please try again';
+    }
 
     if (error.response?.data && typeof error.response.data.error === 'object' && error.response.data.error !== null) {
       error.response.data.error = error.response.data.error.message || error.response.data.error.code || 'Request failed';
     }
 
     const normalized = new Error(typeof message === 'string' ? message : 'Request failed');
-    normalized.code = error.response?.data?.code || (typeof rawError === 'object' ? rawError?.code : undefined);
+    normalized.code = isTimeoutOrNetworkError(error) ? 'ECONNABORTED' : error.response?.data?.code || (typeof rawError === 'object' ? rawError?.code : undefined);
     normalized.status = error.response?.status;
     normalized.response = error.response;
+    normalized.isTimeout = isTimeoutOrNetworkError(error);
     return Promise.reject(normalized);
   }
 );
 
 export const getOnce = (url, config = {}) => api.get(url, config);
+
+export const wakeServer = () => {
+  try {
+    const base = String(env.apiUrl || '').trim().replace(/\/+$/, '');
+    const url = base.endsWith('/api') ? `${base}/health` : `${base}/api/health`;
+    if (typeof window !== 'undefined' && typeof fetch === 'function') {
+      fetch(url, { method: 'GET', cache: 'no-store' }).catch(() => {});
+    }
+  } catch {
+    // Silent
+  }
+};
+
 export default api;

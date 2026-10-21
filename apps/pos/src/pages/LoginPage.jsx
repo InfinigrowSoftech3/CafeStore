@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   AlertCircle, Eye, EyeOff, Loader2, Sparkles, ExternalLink,
-  Monitor, Clock, ShieldCheck, Coffee, Check
+  Monitor, Clock, ShieldCheck, Coffee, Check, RotateCw
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
 import { env } from '../config/env';
 import { Button, Input } from '../components/ui';
+import { wakeServer } from '../services/api';
 
 export default function LoginPage() {
   const tenant = useTenant();
@@ -20,6 +21,12 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
+  const [isWaking, setIsWaking] = useState(false);
+  const [isTimeoutError, setIsTimeoutError] = useState(false);
+
+  useEffect(() => {
+    wakeServer();
+  }, []);
 
   useEffect(() => {
     if (rateLimitCountdown <= 0) return;
@@ -36,7 +43,7 @@ export default function LoginPage() {
   }, [rateLimitCountdown]);
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    if (event && typeof event.preventDefault === 'function') event.preventDefault();
     if (loading || rateLimitCountdown > 0) return;
 
     if (!email || !password) {
@@ -45,22 +52,46 @@ export default function LoginPage() {
     }
 
     setLoading(true);
+    setIsWaking(false);
+    setIsTimeoutError(false);
     setError('');
+
+    const wakeTimer = setTimeout(() => {
+      setIsWaking(true);
+    }, 4000);
 
     try {
       await login(email, password, twoFactorCode);
+      clearTimeout(wakeTimer);
+      setIsWaking(false);
     } catch (err) {
+      clearTimeout(wakeTimer);
+      setIsWaking(false);
+
       if (err.code === 'TWO_FACTOR_REQUIRED') {
         setRequiresTwoFactor(true);
       }
+
+      const isTimeout =
+        err.isTimeout ||
+        err.code === 'ECONNABORTED' ||
+        Boolean(err.message && /timeout|taking too long|network\s*error/i.test(err.message)) ||
+        !err.response;
+
       if (err.status === 429 || err.code === 'RATE_LIMITED') {
+        setIsTimeoutError(false);
         const retrySec = Number(err.retryAfter) || 30;
         setRateLimitCountdown(retrySec);
         setError(`Too many login attempts. Please wait ${retrySec} seconds before trying again.`);
+      } else if (isTimeout) {
+        setIsTimeoutError(true);
+        setError('Server is taking too long. Please try again');
       } else {
+        setIsTimeoutError(false);
         setError(err.message || 'Unable to sign in. Please verify your credentials.');
       }
     } finally {
+      clearTimeout(wakeTimer);
       setLoading(false);
     }
   };
@@ -100,45 +131,97 @@ export default function LoginPage() {
           <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-pos-text">
             {tenant?.name || 'Café'} POS
           </h1>
-          <p className="mt-1.5 text-xs text-pos-muted font-normal">
-            Cashier & Counter Touch Terminal Sign In
+          <p className="mt-1 text-xs text-pos-muted font-normal">
+            Touch Register, Table Orders & Cashier Station
           </p>
         </div>
 
         {/* ── 1-Click Instant Demo / Preview Buttons ─────────── */}
-        <div className="mb-6 rounded-2xl border border-pos-border bg-pos-raised/70 p-3.5 text-xs space-y-2.5">
-          <div className="flex items-center gap-1.5 text-pos-accent font-bold text-[11px] uppercase tracking-wider">
+        <div className="mb-6 p-4 rounded-2xl bg-pos-raised border border-pos-border">
+          <div className="flex items-center gap-2 mb-2 text-xs font-bold text-pos-accent uppercase tracking-wider">
             <Sparkles size={14} />
             <span>Quick Terminal Login (1-Click)</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
+              disabled={loading}
               onClick={() => demoLogin('cashier')}
-              className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-pos-accent text-white font-bold text-xs shadow-xs touch-press min-h-[48px] hover:bg-pos-accent-hover transition-colors"
+              className="flex items-center justify-center gap-2 p-3 rounded-xl bg-pos-surface border border-pos-border hover:border-pos-accent text-xs font-bold text-pos-text hover:text-pos-accent shadow-xs touch-press transition cursor-pointer disabled:opacity-50"
             >
-              <Monitor size={15} />
+              <Coffee size={16} />
               <span>Cashier</span>
             </button>
             <button
               type="button"
+              disabled={loading}
               onClick={() => demoLogin('manager')}
-              className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-pos-surface hover:bg-pos-raised text-pos-text font-bold text-xs border border-pos-border hover:border-pos-accent shadow-xs touch-press min-h-[48px] transition-colors"
+              className="flex items-center justify-center gap-2 p-3 rounded-xl bg-pos-surface border border-pos-border hover:border-pos-accent text-xs font-bold text-pos-text hover:text-pos-accent shadow-xs touch-press transition cursor-pointer disabled:opacity-50"
             >
-              <ShieldCheck size={15} className="text-pos-accent" />
+              <ShieldCheck size={16} />
               <span>Manager</span>
             </button>
           </div>
+          <div className="mt-2 text-[11px] text-pos-muted text-center">
+            Instantly enters terminal with live demo staff privileges
+          </div>
         </div>
 
-        {error && (
-          <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-pos-danger/40 bg-pos-danger/10 p-3.5 text-xs text-pos-danger">
-            <AlertCircle size={16} className="shrink-0 mt-0.5" />
-            <span className="leading-relaxed font-semibold">{error}</span>
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-pos-border" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase tracking-wider font-bold">
+            <span className="bg-pos-surface px-3 text-pos-muted">Or sign in with email</span>
+          </div>
+        </div>
+
+        {/* Slow connection / cold start waking notice */}
+        {isWaking && loading && (
+          <div className="mb-4 flex items-center gap-3 rounded-xl border border-pos-accent/40 bg-pos-raised p-3.5 text-xs text-pos-text">
+            <Loader2 size={18} className="animate-spin shrink-0 text-pos-accent" />
+            <span className="font-medium leading-relaxed">
+              Waking up the server, this can take up to a minute on first load…
+            </span>
           </div>
         )}
 
-        {/* ── Standard Staff Credentials Form ──────────────── */}
+        {/* ── Error Notification ────────────────────────────── */}
+        {error && (
+          <div className={`mb-5 flex flex-col gap-2 rounded-2xl border p-4 text-xs font-medium ${
+            rateLimitCountdown > 0
+              ? 'border-amber-400/50 bg-amber-500/10 text-amber-900'
+              : 'border-rose-400/50 bg-rose-500/10 text-rose-900'
+          }`}>
+            <div className="flex items-start gap-3">
+              {rateLimitCountdown > 0 ? (
+                <Clock size={18} className="shrink-0 mt-0.5 text-amber-700 animate-spin" />
+              ) : (
+                <AlertCircle size={18} className="shrink-0 mt-0.5 text-rose-600" />
+              )}
+              <div className="flex-1">
+                <span>{error}</span>
+                {rateLimitCountdown > 0 && (
+                  <div className="mt-1 text-[11px] opacity-80">
+                    Terminal will re-enable in <strong className="font-mono">{rateLimitCountdown}s</strong>.
+                  </div>
+                )}
+              </div>
+            </div>
+            {isTimeoutError && (
+              <button
+                type="button"
+                onClick={(e) => handleSubmit(e)}
+                className="mt-1 inline-flex items-center justify-center gap-1.5 self-start rounded-xl bg-pos-accent hover:opacity-90 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition cursor-pointer"
+              >
+                <RotateCw size={13} />
+                <span>Retry</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* ── Email / Password Form ─────────────────────────── */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -211,7 +294,13 @@ export default function LoginPage() {
             isLoading={loading}
             className="w-full font-bold shadow-elevation1"
           >
-            {loading ? 'Verifying Station...' : 'Sign in to Terminal'}
+            {loading ? (
+              <span className="text-xs">
+                {isWaking ? 'Waking up the server, this can take up to a minute on first load…' : 'Verifying Station...'}
+              </span>
+            ) : (
+              'Sign in to Terminal'
+            )}
           </Button>
         </form>
 
@@ -221,30 +310,21 @@ export default function LoginPage() {
             href={env.adminUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-pos-accent flex items-center gap-1 transition font-medium min-h-[32px] px-1"
+            className="inline-flex items-center gap-1 hover:text-pos-accent transition font-medium"
           >
-            <span>Back Office</span>
-            <ExternalLink size={12} />
+            <ShieldCheck size={14} />
+            <span>Admin Back-Office</span>
+            <ExternalLink size={11} className="opacity-70" />
           </a>
-          <span className="text-pos-border">·</span>
           <a
             href={env.kdsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-pos-accent flex items-center gap-1 transition font-medium min-h-[32px] px-1"
+            className="inline-flex items-center gap-1 hover:text-pos-accent transition font-medium"
           >
-            <Clock size={12} />
-            <span>Kitchen KDS</span>
-          </a>
-          <span className="text-pos-border">·</span>
-          <a
-            href={env.customerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-pos-accent flex items-center gap-1 transition font-medium min-h-[32px] px-1"
-          >
-            <span>Storefront</span>
-            <ExternalLink size={12} />
+            <Monitor size={14} />
+            <span>Kitchen Display</span>
+            <ExternalLink size={11} className="opacity-70" />
           </a>
         </div>
       </motion.div>
