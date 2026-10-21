@@ -23,6 +23,7 @@ import { useTenant } from '../context/TenantContext';
 import { formatMoney } from '../utils/money';
 import PageHeader from '../components/common/PageHeader';
 import ImageWithFallback from '../components/common/ImageWithFallback';
+import CustomSelect from '../components/common/CustomSelect';
 import ImageUploader from '../components/common/ImageUploader';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import EmptyState from '../components/common/EmptyState';
@@ -215,18 +216,19 @@ export default function ProductsPage() {
 
           {/* Category Dropdown & View Mode Switcher */}
           <div className="flex items-center gap-2.5">
-            <select
+            <CustomSelect
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-stone-700 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
-            >
-              <option value="">All Categories ({products.length})</option>
-              {categories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => setSelectedCategory(typeof val === 'object' ? val.target.value : val)}
+              placeholder={`All Categories (${products.length})`}
+              options={[
+                { value: '', label: `All Categories (${products.length})` },
+                ...categories.map((category) => ({
+                  value: category._id,
+                  label: category.name,
+                })),
+              ]}
+              className="min-w-[170px]"
+            />
 
             <div className="flex items-center rounded-xl border border-stone-200 bg-stone-50 p-1">
               <button

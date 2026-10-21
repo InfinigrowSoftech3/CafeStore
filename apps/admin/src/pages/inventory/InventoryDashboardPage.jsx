@@ -10,6 +10,7 @@ import api from '../../services/api';
 import { useTenant } from '../../context/TenantContext';
 import { formatMoney } from '../../utils/money';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import CustomSelect from '../../components/common/CustomSelect';
 
 const COMMON_UNITS = [
   'Can', 'Bottle', 'Piece', 'Cup', 'Glass', 
@@ -600,27 +601,29 @@ export default function InventoryDashboardPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <select
+              <CustomSelect
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="rounded-xl border border-stone-200 px-3 py-2 text-xs text-stone-700 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E] bg-white"
-              >
-                <option value="">All Categories</option>
-                {categories.map(c => (
-                  <option key={c._id} value={c._id}>{c.name}</option>
-                ))}
-              </select>
+                onChange={(val) => setSelectedCategory(typeof val === 'object' ? val.target.value : val)}
+                placeholder="All Categories"
+                options={[
+                  { value: '', label: 'All Categories' },
+                  ...categories.map((c) => ({ value: c._id, label: c.name })),
+                ]}
+                className="min-w-[150px]"
+              />
 
-              <select
+              <CustomSelect
                 value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="rounded-xl border border-stone-200 px-3 py-2 text-xs text-stone-700 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E] bg-white"
-              >
-                <option value="">All Statuses</option>
-                <option value="in_stock">🟢 In Stock</option>
-                <option value="low_stock">🟡 Low Stock</option>
-                <option value="out_of_stock">🔴 Out of Stock</option>
-              </select>
+                onChange={(val) => setSelectedStatus(typeof val === 'object' ? val.target.value : val)}
+                placeholder="All Statuses"
+                options={[
+                  { value: '', label: 'All Statuses' },
+                  { value: 'in_stock', label: 'In Stock', dot: 'bg-emerald-500' },
+                  { value: 'low_stock', label: 'Low Stock', dot: 'bg-amber-500' },
+                  { value: 'out_of_stock', label: 'Out of Stock', dot: 'bg-red-500' },
+                ]}
+                className="min-w-[140px]"
+              />
             </div>
           </div>
 

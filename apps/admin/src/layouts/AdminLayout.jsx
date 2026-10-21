@@ -18,6 +18,7 @@ import api from '../services/api';
 import { env } from '../config/env';
 import { getAccessToken } from '@cafe/shared';
 import CommandPaletteModal from '../components/common/CommandPaletteModal';
+import CustomSelect from '../components/common/CustomSelect';
 
 const getAppHref = (href) => {
   if (!href) return '';
@@ -393,24 +394,23 @@ export default function AdminLayout({ children, title }) {
 
               {branches.length > 0 && (
                 <div className="shrink-0 border-b border-slate-200 px-4 py-3 bg-slate-50">
-                  <label htmlFor="mobile-branch-switcher" className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-500">
                     Current branch
                   </label>
-                  <select
-                    id="mobile-branch-switcher"
+                  <CustomSelect
                     value={selectedBranchId}
-                    onChange={(event) => {
-                      handleBranchChange(event.target.value);
+                    onChange={(val) => {
+                      handleBranchChange(typeof val === 'object' ? val.target.value : val);
                       setSidebarOpen(false);
                     }}
-                    className="w-full rounded-md border border-slate-300 bg-white px-2.5 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  >
-                    {branches.map((branch) => (
-                      <option key={branch._id} value={branch._id}>
-                        {branch.name} ({branch.code}){branch.isMain ? ' ★' : ''}
-                      </option>
-                    ))}
-                  </select>
+                    options={branches.map((b) => ({
+                      value: b._id,
+                      label: `${b.name} (${b.code})${b.isMain ? ' ★' : ''}`,
+                      dot: b.isMain ? 'bg-amber-500' : 'bg-emerald-500',
+                    }))}
+                    icon={Store}
+                    className="w-full bg-white border-slate-300"
+                  />
                 </div>
               )}
 
@@ -584,22 +584,18 @@ export default function AdminLayout({ children, title }) {
 
             {/* Branch Switcher */}
             {branches.length > 0 && (
-              <div className="hidden items-center gap-1.5 rounded-md px-2.5 py-1.5 border border-slate-200 bg-slate-50 sm:flex shadow-2xs">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-                <Store size={13} className="text-slate-500 shrink-0" />
-                <select
-                  value={selectedBranchId}
-                  onChange={e => handleBranchChange(e.target.value)}
-                  className="bg-transparent text-xs font-semibold text-slate-800 focus:outline-none cursor-pointer max-w-[140px] truncate"
-                  title="Switch Branch Outlet"
-                >
-                  {branches.map(b => (
-                    <option key={b._id} value={b._id}>
-                      {b.name} ({b.code}){b.isMain ? ' ★' : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <CustomSelect
+                value={selectedBranchId}
+                onChange={(val) => handleBranchChange(typeof val === 'object' ? val.target.value : val)}
+                options={branches.map((b) => ({
+                  value: b._id,
+                  label: `${b.name} (${b.code})${b.isMain ? ' ★' : ''}`,
+                  dot: b.isMain ? 'bg-amber-500' : 'bg-emerald-500',
+                }))}
+                icon={Store}
+                className="bg-slate-50 border-slate-200 text-slate-800 max-w-[210px]"
+                title="Switch Branch Outlet"
+              />
             )}
 
             {/* Online / Sync Badge */}

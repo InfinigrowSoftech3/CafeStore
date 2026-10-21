@@ -15,6 +15,7 @@ import StatusPill from '../components/common/StatusPill';
 import EmptyState from '../components/common/EmptyState';
 import Drawer from '../components/common/Drawer';
 import SearchInput from '../components/common/SearchInput';
+import CustomSelect from '../components/common/CustomSelect';
 
 export default function CustomersPage() {
   const tenant = useTenant();
@@ -302,26 +303,36 @@ export default function CustomersPage() {
 
           {/* Quick Filter Selectors */}
           <div className="flex items-center gap-2 flex-wrap">
-            <select
+            <CustomSelect
               value={consentFilter}
-              onChange={(e) => { setConsentFilter(e.target.value); setPage(1); }}
-              className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
-            >
-              <option value="">All Consent States</option>
-              <option value="true">Marketing Opted-In</option>
-              <option value="false">Opted-Out</option>
-            </select>
+              onChange={(val) => {
+                setConsentFilter(typeof val === 'object' ? val.target.value : val);
+                setPage(1);
+              }}
+              placeholder="All Consent States"
+              options={[
+                { value: '', label: 'All Consent States' },
+                { value: 'true', label: 'Marketing Opted-In' },
+                { value: 'false', label: 'Opted-Out' },
+              ]}
+              className="min-w-[155px]"
+            />
 
-            <select
+            <CustomSelect
               value={frequencyFilter}
-              onChange={(e) => { setFrequencyFilter(e.target.value); setPage(1); }}
-              className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 focus:border-[#0F3D2E] focus:outline-none focus:ring-1 focus:ring-[#0F3D2E]"
-            >
-              <option value="">All Frequencies</option>
-              <option value="frequent">VIP (3+ Visits)</option>
-              <option value="repeat">Repeat (2 Visits)</option>
-              <option value="one-time">First Time (1 Visit)</option>
-            </select>
+              onChange={(val) => {
+                setFrequencyFilter(typeof val === 'object' ? val.target.value : val);
+                setPage(1);
+              }}
+              placeholder="All Frequencies"
+              options={[
+                { value: '', label: 'All Frequencies' },
+                { value: 'frequent', label: 'VIP (3+ Visits)' },
+                { value: 'repeat', label: 'Repeat (2 Visits)' },
+                { value: 'one-time', label: 'First Time (1 Visit)' },
+              ]}
+              className="min-w-[150px]"
+            />
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import api from '../../services/api';
 import { useTenant } from '../../context/TenantContext';
 import { formatMoney } from '../../utils/money';
+import CustomSelect from '../../components/common/CustomSelect';
 
 const UNIT_LABELS = {
   piece: 'pcs', cup: 'cups', glass: 'glasses', bottle: 'bottles',
@@ -201,21 +202,28 @@ export default function InventoryItemsPage() {
             className="w-full rounded-xl border border-stone-200 bg-stone-50/70 hover:bg-white py-2 pl-10 pr-3 text-xs sm:text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-[#0F3D2E] focus:ring-2 focus:ring-[#0F3D2E]/15 transition"
           />
         </div>
-        <select
+        <CustomSelect
           value={categoryFilter}
-          onChange={e => setCategoryFilter(e.target.value)}
-          className="rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:outline-none focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E]"
-        >
-          <option value="">All Categories</option>
-          {categories.map(c => <option key={c._id} value={c._id}>{c.icon} {c.name}</option>)}
-        </select>
-        <select
+          onChange={(val) => setCategoryFilter(typeof val === 'object' ? val.target.value : val)}
+          placeholder="All Categories"
+          options={[
+            { value: '', label: 'All Categories' },
+            ...categories.map((c) => ({ value: c._id, label: `${c.icon ? `${c.icon} ` : ''}${c.name}` })),
+          ]}
+          className="min-w-[150px]"
+        />
+        <CustomSelect
           value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-          className="rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 focus:outline-none focus:border-[#0F3D2E] focus:ring-1 focus:ring-[#0F3D2E]"
-        >
-          {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
+          onChange={(val) => setStatusFilter(typeof val === 'object' ? val.target.value : val)}
+          placeholder="All Status"
+          options={[
+            { value: '', label: 'All Status' },
+            { value: 'in_stock', label: 'In Stock', dot: 'bg-emerald-500' },
+            { value: 'low_stock', label: 'Low Stock', dot: 'bg-amber-500' },
+            { value: 'out_of_stock', label: 'Out of Stock', dot: 'bg-red-500' },
+          ]}
+          className="min-w-[140px]"
+        />
       </div>
 
       {/* Table */}
