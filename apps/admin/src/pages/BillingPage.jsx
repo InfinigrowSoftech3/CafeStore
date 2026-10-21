@@ -265,18 +265,20 @@ export default function BillingPage() {
         {/* 3 Quota Meters */}
         <div className="grid gap-4 sm:grid-cols-3">
           {/* Menu items meter */}
-          <div className={`rounded-2xl border p-4.5 space-y-2.5 ${
+          <div className={`rounded-2xl border p-5 space-y-3 transition shadow-2xs ${
             usage.menuItems > limits.menuItems
-              ? 'border-red-300 bg-red-50/40'
-              : 'border-stone-200 bg-stone-50/50'
+              ? 'border-red-300 bg-red-50/50'
+              : 'border-stone-200 bg-white'
           }`}>
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-stone-700">Menu Items Quota</span>
-              <span className={`font-mono font-bold ${usage.menuItems > limits.menuItems ? 'text-red-700' : 'text-stone-900'}`}>
+              <span className="font-semibold text-stone-700 tracking-tight">Menu Items Quota</span>
+              <span className={`inline-flex items-center font-mono font-bold px-2 py-0.5 rounded-md ${
+                usage.menuItems > limits.menuItems ? 'bg-red-100 text-red-700' : 'bg-stone-100 text-stone-900'
+              }`}>
                 {usage.menuItems} / {limits.menuItems}
               </span>
             </div>
-            <div className="h-2.5 w-full rounded-full bg-stone-200 overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-stone-100 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-300 ${
                   usage.menuItems > limits.menuItems ? 'bg-red-500' : 'bg-[#0F3D2E]'
@@ -285,7 +287,7 @@ export default function BillingPage() {
               />
             </div>
             {usage.menuItems > limits.menuItems ? (
-              <p className="text-[11px] font-semibold text-red-600 flex items-center justify-between">
+              <p className="text-[11px] font-semibold text-red-600 flex items-center justify-between pt-0.5">
                 <span>Limit exceeded (+{usage.menuItems - limits.menuItems} items)</span>
                 <button
                   type="button"
@@ -296,25 +298,27 @@ export default function BillingPage() {
                 </button>
               </p>
             ) : (
-              <p className="text-[11px] text-stone-500">
-                {limits.menuItems - usage.menuItems} slots remaining
+              <p className="text-[11px] font-medium text-stone-500 pt-0.5">
+                {limits.menuItems - usage.menuItems} {limits.menuItems - usage.menuItems === 1 ? 'slot' : 'slots'} remaining
               </p>
             )}
           </div>
 
           {/* Tables meter */}
-          <div className={`rounded-2xl border p-4.5 space-y-2.5 ${
+          <div className={`rounded-2xl border p-5 space-y-3 transition shadow-2xs ${
             usage.tables > limits.tables
-              ? 'border-red-300 bg-red-50/40'
-              : 'border-stone-200 bg-stone-50/50'
+              ? 'border-red-300 bg-red-50/50'
+              : 'border-stone-200 bg-white'
           }`}>
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-stone-700">Tables & QRs</span>
-              <span className={`font-mono font-bold ${usage.tables > limits.tables ? 'text-red-700' : 'text-stone-900'}`}>
+              <span className="font-semibold text-stone-700 tracking-tight">Tables & QRs</span>
+              <span className={`inline-flex items-center font-mono font-bold px-2 py-0.5 rounded-md ${
+                usage.tables > limits.tables ? 'bg-red-100 text-red-700' : 'bg-stone-100 text-stone-900'
+              }`}>
                 {usage.tables} / {limits.tables}
               </span>
             </div>
-            <div className="h-2.5 w-full rounded-full bg-stone-200 overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-stone-100 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-300 ${
                   usage.tables > limits.tables ? 'bg-red-500' : 'bg-[#0F3D2E]'
@@ -322,27 +326,27 @@ export default function BillingPage() {
                 style={{ width: `${Math.min(100, (usage.tables / limits.tables) * 100)}%` }}
               />
             </div>
-            <p className="text-[11px] text-stone-500">
-              {Math.max(0, limits.tables - usage.tables)} tables available
+            <p className="text-[11px] font-medium text-stone-500 pt-0.5">
+              {Math.max(0, limits.tables - usage.tables)} {Math.max(0, limits.tables - usage.tables) === 1 ? 'table' : 'tables'} available
             </p>
           </div>
 
           {/* Staff users meter */}
-          <div className="rounded-2xl border border-stone-200 bg-stone-50/50 p-4.5 space-y-2.5">
+          <div className="rounded-2xl border border-stone-200 bg-white p-5 space-y-3 shadow-2xs transition">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-stone-700">Staff Accounts</span>
-              <span className="font-mono font-bold text-stone-900">
+              <span className="font-semibold text-stone-700 tracking-tight">Staff Accounts</span>
+              <span className="inline-flex items-center font-mono font-bold px-2 py-0.5 rounded-md bg-stone-100 text-stone-900">
                 {usage.staffUsers} / {limits.staffUsers}
               </span>
             </div>
-            <div className="h-2.5 w-full rounded-full bg-stone-200 overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-stone-100 overflow-hidden">
               <div
                 className="h-full rounded-full bg-[#0F3D2E] transition-all duration-300"
                 style={{ width: `${Math.min(100, (usage.staffUsers / limits.staffUsers) * 100)}%` }}
               />
             </div>
-            <p className="text-[11px] text-stone-500">
-              {Math.max(0, limits.staffUsers - usage.staffUsers)} invites remaining
+            <p className="text-[11px] font-medium text-stone-500 pt-0.5">
+              {Math.max(0, limits.staffUsers - usage.staffUsers)} {Math.max(0, limits.staffUsers - usage.staffUsers) === 1 ? 'invite' : 'invites'} remaining
             </p>
           </div>
         </div>

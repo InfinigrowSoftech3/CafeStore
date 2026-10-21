@@ -227,7 +227,7 @@ export default function ReviewsPage() {
           {reviews.map((review) => (
             <div
               key={review._id}
-              className="rounded-2xl border border-stone-200/90 bg-white p-4.5 shadow-xs space-y-3"
+              className="rounded-2xl border border-stone-200/90 bg-white p-5 shadow-xs space-y-3"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">

@@ -659,7 +659,7 @@ export default function TablesPage() {
             return (
               <div
                 key={table._id}
-                className={`flex flex-col justify-between rounded-3xl border bg-white p-4.5 shadow-xs hover:shadow-md transition duration-200 ${
+                className={`flex flex-col justify-between rounded-3xl border bg-white p-5 shadow-xs hover:shadow-md transition duration-200 ${
                   isOccupied
                     ? 'border-blue-300 ring-2 ring-blue-500/10'
                     : table.effectiveStatus === 'CLEANING'
