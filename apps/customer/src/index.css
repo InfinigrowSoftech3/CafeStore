@@ -3,28 +3,45 @@
 @tailwind utilities;
 
 :root {
-  --bg: #FFFFFF;
-  --surface: #FFFFFF;
-  --ink: #111827;
-  --muted: #6B7280;
-  --border: #E5E7EB;
-  --hero: #0F3D2E;
-  --brand: #0F3D2E;
-  --brand-strong: #0A2B20;
-  --brand-soft: #FFF1C9;
-  --tenant-primary: #0F3D2E;
-  --tenant-accent: #FFF1C9;
+  --bg-cream: #FBF6EF;
+  --surface: #FFFDF9;
+  --text-espresso: #2B1810;
+  --text-muted: #7B6B5F;
+  --primary-rust: #7A3316;
+  --primary-pressed: #5E2610;
+  --caramel: #B5702F;
+  --divider: #EFE4D6;
+  --inactive-chip: #F3E9DC;
+  --badge-red: #E23B2E;
 
-  /* Customer Menu Tokens (Warm Luxury Rounded Theme) */
-  --menu-bg: #FFFFFF;
-  --menu-ink: #0F3D2E;
-  --menu-accent: #C93A1C;
-  --menu-accent-text: #FFFFFF;
-  --menu-card: #FFFFFF;
-  --menu-card-radius: 16px;
+  --bg: #FBF6EF;
+  --surface-clean: #FFFDF9;
+  --ink: #2B1810;
+  --muted: #7B6B5F;
+  --border: #EFE4D6;
+  --hero: #7A3316;
+  --brand: #7A3316;
+  --brand-strong: #5E2610;
+  --brand-soft: #F3E9DC;
+  --tenant-primary: #7A3316;
+  --tenant-accent: #B5702F;
+
+  /* Customer Menu Tokens (Light Warm Cream / Espresso Theme) */
+  --menu-bg: #FBF6EF;
+  --menu-ink: #2B1810;
+  --menu-accent: #7A3316;
+  --menu-accent-text: #FFFDF9;
+  --menu-card: #FFFDF9;
+  --menu-card-radius: 20px;
   --menu-veg: #16A34A;
   --menu-nonveg: #DC2626;
-  --menu-butter: #FFF1C9;
+  --menu-butter: #F3E9DC;
+}
+
+body {
+  background-color: #FBF6EF;
+  color: #2B1810;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 :focus-visible {

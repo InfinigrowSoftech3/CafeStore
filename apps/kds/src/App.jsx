@@ -58,8 +58,8 @@ export default function App() {
       {/* ── KDS Top Shell Header (White-based theme) ───────────────── */}
       <header className="h-14 bg-white border-b border-[#E5DED5] px-3 sm:px-4 flex items-center justify-between shrink-0 shadow-xs z-30">
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500 text-stone-950 font-black text-sm shadow-xs shrink-0">
-            🍳
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500 text-stone-950 font-black text-sm shadow-xs shrink-0 overflow-hidden">
+            <img src={tenant?.logoUrl || '/logo.png'} alt="Logo" className="h-full w-full object-cover" />
           </div>
           <div className="flex items-center gap-2">
             <span className="font-display font-bold text-sm sm:text-base md:text-lg tracking-tight text-[#1C1815] truncate max-w-[120px] sm:max-w-none">

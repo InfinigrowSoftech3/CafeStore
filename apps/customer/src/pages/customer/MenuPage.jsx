@@ -1,30 +1,10 @@
 import { useState, useEffect, useRef, lazy, Suspense, useMemo } from 'react';
-import { useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Search,
-  SlidersHorizontal,
-  X,
-  ScanLine,
-  ShoppingBag,
-  ArrowRight,
-  Coffee,
-  CupSoda,
-  Sandwich,
-  Pizza,
-  CakeSlice,
-  Sparkles,
-  Utensils,
-  AlertCircle,
-  RotateCcw,
-  ChevronLeft,
-  ChevronRight,
-  Menu as MenuIcon,
-} from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { ArrowRight, UtensilsCrossed, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
-import useCartStore, { cartItemCount } from '../../context/cartStore';
-import { getCached, setCached, CATEGORIES_TTL_MS, DEFAULT_TTL_MS, clearClientCache } from '../../utils/menuCache';
+import useCartStore from '../../context/cartStore';
+import { getCached, setCached, CATEGORIES_TTL_MS, DEFAULT_TTL_MS } from '../../utils/menuCache';
 import { subscribeToLiveStream } from '../../utils/liveStream';
 import TableServiceActions from '../../components/table/TableServiceActions';
 import { useTenant } from '../../context/TenantContext';
@@ -32,73 +12,34 @@ import {
   getResolvedTenantSlug,
   getCustomerSessionItem,
   setCustomerSessionItem,
-  removeCustomerSessionItem,
 } from '../../utils/tenantHelper';
 import usePageMeta from '../../hooks/usePageMeta';
-import { formatMoney } from '../../utils/money';
-import VegMark from '../../components/menu/VegMark';
-import PopularCard from '../../components/menu/PopularCard';
-import MenuItemRow from '../../components/menu/MenuItemRow';
-import { PopularSkeleton, RowSkeleton } from '../../components/menu/MenuSkeletons';
-import DesktopOrderSidebar from '../../components/menu/DesktopOrderSidebar';
+import { getFavorites, toggleFavorite } from '../../utils/favorites';
+
+import CustomerScreenHeader from '../../components/menu/CustomerScreenHeader';
+import CustomerHero from '../../components/menu/CustomerHero';
+import CustomerCategoryCircles from '../../components/menu/CustomerCategoryCircles';
+import CustomerProductCard from '../../components/menu/CustomerProductCard';
+import CustomerCategoryBanner from '../../components/menu/CustomerCategoryBanner';
+import CustomerSubcategoryTabs from '../../components/menu/CustomerSubcategoryTabs';
+import CustomerItemRow from '../../components/menu/CustomerItemRow';
+import CustomerBottomNav from '../../components/ui/CustomerBottomNav';
 
 const ProductModal = lazy(() => import('../../components/menu/ProductModal'));
 const QrScannerModal = lazy(() => import('../../components/ui/QrScannerModal'));
 
-const SORT_OPTIONS = [
-  { value: '', label: 'Featured' },
-  { value: 'popular', label: 'Popular First' },
-  { value: 'price_asc', label: 'Price: Low to High' },
-  { value: 'price_desc', label: 'Price: High to Low' },
-];
-
-/**
- * Returns an appropriate Lucide icon component based on category name.
- * Strictly avoids emoji icons per design requirement.
- */
-function getCategoryIcon(name, isSelected) {
-  const n = String(name || '').toLowerCase();
-  const colorClass = isSelected ? 'text-[#FFF1C9]' : 'text-[#0F3D2E]';
-  if (n.includes('hot') || n.includes('brew') || n.includes('coffee') || n.includes('tea')) {
-    return <Coffee size={14} className={colorClass} strokeWidth={2.2} />;
-  }
-  if (n.includes('cold') || n.includes('beverage') || n.includes('drink') || n.includes('shake') || n.includes('smoothie')) {
-    return <CupSoda size={14} className={colorClass} strokeWidth={2.2} />;
-  }
-  if (n.includes('burger') || n.includes('bite') || n.includes('sandwich')) {
-    return <Sandwich size={14} className={colorClass} strokeWidth={2.2} />;
-  }
-  if (n.includes('pizza')) {
-    return <Pizza size={14} className={colorClass} strokeWidth={2.2} />;
-  }
-  if (n.includes('dessert') || n.includes('bakery') || n.includes('cake') || n.includes('sweet') || n.includes('pastry')) {
-    return <CakeSlice size={14} className={colorClass} strokeWidth={2.2} />;
-  }
-  if (n.includes('special') || n.includes('chef')) {
-    return <Sparkles size={14} className={colorClass} strokeWidth={2.2} />;
-  }
-  return <Utensils size={14} className={colorClass} strokeWidth={2.2} />;
-}
-
-/**
- * Parses operating hours from tenant settings to produce real-time status.
- */
 function getOperatingStatus(tenant) {
-  const rawCity = (tenant.address || 'Surat').split(',')[0].trim();
-  const city = rawCity ? rawCity.charAt(0).toUpperCase() + rawCity.slice(1).toLowerCase() : 'Surat';
-
-  const openingHours = tenant.openingHours || tenant.settings?.openingHours || {};
+  const openingHours = tenant?.openingHours || tenant?.settings?.openingHours || {};
   const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const todayKey = days[new Date().getDay()];
   const todaySchedule = openingHours[todayKey];
 
-  const formatTime12h = (tStr) => {
-    if (!tStr) return '';
-    const [h, m] = tStr.split(':').map(Number);
-    const ampm = (h || 0) >= 12 ? 'PM' : 'AM';
-    const h12 = (h || 0) % 12 || 12;
-    return m > 0 ? `${h12}:${String(m).padStart(2, '0')} ${ampm}` : `${h12} ${ampm}`;
-  };
+  if (!todaySchedule || !todaySchedule.close) {
+    return { isOpen: true, text: 'Kitchen open' };
+  }
+  if (todaySchedule.isClosed) {
+    return { isOpen: false, text: 'Kitchen closed today' };
+  }
 
   const parseMinutes = (tStr) => {
     if (!tStr) return 0;
@@ -106,38 +47,13 @@ function getOperatingStatus(tenant) {
     return (h || 0) * 60 + (m || 0);
   };
 
-  // If no hours are configured in DB, use default café hours (open till 11 PM)
-  if (!todaySchedule || !todaySchedule.close) {
-    return {
-      isOpen: true,
-      text: `Kitchen open · till 11 PM · ${city}`,
-    };
-  }
-
-  if (todaySchedule.isClosed) {
-    return {
-      isOpen: false,
-      text: `Kitchen closed today · ${city}`,
-    };
-  }
-
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const openMinutes = parseMinutes(todaySchedule.open || '08:00');
   const closeMinutes = parseMinutes(todaySchedule.close || '23:00');
 
   const isOpen = currentMinutes >= openMinutes && currentMinutes < closeMinutes;
-  if (isOpen) {
-    return {
-      isOpen: true,
-      text: `Kitchen open · till ${formatTime12h(todaySchedule.close) || '11 PM'} · ${city}`,
-    };
-  }
-
-  return {
-    isOpen: false,
-    text: `Kitchen closed · Opens ${formatTime12h(todaySchedule.open) || '8 AM'} · ${city}`,
-  };
+  return { isOpen, text: isOpen ? 'Kitchen open' : 'Kitchen closed' };
 }
 
 export default function MenuPage() {
@@ -151,6 +67,7 @@ export default function MenuPage() {
   const navigate = useNavigate();
   const tableTokenParam = searchParams.get('token') || searchParams.get('tableToken');
   const queryTable = searchParams.get('table') || searchParams.get('tableNumber');
+  const urlCategory = searchParams.get('category');
 
   const {
     items,
@@ -161,797 +78,493 @@ export default function MenuPage() {
     isScannerOpen,
     openScanner,
     closeScanner,
-    openNavDrawer,
   } = useCartStore();
-
-  const itemCount = useCartStore(cartItemCount);
-  const subtotal = items.reduce((s, i) => s + (i.itemTotal || 0), 0);
-  const tax = Number(((subtotal * Number(tenant.taxRate || 0)) / 100).toFixed(2));
-  const grandTotal = (subtotal + tax).toFixed(2);
 
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [menuError, setMenuError] = useState('');
-  const [reloadKey, setReloadKey] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory || 'all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState('all');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [vegOnly, setVegOnly] = useState(false);
-  const [sort, setSort] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showFilters, setShowFilters] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [favorites, setFavorites] = useState(() => getFavorites(tenant?.slug));
 
-  const searchRef = useRef(null);
+  const isHomeView = selectedCategory === 'all' && !debouncedSearch;
+
   const debounceRef = useRef(null);
-  const popularRef = useRef(null);
 
-  const scrollPopular = (direction) => {
-    if (popularRef.current) {
-      const scrollAmount = direction === 'left' ? -380 : 380;
-      popularRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
+  // Broadcast active view changes to bottom nav
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent('menu:viewchange', {
+        detail: { view: isHomeView ? 'home' : 'category' },
+      })
+    );
+  }, [isHomeView]);
+
+  // Handle bottom navigation events
+  useEffect(() => {
+    const handleNavHome = () => {
+      setSelectedCategory('all');
+      setSearch('');
+      setDebouncedSearch('');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    const handleNavMenu = () => {
+      if (categories.length > 0) {
+        setSelectedCategory(categories[0]._id);
+      }
+    };
+    window.addEventListener('nav:home', handleNavHome);
+    window.addEventListener('nav:menu', handleNavMenu);
+    return () => {
+      window.removeEventListener('nav:home', handleNavHome);
+      window.removeEventListener('nav:menu', handleNavMenu);
+    };
+  }, [categories]);
+
+  const handleToggleFavorite = (productId) => {
+    toggleFavorite(tenant?.slug, productId);
+    setFavorites(getFavorites(tenant?.slug));
   };
 
-  // Fallback table detection from URL param or namespaced sessionStorage if not yet in store
+  // Debounced search handling
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 200);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [search]);
+
+  // Fallback table detection from URL param or namespaced sessionStorage
   useEffect(() => {
     const slug = tenant?.slug || getResolvedTenantSlug();
     if (!tableNumber && slug) {
-      const sessionTable = getCustomerSessionItem(slug, 'table_number');
-      const sessionToken = getCustomerSessionItem(slug, 'table_token');
-      if (sessionTable) {
-        setTable(Number(sessionTable), sessionToken || null);
-      } else if (queryTable) {
-        setTable(Number(queryTable), null);
+      const storedTable = getCustomerSessionItem(slug, 'table_number');
+      const storedToken = getCustomerSessionItem(slug, 'table_token');
+      if (storedTable && !isNaN(Number(storedTable))) {
+        setTable(Number(storedTable));
+        if (storedToken) setDiningSessionToken(storedToken);
       }
     }
-  }, [tableNumber, queryTable, setTable, tenant?.slug]);
+  }, [tableNumber, tenant?.slug, setTable, setDiningSessionToken]);
 
-  // Authoritative server resolution of the table QR token
+  // Table QR token verification
   useEffect(() => {
-    if (!tableTokenParam) return;
-    let active = true;
+    const effectiveToken = tableTokenParam || tableToken;
     const slug = tenant?.slug || getResolvedTenantSlug();
-    api.get('/public/cafes/resolve', { params: { token: tableTokenParam } })
-      .then(({ data }) => {
-        if (!active || !data.data?.table) return;
-        const resolvedTable = data.data.table;
-        const currentStore = useCartStore.getState();
-        const isNewTableScan =
-          (currentStore.tableNumber != null && currentStore.tableNumber !== Number(resolvedTable.number)) ||
-          (currentStore.tableToken != null && currentStore.tableToken !== tableTokenParam);
+    if (effectiveToken && slug) {
+      setDiningSessionToken(effectiveToken);
+      setCustomerSessionItem(slug, 'table_token', effectiveToken);
 
-        if (isNewTableScan) {
-          currentStore.clearCart();
-          currentStore.setDiningSessionToken(null);
-        }
+      api.get(`/tables/verify?token=${effectiveToken}`)
+        .then((res) => {
+          if (res.data?.tableNumber) {
+            setTable(res.data.tableNumber);
+            setCustomerSessionItem(slug, 'table_number', res.data.tableNumber);
+          }
+        })
+        .catch(() => {
+          if (queryTable && !isNaN(Number(queryTable))) {
+            setTable(Number(queryTable));
+            setCustomerSessionItem(slug, 'table_number', queryTable);
+          }
+        });
+    } else if (queryTable && !isNaN(Number(queryTable)) && slug) {
+      setTable(Number(queryTable));
+      setCustomerSessionItem(slug, 'table_number', queryTable);
+    }
+  }, [tableTokenParam, queryTable, tableToken, tenant?.slug, setTable, setDiningSessionToken]);
 
-        setTable(resolvedTable.number, tableTokenParam);
-        if (slug) {
-          setCustomerSessionItem(slug, 'table_token', tableTokenParam);
-          setCustomerSessionItem(slug, 'table_number', resolvedTable.number);
-          setCustomerSessionItem(slug, 'table_id', resolvedTable.id);
-        }
-      })
-      .catch(() => {
-        api.get('/tables/qr/validate', { params: { token: tableTokenParam } })
-          .then(({ data }) => {
-            if (!active || !data.valid) return;
-            const currentStore = useCartStore.getState();
-            const isNewTableScan =
-              (currentStore.tableNumber != null && currentStore.tableNumber !== Number(data.table.tableNumber)) ||
-              (currentStore.tableToken != null && currentStore.tableToken !== tableTokenParam);
-
-            if (isNewTableScan) {
-              currentStore.clearCart();
-              currentStore.setDiningSessionToken(null);
-            }
-
-            setTable(data.table.tableNumber, tableTokenParam);
-            if (slug) {
-              setCustomerSessionItem(slug, 'table_token', tableTokenParam);
-              setCustomerSessionItem(slug, 'table_number', data.table.tableNumber);
-            }
-          })
-          .catch(() => {
-            if (slug) {
-              removeCustomerSessionItem(slug, 'table_token');
-              removeCustomerSessionItem(slug, 'table_number');
-              removeCustomerSessionItem(slug, 'table_id');
-            }
-            if (active) toast.error('This table QR code is invalid or expired. Ask staff for a new code.');
-          });
-      });
-    return () => { active = false; };
-  }, [tableTokenParam, setTable, tenant?.slug]);
-
-  // Session initialization when table is verified
+  // Load menu categories and products
   useEffect(() => {
-    if (!tableToken || !tableNumber) return undefined;
-    let active = true;
-    api.post('/session', {
-      tableNumber,
-      tableToken,
-      ...(useCartStore.getState().diningSessionToken && { diningSessionToken: useCartStore.getState().diningSessionToken }),
-    }).then((res) => {
-      const data = res?.data;
-      if (!active || !data) return;
+    let isMounted = true;
+    const slug = tenant?.slug || getResolvedTenantSlug();
 
-      const prevSessionToken = useCartStore.getState().diningSessionToken;
-      if (res.status === 201 || (prevSessionToken && data.diningSessionToken && prevSessionToken !== data.diningSessionToken)) {
-        useCartStore.getState().clearCart();
+    const fetchMenu = async () => {
+      const catCacheKey = `categories_${slug}`;
+      const prodCacheKey = `products_${slug}`;
+
+      const cachedCats = getCached(catCacheKey);
+      const cachedProds = getCached(prodCacheKey);
+
+      if (cachedCats && cachedProds) {
+        setCategories(cachedCats);
+        setProducts(cachedProds);
+        setLoading(false);
+      } else {
+        setLoading(true);
       }
 
-      if (data.diningSessionToken) {
-        setDiningSessionToken(data.diningSessionToken);
-      }
-    }).catch((error) => {
-      if (active) toast.error(error.message || 'Unable to start your table session.');
-    });
-    return () => { active = false; };
-  }, [tableNumber, tableToken, setDiningSessionToken]);
+      try {
+        const [catsRes, prodsRes] = await Promise.all([
+          api.get('/categories'),
+          api.get('/menu'),
+        ]);
 
-  // Real-time live stream events for product availability
-  useEffect(() => {
-    const slug = tenant?.slug || getResolvedTenantSlug();
-    if (!slug && !tenant?.id) return;
-    return subscribeToLiveStream('/menu/events', {
-      onEvent: (type, payload) => {
-        if (type === 'connected') {
-          setReloadKey((current) => current + 1);
-        } else if (type === 'availability') {
-          clearClientCache();
-          setProducts((current) => current.map((product) => String(product._id) === payload.productId
-            ? { ...product, available: payload.available }
-            : product));
-        } else if (type === 'removed') {
-          clearClientCache();
-          setProducts((current) => current.filter((product) => String(product._id) !== payload.productId));
+        if (isMounted) {
+          const rawCats = Array.isArray(catsRes.data?.categories)
+            ? catsRes.data.categories
+            : Array.isArray(catsRes.data)
+              ? catsRes.data
+              : [];
+          const rawProds = Array.isArray(prodsRes.data?.products)
+            ? prodsRes.data.products
+            : Array.isArray(prodsRes.data)
+              ? prodsRes.data
+              : [];
+
+          const activeCategories = rawCats.filter((c) => c.active !== false);
+          setCategories(activeCategories);
+          setProducts(rawProds);
+          setCached(catCacheKey, activeCategories, CATEGORIES_TTL_MS);
+          setCached(prodCacheKey, rawProds, DEFAULT_TTL_MS);
         }
+      } catch (err) {
+        console.error('Failed to load menu data:', err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchMenu();
+
+    // Subscribe to live menu stream
+    const unsubscribe = subscribeToLiveStream('/menu/events', {
+      onCategoryChange: (cat) => {
+        setCategories((prev) => {
+          const exists = prev.find((c) => c._id === cat._id);
+          if (exists) {
+            return cat.active === false ? prev.filter((c) => c._id !== cat._id) : prev.map((c) => (c._id === cat._id ? cat : c));
+          }
+          return cat.active === false ? prev : [...prev, cat];
+        });
+      },
+      onProductChange: (prod) => {
+        setProducts((prev) => {
+          const exists = prev.find((p) => p._id === prod._id);
+          if (exists) {
+            return prod.available === false ? prev.map((p) => (p._id === prod._id ? prod : p)) : prev.map((p) => (p._id === prod._id ? prod : p));
+          }
+          return [...prev, prod];
+        });
       },
     });
-  }, [tenant?.slug, tenant?.id]);
 
-  // Periodic scheduled availability check
-  useEffect(() => {
-    const refreshScheduledAvailability = () => {
-      const now = Date.now();
-      setProducts((current) => current.map((product) => {
-        const startsAt = product.availableFrom ? new Date(product.availableFrom).getTime() : null;
-        const endsAt = product.availableUntil ? new Date(product.availableUntil).getTime() : null;
-        const scheduledAvailable = (!startsAt || now >= startsAt) && (!endsAt || now < endsAt);
-        return product.scheduledAvailable === scheduledAvailable ? product : { ...product, scheduledAvailable };
-      }));
+    return () => {
+      isMounted = false;
+      if (unsubscribe) unsubscribe();
     };
-    const timer = window.setInterval(refreshScheduledAvailability, 30000);
-    return () => window.clearInterval(timer);
-  }, []);
+  }, [tenant?.slug]);
 
-  // Fetch categories with client cache
-  useEffect(() => {
-    const slug = tenant?.slug || getResolvedTenantSlug();
-    if (!slug && !tenant?.id) return;
-
-    const cacheKey = `categories_${slug || 'default'}`;
-    const cachedCats = getCached(cacheKey);
-    if (cachedCats && cachedCats.length > 0) {
-      setCategories(cachedCats);
-    }
-    const params = slug ? { cafe: slug } : {};
-    api.get('/categories', { params })
-      .then((res) => {
-        const cats = Array.isArray(res.data?.categories) ? res.data.categories : [];
-        setCategories(cats);
-        setCached(cacheKey, cats, CATEGORIES_TTL_MS);
-      })
-      .catch(() => {});
-  }, [tenant?.slug, tenant?.id]);
-
-  // Debounce search query
-  useEffect(() => {
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setDebouncedSearch(search), 300);
-    return () => clearTimeout(debounceRef.current);
-  }, [search]);
-
-  // Fetch menu products with client cache
-  useEffect(() => {
-    const slug = tenant?.slug || getResolvedTenantSlug();
-    if (!slug && !tenant?.id) return;
-
-    const params = new URLSearchParams();
-    params.append('limit', '100');
-    if (selectedCategory !== 'all') params.append('category', selectedCategory);
-    if (debouncedSearch) params.append('search', debouncedSearch);
-    if (vegOnly) params.append('veg', 'true');
-    if (sort) params.append('sort', sort);
-    if (slug) params.append('cafe', slug);
-
-    const cacheKey = `menu_${slug || 'default'}_${params.toString()}`;
-    const cachedProducts = getCached(cacheKey);
-
-    if (cachedProducts && cachedProducts.length > 0) {
-      setProducts(cachedProducts);
-      setLoading(false);
-      setMenuError('');
-    } else {
-      setLoading(true);
-      setMenuError('');
-    }
-
-    api.get(`/menu?${params}`)
-      .then((res) => {
-        const prods = Array.isArray(res.data?.products) ? res.data.products : [];
-        setProducts(prods);
-        setCached(cacheKey, prods, DEFAULT_TTL_MS);
-      })
-      .catch((error) => {
-        if (!cachedProducts || cachedProducts.length === 0) {
-          setProducts([]);
-          setMenuError(error.message || 'Unable to connect to the menu service.');
-          toast.error('Failed to load menu');
-        }
-      })
-      .finally(() => setLoading(false));
-  }, [selectedCategory, debouncedSearch, vegOnly, sort, reloadKey, tenant?.slug, tenant?.id]);
-
-  // Category counts
-  const categoryCounts = useMemo(() => {
-    const counts = { all: products.length };
-    categories.forEach((cat) => {
-      counts[cat._id] = products.filter(
-        (p) => p.category === cat._id || p.category?._id === cat._id
-      ).length;
-    });
-    return counts;
-  }, [categories, products]);
-
-  // Popular items
+  // Popular items (flags or top items)
   const popularItems = useMemo(() => {
-    return products.filter((p) => p.popular === true);
+    const flagged = products.filter((p) => p.popular === true);
+    if (flagged.length >= 2) return flagged;
+    return products.slice(0, 4);
   }, [products]);
 
-  // Products grouped by category for sections
-  const groupedSections = useMemo(() => {
+  // Recommended items
+  const recommendedItems = useMemo(() => {
+    const popIds = new Set(popularItems.map((p) => p._id));
+    const others = products.filter((p) => !popIds.has(p._id));
+    if (others.length >= 2) return others.slice(0, 4);
+    if (products.length >= 4) return products.slice(2, 6);
+    return [];
+  }, [products, popularItems]);
+
+  // Active category object
+  const currentCategory = useMemo(() => {
+    if (selectedCategory === 'all') return null;
+    return categories.find((c) => c._id === selectedCategory) || null;
+  }, [categories, selectedCategory]);
+
+  // Subcategories on active category if available in data model
+  const subcategories = useMemo(() => {
+    if (!currentCategory) return [];
+    if (Array.isArray(currentCategory.subcategories) && currentCategory.subcategories.length > 0) {
+      return currentCategory.subcategories;
+    }
+    if (Array.isArray(currentCategory.subCategories) && currentCategory.subCategories.length > 0) {
+      return currentCategory.subCategories;
+    }
+    return [];
+  }, [currentCategory]);
+
+  // Filtered products for active category view or search view
+  const categoryProducts = useMemo(() => {
+    let list = products;
     if (selectedCategory !== 'all') {
-      const activeCat = categories.find((c) => c._id === selectedCategory);
-      const catName = activeCat ? activeCat.name : 'Selected Items';
-      return [{ id: selectedCategory, name: catName, items: products }];
+      list = list.filter((p) => {
+        const catId = typeof p.category === 'object' ? p.category?._id : p.category;
+        return catId === selectedCategory;
+      });
     }
-
-    // Group all products by their category
-    const map = new Map();
-    categories.forEach((cat) => {
-      map.set(cat._id, { id: cat._id, name: cat.name, items: [] });
-    });
-
-    const uncategorized = [];
-    products.forEach((prod) => {
-      const catId = typeof prod.category === 'object' ? prod.category?._id : prod.category;
-      if (catId && map.has(catId)) {
-        map.get(catId).items.push(prod);
-      } else {
-        uncategorized.push(prod);
-      }
-    });
-
-    const sections = Array.from(map.values()).filter((sec) => sec.items.length > 0);
-    if (uncategorized.length > 0) {
-      sections.push({ id: 'other', name: 'More Dishes', items: uncategorized });
+    if (selectedSubcategory !== 'all') {
+      list = list.filter((p) => {
+        return (
+          p.subCategory === selectedSubcategory ||
+          p.subcategory === selectedSubcategory ||
+          p.kitchenStation === selectedSubcategory
+        );
+      });
     }
-    return sections;
-  }, [categories, products, selectedCategory]);
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase().trim();
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.description && p.description.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [products, selectedCategory, selectedSubcategory, debouncedSearch]);
 
   const operatingStatus = useMemo(() => getOperatingStatus(tenant), [tenant]);
 
-  // Accent color from tenant branding or default tomato #C93A1C
-  const accentColor = tenant.branding?.accentColor || tenant.settings?.accentColor || '#C93A1C';
+  const handleOrderNow = () => {
+    if (categories.length > 0) {
+      setSelectedCategory(categories[0]._id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const el = document.getElementById('content-sheet');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
-  const handleCategoryClick = (catId) => {
-    setSelectedCategory(catId);
-    if (catId !== 'all') {
-      const targetElement = document.getElementById(`category-section-${catId}`);
-      if (targetElement) {
-        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+  const handleViewAllPopular = () => {
+    if (categories.length > 0) {
+      setSelectedCategory(categories[0]._id);
     }
   };
 
   return (
-    <div
-      className="min-h-screen w-full max-w-full bg-white text-[#111827] font-jakarta selection:bg-[#0F3D2E] selection:text-[#FFF1C9]"
-      style={{
-        '--menu-bg': '#FFFFFF',
-        '--menu-ink': '#0F3D2E',
-        '--menu-accent': accentColor,
-        '--menu-accent-text': '#FFFFFF',
-        '--menu-card': '#FFFFFF',
-        '--menu-veg': '#16A34A',
-        '--menu-nonveg': '#DC2626',
-        '--menu-butter': '#FFF1C9',
-      }}
-    >
-      {/* 
-        Responsive Container:
-        - Base (320-639px): Full width, 16px side padding (20px from 390px up)
-        - Tablet (640-1023px): Centered container max-width 720px
-        - Desktop (1024px+): Centered container max-width 1200px (1320px at 1440px+) with 32px side padding
-        - Bottom padding matches floating order bar + safe-area inset on mobile, relaxes on desktop
-      */}
-      <div className="mx-auto w-full sm:max-w-[720px] lg:max-w-[1200px] 2xl:max-w-[1320px] min-h-screen flex flex-col px-4 min-[390px]:px-5 lg:px-8 pt-3 pb-28 sm:pb-32 lg:pb-12">
-        {/* ─── 1. Header ──────────────────────────────────────────────────────── */}
-        <header className="flex items-center justify-between gap-3 py-2 border-b border-stone-200">
-          {/* Café Name with small accent dot on left */}
-          <div className="flex items-center gap-2.5 min-w-0">
-            <span
-              className="w-2.5 h-2.5 rounded-full bg-[var(--menu-accent,#C93A1C)] shrink-0"
-              aria-hidden="true"
-            />
-            <span className="font-sora font-extrabold text-xl sm:text-2xl lg:text-3xl text-[#0F3D2E] tracking-tight truncate">
-              {tenant.name || 'APNA DOST'}
-            </span>
+    <div className="min-h-screen w-full bg-[#FBF6EF] text-[#2B1810] font-sans antialiased selection:bg-[#7A3316] selection:text-[#FFFDF9]">
+      {/* ── Main Container (Centered, max 1200px) ── */}
+      <div className="mx-auto w-full max-w-[1200px] px-4 min-[390px]:px-5 sm:px-6 lg:px-8 pt-2 pb-32 md:pb-16 flex flex-col">
+        {/* ── Responsive Screen Header ── */}
+        <CustomerScreenHeader
+          mode={isHomeView ? 'home' : 'category'}
+          categoryName={currentCategory?.name || (debouncedSearch ? `Search: "${debouncedSearch}"` : 'All Menu')}
+          categorySubtitle={currentCategory?.description || (debouncedSearch ? `${categoryProducts.length} items found` : 'Freshly brewed happiness')}
+          onBack={() => {
+            setSelectedCategory('all');
+            setSearch('');
+            setDebouncedSearch('');
+          }}
+          onOpenSearch={() => setIsSearchOpen(!isSearchOpen)}
+          isSearchOpen={isSearchOpen}
+          searchValue={search}
+          onSearchChange={setSearch}
+          onClearSearch={() => setSearch('')}
+          activeTab={isHomeView ? 'home' : 'menu'}
+          onSelectHome={() => {
+            setSelectedCategory('all');
+            setSearch('');
+            setDebouncedSearch('');
+          }}
+          onSelectMenu={() => {
+            if (categories.length > 0) setSelectedCategory(categories[0]._id);
+          }}
+        />
+
+        {/* ── Table Service Quick Actions (when seated) ── */}
+        {tableNumber && (
+          <div className="mb-3">
+            <TableServiceActions />
           </div>
+        )}
 
-          {/* Right: Dark Table Pill + Round White Cart Button (cart button hidden on desktop since sidebar is visible) */}
-          <div className="flex items-center gap-2 shrink-0">
-            {/* Dark pill button showing the table ("Table 1", from QR/session) */}
-            <button
-              type="button"
-              onClick={openScanner}
-              aria-label={tableNumber ? `Current Table ${tableNumber}, tap to change table` : 'Scan table QR code'}
-              className="inline-flex min-h-[42px] items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-[#0F3D2E] text-white text-xs font-sora font-bold shadow-xs hover:bg-[#16503D] active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+        {/* ═══════════════════════════════════════════════════════════
+            SCREEN 1: HOME SCREEN VIEW (Landing / All Categories)
+           ═══════════════════════════════════════════════════════════ */}
+        {isHomeView ? (
+          <div className="flex flex-col gap-5 sm:gap-7 animate-in fade-in-50 duration-200">
+            {/* 1. Hero Section */}
+            <CustomerHero onOrderNow={handleOrderNow} />
+
+            {/* 2. Overlapping Content Sheet */}
+            <div
+              id="content-sheet"
+              className="relative -mt-4 sm:-mt-6 rounded-t-[28px] sm:rounded-t-[32px] bg-[#FBF6EF] pt-4 sm:pt-6 flex flex-col gap-6 sm:gap-8"
             >
-              {tableNumber ? (
-                <>
-                  <span className="relative flex h-2 w-2 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-                  </span>
-                  <span>Table {tableNumber}</span>
-                </>
-              ) : (
-                <>
-                  <ScanLine size={14} className="text-white" />
-                  <span>Scan Table</span>
-                </>
-              )}
-            </button>
-
-            {/* Round white cart button with item count - only on mobile/tablet */}
-            <Link
-              to="/cart"
-              aria-label={`View Cart with ${itemCount} items`}
-              className="relative lg:hidden w-[42px] h-[42px] min-w-[42px] min-h-[42px] rounded-full bg-white border border-stone-300 flex items-center justify-center text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
-            >
-              <ShoppingBag size={18} strokeWidth={2.4} />
-              {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 min-w-[18px] px-1 items-center justify-center rounded-full bg-[var(--menu-accent,#C93A1C)] text-white text-[10px] font-sora font-extrabold shadow-xs">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
-
-            {/* Hamburger Button to Show All Pages */}
-            <button
-              type="button"
-              onClick={openNavDrawer}
-              aria-label="Open navigation menu - show all pages"
-              className="min-h-[42px] min-w-[42px] px-3 sm:px-4 flex items-center justify-center gap-1.5 rounded-full border border-stone-300 bg-white text-[#0F3D2E] shadow-2xs hover:bg-stone-50 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
-            >
-              <MenuIcon size={19} strokeWidth={2.4} />
-              <span className="hidden sm:inline text-xs font-sora font-bold tracking-wide">All Pages</span>
-            </button>
-          </div>
-        </header>
-
-        {/* ─── 2-Column Desktop Grid Wrapper (1024px+) ─────────────────────────── */}
-        <div className="lg:grid lg:grid-cols-12 lg:gap-8 lg:items-start pt-1">
-          {/* Main Left Column (Full width on mobile/tablet, 8 cols on desktop) */}
-          <div className="lg:col-span-8 min-w-0 flex flex-col space-y-4">
-            {/* Status Line */}
-            <div className="flex items-center gap-2 pt-0.5 pb-1">
-              <span
-                className={`w-2 h-2 rounded-full shrink-0 ${
-                  operatingStatus.isOpen ? 'bg-[#1B7A3E] animate-pulse' : 'bg-[#C93A1C]'
-                }`}
-                aria-hidden="true"
+              {/* Category Row (5 Circular Icon Buttons) */}
+              <CustomerCategoryCircles
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onSelectCategory={(catId) => {
+                  setSelectedCategory(catId);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
               />
-              <span className="text-xs font-jakarta font-semibold text-[#0F3D2E]/80">
-                {operatingStatus.text}
-              </span>
-            </div>
 
-            {/* Kitchen Closed Banner if applicable */}
-            {!operatingStatus.isOpen && (
-              <div className="rounded-2xl bg-[#C93A1C]/10 border border-[#C93A1C]/25 p-3.5 text-[#C93A1C] text-xs font-jakarta font-semibold flex items-center gap-2.5 shadow-2xs">
-                <AlertCircle size={18} className="shrink-0" />
-                <span>The kitchen is currently closed. You can browse the menu, but ordering is paused.</span>
-              </div>
-            )}
-
-            {/* Optional Table Service actions when sitting at a table session */}
-            {tableNumber && <TableServiceActions />}
-
-            {/* ─── 3. Greeting Heading & Search Row ─────────────────────────────── */}
-            <div className="pt-1 pb-1 flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
-              <h1 className="font-sora font-extrabold text-[clamp(26px,5.5vw,38px)] leading-[1.12] tracking-tight text-[#0F3D2E] text-balance max-w-md">
-                Hey dost, what are we eating?
-              </h1>
-
-              {/* ─── 4. Search Row ──────────────────────────────────────────────── */}
-              <div className="w-full md:w-auto md:min-w-[340px] lg:min-w-[360px] space-y-2">
-                <div className="flex items-center gap-2">
-                  {/* Full-pill search input with crisp border */}
-                  <div className="relative flex-1">
-                    <Search
-                      size={18}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none"
-                    />
-                    <input
-                      ref={searchRef}
-                      type="text"
-                      placeholder="Search food, coffee & beverages..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      className="w-full h-11 min-h-[44px] pl-11 pr-10 rounded-full border border-stone-300 focus:border-[#0F3D2E] bg-white text-sm font-jakarta text-[#0F3D2E] placeholder:text-stone-400 focus:outline-none transition shadow-2xs"
-                    />
-                    {search && (
-                      <button
-                        type="button"
-                        onClick={() => setSearch('')}
-                        aria-label="Clear search query"
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-stone-400 hover:text-[#0F3D2E] rounded-full transition"
-                      >
-                        <X size={15} />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* "Veg" toggle rounded pill button */}
-                  <button
-                    type="button"
-                    onClick={() => setVegOnly(!vegOnly)}
-                    aria-pressed={vegOnly}
-                    className={`min-h-[44px] px-4 flex items-center gap-1.5 rounded-full text-xs font-sora font-bold border transition-all active:scale-95 shadow-2xs shrink-0 ${
-                      vegOnly
-                        ? 'bg-[#0F3D2E] text-white border-[#0F3D2E]'
-                        : 'bg-white text-stone-700 border-stone-300 hover:border-stone-400'
-                    }`}
-                  >
-                    <VegMark isVeg={true} size={13} />
-                    <span>Veg</span>
-                  </button>
-
-                  {/* Sort Filter Toggle rounded pill button */}
-                  <button
-                    type="button"
-                    onClick={() => setShowFilters(!showFilters)}
-                    aria-expanded={showFilters}
-                    aria-label="Toggle sort options"
-                    className={`min-h-[44px] w-11 px-3 flex items-center justify-center rounded-full text-xs font-sora font-bold border transition-all active:scale-95 shadow-2xs shrink-0 ${
-                      showFilters || sort
-                        ? 'bg-[#0F3D2E] text-white border-[#0F3D2E]'
-                        : 'bg-white text-stone-700 border-stone-300 hover:border-stone-400'
-                    }`}
-                  >
-                    <SlidersHorizontal size={14} className={showFilters || sort ? 'text-[#FFF1C9]' : 'text-stone-700'} />
-                  </button>
-                </div>
-
-                {/* Expandable Sort selector */}
-                <AnimatePresence>
-                  {showFilters && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.15 }}
-                      className="overflow-hidden"
+              {/* Popular Items Section */}
+              {popularItems.length >= 2 && (
+                <section aria-labelledby="popular-heading" className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <h2
+                      id="popular-heading"
+                      className="font-display font-bold text-xl sm:text-2xl text-[#2B1810] tracking-tight"
                     >
-                      <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-2xl bg-white border border-stone-200 shadow-xs">
-                        <span className="text-xs font-sora font-bold text-stone-700 px-1">Sort:</span>
-                        <div className="flex-1 min-w-[140px]">
-                          <select
-                            value={sort}
-                            onChange={(e) => setSort(e.target.value)}
-                            aria-label="Sort dishes"
-                            className="w-full min-h-[38px] text-xs font-jakarta font-semibold rounded-full px-3 py-1.5 bg-white text-[#0F3D2E] border border-stone-300 focus:outline-none focus:border-[#0F3D2E]"
-                          >
-                            {SORT_OPTIONS.map((o) => (
-                              <option key={o.value} value={o.value}>{o.label}</option>
-                            ))}
-                          </select>
-                        </div>
-                        {(vegOnly || sort || search) && (
-                          <button
-                            type="button"
-                            onClick={() => { setVegOnly(false); setSort(''); setSearch(''); }}
-                            className="text-xs font-sora font-bold text-[var(--menu-accent,#C93A1C)] hover:underline px-2 py-1"
-                          >
-                            Reset
-                          </button>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-
-            {/* ─── 5. Category Chips ──────────────────────────────────────────────── */}
-            <section
-              aria-label="Category Selection"
-              className="py-1.5 sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-stone-200 transition-all overflow-hidden"
-            >
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-fade-right px-0.5 sm:overflow-visible sm:flex-wrap py-1 snap-x snap-mandatory overscroll-x-contain">
-                {/* "All" chip */}
-                <button
-                  type="button"
-                  onClick={() => handleCategoryClick('all')}
-                  className={`snap-start shrink-0 min-h-[42px] inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-sora font-bold uppercase tracking-wider border transition-all active:scale-95 ${
-                    selectedCategory === 'all'
-                      ? 'bg-[#0F3D2E] text-white border-[#0F3D2E] shadow-xs'
-                      : 'bg-white text-stone-700 border-stone-300 hover:border-[#0F3D2E] hover:text-[#0F3D2E]'
-                  }`}
-                >
-                  <span>All</span>
-                  <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                      selectedCategory === 'all'
-                        ? 'bg-white/20 text-[#FFF1C9]'
-                        : 'bg-stone-100 text-stone-600'
-                    }`}
-                  >
-                    {categoryCounts.all || 0}
-                  </span>
-                </button>
-
-                {/* Individual category chips */}
-                {categories.map((cat) => {
-                  const count = categoryCounts[cat._id] || 0;
-                  const isSelected = selectedCategory === cat._id;
-                  return (
-                    <button
-                      key={cat._id}
-                      type="button"
-                      onClick={() => handleCategoryClick(cat._id)}
-                      className={`snap-start shrink-0 min-h-[42px] inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-sora font-bold uppercase tracking-wider border whitespace-nowrap transition-all active:scale-95 ${
-                        isSelected
-                          ? 'bg-[#0F3D2E] text-white border-[#0F3D2E] shadow-xs'
-                          : 'bg-white text-stone-700 border-stone-300 hover:border-[#0F3D2E] hover:text-[#0F3D2E]'
-                      }`}
-                    >
-                      {/* Clean SVG Lucide icon, strictly no emojis */}
-                      {getCategoryIcon(cat.name, isSelected)}
-                      <span>{cat.name}</span>
-                      {count > 0 && (
-                        <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                            isSelected
-                              ? 'bg-white/20 text-[#FFF1C9]'
-                              : 'bg-stone-100 text-stone-600'
-                          }`}
-                        >
-                          {count}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            {/* ─── 6. Popular Right Now ─────────────────────────────────── */}
-            {loading ? (
-              <div className="pt-2 pb-2">
-                <h2 className="font-sora font-extrabold text-xl sm:text-2xl text-[#0F3D2E] mb-3">
-                  Popular right now
-                </h2>
-                <PopularSkeleton />
-              </div>
-            ) : popularItems.length > 0 && selectedCategory === 'all' && !debouncedSearch ? (
-              <section aria-label="Popular Dishes" className="pt-2 pb-2">
-                <div className="flex items-center justify-between mb-3 border-b-2 border-stone-200 pb-2">
-                  <h2 className="font-sora font-extrabold text-xl sm:text-2xl text-[#0F3D2E]">
-                    Popular right now
-                  </h2>
-                  {/* Prev / Next arrow buttons on tablet and desktop */}
-                  <div className="hidden sm:flex items-center gap-2">
+                      Popular Items
+                    </h2>
                     <button
                       type="button"
-                      onClick={() => scrollPopular('left')}
-                      aria-label="Previous popular dishes"
-                      className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-white border border-stone-300 flex items-center justify-center text-[#0F3D2E] shadow-2xs hover:bg-[#0F3D2E] hover:text-white active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
+                      onClick={handleViewAllPopular}
+                      aria-label="View all popular items"
+                      className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-[#7A3316] hover:text-[#5E2610] transition-colors"
                     >
-                      <ChevronLeft size={18} strokeWidth={2.4} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => scrollPopular('right')}
-                      aria-label="Next popular dishes"
-                      className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-white border border-stone-300 flex items-center justify-center text-[#0F3D2E] shadow-2xs hover:bg-[#0F3D2E] hover:text-white active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E]"
-                    >
-                      <ChevronRight size={18} strokeWidth={2.4} />
+                      <span>View All</span>
+                      <ArrowRight size={14} strokeWidth={2.4} />
                     </button>
                   </div>
-                </div>
 
-                <div
-                  ref={popularRef}
-                  className="flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-3 pt-1 scroll-smooth overscroll-x-contain"
-                >
-                  {popularItems.map((prod) => (
-                    <PopularCard
+                  {/* 2-Column Card Grid (Mobile) / 3-4 Column (Desktop) */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 min-[390px]:gap-3.5 sm:gap-4 lg:gap-5">
+                    {popularItems.map((prod) => (
+                      <CustomerProductCard
+                        key={prod._id}
+                        product={prod}
+                        onSelect={setSelectedProduct}
+                        isFavorite={favorites.includes(String(prod._id))}
+                        onToggleFavorite={handleToggleFavorite}
+                        isKitchenOpen={operatingStatus.isOpen}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Recommended for You Section */}
+              {recommendedItems.length >= 2 && (
+                <section aria-labelledby="recommended-heading" className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <h2
+                      id="recommended-heading"
+                      className="font-display font-bold text-xl sm:text-2xl text-[#2B1810] tracking-tight"
+                    >
+                      Recommended for You
+                    </h2>
+                    <button
+                      type="button"
+                      onClick={handleViewAllPopular}
+                      aria-label="View all recommendations"
+                      className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-[#7A3316] hover:text-[#5E2610] transition-colors"
+                    >
+                      <span>View All</span>
+                      <ArrowRight size={14} strokeWidth={2.4} />
+                    </button>
+                  </div>
+
+                  {/* 2-Column Card Grid (Mobile) / 3-4 Column (Desktop) */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 min-[390px]:gap-3.5 sm:gap-4 lg:gap-5">
+                    {recommendedItems.map((prod) => (
+                      <CustomerProductCard
+                        key={prod._id}
+                        product={prod}
+                        onSelect={setSelectedProduct}
+                        isFavorite={favorites.includes(String(prod._id))}
+                        onToggleFavorite={handleToggleFavorite}
+                        isKitchenOpen={operatingStatus.isOpen}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* ═══════════════════════════════════════════════════════════
+              SCREEN 2: CATEGORY / MENU ITEMS VIEW
+             ═══════════════════════════════════════════════════════════ */
+          <div className="flex flex-col gap-4 sm:gap-6 animate-in fade-in-50 duration-200">
+            {/* Category Banner Card */}
+            {currentCategory && <CustomerCategoryBanner category={currentCategory} />}
+
+            {/* Category White Content Sheet */}
+            <div className="rounded-[24px] sm:rounded-[28px] bg-[#FFFDF9] border border-[#EFE4D6] p-4 sm:p-6 shadow-[0_4px_20px_rgba(90,50,20,0.05)] flex flex-col">
+              {/* Optional Subcategories pill row if present in data model */}
+              {subcategories.length > 0 && (
+                <CustomerSubcategoryTabs
+                  subcategories={subcategories}
+                  selectedSubcategory={selectedSubcategory}
+                  onSelectSubcategory={setSelectedSubcategory}
+                />
+              )}
+
+              {/* Items List (Single-column on mobile, 2-column grid at 1024px+) */}
+              {categoryProducts.length > 0 ? (
+                <div className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8">
+                  {categoryProducts.map((prod) => (
+                    <CustomerItemRow
                       key={prod._id}
                       product={prod}
-                      onSelect={(p) => setSelectedProduct(p)}
+                      onSelect={setSelectedProduct}
+                      isFavorite={favorites.includes(String(prod._id))}
+                      onToggleFavorite={handleToggleFavorite}
                       isKitchenOpen={operatingStatus.isOpen}
                     />
                   ))}
                 </div>
-              </section>
-            ) : null}
-
-            {/* ─── 7. Menu Sections by Category ───────────────────────────────────── */}
-            <main id="menu-sections" className="pt-2 space-y-6">
-              {loading ? (
-                <RowSkeleton />
-              ) : menuError ? (
-                /* Error State */
-                <div className="text-center py-16 px-4 bg-white rounded-2xl p-6 border border-stone-200 shadow-2xs">
-                  <div className="w-14 h-14 mx-auto rounded-full bg-red-50 flex items-center justify-center text-red-500 mb-3 border border-red-200">
-                    <AlertCircle size={28} />
+              ) : (
+                <div className="py-16 text-center flex flex-col items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-[#F3E9DC] text-[#7A3316] flex items-center justify-center mb-3">
+                    <UtensilsCrossed size={24} />
                   </div>
-                  <h2 className="font-sora text-xl font-bold text-stone-900">Unable to load menu</h2>
-                  <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">{menuError}</p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      clearClientCache();
-                      setLoading(true);
-                      setMenuError('');
-                      setReloadKey((k) => k + 1);
-                    }}
-                    className="mt-5 inline-flex min-h-[44px] items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-full text-xs font-sora font-bold shadow-2xs hover:bg-stone-800 active:scale-95 transition"
-                  >
-                    <RotateCcw size={14} />
-                    <span>Try Again</span>
-                  </button>
-                </div>
-              ) : products.length === 0 ? (
-                /* Empty Filter / Search State */
-                <div className="text-center py-16 px-4 bg-white rounded-2xl p-6 border border-stone-200 shadow-2xs">
-                  <div className="w-14 h-14 mx-auto rounded-full bg-[#FFF1C9] flex items-center justify-center text-[#0F3D2E] mb-3 border border-amber-300/60">
-                    <Search size={24} />
-                  </div>
-                  <h2 className="font-sora text-xl font-bold text-[#0F3D2E]">No matches found</h2>
-                  <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto font-jakarta">
-                    We couldn&apos;t find any items matching &ldquo;{debouncedSearch || 'current filter'}&rdquo;.
+                  <h3 className="font-display font-bold text-lg text-[#2B1810]">
+                    No items found
+                  </h3>
+                  <p className="text-xs text-[#7B6B5F] mt-1 max-w-xs">
+                    {debouncedSearch
+                      ? `No dishes matched "${debouncedSearch}". Try another term.`
+                      : 'This category does not have available items at the moment.'}
                   </p>
                   <button
                     type="button"
                     onClick={() => {
-                      setSearch('');
-                      setVegOnly(false);
-                      setSort('');
                       setSelectedCategory('all');
+                      setSearch('');
+                      setDebouncedSearch('');
                     }}
-                    className="mt-5 inline-flex min-h-[44px] items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#0F3D2E] text-[#FFF1C9] text-xs font-sora font-bold uppercase tracking-wider shadow-xs hover:bg-[#16503D] active:scale-95 transition"
+                    className="mt-4 px-5 py-2 rounded-full bg-[#7A3316] text-[#FFFDF9] text-xs font-bold shadow-xs hover:bg-[#5E2610] transition"
                   >
-                    Clear all filters
+                    Browse All Items
                   </button>
                 </div>
-              ) : (
-                /* Grouped Category Sections */
-                groupedSections.map((section) => (
-                  <section
-                    key={section.id}
-                    id={`category-section-${section.id}`}
-                    className="space-y-2.5 scroll-mt-20 sm:scroll-mt-24"
-                  >
-                    <div className="flex items-center justify-between pb-2 pt-2">
-                      <h2 className="font-sora font-extrabold text-xl sm:text-2xl text-stone-900 tracking-tight">
-                        {section.name}
-                      </h2>
-                      <span className="text-xs font-sora font-bold text-stone-400 uppercase tracking-wider font-mono">
-                        {section.items.length} {section.items.length === 1 ? 'DISH' : 'DISHES'}
-                      </span>
-                    </div>
-
-                    {/* Food Cards matching the exact screenshot layout */}
-                    <div className="space-y-4 sm:space-y-5">
-                      {section.items.map((prod) => (
-                        <MenuItemRow
-                          key={prod._id}
-                          product={prod}
-                          onSelect={(p) => setSelectedProduct(p)}
-                          isKitchenOpen={operatingStatus.isOpen}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                ))
               )}
-            </main>
+            </div>
           </div>
-
-          {/* Right Column: Sticky "Your Order" Sidebar for Desktop (1024px+) */}
-          <div className="hidden lg:block lg:col-span-4 min-w-0">
-            <DesktopOrderSidebar
-              onOpenScanner={openScanner}
-              isKitchenOpen={operatingStatus.isOpen}
-            />
-          </div>
-        </div>
+        )}
       </div>
 
-      {/* ─── 8. Floating Order Bar Fixed at Bottom (Mobile & Tablet only) ───────────────────────────── */}
-      <AnimatePresence>
-        {itemCount > 0 && (
-          <motion.div
-            initial={{ y: 90, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 90, opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-3 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-[480px] z-40 pb-[env(safe-area-inset-bottom,0px)] pointer-events-auto lg:hidden"
-          >
-            <div className="flex items-center justify-between gap-3 bg-[#0F3D2E] text-white rounded-[26px] pl-5 pr-3 py-3 shadow-[0_16px_40px_rgba(15,61,46,0.35)] border border-[#0F3D2E]">
-              {/* Left: N items + Total in large text */}
-              <div className="flex flex-col">
-                <span className="text-xs font-jakarta font-medium text-[#FFF1C9]/80 leading-none">
-                  {itemCount} {itemCount === 1 ? 'item' : 'items'}
-                </span>
-                <span className="font-sora font-extrabold text-xl sm:text-2xl text-[#FFF1C9] leading-tight mt-0.5">
-                  {formatMoney(grandTotal, tenant.currency)}
-                </span>
-              </div>
-
-              {/* Right: Rounded "View order" button */}
-              <Link
-                to="/cart"
-                aria-label="View order"
-                className="inline-flex min-h-[44px] items-center gap-1.5 bg-[var(--menu-accent,#C93A1C)] text-white font-sora font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full shadow-sm hover:brightness-105 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-              >
-                <span>View order</span>
-                <ArrowRight size={16} strokeWidth={2.5} />
-              </Link>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Product Details Customization Modal */}
-      <AnimatePresence>
+      {/* ── Product Customization Modal ── */}
+      <Suspense fallback={null}>
         {selectedProduct && (
-          <Suspense fallback={null}>
-            <ProductModal
-              product={selectedProduct}
-              onClose={() => setSelectedProduct(null)}
-            />
-          </Suspense>
+          <ProductModal
+            product={selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+          />
         )}
-      </AnimatePresence>
+      </Suspense>
 
-      {/* QR Scanner Modal */}
-      <AnimatePresence>
-        {(showScanner || isScannerOpen) && (
-          <Suspense fallback={null}>
-            <QrScannerModal
-              onClose={() => {
-                setShowScanner(false);
-                closeScanner();
-              }}
-              onTableFound={(tableNum, token) => {
-                setShowScanner(false);
-                closeScanner();
-                setTable(tableNum, token);
-                navigate(`/menu?tableToken=${encodeURIComponent(token)}`, { replace: true });
-              }}
-            />
-          </Suspense>
+      {/* ── QR Scanner Modal ── */}
+      <Suspense fallback={null}>
+        {(isScannerOpen || showScanner) && (
+          <QrScannerModal
+            isOpen={isScannerOpen || showScanner}
+            onClose={() => {
+              closeScanner();
+              setShowScanner(false);
+            }}
+          />
         )}
-      </AnimatePresence>
+      </Suspense>
     </div>
   );
 }

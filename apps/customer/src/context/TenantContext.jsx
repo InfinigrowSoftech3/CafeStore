@@ -9,7 +9,7 @@ import {
 import { clearClientCache } from '../utils/menuCache';
 
 const TenantContext = createContext(null);
-const fallback = { name: 'Cafe', currency: 'INR', taxRate: 5, primaryColor: '#0F3D2E', accentColor: '#FFF1C9' };
+const fallback = { name: 'Cafe', currency: 'INR', taxRate: 5, primaryColor: '#7A3316', accentColor: '#B5702F', logoUrl: '/logo.png' };
 
 export function TenantProvider({ children }) {
   const [tenant, setTenant] = useState(fallback);
@@ -117,19 +117,19 @@ export function TenantProvider({ children }) {
           rawPrimary &&
           !['#c96b18', '#2563eb', '#c8963e', '#c8963e'].includes(rawPrimary.toLowerCase())
             ? rawPrimary
-            : '#0F3D2E';
+            : '#7A3316';
         const accentColor =
           rawAccent &&
-          !['#1a0f08', '#0f172a', '#17110c'].includes(rawAccent.toLowerCase())
+          !['#1a0f08', '#0f172a', '#17110c', '#fff1c9'].includes(rawAccent.toLowerCase())
             ? rawAccent
-            : '#FFF1C9';
+            : '#B5702F';
 
         const normalizedTenant = {
           id: cafeData.id || cafeData._id,
           name: cafeData.name,
           slug: cafeData.slug,
-          logo: cafeData.logo || cafeData.settings?.logoUrl || '',
-          logoUrl: cafeData.logoUrl || cafeData.logo || cafeData.settings?.logoUrl || '',
+          logo: cafeData.logo || cafeData.settings?.logoUrl || '/logo.png',
+          logoUrl: cafeData.logoUrl || cafeData.logo || cafeData.settings?.logoUrl || '/logo.png',
           tagline: cafeData.description || cafeData.settings?.tagline || '',
           primaryColor,
           accentColor,
@@ -218,14 +218,14 @@ export function TenantProvider({ children }) {
 
   if (tenantState.status === 'loading') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFF1C9] text-[#0F3D2E] font-sans">
-        <div className="w-12 h-12 rounded-2xl bg-[#0F3D2E] flex items-center justify-center text-[#FFF1C9] shadow-lg animate-pulse mb-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FBF6EF] text-[#2B1810] font-sans">
+        <div className="w-12 h-12 rounded-2xl bg-[#7A3316] flex items-center justify-center text-[#FFFDF9] shadow-lg animate-pulse mb-4">
           <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
           </svg>
         </div>
-        <p className="text-sm font-semibold text-[#0F3D2E] tracking-wide">Loading menu...</p>
+        <p className="text-sm font-semibold text-[#7A3316] tracking-wide">Loading menu...</p>
       </div>
     );
   }

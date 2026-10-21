@@ -158,7 +158,7 @@ export default function AboutPage() {
       const gen = ++generation;
       tier = chooseTier();
       bitmaps.forEach((b) => {
-        try { b.close(); } catch (_) {}
+        try { b.close(); } catch (_) { /* ignore */ }
       });
       bitmaps.clear();
       pending.clear();
@@ -237,7 +237,7 @@ export default function AboutPage() {
           .then((bm) => {
             pending.delete(i);
             if (gen !== generation || isDisposed || Math.abs(i - lastWarm) > W * 2) {
-              try { bm.close(); } catch (_) {}
+              try { bm.close(); } catch (_) { /* ignore */ }
             } else {
               bitmaps.set(i, bm);
             }
@@ -247,7 +247,7 @@ export default function AboutPage() {
 
       bitmaps.forEach((bm, i) => {
         if (Math.abs(i - center) > W * 2) {
-          try { bm.close(); } catch (_) {}
+          try { bm.close(); } catch (_) { /* ignore */ }
           bitmaps.delete(i);
         }
       });
@@ -366,7 +366,7 @@ export default function AboutPage() {
       window.removeEventListener('scroll', readScroll);
       resizeObserver.disconnect();
       bitmaps.forEach((b) => {
-        try { b.close(); } catch (_) {}
+        try { b.close(); } catch (_) { /* ignore */ }
       });
       bitmaps.clear();
       pending.clear();

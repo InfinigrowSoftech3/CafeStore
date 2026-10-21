@@ -6,6 +6,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import { wakeServer } from './services/api';
 
 import QuickCartPopup from './components/ui/QuickCartPopup';
+import CustomerBottomNav from './components/ui/CustomerBottomNav';
 import WebPushPrompt from './components/ui/WebPushPrompt';
 import Navbar from './components/ui/Navbar';
 import CustomerNavDrawer from './components/ui/CustomerNavDrawer';
@@ -119,6 +120,7 @@ export default function App() {
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Navbar />
       <CustomerNavDrawer />
+      <CustomerBottomNav />
       <QuickCartPopup />
       <WebPushPrompt />
       <Analytics />
@@ -128,15 +130,15 @@ export default function App() {
         toastOptions={{
           duration: 3000,
           style: {
-            background: '#0F3D2E',
-            color: '#FFFFFF',
-            border: '1px solid #16503D',
+            background: '#2B1810',
+            color: '#FFFDF9',
+            border: '1px solid #3E2419',
             borderRadius: '16px',
-            fontFamily: 'Plus Jakarta Sans, sans-serif',
+            fontFamily: 'Inter, sans-serif',
             fontSize: '14px',
-            boxShadow: '0 10px 25px -5px rgba(15, 61, 46, 0.25)',
+            boxShadow: '0 10px 25px -5px rgba(43, 24, 16, 0.25)',
           },
-          success: { iconTheme: { primary: '#FFF1C9', secondary: '#0F3D2E' } },
+          success: { iconTheme: { primary: '#F3E9DC', secondary: '#7A3316' } },
           error: { iconTheme: { primary: '#ef4444', secondary: '#ffffff' } },
         }}
       />

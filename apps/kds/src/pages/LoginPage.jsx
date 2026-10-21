@@ -120,8 +120,8 @@ export default function LoginPage() {
             <span>Kitchen & Bar Display Station</span>
           </div>
 
-          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#E5DED5] bg-amber-500 text-3xl font-black text-stone-950 shadow-sm overflow-hidden">
-            🍳
+          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#E5DED5] bg-white text-3xl font-black text-stone-950 shadow-sm overflow-hidden">
+            <img src={tenant?.logoUrl || '/logo.png'} alt="Logo" className="h-full w-full object-cover" />
           </div>
           <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-[#1C1815]">
             {tenant?.name || 'Café'} KDS

@@ -3,7 +3,7 @@ import api, { getOnce } from '../services/api';
 import { useAuth } from './AuthContext';
 
 const Context = createContext(null);
-const fallback = { name: 'Café', logoUrl: '', primaryColor: '#c96b18', accentColor: '#1a0f08' };
+const fallback = { name: 'Café', logoUrl: '/logo.png', primaryColor: '#c96b18', accentColor: '#1a0f08' };
 
 export const applyTenantThemeVariables = (primaryColor = '#c96b18', accentColor = '#1a0f08') => {
   const root = document.documentElement;

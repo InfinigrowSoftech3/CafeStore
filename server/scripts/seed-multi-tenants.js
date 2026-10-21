@@ -31,7 +31,7 @@ const seed = async () => {
           plan: 'starter',
           settings: {
             cafeName: 'Brewhaus Café',
-            logoUrl: '',
+            logoUrl: '/logo.png',
             primaryColor: '#c96b18',
             accentColor: '#1a0f08',
             currency: 'INR',

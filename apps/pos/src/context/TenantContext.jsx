@@ -3,7 +3,7 @@ import api from '../services/api';
 import { useAuth } from './AuthContext';
 
 const Context = createContext(null);
-const fallback = { name: 'Café', currency: '₹', logoUrl: '', primaryColor: '#0F3D2E', settings: { taxRate: 5, currency: '₹' } };
+const fallback = { name: 'Café', currency: '₹', logoUrl: '/logo.png', primaryColor: '#0F3D2E', settings: { taxRate: 5, currency: '₹' } };
 
 export function TenantProvider({ children }) {
   const { user } = useAuth();

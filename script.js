@@ -12,7 +12,7 @@ const CONFIG = {
 
   // Visual Assets
   // Set to image path (e.g., "logo.png") or "" to use fallback letter
-  logoImage: "",
+  logoImage: "logo.png",
   logoLetter: "B",
 
   // Background Image Path or "none" (if "none", radial gradient is used)
