@@ -17,8 +17,8 @@ export default function Navbar() {
   const tenant = useTenant();
   const location = useLocation();
 
-  // Hide global navbar on menu, cart, and checkout since they have their own dedicated headers
-  if (['/menu', '/cart', '/checkout'].includes(location.pathname)) {
+  // Hide global navbar on menu, cart, checkout, and about since they have their own dedicated headers
+  if (['/menu', '/cart', '/checkout', '/about'].includes(location.pathname)) {
     return null;
   }
 
