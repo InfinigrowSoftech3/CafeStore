@@ -41,7 +41,9 @@ class ChunkErrorBoundary extends Component {
       error?.name === 'ChunkLoadError' ||
       error?.message?.includes?.('Failed to fetch dynamically imported module') ||
       error?.message?.includes?.('dynamically imported module') ||
-      error?.message?.includes?.('Expected a JavaScript-or-Wasm module script');
+      error?.message?.includes?.('Expected a JavaScript-or-Wasm module script') ||
+      error?.message?.includes?.("Unexpected token '<'") ||
+      error?.message?.includes?.('is not valid JSON');
     return { hasError: true, isChunkError };
   }
 
@@ -50,7 +52,9 @@ class ChunkErrorBoundary extends Component {
       error?.name === 'ChunkLoadError' ||
       error?.message?.includes?.('Failed to fetch dynamically imported module') ||
       error?.message?.includes?.('dynamically imported module') ||
-      error?.message?.includes?.('Expected a JavaScript-or-Wasm module script');
+      error?.message?.includes?.('Expected a JavaScript-or-Wasm module script') ||
+      error?.message?.includes?.("Unexpected token '<'") ||
+      error?.message?.includes?.('is not valid JSON');
 
     if (isChunkError) {
       const reloadKey = 'chunk_boundary_reload';
@@ -123,8 +127,12 @@ export default function App() {
       <CustomerBottomNav />
       <QuickCartPopup />
       <WebPushPrompt />
-      <Analytics />
-      <SpeedInsights dsn="CmYU8C4o7QrHziabP83DyQ2CEd" />
+      {typeof window !== 'undefined' && !['localhost', '127.0.0.1'].includes(window.location.hostname) && (
+        <>
+          <Analytics />
+          <SpeedInsights dsn="CmYU8C4o7QrHziabP83DyQ2CEd" />
+        </>
+      )}
       <Toaster
         position="top-center"
         toastOptions={{

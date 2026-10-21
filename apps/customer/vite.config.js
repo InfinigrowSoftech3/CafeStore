@@ -9,7 +9,33 @@ const __dirname = path.dirname(__filename);
 
 // Warm luxury gold & espresso theme configuration
 export default defineConfig({
-  plugins: [react(), imagetools()],
+  plugins: [
+    react(),
+    imagetools(),
+    {
+      name: 'mock-vercel-insights',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url && req.url.startsWith('/_vercel/')) {
+            res.setHeader('Content-Type', 'application/javascript');
+            res.end('/* vercel analytics mock for local development */');
+            return;
+          }
+          next();
+        });
+      },
+      configurePreviewServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url && req.url.startsWith('/_vercel/')) {
+            res.setHeader('Content-Type', 'application/javascript');
+            res.end('/* vercel analytics mock for local development */');
+            return;
+          }
+          next();
+        });
+      },
+    },
+  ],
   resolve: {
     alias: {
       '@cafe/shared': path.resolve(__dirname, '../../packages/shared/src'),
