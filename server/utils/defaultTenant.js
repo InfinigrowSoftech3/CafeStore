@@ -6,7 +6,9 @@ import Tenant from '../models/Tenant.js';
  * back to the oldest active tenant on the platform.
  */
 export const findDefaultTenant = async () => {
-  const configuredSlug = String(process.env.TENANT_DEFAULT_SLUG || '').trim().toLowerCase();
+  // This storefront is branded for Brewhaus; a deployment-specific slug can
+  // override it. Never fall back to an arbitrary tenant just because it is oldest.
+  const configuredSlug = String(process.env.TENANT_DEFAULT_SLUG || 'brewhaus').trim().toLowerCase();
   if (configuredSlug) {
     const preferred = await Tenant.findOne({ slug: configuredSlug, status: 'active' }).lean();
     if (preferred) return preferred;
