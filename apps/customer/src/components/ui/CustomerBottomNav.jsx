@@ -225,7 +225,7 @@ export default function CustomerBottomNav() {
           <button
             type="button"
             onClick={handleMenuClick}
-            aria-label="Browse Menu Categories"
+            aria-label="Browse Full Menu"
             className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-full transition-all duration-200 min-w-[36px] min-h-[44px] min-[360px]:min-w-[42px] min-[360px]:px-1.5 sm:min-w-[48px] sm:px-2 ${
               isMenuActive
                 ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'

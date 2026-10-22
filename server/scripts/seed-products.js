@@ -18,6 +18,25 @@ const normalizeName = (value) => String(value || '').trim().toLowerCase();
 // cards render that flag as BESTSELLER, so B products set the same field.
 const MENU_GROUPS = [
   {
+    name: 'Artisanal Coffee',
+    icon: '☕',
+    kitchenStation: 'BAR',
+    items: [
+      {
+        name: 'Cortado',
+        description: 'Equal parts espresso and warm milk, served in a small glass for a balanced, silky sip.',
+        price: 180,
+        prepTime: 5,
+      },
+      {
+        name: 'Chemex Brew',
+        description: 'Slow-filtered single-origin coffee with a clean body and a bright, tea-like finish.',
+        price: 240,
+        prepTime: 6,
+      },
+    ],
+  },
+  {
     name: 'Hot Coffee',
     icon: '☕',
     kitchenStation: 'BAR',
@@ -61,6 +80,18 @@ const MENU_GROUPS = [
         price: 200,
         prepTime: 10,
       },
+      {
+        name: 'Americano',
+        description: 'Double espresso lengthened with hot water for a smooth, full-bodied black coffee.',
+        price: 140,
+        prepTime: 5,
+      },
+      {
+        name: 'Vanilla Latte',
+        description: 'Espresso and steamed milk finished with a gentle vanilla sweetness.',
+        price: 190,
+        prepTime: 8,
+      },
     ],
   },
   {
@@ -95,6 +126,18 @@ const MENU_GROUPS = [
         prepTime: 7,
         popular: true,
       },
+      {
+        name: 'Iced Latte',
+        description: 'Chilled espresso and milk poured over ice for a crisp, creamy coffee.',
+        price: 190,
+        prepTime: 6,
+      },
+      {
+        name: 'Mocha Frappe',
+        description: 'Blended coffee, dark chocolate and milk topped with whipped cream.',
+        price: 230,
+        prepTime: 8,
+      },
     ],
   },
   {
@@ -119,6 +162,18 @@ const MENU_GROUPS = [
         description: 'Dark chocolate melted into steamed milk, finished with whipped cream.',
         price: 190,
         prepTime: 8,
+      },
+      {
+        name: 'Green Tea',
+        description: 'Light, refreshing green tea leaves steeped to a clean, grassy finish.',
+        price: 90,
+        prepTime: 4,
+      },
+      {
+        name: 'Lemon Iced Tea',
+        description: 'Chilled black tea brightened with fresh lemon and a touch of sweetness.',
+        price: 120,
+        prepTime: 5,
       },
     ],
   },
@@ -147,6 +202,18 @@ const MENU_GROUPS = [
         price: 170,
         prepTime: 12,
       },
+      {
+        name: 'Cheesy Nachos',
+        description: 'Crunchy tortilla chips loaded with melted cheese, salsa and jalapeños.',
+        price: 180,
+        prepTime: 10,
+      },
+      {
+        name: 'Garlic Bread with Cheese',
+        description: 'Toasted garlic butter bread topped with bubbling mozzarella.',
+        price: 160,
+        prepTime: 10,
+      },
     ],
   },
   {
@@ -174,6 +241,68 @@ const MENU_GROUPS = [
         description: 'Creamy baked cheesecake on a biscuit base with blueberry compote.',
         price: 190,
         prepTime: 5,
+      },
+      {
+        name: 'Almond Croissant',
+        description: 'Buttery croissant filled with almond cream and finished with toasted flakes.',
+        price: 150,
+        prepTime: 5,
+      },
+      {
+        name: 'Cinnamon Roll',
+        description: 'Soft swirled dough with cinnamon sugar and a vanilla glaze.',
+        price: 140,
+        prepTime: 5,
+      },
+    ],
+  },
+  {
+    name: 'All-Day Breakfast',
+    icon: '🥞',
+    kitchenStation: 'KITCHEN',
+    items: [
+      {
+        name: 'Avocado Toast',
+        description: 'Sourdough toast topped with smashed avocado, cherry tomatoes and chilli flakes.',
+        price: 220,
+        prepTime: 8,
+      },
+      {
+        name: 'Masala Poha',
+        description: 'Flattened rice tossed with mustard seeds, turmeric, peanuts and fresh coriander.',
+        price: 120,
+        prepTime: 10,
+      },
+      {
+        name: 'Pancake Stack',
+        description: 'Three fluffy pancakes served with maple syrup and a knob of butter.',
+        price: 210,
+        prepTime: 12,
+      },
+    ],
+  },
+  {
+    name: 'Sandwiches & Bowls',
+    icon: '🥗',
+    kitchenStation: 'KITCHEN',
+    items: [
+      {
+        name: 'Grilled Cheese',
+        description: 'Golden toasted bread with a generous three-cheese melt.',
+        price: 160,
+        prepTime: 10,
+      },
+      {
+        name: 'Pesto Panini',
+        description: 'Pressed ciabatta with basil pesto, roasted vegetables and mozzarella.',
+        price: 200,
+        prepTime: 12,
+      },
+      {
+        name: 'Mediterranean Bowl',
+        description: 'Herbed couscous, chickpeas, crunchy vegetables and a lemon-tahini drizzle.',
+        price: 260,
+        prepTime: 12,
       },
     ],
   },

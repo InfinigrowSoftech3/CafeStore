@@ -15,6 +15,7 @@ import {
 } from '../../utils/tenantHelper';
 import usePageMeta from '../../hooks/usePageMeta';
 import { getFavorites, toggleFavorite } from '../../utils/favorites';
+import { getCategoryVisual } from '../../utils/categoryIcons';
 
 import CustomerHero from '../../components/menu/CustomerHero';
 import CustomerCategoryCircles from '../../components/menu/CustomerCategoryCircles';
@@ -90,9 +91,10 @@ export default function MenuPage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showScanner, setShowScanner] = useState(false);
+  const [showFullMenu, setShowFullMenu] = useState(false);
   const [favorites, setFavorites] = useState(() => getFavorites(tenant?.slug));
 
-  const isHomeView = selectedCategory === 'all' && !debouncedSearch;
+  const isHomeView = selectedCategory === 'all' && !debouncedSearch && !showFullMenu;
 
   const debounceRef = useRef(null);
 
@@ -108,15 +110,22 @@ export default function MenuPage() {
   // Handle bottom navigation events
   useEffect(() => {
     const handleNavHome = () => {
+      setShowFullMenu(false);
       setSelectedCategory('all');
+      setSelectedSubcategory('all');
       setSearch('');
       setDebouncedSearch('');
+      setIsSearchOpen(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     const handleNavMenu = () => {
-      if (categories.length > 0) {
-        setSelectedCategory(categories[0]._id);
-      }
+      setShowFullMenu(true);
+      setSelectedCategory('all');
+      setSelectedSubcategory('all');
+      setSearch('');
+      setDebouncedSearch('');
+      setIsSearchOpen(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     window.addEventListener('nav:home', handleNavHome);
     window.addEventListener('nav:menu', handleNavMenu);
@@ -124,7 +133,7 @@ export default function MenuPage() {
       window.removeEventListener('nav:home', handleNavHome);
       window.removeEventListener('nav:menu', handleNavMenu);
     };
-  }, [categories]);
+  }, []);
 
   const handleToggleFavorite = (productId) => {
     toggleFavorite(tenant?.slug, productId);
@@ -326,21 +335,71 @@ export default function MenuPage() {
     return list;
   }, [products, selectedCategory, selectedSubcategory, debouncedSearch]);
 
+  const fullMenuSections = useMemo(() => {
+    const byCategory = new Map();
+    categoryProducts.forEach((product) => {
+      const categoryId = String(
+        typeof product.category === 'object' ? product.category?._id : product.category || ''
+      );
+      if (!byCategory.has(categoryId)) byCategory.set(categoryId, []);
+      byCategory.get(categoryId).push(product);
+    });
+
+    const sections = categories
+      .map((category) => ({
+        category,
+        items: byCategory.get(String(category._id)) || [],
+      }))
+      .filter((section) => section.items.length > 0);
+
+    const knownCategoryIds = new Set(categories.map((category) => String(category._id)));
+    const ungroupedItems = categoryProducts.filter((product) => {
+      const categoryId = String(
+        typeof product.category === 'object' ? product.category?._id : product.category || ''
+      );
+      return !knownCategoryIds.has(categoryId);
+    });
+
+    if (ungroupedItems.length > 0) {
+      sections.push({
+        category: { _id: 'more-items', name: 'More Items', icon: '🍽️' },
+        items: ungroupedItems,
+      });
+    }
+
+    return sections;
+  }, [categories, categoryProducts]);
+
   const operatingStatus = useMemo(() => getOperatingStatus(tenant), [tenant]);
 
+  const handleOpenFullMenu = () => {
+    setShowFullMenu(true);
+    setSelectedCategory('all');
+    setSelectedSubcategory('all');
+    setSearch('');
+    setDebouncedSearch('');
+    setIsSearchOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBack = () => {
+    setShowFullMenu(false);
+    setSelectedCategory('all');
+    setSelectedSubcategory('all');
+    setSearch('');
+    setDebouncedSearch('');
+    setIsSearchOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleOrderNow = () => {
+    setShowFullMenu(false);
     if (categories.length > 0) {
       setSelectedCategory(categories[0]._id);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       const el = document.getElementById('content-sheet');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleViewAllPopular = () => {
-    if (categories.length > 0) {
-      setSelectedCategory(categories[0]._id);
     }
   };
 
@@ -354,12 +413,8 @@ export default function MenuPage() {
             {!isHomeView && (
               <button
                 type="button"
-                onClick={() => {
-                  setSelectedCategory('all');
-                  setSearch('');
-                  setDebouncedSearch('');
-                }}
-                aria-label="Back to all categories"
+                onClick={handleBack}
+                aria-label={showFullMenu ? 'Back to menu home' : 'Back to all categories'}
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#2B1810] shadow-[0_4px_12px_rgba(90,50,20,0.06)] transition active:scale-95"
               >
                 <ArrowLeft size={18} strokeWidth={2.4} />
@@ -369,12 +424,18 @@ export default function MenuPage() {
               <h1 className="truncate font-display text-lg font-bold leading-tight text-[#2B1810]">
                 {isHomeView
                   ? 'Our Menu'
-                  : currentCategory?.name || (debouncedSearch ? `Search: "${debouncedSearch}"` : 'All Menu')}
+                  : showFullMenu
+                    ? (debouncedSearch ? `Search: "${debouncedSearch}"` : 'Full Menu')
+                    : currentCategory?.name || (debouncedSearch ? `Search: "${debouncedSearch}"` : 'All Menu')}
               </h1>
               <p className="truncate text-[11px] text-[#7B6B5F]">
                 {isHomeView
                   ? 'Freshly brewed happiness'
-                  : currentCategory?.description || (debouncedSearch ? `${categoryProducts.length} items found` : 'Browse every dish and drink')}
+                  : showFullMenu
+                    ? (debouncedSearch
+                      ? `${categoryProducts.length} items found`
+                      : `${products.length} items across ${categories.length} categories`)
+                    : currentCategory?.description || (debouncedSearch ? `${categoryProducts.length} items found` : 'Browse every dish and drink')}
               </p>
             </div>
           </div>
@@ -434,12 +495,14 @@ export default function MenuPage() {
               id="content-sheet"
               className="relative -mt-4 rounded-t-[28px] bg-[#FBF6EF] pt-4 flex flex-col gap-6"
             >
-              {/* Category Row (5 Circular Icon Buttons) */}
+              {/* Category Row (All + café categories) */}
               <CustomerCategoryCircles
                 categories={categories}
                 selectedCategory={selectedCategory}
                 onSelectCategory={(catId) => {
+                  setShowFullMenu(false);
                   setSelectedCategory(catId);
+                  setSelectedSubcategory('all');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
               />
@@ -465,8 +528,8 @@ export default function MenuPage() {
                     </h2>
                     <button
                       type="button"
-                      onClick={handleViewAllPopular}
-                      aria-label="View all popular items"
+                      onClick={handleOpenFullMenu}
+                      aria-label="View full menu"
                       className="inline-flex min-h-[44px] items-center gap-1 text-xs font-bold text-[#7A3316] hover:text-[#5E2610] transition-colors"
                     >
                       <span>View All</span>
@@ -502,8 +565,8 @@ export default function MenuPage() {
                     </h2>
                     <button
                       type="button"
-                      onClick={handleViewAllPopular}
-                      aria-label="View all recommendations"
+                      onClick={handleOpenFullMenu}
+                      aria-label="View full menu"
                       className="inline-flex min-h-[44px] items-center gap-1 text-xs font-bold text-[#7A3316] hover:text-[#5E2610] transition-colors"
                     >
                       <span>View All</span>
@@ -527,6 +590,46 @@ export default function MenuPage() {
                 </section>
               )}
 
+              {/* Full Menu entry point */}
+              {products.length > 0 && (
+                <section aria-labelledby="full-menu-cta-heading" className="flex flex-col gap-3">
+                  <div className="flex items-end justify-between gap-3">
+                    <h2
+                      id="full-menu-cta-heading"
+                      className="font-display font-bold text-xl text-[#2B1810] tracking-tight"
+                    >
+                      Full Menu
+                    </h2>
+                    <span className="text-[11px] font-semibold text-[#7B6B5F]">
+                      {products.length} items
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleOpenFullMenu}
+                    className="group flex w-full items-center justify-between gap-4 rounded-[20px] border border-[#EFE4D6] bg-[#FFFDF9] p-4 text-left shadow-[0_4px_16px_rgba(90,50,20,0.05)] transition hover:border-[#7A3316]/30 hover:shadow-[0_8px_24px_rgba(90,50,20,0.08)] active:scale-[0.99]"
+                  >
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#F3E9DC] text-[#7A3316]">
+                        <UtensilsCrossed size={22} strokeWidth={1.8} />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block font-display text-base font-bold leading-tight text-[#2B1810]">
+                          Every dish &amp; drink
+                        </span>
+                        <span className="mt-0.5 block text-xs leading-relaxed text-[#7B6B5F]">
+                          Browse all {products.length} items across {categories.length} categories
+                        </span>
+                      </span>
+                    </span>
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#7A3316] text-[#FFFDF9] transition group-hover:bg-[#5E2610]">
+                      <ArrowRight size={17} strokeWidth={2.4} />
+                    </span>
+                  </button>
+                </section>
+              )}
+
               {/* Friendly empty state for a menu with no available products */}
               {!loading && products.length === 0 && (
                 <section className="flex flex-col items-center justify-center rounded-[20px] border border-[#EFE4D6] bg-[#FFFDF9] px-6 py-12 text-center shadow-[0_4px_16px_rgba(90,50,20,0.05)]">
@@ -543,9 +646,132 @@ export default function MenuPage() {
               )}
             </div>
           </div>
+        ) : showFullMenu ? (
+          /* ═══════════════════════════════════════════════════════════
+              SCREEN 2: FULL MENU VIEW
+             ═══════════════════════════════════════════════════════════ */
+          <div className="flex flex-col gap-5 animate-in fade-in-50 duration-200">
+            {loading && products.length === 0 ? (
+              <div className={PRODUCT_GRID_CLASS}>
+                {SKELETON_CARDS.map((card) => (
+                  <MenuItemSkeleton key={card} />
+                ))}
+              </div>
+            ) : debouncedSearch ? (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-end justify-between gap-3">
+                  <h2 className="font-display font-bold text-xl text-[#2B1810] tracking-tight">
+                    Search Results
+                  </h2>
+                  <span className="text-[11px] font-semibold text-[#7B6B5F]">
+                    {categoryProducts.length} found
+                  </span>
+                </div>
+
+                {categoryProducts.length > 0 ? (
+                  <div className={PRODUCT_GRID_CLASS}>
+                    {categoryProducts.map((prod) => (
+                      <MenuItemRow
+                        key={prod._id}
+                        product={prod}
+                        onSelect={setSelectedProduct}
+                        isFavorite={favorites.includes(String(prod._id))}
+                        onToggleFavorite={handleToggleFavorite}
+                        isKitchenOpen={operatingStatus.isOpen}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center rounded-[20px] border border-[#EFE4D6] bg-[#FFFDF9] px-6 py-12 text-center shadow-[0_4px_16px_rgba(90,50,20,0.05)]">
+                    <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#F3E9DC] text-[#7A3316]">
+                      <Search size={22} />
+                    </div>
+                    <h3 className="font-display text-lg font-bold text-[#2B1810]">
+                      No matches found
+                    </h3>
+                    <p className="mt-1 max-w-xs text-xs text-[#7B6B5F]">
+                      No dishes matched &ldquo;{debouncedSearch}&rdquo;. Try another term.
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : fullMenuSections.length > 0 ? (
+              <>
+                <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                  {fullMenuSections.map(({ category, items }) => (
+                    <button
+                      key={category._id}
+                      type="button"
+                      onClick={() => {
+                        document
+                          .getElementById(`full-menu-${category._id}`)
+                          ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] px-3 py-2 text-[11px] font-semibold text-[#2B1810] shadow-[0_2px_8px_rgba(90,50,20,0.04)] transition hover:border-[#7A3316]/30 active:scale-95"
+                    >
+                      <span>{getCategoryVisual(category)}</span>
+                      <span>{category.name}</span>
+                      <span className="rounded-full bg-[#F3E9DC] px-1.5 py-0.5 text-[10px] font-bold text-[#7A3316]">
+                        {items.length}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {fullMenuSections.map(({ category, items }) => (
+                  <section
+                    key={category._id}
+                    id={`full-menu-${category._id}`}
+                    aria-labelledby={`full-menu-heading-${category._id}`}
+                    className="flex scroll-mt-24 flex-col gap-3"
+                  >
+                    <div className="flex items-end justify-between gap-3 border-b border-[#EFE4D6] pb-2">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className="text-xl leading-none">{getCategoryVisual(category)}</span>
+                        <h2
+                          id={`full-menu-heading-${category._id}`}
+                          className="truncate font-display text-lg font-bold leading-tight text-[#2B1810]"
+                        >
+                          {category.name}
+                        </h2>
+                      </div>
+                      <span className="shrink-0 text-[11px] font-semibold text-[#7B6B5F]">
+                        {items.length} {items.length === 1 ? 'item' : 'items'}
+                      </span>
+                    </div>
+
+                    <div className={PRODUCT_GRID_CLASS}>
+                      {items.map((prod) => (
+                        <MenuItemRow
+                          key={prod._id}
+                          product={prod}
+                          onSelect={setSelectedProduct}
+                          isFavorite={favorites.includes(String(prod._id))}
+                          onToggleFavorite={handleToggleFavorite}
+                          isKitchenOpen={operatingStatus.isOpen}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center rounded-[20px] border border-[#EFE4D6] bg-[#FFFDF9] px-6 py-12 text-center shadow-[0_4px_16px_rgba(90,50,20,0.05)]">
+                <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#F3E9DC] text-[#7A3316]">
+                  <UtensilsCrossed size={24} />
+                </div>
+                <h3 className="font-display text-lg font-bold text-[#2B1810]">
+                  Full menu is being refreshed
+                </h3>
+                <p className="mt-1 max-w-xs text-xs leading-relaxed text-[#7B6B5F]">
+                  No items are available right now. Please check back in a little while.
+                </p>
+              </div>
+            )}
+          </div>
         ) : (
           /* ═══════════════════════════════════════════════════════════
-              SCREEN 2: CATEGORY / MENU ITEMS VIEW
+              SCREEN 3: CATEGORY / MENU ITEMS VIEW
              ═══════════════════════════════════════════════════════════ */
           <div className="flex flex-col gap-4 animate-in fade-in-50 duration-200">
             {/* Category Banner Card */}
