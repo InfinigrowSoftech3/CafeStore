@@ -8,26 +8,27 @@ import {
   Clock,
   MoreHorizontal,
   X,
-  Sparkles,
-  Info,
-  Phone,
-  Image,
-  FileText,
-  MailMinus,
-  Receipt,
+  BadgePercent,
+  Store,
+  MapPin,
+  Camera,
+  ScrollText,
+  Wallet,
+  Scale,
+  BellOff,
 } from 'lucide-react';
 import useCartStore, { cartItemCount } from '../../context/cartStore';
 
 // Pages exposed in the "More" sheet
 const MORE_ITEMS = [
-  { label: 'Offers',      path: '/offers',      icon: Sparkles,  desc: 'Daily deals & specials'  },
-  { label: 'About',       path: '/about',       icon: Info,      desc: 'Our story & team'         },
-  { label: 'Contact',     path: '/contact',     icon: Phone,     desc: 'Location & hours'         },
-  { label: 'Gallery',     path: '/gallery',     icon: Image,     desc: 'Photos & guest moments'   },
-  { label: 'Receipt',     path: '/receipt',     icon: Receipt,   desc: 'View session receipt'     },
-  { label: 'Bill',        path: '/bill',        icon: FileText,  desc: 'Table bill & payment'     },
-  { label: 'Legal',       path: '/privacy',     icon: FileText,  desc: 'Terms & privacy'          },
-  { label: 'Unsub',       path: '/unsubscribe', icon: MailMinus, desc: 'Manage notifications'     },
+  { label: 'Offers',      path: '/offers',      icon: BadgePercent, desc: 'Daily deals & specials'  },
+  { label: 'About',       path: '/about',       icon: Store,        desc: 'Our story & team'         },
+  { label: 'Contact',     path: '/contact',     icon: MapPin,       desc: 'Location & hours'         },
+  { label: 'Gallery',     path: '/gallery',     icon: Camera,       desc: 'Photos & guest moments'   },
+  { label: 'Receipt',     path: '/receipt',     icon: ScrollText,   desc: 'View session receipt'     },
+  { label: 'Bill',        path: '/bill',        icon: Wallet,       desc: 'Table bill & payment'     },
+  { label: 'Legal',       path: '/privacy',     icon: Scale,        desc: 'Terms & privacy'          },
+  { label: 'Unsub',       path: '/unsubscribe', icon: BellOff,      desc: 'Manage notifications'     },
 ];
 
 export default function CustomerBottomNav() {
