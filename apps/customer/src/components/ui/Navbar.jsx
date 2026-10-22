@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, ShoppingBag, ScanLine, Coffee, UtensilsCrossed, Sparkles, Image, Phone, Clock } from 'lucide-react';
 import { useTenant } from '../../context/TenantContext';
@@ -16,9 +16,12 @@ const NAV_LINKS = [
 export default function Navbar() {
   const tenant = useTenant();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const currentSearch = searchParams.toString() ? `?${searchParams.toString()}` : '';
 
-  // Hide global navbar on menu, cart, checkout, and about since they have their own dedicated headers
-  if (['/menu', '/cart', '/checkout', '/about'].includes(location.pathname)) {
+  // Keep one shared navbar across the storefront. Only focused checkout flows
+  // and the immersive About story hide it in favour of their own dedicated UI.
+  if (['/cart', '/checkout', '/about'].includes(location.pathname)) {
     return null;
   }
 
@@ -31,7 +34,7 @@ export default function Navbar() {
         {/* Brand Logo & Name */}
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <Link
-            to="/menu"
+            to={`/menu${currentSearch}`}
             aria-label={`${tenant.name || 'Café'} - Homepage`}
             className="group flex items-center gap-2.5 sm:gap-3 rounded-xl transition-transform active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7A3316] min-w-0"
           >
@@ -66,7 +69,12 @@ export default function Navbar() {
             return (
               <Link
                 key={link.to}
-                to={link.to}
+                to={`${link.to}${currentSearch}`}
+                onClick={() => {
+                  if (link.to === '/menu' && location.pathname === '/menu') {
+                    window.dispatchEvent(new CustomEvent('nav:home'));
+                  }
+                }}
                 className={`relative px-4 py-2 text-xs font-bold tracking-wide rounded-full transition-all duration-200 ${
                   isActive
                     ? 'text-[#7A3316] bg-[#F3E9DC] border border-[#EFE4D6] shadow-2xs font-bold'
@@ -109,7 +117,7 @@ export default function Navbar() {
 
           {/* Cart Icon Link */}
           <Link
-            to="/cart"
+            to={`/cart${currentSearch}`}
             aria-label={`Open Cart (${itemCount} items)`}
             className="relative min-h-[38px] min-w-[38px] flex items-center justify-center rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#2B1810] hover:bg-[#F3E9DC] shadow-2xs transition-all active:scale-95"
           >

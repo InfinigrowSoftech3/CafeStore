@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Sparkles, UtensilsCrossed } from 'lucide-react';
 import usePageMeta from '../../hooks/usePageMeta';
 
@@ -24,6 +24,9 @@ const offers = [
 ];
 
 export default function OffersPage() {
+  const [searchParams] = useSearchParams();
+  const currentSearch = searchParams.toString() ? `?${searchParams.toString()}` : '';
+
   usePageMeta({
     title: 'Daily Coffee Specials & Dining Offers',
     description: 'Discover today’s gourmet coffee discounts, early bird specials, and combo dining deals brewed fresh daily at our artisanal café.',
@@ -34,14 +37,14 @@ export default function OffersPage() {
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center justify-between gap-3">
           <Link
-            to="/menu"
+            to={`/menu${currentSearch}`}
             className="btn-secondary inline-flex min-h-[40px] items-center gap-2 text-xs font-bold uppercase tracking-wider py-2 px-5 rounded-full border border-[#EFE4D6] shadow-2xs"
           >
             <ArrowLeft size={16} />
             <span>Back to Menu</span>
           </Link>
           <Link
-            to="/about"
+            to={`/about${currentSearch}`}
             className="inline-flex min-h-[40px] items-center text-xs font-bold uppercase tracking-wider text-[#2B1810] hover:underline px-2"
           >
             Our Story →
@@ -86,7 +89,7 @@ export default function OffersPage() {
                 </div>
                 <div className="mt-6 pt-4 border-t border-[#EFE4D6]">
                   <Link
-                    to="/menu"
+                    to={`/menu${currentSearch}`}
                     className="inline-flex min-h-[38px] items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#2B1810] hover:underline transition"
                   >
                     <UtensilsCrossed size={14} />

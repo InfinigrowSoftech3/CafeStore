@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowRight, UtensilsCrossed, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search, UtensilsCrossed, Sparkles, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
 import useCartStore from '../../context/cartStore';
@@ -16,7 +16,6 @@ import {
 import usePageMeta from '../../hooks/usePageMeta';
 import { getFavorites, toggleFavorite } from '../../utils/favorites';
 
-import CustomerScreenHeader from '../../components/menu/CustomerScreenHeader';
 import CustomerHero from '../../components/menu/CustomerHero';
 import CustomerCategoryCircles from '../../components/menu/CustomerCategoryCircles';
 import MenuItemRow from '../../components/menu/MenuItemRow';
@@ -347,31 +346,71 @@ export default function MenuPage() {
     <div className="min-h-screen w-full bg-[#FBF6EF] text-[#2B1810] font-sans antialiased selection:bg-[#7A3316] selection:text-[#FFFDF9]">
       {/* ── Main Container (Centered, max 1200px) ── */}
       <div className="mx-auto w-full max-w-[1200px] px-4 min-[390px]:px-5 sm:px-6 lg:px-8 pt-2 pb-32 md:pb-16 flex flex-col">
-        {/* ── Responsive Screen Header ── */}
-        <CustomerScreenHeader
-          mode={isHomeView ? 'home' : 'category'}
-          categoryName={currentCategory?.name || (debouncedSearch ? `Search: "${debouncedSearch}"` : 'All Menu')}
-          categorySubtitle={currentCategory?.description || (debouncedSearch ? `${categoryProducts.length} items found` : 'Freshly brewed happiness')}
-          onBack={() => {
-            setSelectedCategory('all');
-            setSearch('');
-            setDebouncedSearch('');
-          }}
-          onOpenSearch={() => setIsSearchOpen(!isSearchOpen)}
-          isSearchOpen={isSearchOpen}
-          searchValue={search}
-          onSearchChange={setSearch}
-          onClearSearch={() => setSearch('')}
-          activeTab={isHomeView ? 'home' : 'menu'}
-          onSelectHome={() => {
-            setSelectedCategory('all');
-            setSearch('');
-            setDebouncedSearch('');
-          }}
-          onSelectMenu={() => {
-            if (categories.length > 0) setSelectedCategory(categories[0]._id);
-          }}
-        />
+        {/* ── Menu toolbar: category context + search ── */}
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            {!isHomeView && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedCategory('all');
+                  setSearch('');
+                  setDebouncedSearch('');
+                }}
+                aria-label="Back to all categories"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#2B1810] shadow-[0_4px_12px_rgba(90,50,20,0.06)] transition active:scale-95"
+              >
+                <ArrowLeft size={18} strokeWidth={2.4} />
+              </button>
+            )}
+            <div className="min-w-0">
+              <h1 className="truncate font-display text-lg font-bold leading-tight text-[#2B1810]">
+                {isHomeView
+                  ? 'Our Menu'
+                  : currentCategory?.name || (debouncedSearch ? `Search: "${debouncedSearch}"` : 'All Menu')}
+              </h1>
+              <p className="truncate text-[11px] text-[#7B6B5F]">
+                {isHomeView
+                  ? 'Freshly brewed happiness'
+                  : currentCategory?.description || (debouncedSearch ? `${categoryProducts.length} items found` : 'Browse every dish and drink')}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsSearchOpen((open) => !open)}
+            aria-label={isSearchOpen ? 'Close menu search' : 'Search menu items'}
+            aria-expanded={isSearchOpen}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#2B1810] shadow-[0_4px_12px_rgba(90,50,20,0.06)] transition hover:border-[#7A3316]/30 active:scale-95"
+          >
+            {isSearchOpen ? <X size={18} strokeWidth={2.2} /> : <Search size={18} strokeWidth={2.2} />}
+          </button>
+        </div>
+
+        {isSearchOpen && (
+          <div className="mb-3 flex w-full items-center gap-2.5 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] px-4 py-2 shadow-[0_4px_16px_rgba(90,50,20,0.06)]">
+            <Search size={18} className="shrink-0 text-[#7B6B5F]" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search menu items..."
+              autoFocus
+              className="w-full bg-transparent text-sm text-[#2B1810] placeholder-[#7B6B5F] focus:outline-none"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                aria-label="Clear search"
+                className="p-1 text-[#7B6B5F] hover:text-[#2B1810]"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+        )}
 
         {/* ── Table Service Quick Actions (when seated) ── */}
         {tableNumber && (

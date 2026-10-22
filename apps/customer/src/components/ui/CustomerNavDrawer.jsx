@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -69,6 +69,8 @@ const NAV_ITEMS = [
 export default function CustomerNavDrawer() {
   const tenant = useTenant();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const currentSearch = searchParams.toString() ? `?${searchParams.toString()}` : '';
   const drawerRef = useRef(null);
 
   const {
@@ -226,7 +228,7 @@ export default function CustomerNavDrawer() {
 
               {/* Cart Quick Shortcut */}
               <Link
-                to="/cart"
+                to={`/cart${currentSearch}`}
                 onClick={closeNavDrawer}
                 className="flex items-center justify-between p-3.5 rounded-2xl bg-[#FBF6EF] border border-[#EFE4D6] hover:bg-[#F3E9DC] transition group shadow-2xs"
               >
@@ -265,7 +267,7 @@ export default function CustomerNavDrawer() {
                     return (
                       <Link
                         key={item.to}
-                        to={item.to}
+                        to={`${item.to}${currentSearch}`}
                         onClick={closeNavDrawer}
                         className={`group flex items-center justify-between p-3 rounded-2xl border transition-all ${
                           isActive
@@ -343,15 +345,15 @@ export default function CustomerNavDrawer() {
             {/* ─── Footer: Legal Links ───────────────────────────────────────── */}
             <div className="p-4 border-t border-[#EFE4D6]/80 bg-white space-y-2">
               <div className="flex items-center justify-center gap-4 text-xs font-medium text-stone-500">
-                <Link to="/privacy" onClick={closeNavDrawer} className="hover:text-[#7A3316]">
+                <Link to={`/privacy${currentSearch}`} onClick={closeNavDrawer} className="hover:text-[#7A3316]">
                   Privacy Policy
                 </Link>
                 <span>•</span>
-                <Link to="/terms" onClick={closeNavDrawer} className="hover:text-[#7A3316]">
+                <Link to={`/terms${currentSearch}`} onClick={closeNavDrawer} className="hover:text-[#7A3316]">
                   Terms of Service
                 </Link>
                 <span>•</span>
-                <Link to="/refund-policy" onClick={closeNavDrawer} className="hover:text-[#7A3316]">
+                <Link to={`/refund-policy${currentSearch}`} onClick={closeNavDrawer} className="hover:text-[#7A3316]">
                   Refunds
                 </Link>
               </div>
