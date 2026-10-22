@@ -5,6 +5,7 @@ import Table from '../models/Table.js';
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import Order from '../models/Order.js';
+import { findDefaultTenant } from '../utils/defaultTenant.js';
 import { createTableQrToken, verifyTableQrTokenDetailed } from '../utils/tableQr.js';
 import { generateOrderAccessToken, hashAccessToken } from '../utils/orderSecurity.js';
 import { runWithTenant, runWithSystemTenantAccess } from '../utils/tenantContext.js';
@@ -20,8 +21,7 @@ const resolveCafe = async (cafeIdOrSlug) => {
   if (!cafeIdOrSlug) return { error: 'INVALID_ID' };
   const trimmed = String(cafeIdOrSlug).trim();
   if (trimmed.toLowerCase() === 'default') {
-    const cafe = (await Tenant.findOne({ slug: 'default', status: 'active' }).lean())
-      || (await Tenant.findOne({ status: 'active' }).sort({ createdAt: 1 }).lean());
+    const cafe = await findDefaultTenant();
     if (!cafe) return { error: 'NOT_FOUND' };
     return { cafe };
   }
@@ -117,8 +117,7 @@ router.get('/cafes/resolve', async (req, res, next) => {
 
     // Graceful fallback for brand slug or default
     if (!cafe) {
-      cafe = (await Tenant.findOne({ slug: 'default', status: 'active' }).lean())
-        || (await Tenant.findOne({ status: 'active' }).sort({ createdAt: 1 }).lean());
+      cafe = await findDefaultTenant();
     }
 
     if (!cafe) {

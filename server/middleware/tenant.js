@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import Tenant from '../models/Tenant.js';
+import { findDefaultTenant } from '../utils/defaultTenant.js';
 import { runWithTenant } from '../utils/tenantContext.js';
 import { verifyTableQrToken } from '../utils/tableQr.js';
 
@@ -282,10 +283,9 @@ export const tenantResolver = async (req, res, next) => {
       }
     }
 
-    // 7b. Customer route fallback to active default café when no explicit query slug was requested
+    // 7b. Customer route fallback to the configured default café when no explicit query slug was requested
     if (!tenant && !querySlug && isCustomerPublicRoute(req)) {
-      tenant = (await Tenant.findOne({ slug: 'default', status: 'active' }).lean())
-        || (await Tenant.findOne({ status: 'active' }).sort({ createdAt: 1 }).lean());
+      tenant = await findDefaultTenant();
       if (tenant) tenantId = tenant._id;
     }
 

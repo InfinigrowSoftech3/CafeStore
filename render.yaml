@@ -22,6 +22,8 @@ services:
         sync: false
       - key: CLIENT_URL
         value: https://cafestore-customer.vercel.app
+      - key: TENANT_DEFAULT_SLUG
+        value: brewhaus
       - key: CUSTOMER_APP_URL
         value: https://cafestore-customer.vercel.app
       - key: POS_APP_URL
