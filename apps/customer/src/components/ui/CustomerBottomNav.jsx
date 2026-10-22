@@ -40,6 +40,7 @@ export default function CustomerBottomNav() {
   const [menuView, setMenuView] = useState('home');
   const [moreOpen, setMoreOpen] = useState(false);
   const sheetRef = useRef(null);
+  const navRef = useRef(null);
 
   // Track active menu view (home vs category) via custom event
   useEffect(() => {
@@ -59,7 +60,10 @@ export default function CustomerBottomNav() {
   useEffect(() => {
     if (!moreOpen) return;
     const onOutside = (e) => {
-      if (sheetRef.current && !sheetRef.current.contains(e.target)) {
+      const target = e.target;
+      const insideSheet = sheetRef.current?.contains(target);
+      const insideNav = navRef.current?.contains(target);
+      if (!insideSheet && !insideNav) {
         setMoreOpen(false);
       }
     };
@@ -194,6 +198,7 @@ export default function CustomerBottomNav() {
 
       {/* ── Bottom nav bar ── */}
       <nav
+        ref={navRef}
         aria-label="Bottom Navigation"
         className="fixed left-1/2 z-40 w-[calc(100%-32px)] max-w-[640px] -translate-x-1/2"
         style={{ bottom: 'calc(14px + env(safe-area-inset-bottom, 0px))' }}
