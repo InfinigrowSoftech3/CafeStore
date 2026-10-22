@@ -616,7 +616,9 @@ export const startServer = async () => {
   await connectDB();
   try {
     const { resetStuckTables } = await import('./services/tableLifecycle.js');
-    const healed = await resetStuckTables();
+    const { runWithSystemTenantAccess } = await import('./utils/tenantContext.js');
+    // This is a trusted startup maintenance job that must scan every tenant.
+    const healed = await runWithSystemTenantAccess(() => resetStuckTables());
     if (healed.length > 0) {
       console.log(`[Startup] Self-healed ${healed.length} stuck tables:`, healed.join(', '));
     }

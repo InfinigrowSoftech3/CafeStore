@@ -45,14 +45,9 @@ export default function CustomSelect({
   const displayLabel = selectedOption ? selectedOption.label : placeholder;
 
   const handleSelect = (val) => {
-    if (onChange) {
-      // Support both functional onChange(val) and standard event onChange({ target: { value: val } })
+    if (typeof onChange === 'function') {
+      // Consumers normalize either the raw value or an event-shaped fallback.
       onChange(val);
-      if (typeof onChange === 'function') {
-        try {
-          onChange({ target: { value: val } });
-        } catch (_) {}
-      }
     }
     setIsOpen(false);
   };

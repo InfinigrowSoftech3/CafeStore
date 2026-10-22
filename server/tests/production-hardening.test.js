@@ -40,7 +40,7 @@ test('production API requires HTTPS and rejects origins outside the two-site all
   });
   assert.equal(subdomainBypass.status, 403);
 
-  const forwardedHttps = await fetch(`${baseUrl}/api/health`, {
+  const forwardedHttps = await fetch(`${baseUrl}/api/readyz`, {
     headers: { Origin: 'https://cafe.infinigrowsoftech.com', 'X-Forwarded-Proto': 'https' },
   });
   assert.equal(forwardedHttps.status, 503); // HTTPS passed; DB readiness is correctly unavailable in this isolated test.
@@ -87,6 +87,44 @@ test('validateEnv accepts fallback secrets and sandbox mode in staging/Render de
       });
     },
     (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
+  );
+});
+
+test('validateEnv keeps super-admin bootstrap optional and validates configured pairs', async () => {
+  const { validateEnv } = await import('../config/env.js');
+  const base = {
+    NODE_ENV: 'production',
+    JWT_SECRET: 'd'.repeat(32),
+    MONGO_URI: 'mongodb://127.0.0.1:27017/prod',
+    CLIENT_URL: 'https://cafe.infinigrowsoftech.com',
+    RAZORPAY_KEY_ID: 'rzp_live_testvalidkey123',
+    RAZORPAY_KEY_SECRET: 'live_testvalidsecret12345',
+  };
+
+  // Booting must succeed without bootstrap credentials so existing platform admins can sign in.
+  assert.doesNotThrow(() => validateEnv(base));
+
+  // A partial pair is a misconfiguration.
+  assert.throws(
+    () => validateEnv({ ...base, SUPER_ADMIN_EMAIL: 'admin@example.com' }),
+    (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
+  );
+  assert.throws(
+    () => validateEnv({ ...base, SUPER_ADMIN_PASSWORD: 'ProductionSecurePassword123!' }),
+    (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
+  );
+
+  // Once supplied, both values are validated.
+  assert.throws(
+    () => validateEnv({ ...base, SUPER_ADMIN_EMAIL: 'not-an-email', SUPER_ADMIN_PASSWORD: 'ProductionSecurePassword123!' }),
+    (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
+  );
+  assert.throws(
+    () => validateEnv({ ...base, SUPER_ADMIN_EMAIL: 'admin@example.com', SUPER_ADMIN_PASSWORD: 'SuperAdminTestPass123!' }),
+    (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
+  );
+  assert.doesNotThrow(() =>
+    validateEnv({ ...base, SUPER_ADMIN_EMAIL: 'admin@example.com', SUPER_ADMIN_PASSWORD: 'ProductionSecurePassword123!' })
   );
 });
 

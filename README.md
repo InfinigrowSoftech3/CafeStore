@@ -165,8 +165,8 @@ Each app is independently deployable to Vercel with its own `vercel.json` SPA re
 ## 🔒 Security & Initial Platform Access
 
 - **No Hardcoded Super Admin Credentials**: There are zero seeded default super admin accounts or passwords in code.
-- **Environment Configuration**: Set `SUPER_ADMIN_EMAIL` and `SUPER_ADMIN_PASSWORD` in your server environment variables.
-- **Production Validation**: In production (`NODE_ENV=production`), the server verifies that `SUPER_ADMIN_EMAIL` and `SUPER_ADMIN_PASSWORD` are defined and sufficiently strong (minimum 8 characters, non-trivial). If missing or weak, the backend fails to start.
+- **Optional Bootstrap Credentials**: `SUPER_ADMIN_EMAIL` and `SUPER_ADMIN_PASSWORD` are only used to create the first platform super admin when the SuperAdmin collection is empty. Existing platform admins can still sign in when the pair is omitted.
+- **Production Validation**: In production (`NODE_ENV=production`), the server validates these values only when they are supplied: if either is set, both must be set and the email/password must be sufficiently strong (minimum 8 characters, non-trivial). Missing bootstrap credentials no longer prevent the API from starting; the server logs a warning and disables first-time auto-bootstrap instead. This lets the API boot when production secrets are managed outside the deploy pipeline.
 - **CORS Validation**: The backend server validates CORS against all configured app URLs:
   - `CUSTOMER_APP_URL` (`https://cafestore-customer.vercel.app`)
   - `POS_APP_URL` (`https://cafestore-pos.vercel.app`)

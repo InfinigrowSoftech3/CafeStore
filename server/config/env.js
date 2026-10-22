@@ -3,6 +3,13 @@
  * Refuses server startup when running in production with unsafe or default credentials.
  */
 
+const warnedMessages = new Set();
+const warnOnce = (message) => {
+  if (warnedMessages.has(message)) return;
+  warnedMessages.add(message);
+  console.warn(message);
+};
+
 export const validateEnv = (env = process.env) => {
   if (env.NODE_ENV !== 'production') {
     return { valid: true, errors: [] };
@@ -34,21 +41,32 @@ export const validateEnv = (env = process.env) => {
     errors.push('TENANT_CREDENTIALS_ENCRYPTION_KEY cannot be the default placeholder value from .env.example.');
   }
 
-  // 4. SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD (fail to start in production if missing or weak)
-  const superAdminEmail = env.SUPER_ADMIN_EMAIL || '';
-  const superAdminPassword = env.SUPER_ADMIN_PASSWORD || '';
-  if (!superAdminEmail) {
-    errors.push('SUPER_ADMIN_EMAIL is required in production.');
-  } else if (!superAdminEmail.includes('@') || !superAdminEmail.includes('.')) {
-    errors.push('SUPER_ADMIN_EMAIL must be a valid email address.');
-  }
+  // 4. SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD (optional bootstrap pair)
+  // These are only used to create the first platform super admin when the
+  // SuperAdmin collection is empty. Existing platform admins can still sign in
+  // when the pair is omitted, so missing bootstrap credentials must not stop the
+  // API from booting. When either value is provided, both must be valid.
+  const superAdminEmail = String(env.SUPER_ADMIN_EMAIL || '').trim();
+  const superAdminPassword = String(env.SUPER_ADMIN_PASSWORD || '');
+  const hasSuperAdminEmail = Boolean(superAdminEmail);
+  const hasSuperAdminPassword = Boolean(superAdminPassword);
 
-  if (!superAdminPassword) {
-    errors.push('SUPER_ADMIN_PASSWORD is required in production.');
-  } else if (superAdminPassword.length < 8) {
-    errors.push('SUPER_ADMIN_PASSWORD must be at least 8 characters long.');
-  } else if (['password', 'admin', 'superadmin', '12345678', 'SuperAdmin123!', 'SuperAdminTestPass123!'].includes(superAdminPassword)) {
-    errors.push('SUPER_ADMIN_PASSWORD cannot be a weak or example default password.');
+  if (!hasSuperAdminEmail && !hasSuperAdminPassword) {
+    warnOnce(
+      '[Brewhaus Config Warning] SUPER_ADMIN_EMAIL/SUPER_ADMIN_PASSWORD are not configured. ' +
+      'First-time super-admin auto-bootstrap is disabled; existing platform admins can still sign in.'
+    );
+  } else if (!hasSuperAdminEmail || !hasSuperAdminPassword) {
+    errors.push('SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD must be configured together, or both omitted.');
+  } else {
+    if (!superAdminEmail.includes('@') || !superAdminEmail.includes('.')) {
+      errors.push('SUPER_ADMIN_EMAIL must be a valid email address.');
+    }
+    if (superAdminPassword.length < 8) {
+      errors.push('SUPER_ADMIN_PASSWORD must be at least 8 characters long.');
+    } else if (['password', 'admin', 'superadmin', '12345678', 'SuperAdmin123!', 'SuperAdminTestPass123!'].includes(superAdminPassword)) {
+      errors.push('SUPER_ADMIN_PASSWORD cannot be a weak or example default password.');
+    }
   }
 
   // 5. MONGO_URI
@@ -65,7 +83,7 @@ export const validateEnv = (env = process.env) => {
     if (env.REQUIRE_REDIS === 'true') {
       errors.push('REDIS_URL is required in production when REQUIRE_REDIS=true.');
     } else {
-      console.warn('[Brewhaus Config Warning] REDIS_URL is not configured. Running with in-memory stores for rate limiting and live updates.');
+      warnOnce('[Brewhaus Config Warning] REDIS_URL is not configured. Running with in-memory stores for rate limiting and live updates.');
     }
   }
 
@@ -91,13 +109,13 @@ export const validateEnv = (env = process.env) => {
     if (!allowTestPayments) {
       errors.push('RAZORPAY_KEY_ID is required in production.');
     } else {
-      console.warn('[Brewhaus Config Warning] RAZORPAY_KEY_ID is missing. Online payments will be disabled.');
+      warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_ID is missing. Online payments will be disabled.');
     }
   } else if (razorpayKeyId.startsWith('rzp_test_')) {
     if (!allowTestPayments) {
       errors.push('RAZORPAY_KEY_ID must be a live key in production (cannot start with rzp_test_), or set ALLOW_TEST_PAYMENTS=true for sandbox/testing.');
     } else {
-      console.warn('[Brewhaus Config Warning] Running in production with Razorpay TEST key (rzp_test_...). Sandbox payments enabled.');
+      warnOnce('[Brewhaus Config Warning] Running in production with Razorpay TEST key (rzp_test_...). Sandbox payments enabled.');
     }
   } else if (razorpayKeyId.includes('xxxx')) {
     errors.push('RAZORPAY_KEY_ID cannot contain placeholder characters (xxxx).');
@@ -107,7 +125,7 @@ export const validateEnv = (env = process.env) => {
     if (!allowTestPayments) {
       errors.push('RAZORPAY_KEY_SECRET is required in production.');
     } else {
-      console.warn('[Brewhaus Config Warning] RAZORPAY_KEY_SECRET is missing. Online payments will be disabled.');
+      warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_SECRET is missing. Online payments will be disabled.');
     }
   } else if (
     razorpayKeySecret === 'your_razorpay_secret' ||
@@ -116,13 +134,13 @@ export const validateEnv = (env = process.env) => {
     if (!allowTestPayments) {
       errors.push('RAZORPAY_KEY_SECRET cannot be a placeholder secret in production.');
     } else {
-      console.warn('[Brewhaus Config Warning] RAZORPAY_KEY_SECRET is a placeholder secret. Online payments will fail until configured.');
+      warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_SECRET is a placeholder secret. Online payments will fail until configured.');
     }
   } else if (razorpayKeySecret.startsWith('test_')) {
     if (!allowTestPayments) {
       errors.push('RAZORPAY_KEY_SECRET cannot be a test secret in production (set ALLOW_TEST_PAYMENTS=true for sandbox/testing).');
     } else {
-      console.warn('[Brewhaus Config Warning] Running with Razorpay test secret. Sandbox payments enabled.');
+      warnOnce('[Brewhaus Config Warning] Running with Razorpay test secret. Sandbox payments enabled.');
     }
   }
 
