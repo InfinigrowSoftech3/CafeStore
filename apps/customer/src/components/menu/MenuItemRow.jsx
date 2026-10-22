@@ -228,7 +228,7 @@ export default function MenuItemRow({
         {/* Footer stays at the bottom of every card */}
         <div className="mt-auto flex items-center justify-between gap-2 pt-3" onClick={(e) => e.stopPropagation()}>
           <div className="flex min-w-0 items-baseline gap-1.5">
-            <span className="font-display text-base font-bold leading-none text-[#7A3316]">
+            <span className="font-jakarta text-[17px] font-bold leading-none tracking-tight tabular-nums text-[#7A3316]">
               {formatCardPrice(product.price, tenant?.currency)}
             </span>
             {product.originalPrice && product.originalPrice > product.price && (
