@@ -1,10 +1,61 @@
 import { useState } from 'react';
-import { Plus, Minus, Clock, Utensils, Star, SlidersHorizontal, Heart } from 'lucide-react';
+import { Plus, Minus, Clock, Coffee, Star, SlidersHorizontal, Heart } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useCartStore from '../../context/cartStore';
 import { useTenant } from '../../context/TenantContext';
-import { formatMoney } from '../../utils/money';
 import VegMark from './VegMark';
+
+const CURRENCY_MAP = {
+  '₹': 'INR',
+  '$': 'USD',
+  '€': 'EUR',
+  '£': 'GBP',
+};
+
+function formatCardPrice(value, currency = 'INR') {
+  const num = Number(value || 0);
+  const normalized = CURRENCY_MAP[currency] || (currency && currency.length === 3 ? currency.toUpperCase() : 'INR');
+  const fractionDigits = Number.isInteger(num) ? 0 : 2;
+
+  try {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: normalized,
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+    }).format(num);
+  } catch {
+    return `₹${num.toLocaleString('en-IN', {
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+    })}`;
+  }
+}
+
+export function MenuItemSkeleton() {
+  return (
+    <article
+      aria-hidden="true"
+      className="flex aspect-square h-full w-full flex-col overflow-hidden rounded-none border border-[#EFE4D6] bg-[#FFFDF9] shadow-[0_4px_16px_rgba(90,50,20,0.05)] sm:aspect-auto"
+    >
+      <div className="aspect-auto min-h-0 w-full flex-1 skeleton sm:aspect-[4/3] sm:flex-none" />
+      <div className="flex flex-none flex-col p-3 sm:flex-1">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="h-4 w-4 rounded-[4px] skeleton" />
+          <span className="h-3 w-14 rounded-full skeleton" />
+        </div>
+        <span className="h-4 w-4/5 rounded skeleton" />
+        <span className="mt-1 h-4 w-3/5 rounded skeleton" />
+        <span className="mt-2 h-3 w-full rounded skeleton" />
+        <span className="mt-1 h-3 w-4/5 rounded skeleton" />
+        <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+          <span className="h-5 w-12 rounded skeleton" />
+          <span className="h-9 min-w-[68px] rounded-full skeleton" />
+        </div>
+      </div>
+    </article>
+  );
+}
 
 export default function MenuItemRow({
   product,
@@ -92,12 +143,12 @@ export default function MenuItemRow({
   return (
     <article
       onClick={isAvailable ? () => onSelect(product) : undefined}
-      className={`group relative w-full bg-[#FFFDF9] border border-[#EFE4D6] rounded-2xl overflow-hidden select-none transition-all shadow-[0_4px_16px_rgba(90,50,20,0.05)] hover:shadow-[0_8px_24px_rgba(90,50,20,0.1)] hover:border-[#7A3316]/30 ${
-        isAvailable ? 'cursor-pointer' : 'opacity-60 grayscale-[40%] cursor-default'
+      className={`group flex aspect-square h-full w-full flex-col overflow-hidden rounded-none border border-[#EFE4D6] bg-[#FFFDF9] shadow-[0_4px_16px_rgba(90,50,20,0.05)] select-none transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#7A3316]/30 hover:shadow-[0_10px_26px_rgba(90,50,20,0.12)] sm:aspect-auto ${
+        isAvailable ? 'cursor-pointer' : 'cursor-default opacity-60 grayscale-[40%]'
       }`}
     >
-      {/* ─── Top: Full-Width Food Image ─── */}
-      <div className="relative w-full h-44 bg-[#F3E9DC] border-b border-[#EFE4D6] overflow-hidden rounded-t-2xl">
+      {/* Full-width food image */}
+      <div className="relative aspect-auto min-h-0 w-full flex-1 overflow-hidden border-b border-[#EFE4D6] bg-[#F3E9DC] sm:aspect-[4/3] sm:flex-none">
         {product.image && !imgError ? (
           <img
             src={product.image}
@@ -105,139 +156,129 @@ export default function MenuItemRow({
             loading="lazy"
             decoding="async"
             onError={() => setImgError(true)}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-[#F3E9DC] text-[#7B6B5F]">
-            <Utensils size={36} strokeWidth={1.5} />
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#F7EDDE] via-[#F3E9DC] to-[#E6D2B8]">
+            <Coffee size={40} strokeWidth={1.5} className="text-[#9A7658]" aria-hidden="true" />
           </div>
         )}
 
-        {/* Top-Right: Translucent Heart Favorite Button */}
+        {/* Bestseller overlay — kept out of the meta row */}
+        {product.popular && (
+          <span className="absolute left-2 top-2 z-10 inline-flex items-center gap-1 rounded-full border border-[#E8D3B9] bg-[#FFFDF9]/95 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.08em] text-[#7A3316] shadow-sm backdrop-blur-sm">
+            <Star size={9} fill="currentColor" />
+            <span>Bestseller</span>
+          </span>
+        )}
+
+        {/* 36px wishlist button */}
         {onToggleFavorite && (
           <button
             type="button"
             onClick={handleHeartClick}
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-            className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all active:scale-90 after:absolute after:-inset-1.5 after:content-[''] ${
+            className={`absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-sm backdrop-blur-md transition-all after:absolute after:-inset-1.5 after:content-[''] active:scale-90 ${
               isFavorite
-                ? 'bg-[#E23B2E] text-white shadow-xs'
-                : 'bg-white/80 text-[#2B1810] hover:bg-white shadow-xs'
+                ? 'bg-[#E23B2E] text-white'
+                : 'bg-white/90 text-[#2B1810] hover:bg-white'
             }`}
           >
-            <Heart size={15} fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={isFavorite ? 2.5 : 2} />
+            <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={isFavorite ? 2.5 : 2} />
           </button>
         )}
 
-        {/* Sold Out Overlay */}
+        {/* Sold out overlay */}
         {!isAvailable && (
-          <div className="absolute inset-0 bg-[#2B1810]/60 backdrop-blur-[1px] flex items-center justify-center p-2 text-center">
-            <span className="bg-[#2B1810] text-[#FFFDF9] text-xs font-bold px-3 py-1.5 uppercase tracking-wider rounded-full border border-white/20 shadow-xs">
+          <div className="absolute inset-0 flex items-center justify-center bg-[#2B1810]/60 p-2 text-center backdrop-blur-[1px]">
+            <span className="rounded-full border border-white/20 bg-[#2B1810] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#FFFDF9] shadow-sm">
               Sold out
             </span>
           </div>
         )}
       </div>
 
-      {/* ─── Bottom: Content Area (Badges, Title, Price, Description, ADD + button) ─── */}
-      <div className="p-3.5 bg-[#FFFDF9]">
-        {/* Top Badges Row: Veg Mark + BESTSELLER Badge + Prep Time */}
-        <div className="flex flex-wrap items-center gap-2 mb-2">
+      {/* Content: meta, full-width name/description, then pinned footer */}
+      <div className="flex flex-none flex-col p-3 sm:flex-1">
+        <div className="mb-1.5 flex items-center gap-2 whitespace-nowrap text-[11px] font-medium text-[#7B6B5F]">
           <VegMark isVeg={isVeg} size={15} />
-
-          {product.popular && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#F3E9DC] border border-[#EFE4D6] px-2.5 py-0.5 text-[10px] font-bold text-[#7A3316] tracking-wider uppercase">
-              <Star size={9} fill="currentColor" />
-              <span>BESTSELLER</span>
-            </span>
-          )}
-
-          {product.prepTime && (
-            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#7B6B5F]">
-              <Clock size={12} className="text-[#7B6B5F]/70" />
-              <span>{product.prepTime} mins</span>
-            </span>
-          )}
+          <span className="inline-flex items-center gap-1">
+            <Clock size={12} className="text-[#7B6B5F]/70" />
+            <span>{product.prepTime || 10} mins</span>
+          </span>
         </div>
 
-        {/* Main Content: Details on Left, ADD + Button on Right */}
-        <div className="flex items-start justify-between gap-3">
-          {/* Left: Product Information */}
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-base text-[#2B1810] leading-snug group-hover:text-[#7A3316] transition-colors">
-              {product.name}
-            </h3>
+        <h3 className="line-clamp-2 min-h-0 w-full text-base font-semibold leading-[1.3] text-[#2B1810] transition-colors group-hover:text-[#7A3316] sm:min-h-[2.6em]">
+          {product.name}
+        </h3>
 
-            <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="font-display font-bold text-base text-[#7A3316]">
-                {formatMoney(product.price, tenant.currency)}
+        {product.description && (
+          <p className="mt-1 line-clamp-2 w-full text-[0.8125rem] leading-[1.45] text-[#7B6B5F]">
+            {product.description}
+          </p>
+        )}
+
+        {hasCustomizations && (
+          <div className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold text-[#7A3316]">
+            <SlidersHorizontal size={11} />
+            <span>Customisable</span>
+          </div>
+        )}
+
+        {/* Footer stays at the bottom of every card */}
+        <div className="mt-auto flex items-center justify-between gap-2 pt-3" onClick={(e) => e.stopPropagation()}>
+          <div className="flex min-w-0 items-baseline gap-1.5">
+            <span className="font-display text-base font-bold leading-none text-[#7A3316]">
+              {formatCardPrice(product.price, tenant?.currency)}
+            </span>
+            {product.originalPrice && product.originalPrice > product.price && (
+              <span className="truncate text-[11px] text-[#7B6B5F] line-through tabular-nums">
+                {formatCardPrice(product.originalPrice, tenant?.currency)}
               </span>
-              {product.originalPrice && product.originalPrice > product.price && (
-                <span className="text-xs text-[#7B6B5F] line-through tabular-nums">
-                  {formatMoney(product.originalPrice, tenant.currency)}
-                </span>
-              )}
-            </div>
-
-            {product.description && (
-              <p className="mt-1 text-xs text-[#7B6B5F] leading-relaxed line-clamp-2">
-                {product.description}
-              </p>
-            )}
-
-            {hasCustomizations && (
-              <div className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-[#7A3316]">
-                <SlidersHorizontal size={11} />
-                <span>Customisable</span>
-              </div>
             )}
           </div>
 
-          {/* Right: Rounded Action Button */}
-          <div className="shrink-0 pt-0.5" onClick={(e) => e.stopPropagation()}>
+          <div className="shrink-0">
             {!isAvailable ? null : totalQtyInCart > 0 && !hasCustomizations ? (
-              /* Rounded Quantity Stepper */
-              <div className="inline-flex items-center bg-[#FFFDF9] border border-[#7A3316] rounded-full shadow-2xs px-1">
+              <div className="inline-flex h-9 shrink-0 items-center rounded-full border border-[#7A3316] bg-[#FFFDF9] px-0.5 shadow-2xs">
                 <button
                   type="button"
                   onClick={handleDecrement}
                   aria-label={`Decrease quantity of ${product.name}`}
-                  className="w-11 h-11 flex items-center justify-center rounded-full text-[#7A3316] hover:bg-[#F3E9DC] active:scale-90 transition"
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-[#7A3316] transition hover:bg-[#F3E9DC] active:scale-90"
                 >
-                  <Minus size={13} strokeWidth={2.5} />
+                  <Minus size={12} strokeWidth={2.5} />
                 </button>
-                <span className="font-bold text-xs px-2 min-w-[22px] text-center text-[#2B1810]">
+                <span className="min-w-[18px] px-0.5 text-center text-xs font-bold text-[#2B1810]">
                   {totalQtyInCart}
                 </span>
                 <button
                   type="button"
                   onClick={handleIncrement}
                   aria-label={`Increase quantity of ${product.name}`}
-                  className="w-11 h-11 flex items-center justify-center rounded-full text-[#7A3316] hover:bg-[#F3E9DC] active:scale-90 transition"
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-[#7A3316] transition hover:bg-[#F3E9DC] active:scale-90"
                 >
-                  <Plus size={13} strokeWidth={2.5} />
+                  <Plus size={12} strokeWidth={2.5} />
                 </button>
               </div>
             ) : totalQtyInCart > 0 && hasCustomizations ? (
-              /* Customizable item in cart */
               <button
                 type="button"
                 onClick={() => onSelect(product)}
                 aria-label={`Customize ${product.name}`}
-                className="min-h-[44px] px-4 bg-[#7A3316] text-[#FFFDF9] font-bold text-xs uppercase tracking-wider shadow-2xs hover:bg-[#5E2610] active:scale-95 transition rounded-full border border-[#7A3316] flex items-center gap-1"
+                className="flex h-9 min-w-[68px] shrink-0 items-center justify-center gap-1 rounded-full border border-[#7A3316] bg-[#7A3316] px-2.5 text-[10px] font-bold uppercase tracking-wide text-[#FFFDF9] shadow-2xs transition hover:bg-[#5E2610] active:scale-95"
               >
                 <span>{totalQtyInCart} IN CART</span>
               </button>
             ) : (
-              /* Crisp Rounded ADD + Button */
               <button
                 type="button"
                 onClick={handleQuickAdd}
                 aria-label={`Add ${product.name} to order`}
-                className="min-h-[44px] px-5 bg-[#FFFDF9] text-[#7A3316] font-bold text-xs uppercase tracking-wider shadow-2xs border border-[#7A3316] hover:bg-[#7A3316] hover:text-[#FFFDF9] active:scale-95 transition rounded-full flex items-center justify-center gap-1.5"
+                className="flex h-9 min-w-[68px] shrink-0 items-center justify-center gap-1 rounded-full border border-[#7A3316] bg-[#FFFDF9] px-3 text-xs font-bold uppercase tracking-wider text-[#7A3316] shadow-2xs transition hover:bg-[#7A3316] hover:text-[#FFFDF9] active:scale-95 active:bg-[#5E2610] active:text-[#FFFDF9]"
               >
                 <span>ADD</span>
-                <Plus size={13} strokeWidth={2.8} />
+                <Plus size={12} strokeWidth={2.8} />
               </button>
             )}
           </div>

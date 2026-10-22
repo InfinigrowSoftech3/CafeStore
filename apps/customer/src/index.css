@@ -153,6 +153,13 @@ body {
 }
 
 @layer components {
+  .customer-container {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 4vw, 48px);
+  }
+
   .btn-primary {
     background-color: var(--tenant-primary, #7A3316);
     color: #FFFFFF;

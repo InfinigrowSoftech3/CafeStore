@@ -110,7 +110,7 @@ export default function ProductModal({ product, onClose }) {
         exit={{ y: '100%', opacity: 0 }}
         transition={{ type: 'spring', damping: 28, stiffness: 360 }}
         onClick={e => e.stopPropagation()}
-        className="bg-[#FFFDF9] w-full max-w-[480px] mx-auto rounded-t-3xl overflow-hidden max-h-[92dvh] flex flex-col shadow-2xl border border-[#EFE4D6]"
+        className="bg-[#FFFDF9] w-full max-w-[640px] mx-auto rounded-t-3xl overflow-hidden max-h-[92dvh] flex flex-col shadow-2xl border border-[#EFE4D6]"
       >
         {/* Swipe / Drag Handle */}
         <div className="flex items-center justify-center pt-2.5 pb-1 bg-[#FFFDF9]">

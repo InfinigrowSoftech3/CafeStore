@@ -1,9 +1,10 @@
 import { Component, lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { wakeServer } from './services/api';
+import useCartStore from './context/cartStore';
 
 import QuickCartPopup from './components/ui/QuickCartPopup';
 import CustomerBottomNav from './components/ui/CustomerBottomNav';
@@ -28,6 +29,7 @@ const BillPage = lazy(() => import('./pages/customer/BillPage'));
 const UnsubscribePage = lazy(() => import('./pages/customer/UnsubscribePage'));
 const LegalPage = lazy(() => import('./pages/customer/LegalPage'));
 const NotFoundPage = lazy(() => import('./pages/customer/NotFoundPage'));
+const QrScannerModal = lazy(() => import('./components/ui/QrScannerModal'));
 
 class ChunkErrorBoundary extends Component {
   constructor(props) {
@@ -114,6 +116,21 @@ function MenuRouteWrapper() {
   return <MenuPage key={slug} />;
 }
 
+function GlobalScanner() {
+  const location = useLocation();
+  const isScannerOpen = useCartStore((state) => state.isScannerOpen);
+  const closeScanner = useCartStore((state) => state.closeScanner);
+  const hasPageScanner = location.pathname.startsWith('/menu') || location.pathname.startsWith('/cart');
+
+  if (!isScannerOpen || hasPageScanner) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <QrScannerModal onClose={closeScanner} />
+    </Suspense>
+  );
+}
+
 export default function App() {
   useEffect(() => {
     wakeServer();
@@ -121,67 +138,66 @@ export default function App() {
 
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <div className="min-h-[100dvh] w-full bg-[#F3E9DC]">
-        <div className="mx-auto flex min-h-[100dvh] w-full max-w-[480px] flex-col bg-[#FBF6EF] shadow-[0_0_40px_rgba(90,50,20,0.06)]">
-          <Navbar />
-          <CustomerBottomNav />
-          <QuickCartPopup />
-          <WebPushPrompt />
-          {typeof window !== 'undefined' && !['localhost', '127.0.0.1'].includes(window.location.hostname) && (
-            <>
-              <Analytics />
-              <SpeedInsights dsn="CmYU8C4o7QrHziabP83DyQ2CEd" />
-            </>
-          )}
+      <div className="flex min-h-[100dvh] w-full flex-col bg-[#FBF6EF] text-[#2B1810]">
+        <Navbar />
+        <CustomerBottomNav />
+        <GlobalScanner />
+        <QuickCartPopup />
+        <WebPushPrompt />
+        {typeof window !== 'undefined' && !['localhost', '127.0.0.1'].includes(window.location.hostname) && (
+          <>
+            <Analytics />
+            <SpeedInsights dsn="CmYU8C4o7QrHziabP83DyQ2CEd" />
+          </>
+        )}
 
-          <div className="flex-1">
-            <ChunkErrorBoundary>
-              <Suspense fallback={<PageFallback />}>
-                <Routes>
-                  <Route path="/" element={<RootRedirect />} />
-                  <Route path="/menu" element={<MenuRouteWrapper />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/offers" element={<OffersPage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/gallery" element={<GalleryPage />} />
-                  <Route path="/cart" element={<CartPage />} />
-                  <Route path="/checkout" element={<CheckoutPage />} />
-                  <Route path="/bill" element={<BillPage />} />
-                  <Route path="/unsubscribe" element={<UnsubscribePage />} />
-                  <Route path="/privacy" element={<LegalPage />} />
-                  <Route path="/terms" element={<LegalPage />} />
-                  <Route path="/refund-policy" element={<LegalPage />} />
+        <div className="flex-1">
+          <ChunkErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              <Routes>
+                <Route path="/" element={<RootRedirect />} />
+                <Route path="/menu" element={<MenuRouteWrapper />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/offers" element={<OffersPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/gallery" element={<GalleryPage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/bill" element={<BillPage />} />
+                <Route path="/unsubscribe" element={<UnsubscribePage />} />
+                <Route path="/privacy" element={<LegalPage />} />
+                <Route path="/terms" element={<LegalPage />} />
+                <Route path="/refund-policy" element={<LegalPage />} />
 
-                  <Route path="/receipt" element={<ReceiptPage />} />
-                  <Route path="/receipt/:orderId" element={<ReceiptPage />} />
-                  <Route path="/orders" element={<OrdersPage />} />
-                  <Route path="/order-confirm/:orderId" element={<OrderConfirmPage />} />
-                  <Route path="/track/:orderId" element={<TrackOrderPage />} />
+                <Route path="/receipt" element={<ReceiptPage />} />
+                <Route path="/receipt/:orderId" element={<ReceiptPage />} />
+                <Route path="/orders" element={<OrdersPage />} />
+                <Route path="/order-confirm/:orderId" element={<OrderConfirmPage />} />
+                <Route path="/track/:orderId" element={<TrackOrderPage />} />
 
-                  <Route path="*" element={<NotFoundPage />} />
-                </Routes>
-              </Suspense>
-            </ChunkErrorBoundary>
-          </div>
-
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: '#2B1810',
-                color: '#FFFDF9',
-                border: '1px solid #3E2419',
-                borderRadius: '16px',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px',
-                boxShadow: '0 10px 25px -5px rgba(43, 24, 16, 0.25)',
-              },
-              success: { iconTheme: { primary: '#F3E9DC', secondary: '#7A3316' } },
-              error: { iconTheme: { primary: '#ef4444', secondary: '#ffffff' } },
-            }}
-          />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
+          </ChunkErrorBoundary>
         </div>
+
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: '#2B1810',
+              color: '#FFFDF9',
+              border: '1px solid #3E2419',
+              borderRadius: '16px',
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              boxShadow: '0 10px 25px -5px rgba(43, 24, 16, 0.25)',
+            },
+            success: { iconTheme: { primary: '#F3E9DC', secondary: '#7A3316' } },
+            error: { iconTheme: { primary: '#ef4444', secondary: '#ffffff' } },
+          }}
+        />
       </div>
     </BrowserRouter>
   );

@@ -3,7 +3,8 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Home,
   UtensilsCrossed,
-  ShoppingBag,
+  ShoppingCart,
+  QrCode,
   Clock,
   MoreHorizontal,
   X,
@@ -34,6 +35,8 @@ export default function CustomerBottomNav() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const itemCount = useCartStore(cartItemCount);
+  const tableNumber = useCartStore((state) => state.tableNumber);
+  const openScanner = useCartStore((state) => state.openScanner);
   const [menuView, setMenuView] = useState('home');
   const [moreOpen, setMoreOpen] = useState(false);
   const sheetRef = useRef(null);
@@ -114,6 +117,12 @@ export default function CustomerBottomNav() {
     navigate(`/cart${currentSearch}`);
   };
 
+  const handleScanClick = (e) => {
+    e.preventDefault();
+    setMoreOpen(false);
+    openScanner();
+  };
+
   const handleMoreNav = (path) => {
     setMoreOpen(false);
     navigate(`${path}${currentSearch}`);
@@ -138,7 +147,7 @@ export default function CustomerBottomNav() {
       {moreOpen && (
         <div
           ref={sheetRef}
-          className="fixed left-1/2 z-40 w-[calc(100%-2rem)] max-w-[448px] -translate-x-1/2 rounded-[24px] bg-[#FFFDF9] border border-[#EFE4D6] shadow-[0_-8px_32px_rgba(90,50,20,0.14)] overflow-hidden"
+          className="fixed left-1/2 z-40 w-[calc(100%-32px)] max-w-[640px] -translate-x-1/2 rounded-[24px] bg-[#FFFDF9] border border-[#EFE4D6] shadow-[0_-8px_32px_rgba(90,50,20,0.14)] overflow-hidden"
           style={{ bottom: 'calc(82px + env(safe-area-inset-bottom, 0px))' }}
           role="dialog"
           aria-label="More options"
@@ -186,17 +195,17 @@ export default function CustomerBottomNav() {
       {/* ── Bottom nav bar ── */}
       <nav
         aria-label="Bottom Navigation"
-        className="fixed left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4"
+        className="fixed left-1/2 z-40 w-[calc(100%-32px)] max-w-[640px] -translate-x-1/2"
         style={{ bottom: 'calc(14px + env(safe-area-inset-bottom, 0px))' }}
       >
-        <div className="relative flex items-center justify-between px-2 py-2 bg-[#FFFDF9]/95 backdrop-blur-md border border-[#EFE4D6] rounded-[28px] shadow-[0_10px_30px_rgba(90,50,20,0.12)]">
+        <div className="relative flex items-center justify-between px-1 py-2 bg-[#FFFDF9]/95 backdrop-blur-md border border-[#EFE4D6] rounded-[28px] shadow-[0_10px_30px_rgba(90,50,20,0.12)] sm:px-2">
 
           {/* Home Tab */}
           <button
             type="button"
             onClick={handleHomeClick}
             aria-label="Go to Home"
-            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all duration-200 min-w-[48px] min-h-[44px] ${
+            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-full transition-all duration-200 min-w-[36px] min-h-[44px] min-[360px]:min-w-[42px] min-[360px]:px-1.5 sm:min-w-[48px] sm:px-2 ${
               isHomeActive
                 ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'
                 : 'text-[#7B6B5F] hover:text-[#2B1810]'
@@ -211,7 +220,7 @@ export default function CustomerBottomNav() {
             type="button"
             onClick={handleMenuClick}
             aria-label="Browse Menu Categories"
-            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all duration-200 min-w-[48px] min-h-[44px] ${
+            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-full transition-all duration-200 min-w-[36px] min-h-[44px] min-[360px]:min-w-[42px] min-[360px]:px-1.5 sm:min-w-[48px] sm:px-2 ${
               isMenuActive
                 ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'
                 : 'text-[#7B6B5F] hover:text-[#2B1810]'
@@ -221,15 +230,31 @@ export default function CustomerBottomNav() {
             <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Menu</span>
           </button>
 
-          {/* Center Raised Cart Button */}
-          <div className="relative -mt-7 flex flex-col items-center justify-center">
+          {/* Center Raised Scan + Cart Actions */}
+          <div className="relative -mt-7 flex items-center justify-center gap-1 sm:gap-1.5">
+            <button
+              type="button"
+              onClick={handleScanClick}
+              aria-label={
+                tableNumber
+                  ? `Table ${String(tableNumber).padStart(2, '0')} selected - tap to scan again`
+                  : 'Scan Table QR Code'
+              }
+              title={tableNumber ? `Table ${String(tableNumber).padStart(2, '0')} - tap to change` : 'Scan Table'}
+              className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#7A3316] text-[#FFFDF9] shadow-[0_10px_22px_rgba(122,51,22,0.38)] border-4 border-[#FFFDF9] active:scale-95 transition-transform"
+            >
+              <QrCode size={22} strokeWidth={2.4} />
+              {tableNumber ? (
+                <span className="absolute -right-1 -top-1 h-3.5 w-3.5 rounded-full border-2 border-[#FFFDF9] bg-emerald-500" />
+              ) : null}
+            </button>
             <button
               type="button"
               onClick={handleCartClick}
               aria-label={`View Cart (${itemCount} items)`}
               className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#7A3316] text-[#FFFDF9] shadow-[0_10px_22px_rgba(122,51,22,0.38)] border-4 border-[#FFFDF9] active:scale-95 transition-transform"
             >
-              <ShoppingBag size={22} strokeWidth={2.4} />
+              <ShoppingCart size={22} strokeWidth={2.4} />
               {itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full bg-[#E23B2E] text-white text-[10px] font-black border-2 border-white shadow-xs animate-in zoom-in-50">
                   {itemCount > 99 ? '99+' : itemCount}
@@ -243,7 +268,7 @@ export default function CustomerBottomNav() {
             type="button"
             onClick={handleOrdersClick}
             aria-label="View My Orders"
-            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all duration-200 min-w-[48px] min-h-[44px] ${
+            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-full transition-all duration-200 min-w-[36px] min-h-[44px] min-[360px]:min-w-[42px] min-[360px]:px-1.5 sm:min-w-[48px] sm:px-2 ${
               isOrdersActive
                 ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'
                 : 'text-[#7B6B5F] hover:text-[#2B1810]'
@@ -259,7 +284,7 @@ export default function CustomerBottomNav() {
             onClick={() => setMoreOpen((prev) => !prev)}
             aria-label="More pages"
             aria-expanded={moreOpen}
-            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all duration-200 min-w-[48px] min-h-[44px] ${
+            className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-full transition-all duration-200 min-w-[36px] min-h-[44px] min-[360px]:min-w-[42px] min-[360px]:px-1.5 sm:min-w-[48px] sm:px-2 ${
               moreOpen || isMoreActive
                 ? 'bg-[#7A3316] text-[#FFFDF9] shadow-xs'
                 : 'text-[#7B6B5F] hover:text-[#2B1810]'

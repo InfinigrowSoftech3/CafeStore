@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Search, UtensilsCrossed, Sparkles, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search, UtensilsCrossed, Coffee, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
 import useCartStore from '../../context/cartStore';
@@ -18,12 +18,15 @@ import { getFavorites, toggleFavorite } from '../../utils/favorites';
 
 import CustomerHero from '../../components/menu/CustomerHero';
 import CustomerCategoryCircles from '../../components/menu/CustomerCategoryCircles';
-import MenuItemRow from '../../components/menu/MenuItemRow';
+import MenuItemRow, { MenuItemSkeleton } from '../../components/menu/MenuItemRow';
 import CustomerCategoryBanner from '../../components/menu/CustomerCategoryBanner';
 import CustomerSubcategoryTabs from '../../components/menu/CustomerSubcategoryTabs';
 
 const ProductModal = lazy(() => import('../../components/menu/ProductModal'));
 const QrScannerModal = lazy(() => import('../../components/ui/QrScannerModal'));
+
+const PRODUCT_GRID_CLASS = 'grid grid-cols-1 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] sm:gap-4';
+const SKELETON_CARDS = Array.from({ length: 6 }, (_, index) => index);
 
 function getOperatingStatus(tenant) {
   const openingHours = tenant?.openingHours || tenant?.settings?.openingHours || {};
@@ -202,7 +205,7 @@ export default function MenuPage() {
       try {
         const [catsRes, prodsRes] = await Promise.all([
           api.get('/categories'),
-          api.get('/menu'),
+          api.get('/menu?limit=100'),
         ]);
 
         if (isMounted) {
@@ -343,8 +346,8 @@ export default function MenuPage() {
 
   return (
     <div className="min-h-[100dvh] w-full overflow-x-hidden bg-[#FBF6EF] text-[#2B1810] font-sans antialiased selection:bg-[#7A3316] selection:text-[#FFFDF9]">
-      {/* ── Single mobile layout container ── */}
-      <div className="mx-auto flex w-full flex-col px-4 pb-[calc(112px+env(safe-area-inset-bottom,0px))] pt-2">
+      {/* ── Shared fluid content container ── */}
+      <div className="customer-container flex flex-col pb-[calc(120px+env(safe-area-inset-bottom,0px))] pt-2">
         {/* ── Menu toolbar: category context + search ── */}
         <div className="mb-3 flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
@@ -442,7 +445,16 @@ export default function MenuPage() {
               />
 
               {/* Popular Items Section */}
-              {popularItems.length >= 2 && (
+              {loading && products.length === 0 ? (
+                <section aria-label="Loading popular items" className="flex flex-col gap-3">
+                  <div className="h-6 w-32 rounded skeleton" />
+                  <div className={PRODUCT_GRID_CLASS}>
+                    {SKELETON_CARDS.map((card) => (
+                      <MenuItemSkeleton key={card} />
+                    ))}
+                  </div>
+                </section>
+              ) : popularItems.length >= 2 ? (
                 <section aria-labelledby="popular-heading" className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <h2
@@ -462,8 +474,8 @@ export default function MenuPage() {
                     </button>
                   </div>
 
-                  {/* Mobile column grid of food cards */}
-                  <div className="grid grid-cols-1 gap-4">
+                  {/* Same card on every device; only the column count changes */}
+                  <div className={PRODUCT_GRID_CLASS}>
                     {popularItems.map((prod) => (
                       <MenuItemRow
                         key={prod._id}
@@ -476,7 +488,7 @@ export default function MenuPage() {
                     ))}
                   </div>
                 </section>
-              )}
+              ) : null}
 
               {/* Recommended for You Section */}
               {recommendedItems.length >= 2 && (
@@ -499,8 +511,8 @@ export default function MenuPage() {
                     </button>
                   </div>
 
-                  {/* Mobile column grid of food cards */}
-                  <div className="grid grid-cols-1 gap-4">
+                  {/* Same card on every device; only the column count changes */}
+                  <div className={PRODUCT_GRID_CLASS}>
                     {recommendedItems.map((prod) => (
                       <MenuItemRow
                         key={prod._id}
@@ -514,6 +526,21 @@ export default function MenuPage() {
                   </div>
                 </section>
               )}
+
+              {/* Friendly empty state for a menu with no available products */}
+              {!loading && products.length === 0 && (
+                <section className="flex flex-col items-center justify-center rounded-[20px] border border-[#EFE4D6] bg-[#FFFDF9] px-6 py-12 text-center shadow-[0_4px_16px_rgba(90,50,20,0.05)]">
+                  <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#F3E9DC] text-[#7A3316]">
+                    <Coffee size={26} strokeWidth={1.8} />
+                  </div>
+                  <h2 className="font-display text-lg font-bold text-[#2B1810]">
+                    The menu is being refreshed
+                  </h2>
+                  <p className="mt-1 max-w-xs text-xs leading-relaxed text-[#7B6B5F]">
+                    No items are available right now. Please check back in a little while.
+                  </p>
+                </section>
+              )}
             </div>
           </div>
         ) : (
@@ -524,8 +551,8 @@ export default function MenuPage() {
             {/* Category Banner Card */}
             {currentCategory && <CustomerCategoryBanner category={currentCategory} />}
 
-            {/* Category White Content Sheet */}
-            <div className="rounded-[24px] bg-[#FFFDF9] border border-[#EFE4D6] p-4 shadow-[0_4px_20px_rgba(90,50,20,0.05)] flex flex-col">
+            {/* Products share the page container; no nested card-in-card padding */}
+            <div className="flex flex-col gap-3">
               {/* Optional Subcategories pill row if present in data model */}
               {subcategories.length > 0 && (
                 <CustomerSubcategoryTabs
@@ -535,9 +562,15 @@ export default function MenuPage() {
                 />
               )}
 
-              {/* Items List in the same single-column mobile layout */}
-              {categoryProducts.length > 0 ? (
-                <div className="grid grid-cols-1 gap-4">
+              {/* Items List in the same card layout */}
+              {loading && products.length === 0 ? (
+                <div className={PRODUCT_GRID_CLASS}>
+                  {SKELETON_CARDS.map((card) => (
+                    <MenuItemSkeleton key={card} />
+                  ))}
+                </div>
+              ) : categoryProducts.length > 0 ? (
+                <div className={PRODUCT_GRID_CLASS}>
                   {categoryProducts.map((prod) => (
                     <MenuItemRow
                       key={prod._id}
@@ -550,14 +583,14 @@ export default function MenuPage() {
                   ))}
                 </div>
               ) : (
-                <div className="py-16 text-center flex flex-col items-center justify-center">
-                  <div className="w-14 h-14 rounded-full bg-[#F3E9DC] text-[#7A3316] flex items-center justify-center mb-3">
+                <div className="flex flex-col items-center justify-center rounded-[20px] border border-[#EFE4D6] bg-[#FFFDF9] px-6 py-16 text-center shadow-[0_4px_16px_rgba(90,50,20,0.05)]">
+                  <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#F3E9DC] text-[#7A3316]">
                     <UtensilsCrossed size={24} />
                   </div>
-                  <h3 className="font-display font-bold text-lg text-[#2B1810]">
+                  <h3 className="font-display text-lg font-bold text-[#2B1810]">
                     No items found
                   </h3>
-                  <p className="text-xs text-[#7B6B5F] mt-1 max-w-xs">
+                  <p className="mt-1 max-w-xs text-xs text-[#7B6B5F]">
                     {debouncedSearch
                       ? `No dishes matched "${debouncedSearch}". Try another term.`
                       : 'This category does not have available items at the moment.'}
@@ -569,7 +602,7 @@ export default function MenuPage() {
                       setSearch('');
                       setDebouncedSearch('');
                     }}
-                    className="mt-4 px-5 py-2 rounded-full bg-[#7A3316] text-[#FFFDF9] text-xs font-bold shadow-xs hover:bg-[#5E2610] transition"
+                    className="mt-4 rounded-full bg-[#7A3316] px-5 py-2 text-xs font-bold text-[#FFFDF9] shadow-xs transition hover:bg-[#5E2610]"
                   >
                     Browse All Items
                   </button>

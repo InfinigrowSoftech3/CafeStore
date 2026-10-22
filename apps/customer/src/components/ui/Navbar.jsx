@@ -1,14 +1,12 @@
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
-import { ScanLine, Coffee } from 'lucide-react';
+import { Coffee } from 'lucide-react';
 import { useTenant } from '../../context/TenantContext';
-import useCartStore from '../../context/cartStore';
 
 export default function Navbar() {
   const tenant = useTenant();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const currentSearch = searchParams.toString() ? `?${searchParams.toString()}` : '';
-  const { tableNumber, openScanner } = useCartStore();
 
   // Focused checkout flows and the immersive About story use their own header.
   if (['/cart', '/checkout', '/about'].includes(location.pathname)) {
@@ -19,7 +17,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#EFE4D6] bg-[#FFFDF9]/95 shadow-[0_2px_12px_-2px_rgba(15,61,46,0.04)] backdrop-blur-xl">
-      <div className="flex w-full items-center justify-between gap-3 px-4 py-2.5">
+      <div className="customer-container flex items-center justify-between gap-3 py-2.5">
         <Link
           to={`/menu${currentSearch}`}
           aria-label={`${tenant.name || 'Café'} - Homepage`}
@@ -48,22 +46,6 @@ export default function Navbar() {
           </div>
         </Link>
 
-        <button
-          type="button"
-          onClick={openScanner}
-          aria-label={
-            tableNumber
-              ? `Table ${String(tableNumber).padStart(2, '0')} selected - tap to scan again`
-              : 'Scan Table QR Code'
-          }
-          title={tableNumber ? `Table ${String(tableNumber).padStart(2, '0')} - tap to change` : 'Scan Table'}
-          className="relative flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[#7A3316] text-[#FFFDF9] shadow-[0_6px_16px_rgba(122,51,22,0.28)] transition-all hover:bg-[#5E2610] active:scale-95"
-        >
-          <ScanLine size={20} strokeWidth={2.2} />
-          {tableNumber ? (
-            <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[#FFFDF9] bg-emerald-500" />
-          ) : null}
-        </button>
       </div>
     </header>
   );
