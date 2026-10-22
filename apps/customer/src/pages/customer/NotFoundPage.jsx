@@ -22,7 +22,7 @@ export default function NotFoundPage() {
           404 · Page Not Found
         </p>
 
-        <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#7A3316] sm:text-5xl">
+        <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#7A3316]">
           We couldn’t find that page.
         </h1>
 
@@ -30,17 +30,17 @@ export default function NotFoundPage() {
           The link you followed may be broken or the page may have been moved. Let’s get you back to our delicious dining menu.
         </p>
 
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <div className="mt-8 flex flex-col items-center justify-center gap-3">
           <Link
             to="/menu"
-            className="w-full sm:w-auto btn-primary inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full px-7 py-3 font-bold text-xs uppercase tracking-wider shadow-sm"
+            className="w-full btn-primary inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full px-7 py-3 font-bold text-xs uppercase tracking-wider shadow-sm"
           >
             <UtensilsCrossed size={16} />
             <span>Explore Menu</span>
           </Link>
           <Link
             to="/"
-            className="w-full sm:w-auto btn-secondary inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full px-7 py-3 font-bold text-xs uppercase tracking-wider shadow-2xs"
+            className="w-full btn-secondary inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full px-7 py-3 font-bold text-xs uppercase tracking-wider shadow-2xs"
           >
             <ArrowLeft size={16} />
             <span>Return Home</span>

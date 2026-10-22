@@ -31,7 +31,7 @@ export default function TableServiceActions() {
         type="button"
         onClick={() => requestService('waiter')}
         disabled={Boolean(requesting)}
-        className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] px-4 text-xs sm:text-sm font-sora font-bold text-[#2B1810] shadow-2xs hover:bg-[#FBF6EF] active:scale-98 transition-all disabled:opacity-50"
+        className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] px-4 text-xs font-sora font-bold text-[#2B1810] shadow-2xs hover:bg-[#FBF6EF] active:scale-98 transition-all disabled:opacity-50"
       >
         {requesting === 'waiter' ? (
           <Loader2 size={16} className="animate-spin text-stone-600" />
@@ -45,7 +45,7 @@ export default function TableServiceActions() {
         type="button"
         onClick={() => requestService('bill')}
         disabled={Boolean(requesting)}
-        className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-[#7A3316] hover:bg-[#5E2610] border border-[#7A3316] px-4 text-xs sm:text-sm font-sora font-bold text-white shadow-2xs active:scale-98 transition-all disabled:opacity-50"
+        className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-[#7A3316] hover:bg-[#5E2610] border border-[#7A3316] px-4 text-xs font-sora font-bold text-white shadow-2xs active:scale-98 transition-all disabled:opacity-50"
       >
         {requesting === 'bill' ? (
           <Loader2 size={16} className="animate-spin text-white" />

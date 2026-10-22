@@ -25,7 +25,7 @@ const MORE_ITEMS = [
   { label: 'Gallery',     path: '/gallery',     icon: Image,     desc: 'Photos & guest moments'   },
   { label: 'Receipt',     path: '/receipt',     icon: Receipt,   desc: 'View session receipt'     },
   { label: 'Bill',        path: '/bill',        icon: FileText,  desc: 'Table bill & payment'     },
-  { label: 'Legal',       path: '/legal',       icon: FileText,  desc: 'Terms & privacy'          },
+  { label: 'Legal',       path: '/privacy',     icon: FileText,  desc: 'Terms & privacy'          },
   { label: 'Unsub',       path: '/unsubscribe', icon: MailMinus, desc: 'Manage notifications'     },
 ];
 
@@ -129,7 +129,7 @@ export default function CustomerBottomNav() {
       {/* ── More sheet backdrop ── */}
       {moreOpen && (
         <div
-          className="md:hidden fixed inset-0 z-30 bg-[#2B1810]/30 backdrop-blur-xs"
+          className="fixed inset-0 z-30 bg-[#2B1810]/30 backdrop-blur-xs"
           aria-hidden="true"
         />
       )}
@@ -138,7 +138,7 @@ export default function CustomerBottomNav() {
       {moreOpen && (
         <div
           ref={sheetRef}
-          className="md:hidden fixed left-4 right-4 z-40 max-w-md mx-auto rounded-[24px] bg-[#FFFDF9] border border-[#EFE4D6] shadow-[0_-8px_32px_rgba(90,50,20,0.14)] overflow-hidden"
+          className="fixed left-1/2 z-40 w-[calc(100%-2rem)] max-w-[448px] -translate-x-1/2 rounded-[24px] bg-[#FFFDF9] border border-[#EFE4D6] shadow-[0_-8px_32px_rgba(90,50,20,0.14)] overflow-hidden"
           style={{ bottom: 'calc(82px + env(safe-area-inset-bottom, 0px))' }}
           role="dialog"
           aria-label="More options"
@@ -150,7 +150,7 @@ export default function CustomerBottomNav() {
               type="button"
               onClick={() => setMoreOpen(false)}
               aria-label="Close more menu"
-              className="flex items-center justify-center w-7 h-7 rounded-full bg-[#F3E9DC] text-[#7B6B5F] hover:bg-[#EFE4D6] transition"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F3E9DC] text-[#7B6B5F] hover:bg-[#EFE4D6] transition"
             >
               <X size={14} />
             </button>
@@ -186,7 +186,7 @@ export default function CustomerBottomNav() {
       {/* ── Bottom nav bar ── */}
       <nav
         aria-label="Bottom Navigation"
-        className="md:hidden fixed left-4 right-4 z-40 max-w-md mx-auto"
+        className="fixed left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 px-4"
         style={{ bottom: 'calc(14px + env(safe-area-inset-bottom, 0px))' }}
       >
         <div className="relative flex items-center justify-between px-2 py-2 bg-[#FFFDF9]/95 backdrop-blur-md border border-[#EFE4D6] rounded-[28px] shadow-[0_10px_30px_rgba(90,50,20,0.12)]">

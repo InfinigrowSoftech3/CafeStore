@@ -89,7 +89,7 @@ export default function ReceiptPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FBF6EF]">
+      <div className="flex min-h-[100dvh] items-center justify-center bg-[#FBF6EF]">
         <Loader2 className="animate-spin text-[#7A3316]" size={32} />
       </div>
     );
@@ -97,7 +97,7 @@ export default function ReceiptPage() {
 
   if (!receipt) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#FBF6EF] p-8 text-center">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-[#FBF6EF] p-8 text-center">
         <p className="font-display text-2xl font-bold text-[#7A3316]">
           Order receipt not found.
         </p>
@@ -112,7 +112,7 @@ export default function ReceiptPage() {
   }
 
   return (
-    <div className="receipt-page min-h-screen bg-[#FBF6EF] px-3 py-6 sm:px-6 sm:py-8">
+    <div className="receipt-page min-h-[100dvh] bg-[#FBF6EF] px-3 py-6">
       <div className="receipt-actions mx-auto mb-5 flex max-w-md flex-wrap items-center justify-between gap-2.5">
         <Link
           to="/orders"
@@ -150,7 +150,7 @@ export default function ReceiptPage() {
         </div>
       </div>
 
-      <article className="receipt-sheet mx-auto max-w-md bg-[#FFFDF9] border border-[#EFE4D6] px-5 py-7 shadow-sm rounded-3xl sm:px-7 sm:py-8">
+      <article className="receipt-sheet mx-auto max-w-md bg-[#FFFDF9] border border-[#EFE4D6] px-5 py-7 shadow-sm rounded-3xl">
         <header className="border-b border-[#EFE4D6] pb-6 text-center">
           <p className="font-display text-3xl font-bold tracking-[0.08em] text-[#7A3316]">
             {receipt.tenant?.name || 'Café'}
@@ -174,7 +174,7 @@ export default function ReceiptPage() {
           </p>
         </header>
 
-        <section className="grid gap-4 border-b border-[#EFE4D6] py-6 text-sm sm:grid-cols-2">
+        <section className="grid gap-4 border-b border-[#EFE4D6] py-6 text-sm">
           <div className="space-y-2">
             <Info label="Order" value={receipt.orderNumbers.join(', ')} />
             <Info label="Table" value={String(receipt.tableNumber || '-').padStart(2, '0')} />
@@ -221,7 +221,7 @@ export default function ReceiptPage() {
           </div>
         </section>
 
-        <section className="mt-7 grid gap-4 border-y border-[#EFE4D6] py-5 sm:grid-cols-2">
+        <section className="mt-7 grid gap-4 border-y border-[#EFE4D6] py-5">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-stone-400">Payment method</p>
             <p className="mt-1 font-semibold text-[#2B1810]">{receipt.paymentMethod}</p>
@@ -233,7 +233,7 @@ export default function ReceiptPage() {
             </p>
           </div>
           {receipt.transactionId && (
-            <div className="sm:col-span-2">
+            <div className="">
               <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-stone-400">Transaction ID</p>
               <p className="mt-1 break-all font-mono text-xs text-stone-600">{receipt.transactionId}</p>
             </div>

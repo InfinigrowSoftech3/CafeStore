@@ -91,7 +91,7 @@ export default function CustomerItemRow({
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onSelect && onSelect(product)}
-      className="group flex items-center justify-between gap-3.5 sm:gap-4 py-3.5 sm:py-4 border-b border-[#EFE4D6] last:border-b-0 cursor-pointer text-left transition-colors hover:bg-white/60 rounded-xl px-1"
+      className="group flex items-center justify-between gap-3.5 py-3.5 border-b border-[#EFE4D6] last:border-b-0 cursor-pointer text-left transition-colors hover:bg-white/60 rounded-xl px-1"
     >
       {/* Left: 88x88 Rounded Thumbnail */}
       <div className="relative w-[88px] h-[88px] rounded-[16px] overflow-hidden bg-[#F6EBD5]/40 shrink-0">
@@ -133,14 +133,14 @@ export default function CustomerItemRow({
 
       {/* Middle: Name, Description, Price */}
       <div className="flex-1 min-w-0 pr-1">
-        <h3 className="font-bold text-sm sm:text-base text-[#2B1810] leading-snug truncate group-hover:text-[#7A3316] transition-colors">
+        <h3 className="font-bold text-sm text-[#2B1810] leading-snug truncate group-hover:text-[#7A3316] transition-colors">
           {product.name}
         </h3>
         <p className="text-xs text-[#7B6B5F] line-clamp-2 mt-0.5 leading-relaxed">
           {product.description || 'Crafted with ethically sourced ingredients.'}
         </p>
         <div className="mt-1.5">
-          <span className="font-display font-bold text-sm sm:text-base text-[#2B1810]">
+          <span className="font-display font-bold text-sm text-[#2B1810]">
             {formatMoney(product.price, tenant.currency)}
           </span>
         </div>

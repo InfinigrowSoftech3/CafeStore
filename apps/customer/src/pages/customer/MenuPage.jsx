@@ -21,7 +21,6 @@ import CustomerCategoryCircles from '../../components/menu/CustomerCategoryCircl
 import MenuItemRow from '../../components/menu/MenuItemRow';
 import CustomerCategoryBanner from '../../components/menu/CustomerCategoryBanner';
 import CustomerSubcategoryTabs from '../../components/menu/CustomerSubcategoryTabs';
-import CustomerBottomNav from '../../components/ui/CustomerBottomNav';
 
 const ProductModal = lazy(() => import('../../components/menu/ProductModal'));
 const QrScannerModal = lazy(() => import('../../components/ui/QrScannerModal'));
@@ -343,9 +342,9 @@ export default function MenuPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#FBF6EF] text-[#2B1810] font-sans antialiased selection:bg-[#7A3316] selection:text-[#FFFDF9]">
-      {/* ── Main Container (Centered, max 1200px) ── */}
-      <div className="mx-auto w-full max-w-[1200px] px-4 min-[390px]:px-5 sm:px-6 lg:px-8 pt-2 pb-32 md:pb-16 flex flex-col">
+    <div className="min-h-[100dvh] w-full overflow-x-hidden bg-[#FBF6EF] text-[#2B1810] font-sans antialiased selection:bg-[#7A3316] selection:text-[#FFFDF9]">
+      {/* ── Single mobile layout container ── */}
+      <div className="mx-auto flex w-full flex-col px-4 pb-[calc(112px+env(safe-area-inset-bottom,0px))] pt-2">
         {/* ── Menu toolbar: category context + search ── */}
         <div className="mb-3 flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
@@ -358,7 +357,7 @@ export default function MenuPage() {
                   setDebouncedSearch('');
                 }}
                 aria-label="Back to all categories"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#2B1810] shadow-[0_4px_12px_rgba(90,50,20,0.06)] transition active:scale-95"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#2B1810] shadow-[0_4px_12px_rgba(90,50,20,0.06)] transition active:scale-95"
               >
                 <ArrowLeft size={18} strokeWidth={2.4} />
               </button>
@@ -382,7 +381,7 @@ export default function MenuPage() {
             onClick={() => setIsSearchOpen((open) => !open)}
             aria-label={isSearchOpen ? 'Close menu search' : 'Search menu items'}
             aria-expanded={isSearchOpen}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#2B1810] shadow-[0_4px_12px_rgba(90,50,20,0.06)] transition hover:border-[#7A3316]/30 active:scale-95"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#2B1810] shadow-[0_4px_12px_rgba(90,50,20,0.06)] transition hover:border-[#7A3316]/30 active:scale-95"
           >
             {isSearchOpen ? <X size={18} strokeWidth={2.2} /> : <Search size={18} strokeWidth={2.2} />}
           </button>
@@ -423,14 +422,14 @@ export default function MenuPage() {
             SCREEN 1: HOME SCREEN VIEW (Landing / All Categories)
            ═══════════════════════════════════════════════════════════ */}
         {isHomeView ? (
-          <div className="flex flex-col gap-5 sm:gap-7 animate-in fade-in-50 duration-200">
+          <div className="flex flex-col gap-5 animate-in fade-in-50 duration-200">
             {/* 1. Hero Section */}
             <CustomerHero onOrderNow={handleOrderNow} />
 
             {/* 2. Overlapping Content Sheet */}
             <div
               id="content-sheet"
-              className="relative -mt-4 sm:-mt-6 rounded-t-[28px] sm:rounded-t-[32px] bg-[#FBF6EF] pt-4 sm:pt-6 flex flex-col gap-6 sm:gap-8"
+              className="relative -mt-4 rounded-t-[28px] bg-[#FBF6EF] pt-4 flex flex-col gap-6"
             >
               {/* Category Row (5 Circular Icon Buttons) */}
               <CustomerCategoryCircles
@@ -448,7 +447,7 @@ export default function MenuPage() {
                   <div className="flex items-center justify-between">
                     <h2
                       id="popular-heading"
-                      className="font-display font-bold text-xl sm:text-2xl text-[#2B1810] tracking-tight"
+                      className="font-display font-bold text-xl text-[#2B1810] tracking-tight"
                     >
                       Popular Items
                     </h2>
@@ -456,15 +455,15 @@ export default function MenuPage() {
                       type="button"
                       onClick={handleViewAllPopular}
                       aria-label="View all popular items"
-                      className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-[#7A3316] hover:text-[#5E2610] transition-colors"
+                      className="inline-flex min-h-[44px] items-center gap-1 text-xs font-bold text-[#7A3316] hover:text-[#5E2610] transition-colors"
                     >
                       <span>View All</span>
                       <ArrowRight size={14} strokeWidth={2.4} />
                     </button>
                   </div>
 
-                  {/* Responsive Grid of Food Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                  {/* Mobile column grid of food cards */}
+                  <div className="grid grid-cols-1 gap-4">
                     {popularItems.map((prod) => (
                       <MenuItemRow
                         key={prod._id}
@@ -485,7 +484,7 @@ export default function MenuPage() {
                   <div className="flex items-center justify-between">
                     <h2
                       id="recommended-heading"
-                      className="font-display font-bold text-xl sm:text-2xl text-[#2B1810] tracking-tight"
+                      className="font-display font-bold text-xl text-[#2B1810] tracking-tight"
                     >
                       Recommended for You
                     </h2>
@@ -493,15 +492,15 @@ export default function MenuPage() {
                       type="button"
                       onClick={handleViewAllPopular}
                       aria-label="View all recommendations"
-                      className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-[#7A3316] hover:text-[#5E2610] transition-colors"
+                      className="inline-flex min-h-[44px] items-center gap-1 text-xs font-bold text-[#7A3316] hover:text-[#5E2610] transition-colors"
                     >
                       <span>View All</span>
                       <ArrowRight size={14} strokeWidth={2.4} />
                     </button>
                   </div>
 
-                  {/* Responsive Grid of Food Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                  {/* Mobile column grid of food cards */}
+                  <div className="grid grid-cols-1 gap-4">
                     {recommendedItems.map((prod) => (
                       <MenuItemRow
                         key={prod._id}
@@ -521,12 +520,12 @@ export default function MenuPage() {
           /* ═══════════════════════════════════════════════════════════
               SCREEN 2: CATEGORY / MENU ITEMS VIEW
              ═══════════════════════════════════════════════════════════ */
-          <div className="flex flex-col gap-4 sm:gap-6 animate-in fade-in-50 duration-200">
+          <div className="flex flex-col gap-4 animate-in fade-in-50 duration-200">
             {/* Category Banner Card */}
             {currentCategory && <CustomerCategoryBanner category={currentCategory} />}
 
             {/* Category White Content Sheet */}
-            <div className="rounded-[24px] sm:rounded-[28px] bg-[#FFFDF9] border border-[#EFE4D6] p-4 sm:p-6 shadow-[0_4px_20px_rgba(90,50,20,0.05)] flex flex-col">
+            <div className="rounded-[24px] bg-[#FFFDF9] border border-[#EFE4D6] p-4 shadow-[0_4px_20px_rgba(90,50,20,0.05)] flex flex-col">
               {/* Optional Subcategories pill row if present in data model */}
               {subcategories.length > 0 && (
                 <CustomerSubcategoryTabs
@@ -536,9 +535,9 @@ export default function MenuPage() {
                 />
               )}
 
-              {/* Items List (Single-column on mobile, 2-column grid at 768px+) */}
+              {/* Items List in the same single-column mobile layout */}
               {categoryProducts.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                <div className="grid grid-cols-1 gap-4">
                   {categoryProducts.map((prod) => (
                     <MenuItemRow
                       key={prod._id}

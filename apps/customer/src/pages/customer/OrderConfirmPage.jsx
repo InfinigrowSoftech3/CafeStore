@@ -67,7 +67,7 @@ export default function OrderConfirmPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FBF6EF] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-[100dvh] bg-[#FBF6EF] flex flex-col items-center justify-center p-6 text-center">
         <div className="w-12 h-12 border-2 border-[#7A3316] border-t-transparent animate-spin mb-3" />
         <p className="font-display text-lg font-bold text-[#7A3316]">Retrieving order details...</p>
       </div>
@@ -76,7 +76,7 @@ export default function OrderConfirmPage() {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-[#FBF6EF] flex flex-col items-center justify-center gap-4 p-8 text-center max-w-md mx-auto">
+      <div className="min-h-[100dvh] bg-[#FBF6EF] flex flex-col items-center justify-center gap-4 p-8 text-center max-w-md mx-auto">
         <div className="w-20 h-20 rounded-2xl border border-[#EFE4D6] bg-[#FBF6EF] flex items-center justify-center text-4xl mb-2">
           ❓
         </div>
@@ -94,9 +94,9 @@ export default function OrderConfirmPage() {
   const status = STATUS_CONFIG[order.orderStatus] || STATUS_CONFIG.pending;
 
   return (
-    <div className="min-h-screen bg-[#FBF6EF] pb-16">
+    <div className="min-h-[100dvh] bg-[#FBF6EF] pb-16">
       {/* Celebration Header */}
-      <div className="relative bg-[#FFFDF9] border-b border-[#EFE4D6] px-6 py-10 sm:py-12 text-center overflow-hidden">
+      <div className="relative bg-[#FFFDF9] border-b border-[#EFE4D6] px-6 py-10 text-center overflow-hidden">
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -116,10 +116,10 @@ export default function OrderConfirmPage() {
             <Sparkles size={13} />
             <span>{order.paymentStatus === 'paid' ? 'Payment Verified' : 'Order Placed'}</span>
           </div>
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#7A3316] tracking-tight">
+          <h1 className="font-display text-2xl font-bold text-[#7A3316] tracking-tight">
             Order #{order.orderNumber} Confirmed!
           </h1>
-          <p className="text-stone-600 text-xs sm:text-sm mt-2 leading-relaxed">
+          <p className="text-stone-600 text-xs mt-2 leading-relaxed">
             {order.paymentMethod === 'cash'
               ? 'Your order has been sent to the kitchen. You can pay at the billing counter when leaving.'
               : order.paymentStatus === 'paid'
@@ -130,10 +130,10 @@ export default function OrderConfirmPage() {
       </div>
 
       {/* Main Container */}
-      <div className="mx-auto max-w-3xl p-4 sm:p-6 space-y-4">
+      <div className="mx-auto max-w-3xl p-4 space-y-4">
         {/* Order Metadata Pills Card */}
-        <div className="card p-4 sm:p-5 bg-[#FFFDF9] border border-[#EFE4D6] rounded-2xl shadow-2xs">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="card p-4 bg-[#FFFDF9] border border-[#EFE4D6] rounded-2xl shadow-2xs">
+          <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'Order #', value: order.orderNumber },
               { label: 'Table', value: `Table ${String(order.tableNumber).padStart(2, '0')}` },
@@ -142,7 +142,7 @@ export default function OrderConfirmPage() {
             ].map(row => (
               <div key={row.label} className="bg-[#FBF6EF] rounded-xl p-3 border border-[#EFE4D6]">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">{row.label}</p>
-                <p className="font-display font-bold text-[#7A3316] text-sm sm:text-base mt-0.5">{row.value}</p>
+                <p className="font-display font-bold text-[#7A3316] text-sm mt-0.5">{row.value}</p>
               </div>
             ))}
           </div>
@@ -213,7 +213,7 @@ export default function OrderConfirmPage() {
 
           <div className="space-y-2.5">
             {safeItems.map((item, i) => (
-              <div key={i} className="flex justify-between items-baseline text-xs sm:text-sm">
+              <div key={i} className="flex justify-between items-baseline text-xs">
                 <div className="flex-1 pr-3">
                   <p className="font-semibold text-[#2B1810]">
                     {item.name} <span className="text-stone-400 font-normal">× {item.quantity}</span>
@@ -224,7 +224,7 @@ export default function OrderConfirmPage() {
                     </p>
                   )}
                 </div>
-                <span className="price-tag text-xs sm:text-sm font-bold text-[#2B1810] flex-shrink-0">
+                <span className="price-tag text-xs font-bold text-[#2B1810] flex-shrink-0">
                   {formatMoney(item.itemTotal, order.currency || tenant.currency)}
                 </span>
               </div>
@@ -248,7 +248,7 @@ export default function OrderConfirmPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 pt-2">
+        <div className="grid gap-3 grid-cols-1 pt-2">
           <Link
             to={`/receipt/${orderId}?accessToken=${encodeURIComponent(accessToken)}`}
             className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider rounded-full"
@@ -270,7 +270,7 @@ export default function OrderConfirmPage() {
               type="button"
               onClick={handleDownloadReceipt}
               disabled={downloading}
-              className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider sm:col-span-2 rounded-full"
+              className="btn-secondary min-h-[46px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider rounded-full"
             >
               {downloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
               <span>{downloading ? 'Preparing Receipt PDF...' : 'Download PDF Receipt'}</span>
@@ -279,7 +279,7 @@ export default function OrderConfirmPage() {
 
           <Link
             to="/menu"
-            className="btn-primary min-h-[48px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider sm:col-span-2 shadow-sm rounded-full"
+            className="btn-primary min-h-[48px] flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider shadow-sm rounded-full"
           >
             <UtensilsCrossed size={16} />
             <span>Back to Menu</span>

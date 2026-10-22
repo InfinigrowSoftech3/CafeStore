@@ -141,7 +141,7 @@ export default function NotificationPermissionPrompt({
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
-            className="fixed bottom-20 sm:bottom-6 right-4 left-4 sm:left-auto sm:max-w-sm z-40"
+            className="fixed bottom-20 right-4 left-4 z-40"
           >
             {content}
           </motion.div>

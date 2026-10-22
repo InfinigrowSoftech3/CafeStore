@@ -7,7 +7,7 @@ export default function SkeletonCard() {
       </div>
 
       {/* Info Shimmer */}
-      <div className="p-3 sm:p-3.5 space-y-2.5 flex-1 flex flex-col justify-between">
+      <div className="p-3 space-y-2.5 flex-1 flex flex-col justify-between">
         <div className="space-y-1.5">
           <div className="h-4 skeleton rounded-md w-3/4" />
           <div className="h-3 skeleton rounded-md w-full opacity-70" />

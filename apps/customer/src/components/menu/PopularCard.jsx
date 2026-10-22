@@ -77,7 +77,7 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
   return (
     <div
       onClick={isAvailable ? () => onSelect(product) : undefined}
-      className={`group w-[185px] min-w-[185px] sm:w-[210px] sm:min-w-[210px] shrink-0 snap-start rounded-2xl bg-[#FFFDF9] border border-[#EFE4D6] overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all select-none ${
+      className={`group w-[185px] min-w-[185px] shrink-0 snap-start rounded-2xl bg-[#FFFDF9] border border-[#EFE4D6] overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-all select-none ${
         isAvailable ? 'cursor-pointer' : 'opacity-60 grayscale-[40%] cursor-default'
       }`}
     >
@@ -124,7 +124,7 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
       {/* ─── Bottom Info on Pure White ─── */}
       <div className="p-3 bg-white flex flex-col justify-between flex-1">
         <div>
-          <h4 className="font-sora font-bold text-xs sm:text-sm text-[#2B1810] leading-snug line-clamp-1 group-hover:text-[#7A3316] transition-colors">
+          <h4 className="font-sora font-bold text-xs text-[#2B1810] leading-snug line-clamp-1 group-hover:text-[#7A3316] transition-colors">
             {product.name}
           </h4>
           {product.description && (
@@ -135,7 +135,7 @@ export default function PopularCard({ product, onSelect, isKitchenOpen = true })
         </div>
 
         <div className="mt-2.5 flex items-center justify-between gap-2 pt-2 border-t border-[#EFE4D6]">
-          <span className="font-sora font-extrabold text-xs sm:text-sm text-[#7A3316]">
+          <span className="font-sora font-extrabold text-xs text-[#7A3316]">
             {formatMoney(product.price, tenant.currency)}
           </span>
 

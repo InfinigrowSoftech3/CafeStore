@@ -75,7 +75,7 @@ export default function TrackOrderPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FBF6EF] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-[100dvh] bg-[#FBF6EF] flex flex-col items-center justify-center p-6 text-center">
         <div className="w-12 h-12 border-2 border-[#7A3316] border-t-transparent animate-spin mb-3" />
         <p className="font-display text-lg font-bold text-[#7A3316]">Connecting to kitchen stream...</p>
       </div>
@@ -84,7 +84,7 @@ export default function TrackOrderPage() {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-[#FBF6EF] flex items-center justify-center flex-col gap-4 p-6 text-center max-w-md mx-auto">
+      <div className="min-h-[100dvh] bg-[#FBF6EF] flex items-center justify-center flex-col gap-4 p-6 text-center max-w-md mx-auto">
         <div className="w-20 h-20 rounded-2xl border border-[#EFE4D6] bg-[#FBF6EF] flex items-center justify-center text-4xl mb-2">
           ❓
         </div>
@@ -100,7 +100,7 @@ export default function TrackOrderPage() {
   const currentIdx = STATUS_STEPS.indexOf(order.orderStatus);
 
   return (
-    <div className="min-h-screen bg-[#FBF6EF] flex flex-col pb-16">
+    <div className="min-h-[100dvh] bg-[#FBF6EF] flex flex-col pb-16">
       {/* Top Header */}
       <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b border-[#EFE4D6] bg-[#FFFDF9] shadow-2xs">
         <div className="flex items-center gap-3">
@@ -135,7 +135,7 @@ export default function TrackOrderPage() {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-xl w-full p-4 sm:p-6 space-y-4">
+      <main className="mx-auto max-w-xl w-full p-4 space-y-4">
         {/* Current State Hero Card */}
         <div className="card p-6 text-center bg-[#FFFDF9] border border-[#EFE4D6] rounded-2xl shadow-2xs">
           <span className="text-5xl" role="img" aria-label="Status icon">
@@ -144,7 +144,7 @@ export default function TrackOrderPage() {
           <h2 className="font-display text-2xl font-bold text-[#7A3316] mt-3">
             {STATUS_LABELS[order.orderStatus]}
           </h2>
-          <p className="text-stone-600 text-xs sm:text-sm mt-1 max-w-sm mx-auto">
+          <p className="text-stone-600 text-xs mt-1 max-w-sm mx-auto">
             {STATUS_DESCS[order.orderStatus] || 'Your order is progressing smoothly.'}
           </p>
 

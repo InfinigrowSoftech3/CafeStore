@@ -97,7 +97,7 @@ export default function QuickCartPopup() {
           aria-label="Quick Cart Notification Popup"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="fixed bottom-20 right-4 z-50 w-[calc(100vw-2rem)] max-w-sm sm:bottom-6 sm:right-6 sm:w-96 pointer-events-auto"
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-[448px] pointer-events-auto"
         >
           <motion.div
             initial={{ opacity: 0, y: 35, scale: 0.94 }}
@@ -115,7 +115,7 @@ export default function QuickCartPopup() {
             </div>
 
             {/* Popup Header */}
-            <div className="flex items-center justify-between border-b border-[#EFE4D6] bg-white px-4 py-3 sm:px-5">
+            <div className="flex items-center justify-between border-b border-[#EFE4D6] bg-white px-4 py-3">
               <div className="flex items-center gap-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F3E9DC] border border-amber-300 text-[#7A3316] shadow-2xs">
                   <CheckCircle2 size={15} />
@@ -135,7 +135,7 @@ export default function QuickCartPopup() {
                 type="button"
                 onClick={closeQuickCart}
                 aria-label="Dismiss quick cart popup"
-                className="flex h-7 w-7 items-center justify-center rounded-full border border-[#EFE4D6] text-stone-400 transition hover:bg-[#F3E9DC] hover:text-[#2B1810] active:scale-90"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-[#EFE4D6] text-stone-400 transition hover:bg-[#F3E9DC] hover:text-[#2B1810] active:scale-90"
               >
                 <X size={15} />
               </button>
@@ -143,7 +143,7 @@ export default function QuickCartPopup() {
 
             {/* Recent Item Highlight Card */}
             {recentItem && (
-              <div className="p-4 sm:p-5">
+              <div className="p-4">
                 <div className="flex gap-3.5">
                   <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl border border-[#EFE4D6] bg-[#F3E9DC]">
                     <img

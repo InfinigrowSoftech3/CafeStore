@@ -120,8 +120,8 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBF6EF] pb-20">
-      <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-[#EFE4D6] bg-[#FFFDF9]/95 px-4 py-3 backdrop-blur sm:px-6">
+    <div className="min-h-[100dvh] bg-[#FBF6EF] pb-20">
+      <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-[#EFE4D6] bg-[#FFFDF9]/95 px-4 py-3 backdrop-blur">
         <Link
           to="/menu"
           className="flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-[#EFE4D6] text-stone-700 hover:bg-[#FBF6EF] transition-colors"
@@ -146,7 +146,7 @@ export default function OrdersPage() {
         </button>
       </header>
 
-      <main className="mx-auto max-w-2xl space-y-4 p-4 pb-10 sm:p-6">
+      <main className="mx-auto max-w-2xl space-y-4 p-4 pb-10">
         <div className="flex items-center justify-between rounded-2xl border border-amber-300 bg-amber-50/60 p-4 text-[#2B1810]">
           <div className="flex items-center gap-3">
             <Clock3 size={20} className="text-[#2B1810]" />

@@ -1,154 +1,69 @@
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, ShoppingBag, ScanLine, Coffee, UtensilsCrossed, Sparkles, Image, Phone, Clock } from 'lucide-react';
+import { ScanLine, Coffee } from 'lucide-react';
 import { useTenant } from '../../context/TenantContext';
-import useCartStore, { cartItemCount } from '../../context/cartStore';
-
-const NAV_LINKS = [
-  { to: '/menu', label: 'Menu', icon: UtensilsCrossed },
-  { to: '/about', label: 'About', icon: Coffee },
-  { to: '/offers', label: 'Offers', icon: Sparkles },
-  { to: '/gallery', label: 'Gallery', icon: Image },
-  { to: '/contact', label: 'Contact', icon: Phone },
-  { to: '/orders', label: 'Orders', icon: Clock },
-];
+import useCartStore from '../../context/cartStore';
 
 export default function Navbar() {
   const tenant = useTenant();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const currentSearch = searchParams.toString() ? `?${searchParams.toString()}` : '';
+  const { tableNumber, openScanner } = useCartStore();
 
-  // Keep one shared navbar across the storefront. Only focused checkout flows
-  // and the immersive About story hide it in favour of their own dedicated UI.
+  // Focused checkout flows and the immersive About story use their own header.
   if (['/cart', '/checkout', '/about'].includes(location.pathname)) {
     return null;
   }
 
-  const { tableNumber, openScanner, openNavDrawer } = useCartStore();
-  const itemCount = useCartStore(cartItemCount);
+  const subtitle = tenant.tagline || `Welcome to ${tenant.name || 'our café'}`;
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#FFFDF9]/95 backdrop-blur-xl border-b border-[#EFE4D6] shadow-[0_2px_12px_-2px_rgba(15,61,46,0.04)] transition-all duration-200">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-3.5 py-2.5 sm:px-6 sm:py-3 lg:px-8">
-        {/* Brand Logo & Name */}
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-          <Link
-            to={`/menu${currentSearch}`}
-            aria-label={`${tenant.name || 'Café'} - Homepage`}
-            className="group flex items-center gap-2.5 sm:gap-3 rounded-xl transition-transform active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7A3316] min-w-0"
-          >
-            {tenant.logoUrl ? (
-              <img
-                src={tenant.logoUrl}
-                alt={`${tenant.name || 'Café'} Logo`}
-                className="h-9 w-auto max-w-[130px] sm:max-w-[160px] object-contain transition-transform group-hover:scale-102 flex-shrink-0"
-                width={150}
-                height={36}
-              />
-            ) : (
-              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-2xl bg-[#7A3316] text-[#FFFDF9] shadow-xs flex-shrink-0">
-                <Coffee size={20} className="stroke-[2.2]" />
-              </div>
-            )}
-            <div className="flex flex-col min-w-0">
-              <span className="font-display text-base sm:text-lg font-bold tracking-tight leading-tight text-[#2B1810] group-hover:text-[#7A3316] transition-colors truncate">
-                {tenant.name || 'Café'}
-              </span>
-              <span className="text-[10px] uppercase tracking-wider text-stone-500 font-bold leading-none truncate">
-                {tenant.tagline || 'Artisanal Food & Coffee'}
-              </span>
-            </div>
-          </Link>
-        </div>
-
-        {/* Desktop Navigation */}
-        <nav aria-label="Main Navigation" className="hidden lg:flex items-center gap-1 xl:gap-1.5">
-          {NAV_LINKS.map((link) => {
-            const isActive = location.pathname === link.to;
-            return (
-              <Link
-                key={link.to}
-                to={`${link.to}${currentSearch}`}
-                onClick={() => {
-                  if (link.to === '/menu' && location.pathname === '/menu') {
-                    window.dispatchEvent(new CustomEvent('nav:home'));
-                  }
-                }}
-                className={`relative px-4 py-2 text-xs font-bold tracking-wide rounded-full transition-all duration-200 ${
-                  isActive
-                    ? 'text-[#7A3316] bg-[#F3E9DC] border border-[#EFE4D6] shadow-2xs font-bold'
-                    : 'text-[#7B6B5F] hover:text-[#2B1810] hover:bg-[#F3E9DC]/60 font-medium'
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Quick Actions (Table status, Cart button, Mobile drawer toggle) */}
-        <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
-          {/* Table indicator or scan button */}
-          {tableNumber ? (
-            <button
-              type="button"
-              onClick={openScanner}
-              title="Tap to change table"
-              className="inline-flex min-h-[38px] items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border border-emerald-300 bg-emerald-50 text-emerald-950 hover:bg-emerald-100 transition-all active:scale-95 shadow-2xs"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              <span className="tracking-wide">Table {String(tableNumber).padStart(2, '0')}</span>
-            </button>
+    <header className="sticky top-0 z-40 w-full border-b border-[#EFE4D6] bg-[#FFFDF9]/95 shadow-[0_2px_12px_-2px_rgba(15,61,46,0.04)] backdrop-blur-xl">
+      <div className="flex w-full items-center justify-between gap-3 px-4 py-2.5">
+        <Link
+          to={`/menu${currentSearch}`}
+          aria-label={`${tenant.name || 'Café'} - Homepage`}
+          className="group flex min-h-[44px] min-w-0 items-center gap-2.5 rounded-xl transition-transform active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7A3316]"
+        >
+          {tenant.logoUrl ? (
+            <img
+              src={tenant.logoUrl}
+              alt={`${tenant.name || 'Café'} Logo`}
+              className="h-10 w-auto max-w-[130px] flex-shrink-0 object-contain transition-transform group-hover:scale-102"
+              width={150}
+              height={40}
+            />
           ) : (
-            <button
-              type="button"
-              onClick={openScanner}
-              aria-label="Scan Table QR Code"
-              className="min-h-[38px] inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-bold bg-[#7A3316] text-[#FFFDF9] hover:bg-[#5E2610] transition-all active:scale-95 shadow-2xs"
-            >
-              <ScanLine size={15} className="text-white" />
-              <span className="hidden sm:inline">Scan Table</span>
-            </button>
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-[#7A3316] text-[#FFFDF9] shadow-xs">
+              <Coffee size={20} className="stroke-[2.2]" />
+            </div>
           )}
+          <div className="flex min-w-0 flex-col">
+            <span className="truncate font-display text-base font-bold leading-tight tracking-tight text-[#2B1810] transition-colors group-hover:text-[#7A3316]">
+              {tenant.name || 'Café'}
+            </span>
+            <span className="truncate text-[10px] font-bold uppercase leading-none tracking-wider text-stone-500">
+              {subtitle}
+            </span>
+          </div>
+        </Link>
 
-          {/* Cart Icon Link */}
-          <Link
-            to={`/cart${currentSearch}`}
-            aria-label={`Open Cart (${itemCount} items)`}
-            className="relative min-h-[38px] min-w-[38px] flex items-center justify-center rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#2B1810] hover:bg-[#F3E9DC] shadow-2xs transition-all active:scale-95"
-          >
-            <ShoppingBag size={18} className="stroke-[2.2]" />
-            <AnimatePresence>
-              {itemCount > 0 && (
-                <motion.span
-                  key={itemCount}
-                  initial={{ scale: 0.4, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.4, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                  className="absolute -top-1.5 -right-1.5 flex h-4.5 min-w-[18px] px-1 items-center justify-center rounded-full bg-[#E23B2E] text-[10px] font-bold text-white shadow-sm ring-1 ring-white"
-                >
-                  {itemCount}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </Link>
-
-          {/* Hamburger Button for All Pages */}
-          <button
-            type="button"
-            onClick={openNavDrawer}
-            aria-label="Open navigation menu - show all pages"
-            className="min-h-[38px] min-w-[38px] px-2.5 sm:px-3.5 flex items-center justify-center gap-1.5 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#7A3316] hover:bg-[#FBF6EF] shadow-2xs transition-all active:scale-95"
-          >
-            <Menu size={18} strokeWidth={2.4} />
-            <span className="hidden xl:inline text-xs font-sora font-bold">All Pages</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={openScanner}
+          aria-label={
+            tableNumber
+              ? `Table ${String(tableNumber).padStart(2, '0')} selected - tap to scan again`
+              : 'Scan Table QR Code'
+          }
+          title={tableNumber ? `Table ${String(tableNumber).padStart(2, '0')} - tap to change` : 'Scan Table'}
+          className="relative flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[#7A3316] text-[#FFFDF9] shadow-[0_6px_16px_rgba(122,51,22,0.28)] transition-all hover:bg-[#5E2610] active:scale-95"
+        >
+          <ScanLine size={20} strokeWidth={2.2} />
+          {tableNumber ? (
+            <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[#FFFDF9] bg-emerald-500" />
+          ) : null}
+        </button>
       </div>
     </header>
   );

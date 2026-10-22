@@ -85,7 +85,7 @@ export default function QuickCartDrawer() {
           />
 
           {/* Drawer Panel */}
-          <div className="fixed inset-y-0 right-0 flex max-w-full pl-0 sm:pl-10">
+          <div className="fixed inset-y-0 right-0 flex max-w-full pl-0">
             <motion.aside
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
@@ -95,14 +95,14 @@ export default function QuickCartDrawer() {
               aria-label="Quick View Cart"
             >
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-[#EFE4D6] bg-[#FFFDF9] px-5 py-4 sm:px-6">
+              <div className="flex items-center justify-between border-b border-[#EFE4D6] bg-[#FFFDF9] px-5 py-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-300 bg-[#F3E9DC] text-[#7A3316]">
                     <ShoppingBag size={20} />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="font-display text-xl font-bold text-[#2B1810] sm:text-2xl">
+                      <h2 className="font-display text-xl font-bold text-[#2B1810]">
                         Your Cart
                       </h2>
                       {itemCount > 0 && (
@@ -140,7 +140,7 @@ export default function QuickCartDrawer() {
               )}
 
               {/* Body / Items List */}
-              <div className="flex-1 overflow-y-auto px-5 py-4 sm:px-6">
+              <div className="flex-1 overflow-y-auto px-5 py-4">
                 {items.length === 0 ? (
                   <div className="flex h-full flex-col items-center justify-center py-12 text-center">
                     <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-[#EFE4D6] bg-[#FBF6EF] text-stone-400">
@@ -286,7 +286,7 @@ export default function QuickCartDrawer() {
 
               {/* Footer / Checkout Actions */}
               {items.length > 0 && (
-                <div className="border-t border-[#EFE4D6] bg-[#FFFDF9] p-5 sm:p-6 shadow-sm">
+                <div className="border-t border-[#EFE4D6] bg-[#FFFDF9] p-5 shadow-sm">
                   {/* Bill breakdown */}
                   <div className="space-y-1.5 text-xs">
                     <div className="flex justify-between text-stone-600">

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
@@ -15,7 +15,6 @@ import {
   Tag,
   QrCode,
   Lock,
-  Menu,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
@@ -38,6 +37,9 @@ const loadRazorpay = () => {
 export default function CheckoutPage() {
   const tenant = useTenant();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const currentSearch = searchParams.toString() ? `?${searchParams.toString()}` : '';
+  const extraSearch = currentSearch ? `&${currentSearch.slice(1)}` : '';
   usePageMeta(
     `Checkout — ${tenant.name || 'Café'}`,
     'Complete your table order securely with instant UPI, Cards, or Counter payment.'
@@ -50,7 +52,6 @@ export default function CheckoutPage() {
     clearCart,
     diningSessionToken,
     addRecentOrder,
-    openNavDrawer,
   } = useCartStore();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -102,7 +103,7 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-[#FBF6EF] flex items-center justify-center flex-col gap-4 p-6 text-center">
+      <div className="min-h-[100dvh] bg-[#FBF6EF] flex items-center justify-center flex-col gap-4 p-6 text-center">
         <div className="w-16 h-16 rounded-2xl bg-[#F3E9DC] border border-[#EFE4D6] flex items-center justify-center text-3xl mb-2 shadow-2xs">
           🛒
         </div>
@@ -110,7 +111,7 @@ export default function CheckoutPage() {
         <p className="text-[#7B6B5F] text-sm max-w-sm">
           Please add items to your cart before proceeding to checkout.
         </p>
-        <Link to="/menu" className="btn-primary min-h-[46px] px-8 text-xs font-sora font-bold tracking-wider mt-2 rounded-full shadow-xs">
+        <Link to={`/menu${currentSearch}`} className="btn-primary min-h-[46px] px-8 text-xs font-sora font-bold tracking-wider mt-2 rounded-full shadow-xs">
           Browse Menu
         </Link>
       </div>
@@ -188,7 +189,7 @@ export default function CheckoutPage() {
         });
       }
       clearCart();
-      navigate(`/order-confirm/${res.data.order._id}?token=${accessToken}`);
+      navigate(`/order-confirm/${res.data.order._id}?token=${accessToken}${extraSearch}`);
     } catch (e) {
       setError(e.message || 'Failed to place order. Please try again.');
     } finally {
@@ -308,7 +309,7 @@ export default function CheckoutPage() {
           clearCart();
           sessionStorage.removeItem('brewhaus_checkout_idempotency');
           toast.success('Payment submitted. We are confirming it with the payment provider.');
-          navigate(`/order-confirm/${order._id}?token=${accessToken}`);
+          navigate(`/order-confirm/${order._id}?token=${accessToken}${extraSearch}`);
         },
       });
 
@@ -331,19 +332,19 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF6EF] flex flex-col">
+    <div className="min-h-[100dvh] bg-[#FBF6EF] flex flex-col">
       {/* Top Header */}
       <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3.5 border-b border-[#EFE4D6] bg-[#FFFDF9]/95 backdrop-blur-md shadow-2xs">
         <div className="flex items-center gap-3">
           <Link
-            to="/cart"
+            to={`/cart${currentSearch}`}
             aria-label="Back to Cart"
-            className="min-h-[38px] min-w-[38px] rounded-full border border-[#EFE4D6] flex items-center justify-center text-[#2B1810] hover:bg-[#F3E9DC]/40 transition active:scale-95"
+            className="min-h-[44px] min-w-[44px] rounded-full border border-[#EFE4D6] flex items-center justify-center text-[#2B1810] hover:bg-[#F3E9DC]/40 transition active:scale-95"
           >
             <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="font-sora text-lg sm:text-xl font-bold text-[#2B1810] leading-none">
+            <h1 className="font-sora text-lg font-bold text-[#2B1810] leading-none">
               Checkout
             </h1>
             <p className="text-[11px] text-[#7B6B5F] mt-0.5">{tenant.name}</p>
@@ -351,29 +352,18 @@ export default function CheckoutPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden min-[380px]:flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-300">
+          <div className="flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-300">
             <ShieldCheck size={14} className="text-[#16A34A]" />
             <span className="font-semibold">Secure Checkout</span>
           </div>
-
-          {/* Hamburger All Pages Button */}
-          <button
-            type="button"
-            onClick={openNavDrawer}
-            aria-label="Open navigation menu - show all pages"
-            className="min-h-[38px] min-w-[38px] px-2.5 sm:px-3 flex items-center justify-center gap-1.5 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#7A3316] shadow-2xs hover:bg-[#F3E9DC]/40 active:scale-95 transition-all"
-          >
-            <Menu size={18} strokeWidth={2.4} />
-            <span className="hidden sm:inline text-xs font-sora font-bold tracking-wide">All Pages</span>
-          </button>
         </div>
       </header>
 
       {/* Main Checkout Grid (2-Column on Desktop) */}
-      <main className="flex-1 mx-auto max-w-6xl w-full p-4 sm:p-6 lg:p-8 pb-36 lg:pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <main className="flex-1 mx-auto w-full p-4 pb-32">
+        <div className="grid grid-cols-1 gap-4 items-start">
           {/* Left Column: Table Details + Customer Details + Payment Method */}
-          <div className="lg:col-span-7 space-y-4">
+          <div className="space-y-4">
             {/* Table Badge Card */}
             <div className="p-4 bg-[#FFFDF9] border border-[#EFE4D6] flex items-center justify-between gap-3 shadow-2xs rounded-2xl">
               <div className="flex items-center gap-3">
@@ -394,7 +384,7 @@ export default function CheckoutPage() {
                   <span>Verified</span>
                 </div>
               ) : (
-                <Link to="/menu" className="text-xs font-bold text-[#7A3316] underline">
+                <Link to={`/menu${currentSearch}`} className="text-xs font-bold text-[#7A3316] underline">
                   Scan Table QR
                 </Link>
               )}
@@ -496,7 +486,7 @@ export default function CheckoutPage() {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 {/* Razorpay Option */}
                 <button
                   type="button"
@@ -569,14 +559,14 @@ export default function CheckoutPage() {
                 className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-2xl p-3.5 shadow-2xs"
               >
                 <AlertCircle size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-red-800 text-xs sm:text-sm font-medium">{error}</p>
+                <p className="text-red-800 text-xs font-medium">{error}</p>
               </motion.div>
             )}
           </div>
 
           {/* Right Column: Order Summary & Coupon Code & Pay Button */}
-          <div className="lg:col-span-5">
-            <div className="p-5 sm:p-6 bg-[#FFFDF9] border border-[#EFE4D6] space-y-5 shadow-2xs rounded-2xl sticky top-24">
+          <div>
+            <div className="p-5 bg-[#FFFDF9] border border-[#EFE4D6] space-y-5 shadow-2xs rounded-2xl">
               <h2 className="font-sora text-lg font-bold text-[#2B1810] border-b border-[#EFE4D6] pb-3">
                 Order Summary ({items.length} items)
               </h2>
@@ -667,32 +657,13 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Submit Button (Desktop) */}
-              <motion.button
-                whileTap={{ scale: 0.985 }}
-                onClick={handleSubmit}
-                disabled={loading}
-                className="hidden lg:flex w-full !bg-[#7A3316] hover:!bg-[#5E2610] !text-[#FFFDF9] items-center justify-center gap-2 py-3.5 text-sm font-sora font-bold shadow-2xs rounded-full transition active:scale-98 disabled:opacity-50"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin text-white" />
-                    <span className="text-white">{paymentMethod === 'razorpay' ? 'Opening Payment...' : 'Submitting Order...'}</span>
-                  </>
-                ) : (
-                  <>
-                    {paymentMethod === 'razorpay' ? <CreditCard size={18} className="text-white" /> : <Banknote size={18} className="text-white" />}
-                    <span className="text-white">{paymentMethod === 'razorpay' ? `Pay ${formatMoney(total, tenant.currency)}` : `Place Order · ${formatMoney(total, tenant.currency)}`}</span>
-                  </>
-                )}
-              </motion.button>
             </div>
           </div>
         </div>
       </main>
 
       {/* Floating Bottom Pay Bar for Mobile */}
-      <div className="lg:hidden bottom-safe fixed bottom-0 left-0 right-0 p-3.5 bg-[#FFFDF9] border-t border-[#EFE4D6] shadow-xl z-20">
+      <div className="bottom-safe fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] p-3.5 bg-[#FFFDF9] border-t border-[#EFE4D6] shadow-xl z-20">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-[11px] text-[#7B6B5F] uppercase tracking-wider font-semibold">Amount to Pay</p>

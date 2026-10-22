@@ -102,7 +102,7 @@ export default function ProductModal({ product, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 bg-[#2B1810]/60 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 bg-[#2B1810]/60 backdrop-blur-md z-50 flex items-end justify-center p-0"
     >
       <motion.div
         initial={{ y: '100%', opacity: 0 }}
@@ -110,15 +110,15 @@ export default function ProductModal({ product, onClose }) {
         exit={{ y: '100%', opacity: 0 }}
         transition={{ type: 'spring', damping: 28, stiffness: 360 }}
         onClick={e => e.stopPropagation()}
-        className="bg-[#FFFDF9] w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl overflow-hidden max-h-[92vh] sm:max-h-[88vh] flex flex-col shadow-2xl border border-[#EFE4D6]"
+        className="bg-[#FFFDF9] w-full max-w-[480px] mx-auto rounded-t-3xl overflow-hidden max-h-[92dvh] flex flex-col shadow-2xl border border-[#EFE4D6]"
       >
-        {/* Mobile Swipe / Drag Handle */}
-        <div className="sm:hidden flex items-center justify-center pt-2.5 pb-1 bg-[#FFFDF9]">
+        {/* Swipe / Drag Handle */}
+        <div className="flex items-center justify-center pt-2.5 pb-1 bg-[#FFFDF9]">
           <div className="w-10 h-1 rounded-full bg-stone-300" />
         </div>
 
         {/* Hero Image Section */}
-        <div className="relative h-60 sm:h-64 flex-shrink-0 bg-[#F3E9DC] overflow-hidden">
+        <div className="relative h-60 flex-shrink-0 bg-[#F3E9DC] overflow-hidden">
           <img
             src={product.image || PLACEHOLDER}
             alt={product.name}
@@ -133,7 +133,7 @@ export default function ProductModal({ product, onClose }) {
             type="button"
             onClick={onClose}
             aria-label="Close product modal"
-            className="absolute top-3.5 right-3.5 min-h-[36px] min-w-[36px] w-9 h-9 bg-[#FFFDF9] hover:bg-[#F3E9DC] text-[#2B1810] rounded-full flex items-center justify-center shadow-sm border border-[#EFE4D6] transition-all active:scale-95 focus:outline-none focus:ring-1 focus:ring-[#7A3316]"
+            className="absolute top-3.5 right-3.5 h-11 w-11 bg-[#FFFDF9] hover:bg-[#F3E9DC] text-[#2B1810] rounded-full flex items-center justify-center shadow-sm border border-[#EFE4D6] transition-all active:scale-95 focus:outline-none focus:ring-1 focus:ring-[#7A3316]"
           >
             <X size={18} strokeWidth={2.4} aria-hidden="true" />
           </button>
@@ -158,7 +158,7 @@ export default function ProductModal({ product, onClose }) {
           {/* Bottom title & price overlay */}
           <div className="absolute bottom-3.5 left-4 right-4 flex items-end justify-between gap-3">
             <div>
-              <h2 className="font-sora text-xl sm:text-2xl font-extrabold text-white drop-shadow-sm leading-tight tracking-tight">
+              <h2 className="font-sora text-xl font-extrabold text-white drop-shadow-sm leading-tight tracking-tight">
                 {product.name}
               </h2>
               {product.prepTime && (
@@ -168,7 +168,7 @@ export default function ProductModal({ product, onClose }) {
               )}
             </div>
             <div className="text-right shrink-0">
-              <span className="font-sora text-xl sm:text-2xl font-extrabold text-white drop-shadow-sm">
+              <span className="font-sora text-xl font-extrabold text-white drop-shadow-sm">
                 {formatMoney(basePrice, tenant.currency)}
               </span>
             </div>
@@ -176,7 +176,7 @@ export default function ProductModal({ product, onClose }) {
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#FFFDF9] no-scrollbar">
+        <div className="p-5 flex-1 overflow-y-auto space-y-5 bg-[#FFFDF9] no-scrollbar">
           {/* Description */}
           {product.description && (
             <div className="rounded-2xl bg-[#FBF6EF] p-4 border border-[#EFE4D6] shadow-2xs">
@@ -285,7 +285,7 @@ export default function ProductModal({ product, onClose }) {
                         }`}>
                           {selected && <Check size={12} strokeWidth={3} />}
                         </div>
-                        <span className="font-sora font-bold text-xs sm:text-sm">{addon.name}</span>
+                        <span className="font-sora font-bold text-xs">{addon.name}</span>
                       </div>
                       <span className="text-xs font-sora font-extrabold text-[#2B1810]">
                         +{formatMoney(addon.price, tenant.currency)}
@@ -313,7 +313,7 @@ export default function ProductModal({ product, onClose }) {
                   key={preset}
                   type="button"
                   onClick={() => handlePresetInstruction(preset)}
-                  className="rounded-full border border-[#EFE4D6] bg-[#FBF6EF] hover:bg-[#F3E9DC] hover:border-stone-400 px-3.5 py-1.5 text-xs font-sora font-bold text-[#2B1810] transition active:scale-95 shadow-2xs"
+                  className="min-h-[44px] rounded-full border border-[#EFE4D6] bg-[#FBF6EF] hover:bg-[#F3E9DC] hover:border-stone-400 px-3.5 py-1.5 text-xs font-sora font-bold text-[#2B1810] transition active:scale-95 shadow-2xs"
                 >
                   + {preset}
                 </button>
@@ -332,7 +332,7 @@ export default function ProductModal({ product, onClose }) {
         </div>
 
         {/* Modal Sticky Footer Action */}
-        <div className="p-4 sm:p-5 border-t border-[#EFE4D6] bg-[#FFFDF9] flex items-center gap-3 flex-shrink-0">
+        <div className="p-4 border-t border-[#EFE4D6] bg-[#FFFDF9] flex items-center gap-3 flex-shrink-0">
           {/* Quantity Stepper */}
           <div className="flex items-center gap-1 border border-[#EFE4D6] bg-[#FFFDF9] rounded-full p-1 shadow-2xs">
             <button
@@ -340,7 +340,7 @@ export default function ProductModal({ product, onClose }) {
               onClick={() => changeQty(-1)}
               disabled={!isAvailable || quantity <= 1}
               aria-label="Decrease quantity"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FBF6EF] text-[#2B1810] hover:bg-[#F3E9DC] transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 border border-[#EFE4D6]"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FBF6EF] text-[#2B1810] hover:bg-[#F3E9DC] transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 border border-[#EFE4D6]"
             >
               <Minus size={15} strokeWidth={2.5} aria-hidden="true" />
             </button>
@@ -352,7 +352,7 @@ export default function ProductModal({ product, onClose }) {
               onClick={() => changeQty(1)}
               disabled={!isAvailable || quantity >= maxQty}
               aria-label="Increase quantity"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FBF6EF] text-[#2B1810] hover:bg-[#F3E9DC] transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 border border-[#EFE4D6]"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FBF6EF] text-[#2B1810] hover:bg-[#F3E9DC] transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 border border-[#EFE4D6]"
             >
               <Plus size={15} strokeWidth={2.5} aria-hidden="true" />
             </button>

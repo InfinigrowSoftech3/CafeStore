@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
@@ -12,7 +12,6 @@ import {
   UtensilsCrossed,
   ArrowRight,
   ShieldCheck,
-  Menu,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useCartStore, { cartItemCount } from '../../context/cartStore';
@@ -26,6 +25,8 @@ const FALLBACK_IMAGE = '/images/coffee-placeholder.svg';
 export default function CartPage() {
   const tenant = useTenant();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const currentSearch = searchParams.toString() ? `?${searchParams.toString()}` : '';
   const {
     items,
     tableNumber,
@@ -35,7 +36,6 @@ export default function CartPage() {
     isScannerOpen,
     openScanner,
     closeScanner,
-    openNavDrawer,
   } = useCartStore();
   const itemCount = useCartStore(cartItemCount);
 
@@ -54,18 +54,18 @@ export default function CartPage() {
       openScanner();
       return;
     }
-    navigate('/checkout');
+    navigate(`/checkout${currentSearch}`);
   };
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-[#FBF6EF] flex flex-col">
+      <div className="min-h-[100dvh] bg-[#FBF6EF] flex flex-col">
         {/* Simple Top Bar */}
         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#EFE4D6] bg-[#FFFDF9] shadow-2xs">
           <button
             type="button"
-            onClick={() => navigate('/menu')}
-            className="min-h-[38px] min-w-[38px] rounded-full border border-[#EFE4D6] flex items-center justify-center text-[#2B1810] hover:bg-[#F3E9DC]/40 transition active:scale-95"
+            onClick={() => navigate(`/menu${currentSearch}`)}
+            className="min-h-[44px] min-w-[44px] rounded-full border border-[#EFE4D6] flex items-center justify-center text-[#2B1810] hover:bg-[#F3E9DC]/40 transition active:scale-95"
             aria-label="Back to Menu"
           >
             <ArrowLeft size={18} />
@@ -83,7 +83,7 @@ export default function CartPage() {
             Discover our freshly brewed specialty coffees, artisanal bites, and gourmet food.
           </p>
           <Link
-            to="/menu"
+            to={`/menu${currentSearch}`}
             className="mt-6 btn-primary min-h-[46px] px-8 text-xs font-sora font-bold tracking-wider rounded-full shadow-xs"
           >
             Explore Menu
@@ -94,21 +94,21 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBF6EF] flex flex-col">
+    <div className="min-h-[100dvh] bg-[#FBF6EF] flex flex-col">
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3.5 border-b border-[#EFE4D6] bg-[#FFFDF9]/95 backdrop-blur-md shadow-2xs">
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => navigate('/menu')}
-            className="min-h-[38px] min-w-[38px] rounded-full border border-[#EFE4D6] flex items-center justify-center text-[#2B1810] hover:bg-[#F3E9DC]/40 transition active:scale-95"
+            onClick={() => navigate(`/menu${currentSearch}`)}
+            className="min-h-[44px] min-w-[44px] rounded-full border border-[#EFE4D6] flex items-center justify-center text-[#2B1810] hover:bg-[#F3E9DC]/40 transition active:scale-95"
             aria-label="Back to Menu"
           >
             <ArrowLeft size={18} />
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-sora text-lg sm:text-xl font-bold text-[#2B1810] leading-none">
+              <h1 className="font-sora text-lg font-bold text-[#2B1810] leading-none">
                 Your Order
               </h1>
               <span className="flex h-5 items-center justify-center rounded-full bg-[#7A3316] text-white px-2 text-[11px] font-sora font-bold">
@@ -124,30 +124,20 @@ export default function CartPage() {
             <button
               type="button"
               onClick={clearCart}
-              className="min-h-[36px] px-3.5 py-1 text-xs font-sora font-semibold text-[#7B6B5F] hover:text-red-600 hover:bg-red-50 border border-[#EFE4D6] rounded-full transition"
+              className="min-h-[44px] px-3.5 py-1 text-xs font-sora font-semibold text-[#7B6B5F] hover:text-red-600 hover:bg-red-50 border border-[#EFE4D6] rounded-full transition"
             >
               Clear All
             </button>
           )}
 
-          {/* Hamburger All Pages Button */}
-          <button
-            type="button"
-            onClick={openNavDrawer}
-            aria-label="Open navigation menu - show all pages"
-            className="min-h-[38px] min-w-[38px] px-2.5 sm:px-3 flex items-center justify-center gap-1.5 rounded-full border border-[#EFE4D6] bg-[#FFFDF9] text-[#7A3316] shadow-2xs hover:bg-[#F3E9DC]/40 active:scale-95 transition-all"
-          >
-            <Menu size={18} strokeWidth={2.4} />
-            <span className="hidden sm:inline text-xs font-sora font-bold tracking-wide">All Pages</span>
-          </button>
         </div>
       </header>
 
       {/* Main Content Layout (2-Column on Desktop) */}
-      <main className="flex-1 mx-auto max-w-6xl w-full p-4 sm:p-6 lg:p-8 pb-36 lg:pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <main className="flex-1 mx-auto w-full p-4 pb-32">
+        <div className="grid grid-cols-1 gap-4 items-start">
           {/* Left Column: Table Status & Cart Items */}
-          <div className="lg:col-span-7 space-y-4">
+          <div className="space-y-4">
             {/* Table Identification Card */}
             <div className={`rounded-2xl p-4 border transition-all ${
               tableNumber
@@ -197,7 +187,7 @@ export default function CartPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between px-1 text-xs font-bold uppercase tracking-wider text-[#7B6B5F]">
                 <span>Selected Items ({items.length})</span>
-                <Link to="/menu" className="text-[#2B1810] hover:underline font-semibold transition">
+                <Link to={`/menu${currentSearch}`} className="text-[#2B1810] hover:underline font-semibold transition">
                   + Add more items
                 </Link>
               </div>
@@ -212,7 +202,7 @@ export default function CartPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="p-3.5 sm:p-4 flex gap-3.5 items-center bg-[#FFFDF9] hover:bg-[#F3E9DC]/40/50 transition-colors"
+                      className="p-3.5 flex gap-3.5 items-center bg-[#FFFDF9] hover:bg-[#F3E9DC]/40/50 transition-colors"
                     >
                       {/* Item Thumbnail */}
                       <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-[#F3E9DC] border border-[#EFE4D6]">
@@ -230,7 +220,7 @@ export default function CartPage() {
                       {/* Item Details */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <h2 className="font-sora text-sm sm:text-base font-bold text-[#2B1810] leading-tight truncate">
+                          <h2 className="font-sora text-sm font-bold text-[#2B1810] leading-tight truncate">
                             {item.name}
                           </h2>
                           <button
@@ -300,8 +290,8 @@ export default function CartPage() {
           </div>
 
           {/* Right Column: Order Bill Summary & Checkout Action */}
-          <div className="lg:col-span-5">
-            <div className="p-5 sm:p-6 space-y-5 bg-[#FFFDF9] border border-[#EFE4D6] rounded-2xl shadow-2xs sticky top-24">
+          <div>
+            <div className="p-5 space-y-5 bg-[#FFFDF9] border border-[#EFE4D6] rounded-2xl shadow-2xs">
               <h2 className="font-sora text-lg font-bold text-[#2B1810] border-b border-[#EFE4D6] pb-3">
                 Order Summary
               </h2>
@@ -328,26 +318,13 @@ export default function CartPage() {
                 <span>Orders are prepared fresh by {tenant.name} upon placement.</span>
               </div>
 
-              {/* Checkout Button (Desktop Only — Mobile uses the sticky bottom bar) */}
-              <motion.button
-                type="button"
-                whileTap={{ scale: 0.985 }}
-                onClick={handleProceedCheckout}
-                className="hidden lg:flex w-full min-h-[46px] !bg-[#7A3316] hover:!bg-[#5E2610] !text-[#FFFDF9] items-center justify-between px-6 py-3 text-sm font-sora font-bold rounded-full shadow-2xs transition active:scale-98"
-              >
-                <div className="flex items-center gap-2 text-white">
-                  <ShoppingBag size={18} className="text-white" />
-                  <span className="text-white">Proceed to Checkout</span>
-                </div>
-                <span className="font-sora text-base font-bold text-[#F3E9DC]">{formatMoney(total, tenant.currency)}</span>
-              </motion.button>
             </div>
           </div>
         </div>
       </main>
 
       {/* Floating Bottom Bar for Mobile Viewports (Single Mobile Checkout Button) */}
-      <div className="lg:hidden bottom-safe fixed bottom-0 left-0 right-0 p-3.5 bg-[#FFFDF9] border-t border-[#EFE4D6] shadow-xl z-20">
+      <div className="bottom-safe fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] p-3.5 bg-[#FFFDF9] border-t border-[#EFE4D6] shadow-xl z-20">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-[11px] text-[#7B6B5F] uppercase tracking-wider font-semibold">Total Amount</p>

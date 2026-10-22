@@ -127,7 +127,7 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
             setImgLoaded(true);
           }}
           className={`h-full w-full object-cover transition-transform duration-500 will-change-transform ${
-            isAvailable ? 'md:group-hover:scale-[1.03]' : 'grayscale opacity-50'
+            isAvailable ? '' : 'grayscale opacity-50'
           } ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
         />
 
@@ -191,10 +191,10 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
       </div>
 
       {/* Card Info Section */}
-      <div className="flex flex-1 flex-col justify-between p-3 sm:p-3.5">
+      <div className="flex flex-1 flex-col justify-between p-3">
         <div>
           <div className="flex items-start justify-between gap-1.5">
-            <h3 className="font-display text-sm sm:text-base font-bold text-[#2B1810] leading-snug line-clamp-1 group-hover:text-[#7A3316] transition-colors">
+            <h3 className="font-display text-sm font-bold text-[#2B1810] leading-snug line-clamp-1 group-hover:text-[#7A3316] transition-colors">
               {product.name}
             </h3>
           </div>
@@ -217,7 +217,7 @@ const MenuCard = forwardRef(function MenuCard({ product, onSelect, priority = fa
         <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-[#EFE4D6]">
           <div className="flex flex-col">
             <div className="flex items-baseline gap-1.5">
-              <span className="price-tag text-base sm:text-lg font-bold text-[#7A3316]">
+              <span className="price-tag text-base font-bold text-[#7A3316]">
                 {formatMoney(product.price, tenant.currency)}
               </span>
               {product.originalPrice && product.originalPrice > product.price && (

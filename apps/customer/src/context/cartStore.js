@@ -55,11 +55,6 @@ const useCartStore = create(
       closeQuickCart: () => set({ isQuickCartOpen: false }),
       toggleQuickCart: () => set((state) => ({ isQuickCartOpen: !state.isQuickCartOpen })),
 
-      isNavDrawerOpen: false,
-      openNavDrawer: () => set({ isNavDrawerOpen: true }),
-      closeNavDrawer: () => set({ isNavDrawerOpen: false }),
-      toggleNavDrawer: () => set((state) => ({ isNavDrawerOpen: !state.isNavDrawerOpen })),
-
       addItem: (product, quantity = 1, addons = [], variant = null, specialInstructions = '') => {
         const { items, tableNumber } = get();
 

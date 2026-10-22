@@ -92,7 +92,7 @@ export default function CustomerProductCard({
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onSelect && onSelect(product)}
-      className="group relative flex flex-col justify-between bg-[#FFFDF9] border border-[#EFE4D6] rounded-[20px] p-2.5 sm:p-3 shadow-[0_4px_16px_rgba(90,50,20,0.06)] hover:shadow-[0_8px_24px_rgba(90,50,20,0.1)] transition-all cursor-pointer select-none text-left"
+      className="group relative flex flex-col justify-between bg-[#FFFDF9] border border-[#EFE4D6] rounded-[20px] p-2.5 shadow-[0_4px_16px_rgba(90,50,20,0.06)] hover:shadow-[0_8px_24px_rgba(90,50,20,0.1)] transition-all cursor-pointer select-none text-left"
     >
       {/* Top Media Container */}
       <div className="relative w-full aspect-square rounded-[16px] overflow-hidden bg-[#F6EBD5]/40 shrink-0">
@@ -138,7 +138,7 @@ export default function CustomerProductCard({
       {/* Info Body */}
       <div className="flex flex-col flex-1 justify-between pt-2.5">
         <div>
-          <h3 className="font-bold text-sm sm:text-base text-[#2B1810] leading-snug line-clamp-1 group-hover:text-[#7A3316] transition-colors">
+          <h3 className="font-bold text-sm text-[#2B1810] leading-snug line-clamp-1 group-hover:text-[#7A3316] transition-colors">
             {product.name}
           </h3>
           <p className="text-xs text-[#7B6B5F] line-clamp-2 mt-0.5 leading-relaxed min-h-[32px]">
@@ -148,7 +148,7 @@ export default function CustomerProductCard({
 
         {/* Price & Action Row */}
         <div className="flex items-center justify-between mt-2 pt-1 border-t border-[#EFE4D6]/60">
-          <span className="font-display font-bold text-sm sm:text-base text-[#2B1810]">
+          <span className="font-display font-bold text-sm text-[#2B1810]">
             {formatMoney(product.price, tenant.currency)}
           </span>
 

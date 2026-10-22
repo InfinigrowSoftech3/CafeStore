@@ -20,8 +20,8 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-[#EFE4D6] bg-white text-stone-600" aria-label="Site Footer">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto max-w-7xl px-4 py-12">
+        <div className="grid gap-10">
           {/* Brand Info */}
           <div className="space-y-4">
             <Link
@@ -156,7 +156,7 @@ export default function Footer() {
         </div>
 
         {/* Legal & Copyright */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#EFE4D6] pt-8 sm:flex-row text-xs text-stone-400">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#EFE4D6] pt-8 text-xs text-stone-400">
           <p>© {currentYear} {tenant.name}. All rights reserved.</p>
           <nav aria-label="Legal documents" className="flex flex-wrap gap-5">
             <Link to="/privacy" className="hover:text-[#7A3316] transition-colors">

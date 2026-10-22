@@ -162,7 +162,7 @@ export default function QrScannerModal({ onClose, onTableFound }) {
           </button>
         </div>
 
-        <div className="p-5 sm:p-6 bg-white">
+        <div className="p-5 bg-white">
           {/* Different-table confirmation dialog */}
           {pendingTable && (
             <div className="mb-4 rounded-2xl border border-amber-300 bg-amber-50/60 p-4 shadow-2xs">

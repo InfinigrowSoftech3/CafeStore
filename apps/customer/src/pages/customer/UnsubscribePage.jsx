@@ -47,8 +47,8 @@ export default function UnsubscribePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF6EF] text-[#2B1810]">
-      <main className="mx-auto max-w-xl px-4 py-12 sm:px-6">
+    <div className="min-h-[100dvh] bg-[#FBF6EF] text-[#2B1810]">
+      <main className="mx-auto max-w-xl px-4 py-12">
         <div className="mb-6 flex items-center justify-between">
           <Link
             to="/menu"
@@ -66,7 +66,7 @@ export default function UnsubscribePage() {
           </Link>
         </div>
 
-        <div className="rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] p-6 shadow-xs sm:p-8">
+        <div className="rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] p-6 shadow-xs">
           {unsubscribed ? (
             <div role="status" aria-live="polite" className="text-center py-6 space-y-4">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-emerald-300 bg-emerald-50 text-emerald-600">

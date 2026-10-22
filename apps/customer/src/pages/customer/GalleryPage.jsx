@@ -104,8 +104,8 @@ export default function GalleryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF6EF] text-[#2B1810]">
-      <div className="border-b border-[#EFE4D6] bg-[#FFFDF9]/95 backdrop-blur-md px-4 py-3 sm:px-6">
+    <div className="min-h-[100dvh] bg-[#FBF6EF] text-[#2B1810]">
+      <div className="border-b border-[#EFE4D6] bg-[#FFFDF9]/95 backdrop-blur-md px-4 py-3">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <Link
             to="/menu"
@@ -120,18 +120,18 @@ export default function GalleryPage() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-        <section className="grid items-end gap-8 lg:grid-cols-[1fr_0.8fr]">
+      <main className="mx-auto max-w-6xl px-4 py-10">
+        <section className="grid items-end gap-8">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#7A3316]">{tenant.name} community</p>
-            <h1 className="mt-3 max-w-2xl font-display text-4xl font-bold leading-[1.05] text-[#2B1810] sm:text-5xl lg:text-6xl">
+            <h1 className="mt-3 max-w-2xl font-display text-4xl font-bold leading-[1.05] text-[#2B1810]">
               Good food looks better together.
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-stone-600">
               See the dishes, beverages, and warm moments our guests have shared. Add yours to the wall.
             </p>
           </div>
-          <div className="rounded-3xl bg-[#7A3316] p-6 text-white shadow-2xs sm:p-8">
+          <div className="rounded-3xl bg-[#7A3316] p-6 text-white shadow-2xs">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F3E9DC] text-[#7A3316]">
                 <Camera size={21} />
@@ -144,7 +144,7 @@ export default function GalleryPage() {
           </div>
         </section>
 
-        <section className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="mt-12 grid gap-6">
           {loading ? (
             <div className="col-span-full flex min-h-56 items-center justify-center text-stone-400">
               <Loader2 size={28} className="animate-spin text-[#2B1810]" />
@@ -182,7 +182,7 @@ export default function GalleryPage() {
           )}
         </section>
 
-        <section className="mt-14 grid gap-8 rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] p-6 shadow-2xs sm:p-8 lg:grid-cols-[0.85fr_1.15fr] lg:p-10">
+        <section className="mt-14 grid gap-8 rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] p-6 shadow-2xs">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#7A3316]">Leave a little love</p>
             <h2 className="mt-3 font-display text-4xl font-bold text-[#2B1810]">Add your moment</h2>
@@ -192,7 +192,7 @@ export default function GalleryPage() {
           </div>
 
           <form onSubmit={submitReview} className="space-y-5">
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-5">
               <label className="text-sm font-semibold text-[#2B1810]">
                 Your name *
                 <input
@@ -253,7 +253,7 @@ export default function GalleryPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="btn-primary inline-flex min-h-[44px] w-full items-center justify-center gap-2 sm:w-auto px-7 rounded-full shadow-2xs"
+              className="btn-primary inline-flex min-h-[44px] w-full items-center justify-center gap-2 px-7 rounded-full shadow-2xs"
             >
               {submitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
               <span>{submitting ? 'Publishing...' : 'Publish review'}</span>

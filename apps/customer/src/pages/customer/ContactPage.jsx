@@ -282,7 +282,7 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="contact-page min-h-screen bg-[#FBF6EF] text-[#2B1810]">
+    <main className="contact-page min-h-[100dvh] bg-[#FBF6EF] text-[#2B1810]">
       {/* ========================================================================= */}
       {/* 1. HERO SECTION WITH CINEMATIC VIDEO & 3D FLOATING CUP */}
       {/* ========================================================================= */}
@@ -292,7 +292,7 @@ export default function ContactPage() {
           event.currentTarget.style.setProperty('--contact-x', 0);
           event.currentTarget.style.setProperty('--contact-y', 0);
         }}
-        className="contact-hero relative isolate min-h-[720px] overflow-hidden bg-[#7A3316] text-white sm:min-h-[780px]"
+        className="contact-hero relative isolate min-h-[720px] overflow-hidden bg-[#7A3316] text-white"
       >
         {/* Background Backdrop */}
         {tenant.slug === 'brewhaus' ? (
@@ -333,7 +333,7 @@ export default function ContactPage() {
         <div className="absolute inset-0 z-10 bg-[linear-gradient(0deg,rgba(15,61,46,0.88)_0%,transparent_50%)]" />
 
         {/* Hero Content */}
-        <div className="relative z-20 mx-auto flex min-h-[720px] max-w-7xl items-center px-4 pb-20 pt-28 sm:min-h-[780px] sm:px-6 lg:px-8">
+        <div className="relative z-20 mx-auto flex min-h-[720px] max-w-7xl items-center px-4 pb-20 pt-28">
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
@@ -343,13 +343,13 @@ export default function ContactPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[#F3E9DC]">
               Get in touch
             </p>
-            <p className="mt-4 font-display text-3xl font-bold tracking-[0.16em] text-white sm:text-4xl">
+            <p className="mt-4 font-display text-3xl font-bold tracking-[0.16em] text-white">
               {tenant.name.toUpperCase()}
             </p>
-            <h1 className="mt-4 max-w-xl font-display text-5xl font-semibold leading-[0.94] text-white sm:text-7xl lg:text-[5.25rem]">
+            <h1 className="mt-4 max-w-xl font-display text-5xl font-semibold leading-[0.94] text-white">
               We’d love to hear from you.
             </h1>
-            <p className="mt-6 max-w-lg text-base leading-7 text-white/80 sm:text-lg">
+            <p className="mt-6 max-w-lg text-base leading-7 text-white/80">
               Whether you’re planning a casual meetup, asking about catering, or just want to say
               hello, our team is ready to welcome and assist you.
             </p>
@@ -376,7 +376,7 @@ export default function ContactPage() {
 
         {/* 3D Floating Ceramic Cup with Steam Effect */}
         <div
-          className="contact-hero-cup pointer-events-none absolute bottom-6 right-6 z-20 hidden w-64 md:block lg:right-[8%] lg:w-72"
+          className="contact-hero-cup pointer-events-none absolute bottom-6 right-6 z-20 hidden w-64"
           aria-hidden="true"
         >
           {/* Subtle Ambient Steam Particles */}
@@ -403,11 +403,11 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* 2. CONTACT INFORMATION EDITORIAL CARDS */}
       {/* ========================================================================= */}
-      <section ref={contactSectionRef} className="scroll-mt-8 px-4 py-20 sm:px-6 sm:py-28 lg:px-8 bg-[#FBF6EF]">
+      <section ref={contactSectionRef} className="scroll-mt-8 px-4 py-20 bg-[#FBF6EF]">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
             <SectionEyebrow>Direct channels</SectionEyebrow>
-            <h2 className="mt-4 font-display text-4xl font-semibold leading-[1] text-[#2B1810] sm:text-5xl lg:text-6xl">
+            <h2 className="mt-4 font-display text-4xl font-semibold leading-[1] text-[#2B1810]">
               Every way to connect.
             </h2>
             <p className="mt-5 text-base leading-7 text-stone-600">
@@ -417,7 +417,7 @@ export default function ContactPage() {
           </div>
 
           {/* 3D Depth Elevation Cards */}
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid gap-6">
             {contactDetails(tenant).map((item, index) => {
               const Icon = item.icon;
               return (
@@ -495,14 +495,14 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* 3. CONTACT FORM & EDITORIAL DETAILS */}
       {/* ========================================================================= */}
-      <section className="border-t border-[#EFE4D6] bg-[#FBF6EF] px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+      <section className="border-t border-[#EFE4D6] bg-[#FBF6EF] px-4 py-20">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
+          <div className="grid gap-12">
             {/* Left Context Column */}
             <motion.div {...reveal} className="flex flex-col justify-between">
               <div>
                 <SectionEyebrow>Write to {tenant.name}</SectionEyebrow>
-                <h2 className="mt-4 font-display text-4xl font-semibold leading-[1] text-[#2B1810] sm:text-5xl lg:text-6xl">
+                <h2 className="mt-4 font-display text-4xl font-semibold leading-[1] text-[#2B1810]">
                   Send us a direct message.
                 </h2>
                 <p className="mt-6 text-base leading-8 text-stone-600">
@@ -552,7 +552,7 @@ export default function ContactPage() {
             {/* Right Contact Form / Success Container */}
             <motion.div
               {...reveal}
-              className="relative overflow-hidden rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] p-7 shadow-2xs sm:p-10 lg:p-12"
+              className="relative overflow-hidden rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] p-7 shadow-2xs"
             >
               <AnimatePresence mode="wait">
                 {!isSuccess ? (
@@ -763,7 +763,7 @@ export default function ContactPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    className="flex flex-col items-center py-8 text-center sm:py-12"
+                    className="flex flex-col items-center py-8 text-center"
                   >
                     <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F3E9DC] text-[#2B1810] border border-[#EFE4D6] shadow-2xs">
                       <CheckCircle2 size={36} className="stroke-[1.6]" />
@@ -806,7 +806,7 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* 4. CINEMATIC CAFÉ ATMOSPHERE SECTION */}
       {/* ========================================================================= */}
-      <section className="relative isolate overflow-hidden bg-[#7A3316] px-4 py-24 text-white sm:px-6 lg:px-8">
+      <section className="relative isolate overflow-hidden bg-[#7A3316] px-4 py-24 text-white">
         {tenant.slug === 'brewhaus' ? (
           <>
             <img
@@ -843,10 +843,10 @@ export default function ContactPage() {
 
         <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
           <SectionEyebrow light>Come Say Hello</SectionEyebrow>
-          <h2 className="mt-4 font-display text-4xl font-semibold leading-[0.98] text-white sm:text-6xl lg:text-7xl">
+          <h2 className="mt-4 font-display text-4xl font-semibold leading-[0.98] text-white">
             The ritual, from the first pour.
           </h2>
-          <p className="mx-auto mt-6 max-w-xl text-base leading-8 text-white/80 sm:text-lg">
+          <p className="mx-auto mt-6 max-w-xl text-base leading-8 text-white/80">
             A calm, warm sanctuary designed for slow mornings, afternoon reading, and evening
             conversations over freshly prepared artisanal food and specialty drinks.
           </p>
@@ -863,14 +863,14 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* 5. LOCATION & MAP SECTION */}
       {/* ========================================================================= */}
-      <section className="bg-[#FAFAF8] px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+      <section className="bg-[#FAFAF8] px-4 py-20">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-2xl text-center">
             <SectionEyebrow>Our Location</SectionEyebrow>
-            <h2 className="mt-4 font-display text-4xl font-semibold text-[#2B1810] sm:text-5xl">
+            <h2 className="mt-4 font-display text-4xl font-semibold text-[#2B1810]">
               Finding {tenant.name}.
             </h2>
-            <p className="mt-4 text-sm leading-relaxed text-stone-600 sm:text-base">
+            <p className="mt-4 text-sm leading-relaxed text-stone-600">
               {tenant.address || 'Find our café at the address shown below.'}
             </p>
           </div>
@@ -880,7 +880,7 @@ export default function ContactPage() {
             className="relative mt-12 overflow-hidden rounded-[2.5rem] border border-[#EFE4D6] bg-[#F3E9DC] shadow-xs"
           >
             {/* Map Frame */}
-            <div className="relative h-[380px] w-full sm:h-[460px]">
+            <div className="relative h-[380px] w-full">
               <iframe
                 title={`${tenant.name} location map`}
                 src={tenant.address ? `https://www.google.com/maps?q=${encodeURIComponent(tenant.address)}&output=embed` : 'about:blank'}
@@ -892,7 +892,7 @@ export default function ContactPage() {
             </div>
 
             {/* Floating Location Overlay Card */}
-            <div className="pointer-events-auto absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-8 sm:right-auto sm:max-w-md">
+            <div className="pointer-events-auto absolute bottom-6 left-6 right-6">
               <div className="rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9]/95 p-6 text-[#2B1810] shadow-xl backdrop-blur-md">
                 <div className="flex items-center gap-2 text-[#7A3316]">
                   <Compass size={16} />
@@ -933,7 +933,7 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* 6. CALL TO ACTION SECTION */}
       {/* ========================================================================= */}
-      <section className="relative isolate overflow-hidden bg-[#7A3316] px-4 py-24 text-center text-white sm:px-6 sm:py-32 lg:px-8">
+      <section className="relative isolate overflow-hidden bg-[#7A3316] px-4 py-24 text-center text-white">
         {tenant.slug === 'brewhaus' ? (
           <img
             src="/images/about/brewhaus-story-cup.webp"
@@ -953,10 +953,10 @@ export default function ContactPage() {
 
         <motion.div {...reveal} className="mx-auto max-w-3xl">
           <SectionEyebrow light>Artisanal Food & Dining</SectionEyebrow>
-          <h2 className="mt-4 font-display text-4xl font-semibold leading-[0.96] text-white sm:text-6xl lg:text-7xl">
+          <h2 className="mt-4 font-display text-4xl font-semibold leading-[0.96] text-white">
             Visit {tenant.name}.
           </h2>
-          <p className="mx-auto mt-6 max-w-xl text-base leading-8 text-white/80 sm:text-lg">
+          <p className="mx-auto mt-6 max-w-xl text-base leading-8 text-white/80">
             Enjoy handcrafted coffee, comforting food, and good moments made to last.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">

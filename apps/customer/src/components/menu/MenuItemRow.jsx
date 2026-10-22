@@ -97,7 +97,7 @@ export default function MenuItemRow({
       }`}
     >
       {/* ─── Top: Full-Width Food Image ─── */}
-      <div className="relative w-full h-44 sm:h-52 md:h-60 bg-[#F3E9DC] border-b border-[#EFE4D6] overflow-hidden rounded-t-2xl">
+      <div className="relative w-full h-44 bg-[#F3E9DC] border-b border-[#EFE4D6] overflow-hidden rounded-t-2xl">
         {product.image && !imgError ? (
           <img
             src={product.image}
@@ -119,7 +119,7 @@ export default function MenuItemRow({
             type="button"
             onClick={handleHeartClick}
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-            className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all active:scale-90 ${
+            className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all active:scale-90 after:absolute after:-inset-1.5 after:content-[''] ${
               isFavorite
                 ? 'bg-[#E23B2E] text-white shadow-xs'
                 : 'bg-white/80 text-[#2B1810] hover:bg-white shadow-xs'
@@ -140,7 +140,7 @@ export default function MenuItemRow({
       </div>
 
       {/* ─── Bottom: Content Area (Badges, Title, Price, Description, ADD + button) ─── */}
-      <div className="p-3.5 sm:p-4 bg-[#FFFDF9]">
+      <div className="p-3.5 bg-[#FFFDF9]">
         {/* Top Badges Row: Veg Mark + BESTSELLER Badge + Prep Time */}
         <div className="flex flex-wrap items-center gap-2 mb-2">
           <VegMark isVeg={isVeg} size={15} />
@@ -161,15 +161,15 @@ export default function MenuItemRow({
         </div>
 
         {/* Main Content: Details on Left, ADD + Button on Right */}
-        <div className="flex items-start justify-between gap-3 sm:gap-4">
+        <div className="flex items-start justify-between gap-3">
           {/* Left: Product Information */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-base sm:text-lg text-[#2B1810] leading-snug group-hover:text-[#7A3316] transition-colors">
+            <h3 className="font-bold text-base text-[#2B1810] leading-snug group-hover:text-[#7A3316] transition-colors">
               {product.name}
             </h3>
 
             <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="font-display font-bold text-base sm:text-lg text-[#7A3316]">
+              <span className="font-display font-bold text-base text-[#7A3316]">
                 {formatMoney(product.price, tenant.currency)}
               </span>
               {product.originalPrice && product.originalPrice > product.price && (
@@ -180,7 +180,7 @@ export default function MenuItemRow({
             </div>
 
             {product.description && (
-              <p className="mt-1 text-xs sm:text-sm text-[#7B6B5F] leading-relaxed line-clamp-2 sm:line-clamp-3">
+              <p className="mt-1 text-xs text-[#7B6B5F] leading-relaxed line-clamp-2">
                 {product.description}
               </p>
             )}
@@ -202,7 +202,7 @@ export default function MenuItemRow({
                   type="button"
                   onClick={handleDecrement}
                   aria-label={`Decrease quantity of ${product.name}`}
-                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-[#7A3316] hover:bg-[#F3E9DC] active:scale-90 transition"
+                  className="w-11 h-11 flex items-center justify-center rounded-full text-[#7A3316] hover:bg-[#F3E9DC] active:scale-90 transition"
                 >
                   <Minus size={13} strokeWidth={2.5} />
                 </button>
@@ -213,7 +213,7 @@ export default function MenuItemRow({
                   type="button"
                   onClick={handleIncrement}
                   aria-label={`Increase quantity of ${product.name}`}
-                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-[#7A3316] hover:bg-[#F3E9DC] active:scale-90 transition"
+                  className="w-11 h-11 flex items-center justify-center rounded-full text-[#7A3316] hover:bg-[#F3E9DC] active:scale-90 transition"
                 >
                   <Plus size={13} strokeWidth={2.5} />
                 </button>
@@ -224,7 +224,7 @@ export default function MenuItemRow({
                 type="button"
                 onClick={() => onSelect(product)}
                 aria-label={`Customize ${product.name}`}
-                className="h-8 sm:h-9 px-4 bg-[#7A3316] text-[#FFFDF9] font-bold text-xs uppercase tracking-wider shadow-2xs hover:bg-[#5E2610] active:scale-95 transition rounded-full border border-[#7A3316] flex items-center gap-1"
+                className="min-h-[44px] px-4 bg-[#7A3316] text-[#FFFDF9] font-bold text-xs uppercase tracking-wider shadow-2xs hover:bg-[#5E2610] active:scale-95 transition rounded-full border border-[#7A3316] flex items-center gap-1"
               >
                 <span>{totalQtyInCart} IN CART</span>
               </button>
@@ -234,7 +234,7 @@ export default function MenuItemRow({
                 type="button"
                 onClick={handleQuickAdd}
                 aria-label={`Add ${product.name} to order`}
-                className="h-8 sm:h-9 px-5 sm:px-6 bg-[#FFFDF9] text-[#7A3316] font-bold text-xs uppercase tracking-wider shadow-2xs border border-[#7A3316] hover:bg-[#7A3316] hover:text-[#FFFDF9] active:scale-95 transition rounded-full flex items-center justify-center gap-1.5"
+                className="min-h-[44px] px-5 bg-[#FFFDF9] text-[#7A3316] font-bold text-xs uppercase tracking-wider shadow-2xs border border-[#7A3316] hover:bg-[#7A3316] hover:text-[#FFFDF9] active:scale-95 transition rounded-full flex items-center justify-center gap-1.5"
               >
                 <span>ADD</span>
                 <Plus size={13} strokeWidth={2.8} />

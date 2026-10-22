@@ -218,7 +218,7 @@ export function TenantProvider({ children }) {
 
   if (tenantState.status === 'loading') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FBF6EF] text-[#2B1810] font-sans">
+      <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#FBF6EF] text-[#2B1810] font-sans">
         <div className="w-12 h-12 rounded-2xl bg-[#7A3316] flex items-center justify-center text-[#FFFDF9] shadow-lg animate-pulse mb-4">
           <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

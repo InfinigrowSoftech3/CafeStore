@@ -33,8 +33,8 @@ export default function OffersPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FBF6EF] text-[#2B1810]">
-      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-[100dvh] bg-[#FBF6EF] text-[#2B1810]">
+      <main className="mx-auto max-w-5xl px-4 py-8">
         <div className="mb-6 flex items-center justify-between gap-3">
           <Link
             to={`/menu${currentSearch}`}
@@ -51,21 +51,21 @@ export default function OffersPage() {
           </Link>
         </div>
 
-        <div className="rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] p-6 shadow-2xs sm:p-10">
+        <div className="rounded-3xl border border-[#EFE4D6] bg-[#FFFDF9] p-6 shadow-2xs">
           <div className="flex items-center gap-2">
             <Sparkles size={16} className="text-[#7A3316]" />
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#7A3316]">
               Today’s Handcrafted Specials
             </p>
           </div>
-          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#2B1810] sm:text-5xl">
+          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#2B1810]">
             Good deals, brewed daily.
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-relaxed text-stone-600">
             Enjoy exclusive seasonal savings on single-origin roasts, signature beverages, and gourmet café fare crafted fresh in our kitchen.
           </p>
 
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+          <div className="mt-8 grid gap-6">
             {offers.map((offer) => (
               <div
                 key={offer.title}

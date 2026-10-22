@@ -9,7 +9,6 @@ import QuickCartPopup from './components/ui/QuickCartPopup';
 import CustomerBottomNav from './components/ui/CustomerBottomNav';
 import WebPushPrompt from './components/ui/WebPushPrompt';
 import Navbar from './components/ui/Navbar';
-import CustomerNavDrawer from './components/ui/CustomerNavDrawer';
 
 // Primary customer entry page loaded eagerly
 import MenuPage from './pages/customer/MenuPage';
@@ -70,7 +69,7 @@ class ChunkErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#FAFAF8] text-[#2B1810] flex flex-col items-center justify-center p-6 text-center">
+        <div className="min-h-[100dvh] bg-[#FAFAF8] text-[#2B1810] flex flex-col items-center justify-center p-6 text-center">
           <div className="w-14 h-14 rounded-full border border-amber-200 bg-[#F3E9DC] flex items-center justify-center mb-4 text-2xl shadow-xs">
             ☕
           </div>
@@ -97,7 +96,7 @@ class ChunkErrorBoundary extends Component {
 
 function PageFallback() {
   return (
-    <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
+    <div className="min-h-[100dvh] bg-[#FAFAF8] flex items-center justify-center">
       <div className="w-8 h-8 rounded-full border-2 border-[#7A3316] border-t-transparent animate-spin" />
     </div>
   );
@@ -122,62 +121,68 @@ export default function App() {
 
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <Navbar />
-      <CustomerNavDrawer />
-      <CustomerBottomNav />
-      <QuickCartPopup />
-      <WebPushPrompt />
-      {typeof window !== 'undefined' && !['localhost', '127.0.0.1'].includes(window.location.hostname) && (
-        <>
-          <Analytics />
-          <SpeedInsights dsn="CmYU8C4o7QrHziabP83DyQ2CEd" />
-        </>
-      )}
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#2B1810',
-            color: '#FFFDF9',
-            border: '1px solid #3E2419',
-            borderRadius: '16px',
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '14px',
-            boxShadow: '0 10px 25px -5px rgba(43, 24, 16, 0.25)',
-          },
-          success: { iconTheme: { primary: '#F3E9DC', secondary: '#7A3316' } },
-          error: { iconTheme: { primary: '#ef4444', secondary: '#ffffff' } },
-        }}
-      />
+      <div className="min-h-[100dvh] w-full bg-[#F3E9DC]">
+        <div className="mx-auto flex min-h-[100dvh] w-full max-w-[480px] flex-col bg-[#FBF6EF] shadow-[0_0_40px_rgba(90,50,20,0.06)]">
+          <Navbar />
+          <CustomerBottomNav />
+          <QuickCartPopup />
+          <WebPushPrompt />
+          {typeof window !== 'undefined' && !['localhost', '127.0.0.1'].includes(window.location.hostname) && (
+            <>
+              <Analytics />
+              <SpeedInsights dsn="CmYU8C4o7QrHziabP83DyQ2CEd" />
+            </>
+          )}
 
-      <ChunkErrorBoundary>
-        <Suspense fallback={<PageFallback />}>
-          <Routes>
-            <Route path="/" element={<RootRedirect />} />
-            <Route path="/menu" element={<MenuRouteWrapper />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/offers" element={<OffersPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/gallery" element={<GalleryPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/bill" element={<BillPage />} />
-            <Route path="/unsubscribe" element={<UnsubscribePage />} />
-            <Route path="/privacy" element={<LegalPage />} />
-            <Route path="/terms" element={<LegalPage />} />
-            <Route path="/refund-policy" element={<LegalPage />} />
+          <div className="flex-1">
+            <ChunkErrorBoundary>
+              <Suspense fallback={<PageFallback />}>
+                <Routes>
+                  <Route path="/" element={<RootRedirect />} />
+                  <Route path="/menu" element={<MenuRouteWrapper />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/offers" element={<OffersPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/gallery" element={<GalleryPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/bill" element={<BillPage />} />
+                  <Route path="/unsubscribe" element={<UnsubscribePage />} />
+                  <Route path="/privacy" element={<LegalPage />} />
+                  <Route path="/terms" element={<LegalPage />} />
+                  <Route path="/refund-policy" element={<LegalPage />} />
 
-            <Route path="/receipt" element={<ReceiptPage />} />
-            <Route path="/receipt/:orderId" element={<ReceiptPage />} />
-            <Route path="/orders" element={<OrdersPage />} />
-            <Route path="/order-confirm/:orderId" element={<OrderConfirmPage />} />
-            <Route path="/track/:orderId" element={<TrackOrderPage />} />
+                  <Route path="/receipt" element={<ReceiptPage />} />
+                  <Route path="/receipt/:orderId" element={<ReceiptPage />} />
+                  <Route path="/orders" element={<OrdersPage />} />
+                  <Route path="/order-confirm/:orderId" element={<OrderConfirmPage />} />
+                  <Route path="/track/:orderId" element={<TrackOrderPage />} />
 
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Suspense>
-      </ChunkErrorBoundary>
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Suspense>
+            </ChunkErrorBoundary>
+          </div>
+
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#2B1810',
+                color: '#FFFDF9',
+                border: '1px solid #3E2419',
+                borderRadius: '16px',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                boxShadow: '0 10px 25px -5px rgba(43, 24, 16, 0.25)',
+              },
+              success: { iconTheme: { primary: '#F3E9DC', secondary: '#7A3316' } },
+              error: { iconTheme: { primary: '#ef4444', secondary: '#ffffff' } },
+            }}
+          />
+        </div>
+      </div>
     </BrowserRouter>
   );
 }

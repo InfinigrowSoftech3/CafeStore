@@ -71,11 +71,6 @@ body {
   input, select, textarea {
     font-size: 16px;
   }
-  @media (min-width: 640px) {
-    input, select, textarea {
-      font-size: inherit;
-    }
-  }
 
   html {
     background-color: var(--bg, #FFFFFF);
@@ -155,13 +150,6 @@ body {
     mask-image: linear-gradient(to right, black calc(100% - 32px), transparent 100%);
     -webkit-mask-image: linear-gradient(to right, black calc(100% - 32px), transparent 100%);
   }
-
-  @media (min-width: 640px) {
-    .sm\:mask-none {
-      mask-image: none !important;
-      -webkit-mask-image: none !important;
-    }
-  }
 }
 
 @layer components {
@@ -234,11 +222,6 @@ body {
   }
   .input-field::placeholder {
     color: var(--muted, #9CA3AF);
-  }
-  @media (min-width: 640px) {
-    .input-field {
-      font-size: 0.875rem;
-    }
   }
 }
 

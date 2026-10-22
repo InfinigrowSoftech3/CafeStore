@@ -118,7 +118,7 @@ export default function WebPushPrompt() {
           role="dialog"
           aria-live="polite"
           aria-label="Stay updated with website notifications"
-          className="fixed bottom-20 sm:bottom-6 left-4 right-4 sm:left-auto sm:w-80 z-40 rounded-2xl border border-[#EFE4D6] bg-[#FFFDF9]/95 p-4 shadow-lg backdrop-blur"
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-[448px] rounded-2xl border border-[#EFE4D6] bg-[#FFFDF9]/95 p-4 shadow-lg backdrop-blur"
         >
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F3E9DC] text-[#7A3316]" aria-hidden="true">

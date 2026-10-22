@@ -91,7 +91,7 @@ export default function BillPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FBF6EF] flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-[#FBF6EF] flex items-center justify-center">
         <Loader2 className="animate-spin text-[#7A3316]" size={32} />
       </div>
     );
@@ -99,7 +99,7 @@ export default function BillPage() {
 
   if (!diningSessionToken || !bill) {
     return (
-      <div className="min-h-screen bg-[#FBF6EF] flex flex-col items-center justify-center gap-4 p-8 text-center">
+      <div className="min-h-[100dvh] bg-[#FBF6EF] flex flex-col items-center justify-center gap-4 p-8 text-center">
         <p className="font-display text-2xl font-bold text-[#7A3316]">
           Scan your table QR code to view your bill.
         </p>
@@ -114,7 +114,7 @@ export default function BillPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBF6EF]">
+    <div className="min-h-[100dvh] bg-[#FBF6EF]">
       <header className="flex items-center gap-3 border-b border-[#EFE4D6] bg-[#FFFDF9] p-4">
         <Link
           to="/menu"
@@ -192,7 +192,7 @@ export default function BillPage() {
             Online payment submitted. Waiting for secure payment provider confirmation…
           </div>
         ) : bill.dueAmount > 0 ? (
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3">
             <button
               type="button"
               onClick={payOnline}

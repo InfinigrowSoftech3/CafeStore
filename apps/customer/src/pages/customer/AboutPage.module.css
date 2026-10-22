@@ -19,7 +19,7 @@
   color: var(--porcelain);
   font-family: var(--body);
   -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
   overflow-x: clip;
 }
@@ -80,7 +80,7 @@
 .stage {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100dvh;
   height: 100svh;
   overflow: hidden;
   background: var(--espresso);
