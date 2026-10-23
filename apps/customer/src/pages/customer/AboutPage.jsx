@@ -1,11 +1,15 @@
 import React, { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import styles from './AboutPage.module.css';
 import { useTenant } from '../../context/TenantContext';
 import usePageMeta from '../../hooks/usePageMeta';
 
 const CONFIG = {
-  frameCount: 240,
+  // The source sequence has 240 frames. We use every other frame for a much
+  // smaller download while keeping the pour smooth through cross-fading.
+  frameCount: 120,
+  totalFrames: 240,
+  frameStep: 2,
   tiers: {
     portrait: { path: '/frames/portrait/', crop: { x: 0.1698, w: 0.65 }, fullWidth: 1920 },
     hd:       { path: '/frames/hd/',       crop: { x: 0, w: 1 },         fullWidth: 1920 },
@@ -15,16 +19,29 @@ const CONFIG = {
   holdAt: 0.92,
   focalX: 0.54,
   focalXPortrait: 0.495,
-  smoothing: 0.14,
+  smoothingTau: 55,
   fade: 0.045,
   warmWindow: 6,
+  initialAhead: 8,
+  ahead: 18,
+  behind: 6,
+  maxConcurrent: 4,
+  maxLoaded: 72,
+  fallbackImage: '/images/about/brewhaus-story-cup.webp',
 };
 
-const frameSrc = (name, i) => `${CONFIG.tiers[name].path}f${String(i + 1).padStart(3, '0')}.webp`;
+const frameNumber = (i) => {
+  if (i >= CONFIG.frameCount - 1) return CONFIG.totalFrames;
+  return 1 + i * CONFIG.frameStep;
+};
+
+const frameSrc = (name, i) => `${CONFIG.tiers[name].path}f${String(frameNumber(i)).padStart(3, '0')}.webp`;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
 export default function AboutPage() {
   const tenant = useTenant();
+  const [searchParams] = useSearchParams();
+  const currentSearch = searchParams.toString() ? `?${searchParams.toString()}` : '';
   const cafeName = tenant?.name || 'Brewhaus Café';
 
   usePageMeta(
@@ -44,7 +61,13 @@ export default function AboutPage() {
   const capsRef = useRef([]);
 
   useEffect(() => {
+    // The site uses smooth scrolling globally. Force this route to start at
+    // the top instantly instead of animating from the previous page position.
+    const rootStyle = document.documentElement.style;
+    const previousScrollBehavior = rootStyle.scrollBehavior;
+    rootStyle.scrollBehavior = 'auto';
     window.scrollTo(0, 0);
+    rootStyle.scrollBehavior = previousScrollBehavior;
 
     const section = sectionRef.current;
     const stage = stageRef.current;
@@ -68,15 +91,22 @@ export default function AboutPage() {
     let tier = null;
     let generation = 0;
     let frames = [];
-    let loaded = 0;
-    let failed = 0;
+    let loadedIndices = new Set();
+    let pending = new Set();
+    let failedSet = new Set();
+    let wanted = [];
+    let active = 0;
+    let loadedCount = 0;
+    let failedCount = 0;
     let ready = false;
+    let fallbackActive = false;
     const bitmaps = new Map();
-    const pending = new Set();
     let lastWarm = -1;
+    let lastWindowCenter = -1;
     let target = 0;
     let current = 0;
     let raf = 0;
+    let lastTick = 0;
     let box = { dx: 0, dy: 0, dw: 0, dh: 0, w: 0, h: 0, dpr: 1 };
     let isDisposed = false;
 
@@ -93,98 +123,174 @@ export default function AboutPage() {
       return CONFIG.tiers[want] ? want : CONFIG.tiers.qhd ? 'qhd' : Object.keys(CONFIG.tiers)[0];
     }
 
-    function loadOrder() {
-      const seen = new Set();
+    function updateLoader(share) {
+      const value = clamp(share, 0, 1);
+      if (loaderBar) loaderBar.style.transform = `scaleX(${value})`;
+      if (pctText) pctText.textContent = `${Math.round(value * 100)}%`;
+    }
+
+    function markReady() {
+      if (ready) return;
+      ready = true;
+      updateLoader(1);
+      if (loader) loader.classList.add(styles.loaderDone);
+      layout();
+      draw(current);
+    }
+
+    function showFallback() {
+      if (isDisposed) return;
+      fallbackActive = true;
+      generation++;
+      ready = true;
+      updateLoader(1);
+      if (loader) loader.classList.add(styles.loaderDone);
+      if (stage) {
+        stage.style.backgroundImage = `url('${CONFIG.fallbackImage}')`;
+        stage.style.backgroundSize = 'cover';
+        stage.style.backgroundPosition = 'center';
+      }
+      if (canvas) canvas.style.opacity = '0';
+    }
+
+    function evictFar(center) {
+      if (loadedIndices.size <= CONFIG.maxLoaded) return;
+      for (const i of [...loadedIndices]) {
+        if (Math.abs(i - center) <= 32) continue;
+        frames[i] = null;
+        loadedIndices.delete(i);
+        const bm = bitmaps.get(i);
+        if (bm) {
+          try { bm.close(); } catch (_) { /* ignore */ }
+          bitmaps.delete(i);
+        }
+        if (loadedIndices.size <= CONFIG.maxLoaded) break;
+      }
+    }
+
+    function pump() {
+      if (isDisposed || !tier) return;
+      while (active < CONFIG.maxConcurrent && wanted.length) {
+        const i = wanted.shift();
+        if (frames[i] || pending.has(i) || failedSet.has(i)) continue;
+        pending.add(i);
+        active++;
+        loadOne(i, generation);
+      }
+    }
+
+    function loadOne(i, gen) {
+      const img = new Image();
+      img.decoding = 'async';
+      let settled = false;
+
+      const finish = (ok) => {
+        if (settled) return;
+        settled = true;
+        // A newer generation owns the counters and pending set now. Do not
+        // let an old request decrement the new generation's concurrency.
+        if (gen !== generation || isDisposed) return;
+        active = Math.max(0, active - 1);
+        pending.delete(i);
+
+        if (ok && img.naturalWidth) {
+          frames[i] = img;
+          loadedIndices.add(i);
+          loadedCount++;
+          if (!ready && (i === 0 || loadedCount >= 3)) {
+            markReady();
+          } else if (ready) {
+            draw(current);
+          }
+        } else {
+          failedSet.add(i);
+          failedCount++;
+          if (!ready && (i === 0 || (loadedCount === 0 && failedCount >= 4))) {
+            showFallback();
+            return;
+          }
+        }
+
+        if (!ready) {
+          const initialTarget = Math.min(N, CONFIG.initialAhead + 1);
+          updateLoader(loadedCount / initialTarget);
+        }
+
+        evictFar(lastWindowCenter >= 0 ? lastWindowCenter : 0);
+        pump();
+      };
+
+      img.onload = () => finish(true);
+      img.onerror = () => finish(false);
+      img.src = frameSrc(tier, i);
+    }
+
+    function ensureWindow(center, initial = false) {
+      if (isDisposed || !tier) return;
+      const c = clamp(Math.round(center), 0, N - 1);
+      if (!initial && c === lastWindowCenter) return;
+
+      const start = Math.max(0, c - CONFIG.behind);
+      const end = Math.min(N - 1, c + (initial ? CONFIG.initialAhead : CONFIG.ahead));
       const order = [];
+      const seen = new Set();
       const add = (i) => {
-        if (i >= 0 && i < N && !seen.has(i)) {
+        if (i >= start && i <= end && !seen.has(i)) {
           seen.add(i);
           order.push(i);
         }
       };
-      add(0);
-      add(N - 1);
-      [32, 16, 8, 4, 2, 1].forEach((step) => {
-        for (let i = 0; i < N; i += step) add(i);
-      });
-      return order;
-    }
 
-    function showLoadError() {
-      generation++;
-      if (!loader || isDisposed) return;
-      const p = loader.querySelector('p');
-      if (p) p.textContent = 'The video frames didn’t load';
-      if (loaderBar && loaderBar.parentElement) loaderBar.parentElement.hidden = true;
-      if (loadNote) {
-        loadNote.hidden = false;
-        loadNote.textContent = 'Please check your connection and refresh the page to load the pour animation.';
+      // Load the frame at the current position first, then expand outwards.
+      add(c);
+      const maxD = Math.max(c - start, end - c);
+      for (let d = 1; d <= maxD; d++) {
+        add(c + d);
+        add(c - d);
       }
-    }
 
-    function loadFrame(name, i, gen) {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = img.onerror = () => {
-          if (gen !== generation || isDisposed) return resolve();
-          if (img.naturalWidth) {
-            frames[i] = img;
-          } else {
-            failed++;
-          }
-          loaded++;
-
-          if (failed >= 4 && failed === loaded) {
-            showLoadError();
-            return resolve();
-          }
-
-          const share = loaded / N;
-          if (loaderBar) loaderBar.style.transform = `scaleX(${share})`;
-          if (pctText) pctText.textContent = `${Math.round(share * 100)}%`;
-
-          if (!ready && ((frames[0] && share >= 0.5) || loaded === N)) {
-            ready = true;
-            if (loader) loader.classList.add(styles.loaderDone);
-            layout();
-          }
-          resolve();
-        };
-        img.src = frameSrc(name, i);
-      });
+      wanted = order;
+      lastWindowCenter = c;
+      pump();
+      evictFar(c);
     }
 
     function startLoad() {
-      const gen = ++generation;
+      generation++;
       tier = chooseTier();
       bitmaps.forEach((b) => {
         try { b.close(); } catch (_) { /* ignore */ }
       });
       bitmaps.clear();
       pending.clear();
+      failedSet.clear();
+      loadedIndices.clear();
+      wanted = [];
       frames = new Array(N).fill(null);
-      loaded = 0;
-      failed = 0;
+      loadedCount = 0;
+      failedCount = 0;
+      active = 0;
       ready = false;
+      fallbackActive = false;
       lastWarm = -1;
+      lastWindowCenter = -1;
 
       if (loader) loader.classList.remove(styles.loaderDone);
+      if (canvas) canvas.style.opacity = '';
+      if (stage) stage.style.backgroundImage = '';
       if (loaderBar && loaderBar.parentElement) loaderBar.parentElement.hidden = false;
       if (loadNote) loadNote.hidden = true;
       const p = loader?.querySelector('p');
       if (p) p.textContent = 'Loading the pour';
-      if (loaderBar) loaderBar.style.transform = 'scaleX(0)';
+      updateLoader(0);
 
-      const queue = loadOrder();
-      const name = tier;
-      const worker = async () => {
-        while (queue.length && gen === generation && !isDisposed) {
-          await loadFrame(name, queue.shift(), gen);
-        }
-      };
-      for (let k = 0; k < 6; k++) {
-        worker();
+      if (reduceMotion) {
+        showFallback();
+        return;
       }
+
+      const center = Math.round(clamp(target / CONFIG.holdAt, 0, 1) * (N - 1));
+      ensureWindow(center, true);
     }
 
     function layout() {
@@ -208,13 +314,17 @@ export default function AboutPage() {
       const focal = portrait ? CONFIG.focalXPortrait : CONFIG.focalX;
       const dx = Math.min(0, Math.max(w - dw, w / 2 - focal * dw));
 
+      // A 1.5x backing store is plenty for a soft photographic background and
+      // cuts canvas fill-rate dramatically on high-DPI phones.
       const dpr = clamp(
-        Math.min(window.devicePixelRatio || 1, 2, CONFIG.tiers[tier]?.fullWidth ? CONFIG.tiers[tier].fullWidth / dw : 2),
+        Math.min(window.devicePixelRatio || 1, 1.5, CONFIG.tiers[tier]?.fullWidth ? CONFIG.tiers[tier].fullWidth / dw : 1.5),
         1,
-        2
+        1.5
       );
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'medium';
       box = { dx, dy, dw, dh, w, h, dpr };
 
       const mask = portrait
@@ -235,14 +345,20 @@ export default function AboutPage() {
         pending.add(i);
         createImageBitmap(frames[i])
           .then((bm) => {
+            if (gen !== generation || isDisposed) {
+              try { bm.close(); } catch (_) { /* ignore */ }
+              return;
+            }
             pending.delete(i);
-            if (gen !== generation || isDisposed || Math.abs(i - lastWarm) > W * 2) {
+            if (Math.abs(i - lastWarm) > W * 2) {
               try { bm.close(); } catch (_) { /* ignore */ }
             } else {
               bitmaps.set(i, bm);
             }
           })
-          .catch(() => pending.delete(i));
+          .catch(() => {
+            if (gen === generation && !isDisposed) pending.delete(i);
+          });
       }
 
       bitmaps.forEach((bm, i) => {
@@ -265,7 +381,7 @@ export default function AboutPage() {
     const source = (i) => bitmaps.get(i) || frames[i];
 
     function draw(progress) {
-      if (!box.dw || !tier || isDisposed) return;
+      if (!box.dw || !tier || isDisposed || fallbackActive) return;
       const f = clamp(progress / CONFIG.holdAt, 0, 1) * (N - 1);
       const a = Math.floor(f);
       const b = Math.min(a + 1, N - 1);
@@ -280,7 +396,6 @@ export default function AboutPage() {
 
       ctx.setTransform(box.dpr, 0, 0, box.dpr, 0, 0);
       ctx.clearRect(0, 0, box.w, box.h);
-      ctx.imageSmoothingQuality = 'high';
       ctx.globalAlpha = 1;
 
       const srcA = source(ia);
@@ -289,7 +404,7 @@ export default function AboutPage() {
       }
 
       const ib = nearestIndex(b);
-      if (ib >= 0 && ib !== ia && t > 0.01) {
+      if (ib >= 0 && ib !== ia && t > 0.02) {
         const srcB = source(ib);
         if (srcB) {
           ctx.globalAlpha = t;
@@ -329,19 +444,60 @@ export default function AboutPage() {
       const r = section.getBoundingClientRect();
       const travel = r.height - stage.clientHeight;
       target = clamp(-r.top / (travel || 1), 0, 1);
+
+      // A large jump (Page Down, anchor, restored scroll) should not make the
+      // viewer wait for a long catch-up animation.
+      if (Math.abs(target - current) > 0.28) current = target;
+
+      // Captions and the gauge follow the real scroll position immediately.
+      updateUI(target);
+
+      if (!fallbackActive) {
+        const center = Math.round(clamp(target / CONFIG.holdAt, 0, 1) * (N - 1));
+        ensureWindow(center);
+      }
+
       if (!raf) raf = requestAnimationFrame(tick);
     }
 
-    function tick() {
+    function tick(now = performance.now()) {
       if (isDisposed) return;
+      if (!lastTick) lastTick = now;
+      const dt = clamp(now - lastTick, 0, 64);
+      lastTick = now;
       const diff = target - current;
-      current = reduceMotion || Math.abs(diff) < 0.0004 ? target : current + diff * CONFIG.smoothing;
+
+      if (reduceMotion || Math.abs(diff) < 0.0004) {
+        current = target;
+      } else {
+        const factor = 1 - Math.exp(-dt / CONFIG.smoothingTau);
+        current += diff * factor;
+      }
+
       draw(current);
-      updateUI(current);
-      raf = current === target ? 0 : requestAnimationFrame(tick);
+
+      if (Math.abs(target - current) > 0.0004) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        current = target;
+        raf = 0;
+      }
+    }
+
+    function onVisibilityChange() {
+      if (document.hidden || isDisposed) return;
+      // Recompute from the real scroll position in case the browser restored
+      // or changed the scroll offset while the tab was in the background.
+      readScroll();
+      current = target;
+      lastTick = 0;
+      updateUI(target);
+      draw(current);
+      if (!raf) raf = requestAnimationFrame(tick);
     }
 
     window.addEventListener('scroll', readScroll, { passive: true });
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     const resizeObserver = new ResizeObserver(() => {
       if (isDisposed) return;
@@ -364,12 +520,14 @@ export default function AboutPage() {
       generation++;
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener('scroll', readScroll);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       resizeObserver.disconnect();
       bitmaps.forEach((b) => {
         try { b.close(); } catch (_) { /* ignore */ }
       });
       bitmaps.clear();
       pending.clear();
+      wanted = [];
     };
   }, []);
 
@@ -377,10 +535,10 @@ export default function AboutPage() {
     <div className={styles.pageWrapper}>
       {/* Top Fixed Floating Navigation Bar */}
       <header className={styles.bar}>
-        <Link className={styles.mark} to="/">
+        <Link className={styles.mark} to={`/menu${currentSearch}`}>
           {cafeName}
         </Link>
-        <Link className={styles.menuLink} to="/menu">
+        <Link className={styles.menuLink} to={`/menu${currentSearch}`}>
           Menu
         </Link>
       </header>
@@ -407,7 +565,7 @@ export default function AboutPage() {
                 ref={(el) => (capsRef.current[0] = el)}
                 className={styles.cap}
                 data-in="-1"
-                data-out="0.22"
+                data-out="0.27"
               >
                 <h1>Pour yourself a slow morning.</h1>
                 <p>Scroll down and watch the cup fill.</p>
@@ -420,8 +578,8 @@ export default function AboutPage() {
               <article
                 ref={(el) => (capsRef.current[1] = el)}
                 className={styles.cap}
-                data-in="0.27"
-                data-out="0.5"
+                data-in="0.22"
+                data-out="0.55"
               >
                 <h2>Scan the code on your table.</h2>
                 <p>No queue and no waving for the menu. The QR code opens our full menu on your phone.</p>
@@ -430,8 +588,8 @@ export default function AboutPage() {
               <article
                 ref={(el) => (capsRef.current[2] = el)}
                 className={styles.cap}
-                data-in="0.55"
-                data-out="0.79"
+                data-in="0.5"
+                data-out="0.85"
               >
                 <h2>Choose what you like.</h2>
                 <p>Pick your drinks, add anything from the counter and send the order straight to the kitchen.</p>
@@ -440,12 +598,12 @@ export default function AboutPage() {
               <article
                 ref={(el) => (capsRef.current[3] = el)}
                 className={styles.cap}
-                data-in="0.85"
+                data-in="0.8"
                 data-out="2"
               >
                 <h2>Your cup is ready.</h2>
                 <p>Come hungry. The menu is one tap away.</p>
-                <Link ref={ctaRef} className={styles.cta} to="/menu" id="cta">
+                <Link ref={ctaRef} className={styles.cta} to={`/menu${currentSearch}`} id="cta">
                   Open the menu
                 </Link>
               </article>
@@ -471,10 +629,10 @@ export default function AboutPage() {
 
       {/* Footer */}
       <footer className={styles.foot}>
-        <Link className={styles.mark} to="/">
+        <Link className={styles.mark} to={`/menu${currentSearch}`}>
           {cafeName}
         </Link>
-        <Link className={styles.footLink} to="/menu">
+        <Link className={styles.footLink} to={`/menu${currentSearch}`}>
           Open the menu
         </Link>
       </footer>

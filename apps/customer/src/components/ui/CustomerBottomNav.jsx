@@ -72,14 +72,16 @@ export default function CustomerBottomNav() {
     return () => document.removeEventListener('pointerdown', onOutside);
   }, [moreOpen]);
 
-  // Hidden on checkout, cart, or order confirmation flows
+  // Hidden on focused flows (checkout, cart, confirmation) and the immersive
+  // scroll-to-pour story, which provides its own navigation.
   const isHiddenRoute = useMemo(() => {
     const p = location.pathname;
     return (
       p.startsWith('/checkout') ||
       p.startsWith('/cart') ||
       p.startsWith('/order-confirm') ||
-      p.startsWith('/receipt')
+      p.startsWith('/receipt') ||
+      p.startsWith('/about')
     );
   }, [location.pathname]);
 
