@@ -60,7 +60,7 @@ function getEventBadge(category) {
     case 'billing':
       return { label: 'Subscription', color: 'border-[var(--info-border)] bg-[var(--info-bg)] text-[var(--info-text)]', icon: Key };
     case 'settings':
-      return { label: 'Config', color: 'border-purple-200 dark:border-purple-500/30 bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400', icon: Settings };
+      return { label: 'Config', color: 'border-[var(--sa-primary-border)] bg-[var(--sa-primary-subtle)] text-[var(--sa-primary)]', icon: Settings };
     default:
       return { label: 'Security', color: 'border-[var(--border-primary)] bg-[var(--hover-bg)] text-[var(--text-secondary)]', icon: Store };
   }
@@ -121,9 +121,9 @@ export default function AuditTimeline({ logs = [], loading = false }) {
   return (
     <div className="space-y-4">
       {/* Filter bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-card,#FFFFFF)] p-3 sm:p-4 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-3 sm:p-4 shadow-xs">
         <div className="relative flex-1 w-full max-w-md">
-          <Search size={15} className="absolute left-3.5 top-3 text-[var(--text-muted,#8E9BBF)]" />
+          <Search size={15} className="absolute left-3.5 top-3 text-[var(--text-muted)]" />
           <input
             type="text"
             value={search}
@@ -132,7 +132,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
               setPage(1);
             }}
             placeholder="Search audit trail by actor, action, café or reason..."
-            className="w-full rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--input-bg,#FFFFFF)] pl-10 pr-4 py-2 text-xs text-[var(--text-primary,#1B2559)] placeholder-[var(--text-muted,#8E9BBF)] focus:border-[#1E3FAE] focus:outline-none"
+            className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--input-bg)] pl-10 pr-4 py-2 text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-[var(--sa-primary)] focus:outline-none"
           />
         </div>
 
@@ -143,7 +143,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
               setCategoryFilter(e.target.value);
               setPage(1);
             }}
-            className="flex-1 sm:flex-none rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--input-bg,#FFFFFF)] px-3 py-2 text-xs text-[var(--text-primary,#1B2559)] focus:border-[#1E3FAE] focus:outline-none"
+            className="flex-1 sm:flex-none rounded-xl border border-[var(--border-primary)] bg-[var(--input-bg)] px-3 py-2 text-xs text-[var(--text-primary)] focus:border-[var(--sa-primary)] focus:outline-none"
           >
             <option value="all">All Event Categories</option>
             <option value="status">Status & Suspension</option>
@@ -155,7 +155,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
 
           <button
             onClick={handleExportAudit}
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary,#3B4874)] hover:text-[var(--text-primary,#1B2559)] transition w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition w-full sm:w-auto"
           >
             <Download size={13} /> Export CSV
           </button>
@@ -163,7 +163,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
       </div>
 
       {/* Timeline List Card */}
-      <div className="rounded-3xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-card,#FFFFFF)] p-4 sm:p-6 shadow-xs">
+      <div className="rounded-3xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-4 sm:p-6 shadow-xs">
         {loading ? (
           <div className="py-12 text-center text-[var(--text-muted)] text-xs">
             Loading platform audit entries...
@@ -173,7 +173,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
             No audit records found matching your filters.
           </div>
         ) : (
-          <div className="relative pl-5 sm:pl-6 before:absolute before:left-2 sm:before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-[var(--border-primary,#E3E8F5)] space-y-4 sm:space-y-6">
+          <div className="relative pl-5 sm:pl-6 before:absolute before:left-2 sm:before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-[var(--border-primary)] space-y-4 sm:space-y-6">
             {paginatedLogs.map((log) => {
               const cat = getEventCategory(log.action);
               const badge = getEventBadge(cat);
@@ -183,7 +183,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
               return (
                 <div key={log._id || Math.random()} className="relative group">
                   {/* Timeline dot */}
-                  <div className="absolute -left-5 sm:-left-6 top-1.5 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-[var(--bg-surface,#FFFFFF)] border border-[var(--border-primary,#E3E8F5)] text-[var(--text-muted,#8E9BBF)] group-hover:border-[#1E3FAE] group-hover:text-[#1E3FAE] transition">
+                  <div className="absolute -left-5 sm:-left-6 top-1.5 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-[var(--bg-surface)] border border-[var(--border-primary)] text-[var(--text-muted)] group-hover:border-[var(--sa-primary)] group-hover:text-[var(--sa-primary)] transition">
                     <div className="h-1.5 w-1.5 rounded-full bg-current" />
                   </div>
 
@@ -223,7 +223,7 @@ export default function AuditTimeline({ logs = [], loading = false }) {
                       {log.targetTenantSlug && (
                         <span className="flex items-center gap-1.5">
                           <Store size={12} className="text-[var(--text-muted)]" />
-                          Target: <strong className="text-[#1E3FAE] dark:text-[#688bf7]">{log.targetTenantSlug}</strong>
+                          Target: <strong className="text-[var(--sa-primary)]">{log.targetTenantSlug}</strong>
                         </span>
                       )}
 

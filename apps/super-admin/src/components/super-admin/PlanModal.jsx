@@ -81,7 +81,7 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
           </button>
 
           <div className="mb-6">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#1E3FAE] dark:text-[#D4AF37]">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--sa-primary)]">
               Subscription Management
             </span>
             <h2 className="text-xl font-bold text-[var(--text-primary)] mt-1">
@@ -103,12 +103,12 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
                   onClick={() => setSelectedPlan(plan.id)}
                   className={`relative flex flex-col justify-between rounded-2xl border p-5 cursor-pointer transition ${
                     isSelected
-                      ? 'border-[#D4AF37] ring-2 ring-[#D4AF37]/30 bg-[#FBF3D5]/40 dark:bg-[#0B1B4D]/30 shadow-sm'
+                      ? 'border-[var(--sa-primary)] ring-2 ring-[var(--sa-primary)]/30 bg-[var(--sa-primary-subtle)] shadow-sm'
                       : 'border-[var(--border-primary)] bg-[var(--hover-bg)] hover:border-[var(--border-primary)]'
                   }`}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-2.5 right-4 rounded-full bg-[#D4AF37] px-2.5 py-0.5 text-[9px] font-black uppercase text-[#0B1B4D]">
+                    <div className="absolute -top-2.5 right-4 rounded-full bg-[var(--sa-primary)] px-2.5 py-0.5 text-[9px] font-black uppercase text-white">
                       Most Popular
                     </div>
                   )}
@@ -124,7 +124,7 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
                     </div>
 
                     <div className="mt-3 flex items-baseline gap-1">
-                      <span className="text-2xl font-black text-[#1E3FAE] dark:text-[#D4AF37] tabular-nums">{plan.price}</span>
+                      <span className="text-2xl font-black text-[var(--sa-primary)] tabular-nums">{plan.price}</span>
                       <span className="text-[11px] text-[var(--text-muted)]">{plan.period}</span>
                     </div>
 
@@ -132,10 +132,10 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
 
                     <div className="my-4 border-t border-[var(--border-primary)]/80 pt-3 space-y-1.5">
                       <div className="text-[11px] font-semibold text-[var(--text-secondary)] flex items-center gap-1.5">
-                        <Check size={12} className="text-emerald-500 dark:text-emerald-400" /> {plan.tables}
+                        <Check size={12} className="text-[var(--sa-success)]" /> {plan.tables}
                       </div>
                       <div className="text-[11px] font-semibold text-[var(--text-secondary)] flex items-center gap-1.5">
-                        <Check size={12} className="text-emerald-500 dark:text-emerald-400" /> {plan.items}
+                        <Check size={12} className="text-[var(--sa-success)]" /> {plan.items}
                       </div>
                       {plan.features.map((feat) => (
                         <div key={feat} className="text-[10px] text-[var(--text-muted)] flex items-center gap-1.5">
@@ -150,7 +150,7 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
                       type="button"
                       className={`w-full rounded-xl py-2 text-xs font-bold transition ${
                         isSelected
-                          ? 'bg-[#D4AF37] text-[#0B1B4D] shadow-xs'
+                          ? 'bg-[var(--sa-primary)] text-white shadow-xs'
                           : 'bg-[var(--hover-bg)] text-[var(--text-secondary)] hover:bg-[var(--border-primary)]'
                       }`}
                     >
@@ -175,7 +175,7 @@ export default function PlanModal({ isOpen, onClose, tenant, onSave, loading }) 
               type="button"
               onClick={() => onSave(selectedPlan)}
               disabled={loading || selectedPlan === tenant.plan}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#1E3FAE] px-5 py-2 text-xs font-bold text-white transition hover:bg-[#17318A] disabled:opacity-50 shadow-xs"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--sa-primary)] px-5 py-2 text-xs font-bold text-white transition hover:bg-[var(--sa-primary-hover)] disabled:opacity-50 shadow-xs"
             >
               {loading && <Loader2 size={13} className="animate-spin" />}
               Save Plan Update

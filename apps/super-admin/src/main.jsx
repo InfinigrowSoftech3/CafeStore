@@ -22,15 +22,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           toastOptions={{
             duration: 3000,
             style: {
-              background: '#0B1B4D',
+              background: '#20309A',
               color: '#FFFFFF',
               borderRadius: '10px',
               fontSize: '13px',
-              border: '1px solid rgba(212, 175, 55, 0.3)',
-              boxShadow: '0 8px 30px rgba(0, 0, 0, 0.25)',
+              border: '1px solid rgba(255, 255, 255, 0.20)',
+              boxShadow: '0 8px 30px rgba(10, 16, 50, 0.25)',
             },
-            success: { iconTheme: { primary: '#12A37A', secondary: '#FFFFFF' } },
-            error: { iconTheme: { primary: '#DC2626', secondary: '#FFFFFF' } },
+            success: { iconTheme: { primary: '#15803D', secondary: '#FFFFFF' } },
+            error: { iconTheme: { primary: '#BB232B', secondary: '#FFFFFF' } },
           }}
         />
       </ThemeProvider>

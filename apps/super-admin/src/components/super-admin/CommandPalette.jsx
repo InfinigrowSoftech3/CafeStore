@@ -110,7 +110,7 @@ export default function CommandPalette({
           exit={{ opacity: 0 }}
           onClick={onClose}
           className="fixed inset-0"
-          style={{ backgroundColor: 'var(--modal-backdrop, rgba(7, 18, 58, 0.65))', backdropFilter: 'blur(8px)' }}
+          style={{ backgroundColor: 'var(--modal-backdrop)', backdropFilter: 'blur(8px)' }}
         />
 
         {/* Modal */}
@@ -118,15 +118,15 @@ export default function CommandPalette({
           initial={{ opacity: 0, scale: 0.95, y: -10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -10 }}
-          className="relative w-full max-w-2xl max-h-[85vh] rounded-2xl border shadow-2xl text-[var(--text-primary,#1B2559)] overflow-hidden z-10 custom-scrollbar flex flex-col"
+          className="relative w-full max-w-2xl max-h-[85vh] rounded-2xl border shadow-2xl text-[var(--text-primary)] overflow-hidden z-10 custom-scrollbar flex flex-col"
           style={{
-            backgroundColor: 'var(--bg-card, #FFFFFF)',
-            borderColor: 'var(--border-primary, #E3E8F5)',
+            backgroundColor: 'var(--bg-card)',
+            borderColor: 'var(--border-primary)',
           }}
         >
           {/* Search bar */}
-          <div className="flex items-center gap-3 border-b border-[var(--border-primary,#E3E8F5)] px-3.5 py-3 sm:px-4 sm:py-3.5 bg-[var(--hover-bg,#EEF2FA)]/70 shrink-0">
-            <Search size={18} className="text-[#1E3FAE] dark:text-[#D4AF37] shrink-0" />
+          <div className="flex items-center gap-3 border-b border-[var(--border-primary)] px-3.5 py-3 sm:px-4 sm:py-3.5 bg-[var(--hover-bg)]/70 shrink-0">
+            <Search size={18} className="text-[var(--sa-primary)] shrink-0" />
             <input
               ref={inputRef}
               type="text"
@@ -136,11 +136,11 @@ export default function CommandPalette({
                 setSelectedIndex(0);
               }}
               placeholder="Search anything... (café name, view, or command)"
-              className="w-full bg-transparent text-xs sm:text-sm text-[var(--text-primary,#1B2559)] placeholder-[var(--text-muted,#8E9BBF)] focus:outline-none"
+              className="w-full bg-transparent text-xs sm:text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none"
             />
             <button
               onClick={onClose}
-              className="rounded-lg p-1 text-[var(--text-muted,#8E9BBF)] hover:text-[var(--text-primary,#1B2559)] transition shrink-0"
+              className="rounded-lg p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition shrink-0"
               aria-label="Close"
             >
               <X size={18} />
@@ -150,7 +150,7 @@ export default function CommandPalette({
           {/* Results list */}
           <div className="overflow-y-auto p-2 space-y-1 flex-1">
             {filteredItems.length === 0 ? (
-              <div className="py-8 text-center text-xs text-[var(--text-muted,#8E9BBF)]">
+              <div className="py-8 text-center text-xs text-[var(--text-muted)]">
                 No matching café, navigation, or action found for "{query}".
               </div>
             ) : (
@@ -168,24 +168,24 @@ export default function CommandPalette({
                     onMouseEnter={() => setSelectedIndex(idx)}
                     className={`flex items-center justify-between rounded-xl px-3 py-2 sm:px-3.5 sm:py-2.5 cursor-pointer text-xs transition ${
                       isSelected
-                        ? 'bg-[#1E3FAE]/10 border border-[#1E3FAE]/30 text-[var(--text-primary,#1B2559)] font-semibold'
-                        : 'hover:bg-[var(--hover-bg,#EEF2FA)] text-[var(--text-secondary,#3B4874)]'
+                        ? 'bg-[var(--sa-primary-subtle)] border border-[var(--sa-primary)]/30 text-[var(--text-primary)] font-semibold'
+                        : 'hover:bg-[var(--hover-bg)] text-[var(--text-secondary)]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                       <div
                         className={`flex h-7 w-7 items-center justify-center rounded-lg border shrink-0 ${
                           isSelected
-                            ? 'border-[#1E3FAE]/30 bg-[#1E3FAE]/15 text-[#1E3FAE]'
-                            : 'border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] text-[var(--text-muted,#8E9BBF)]'
+                            ? 'border-[var(--sa-primary)]/30 bg-[var(--sa-primary-subtle)] text-[var(--sa-primary)]'
+                            : 'border-[var(--border-primary)] bg-[var(--hover-bg)] text-[var(--text-muted)]'
                         }`}
                       >
                         <Icon size={14} />
                       </div>
 
                       <div className="min-w-0 truncate">
-                        <div className="font-bold truncate text-[var(--text-primary,#1B2559)]">{item.title}</div>
-                        <div className="text-[10px] sm:text-[11px] text-[var(--text-muted,#8E9BBF)] truncate">{item.subtitle}</div>
+                        <div className="font-bold truncate text-[var(--text-primary)]">{item.title}</div>
+                        <div className="text-[10px] sm:text-[11px] text-[var(--text-muted)] truncate">{item.subtitle}</div>
                       </div>
                     </div>
 
@@ -194,14 +194,14 @@ export default function CommandPalette({
                         <span
                           className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
                             item.badge === 'active'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : 'bg-red-100 text-red-800'
+                              ? 'bg-[var(--sa-success-bg)] text-[var(--sa-success-text)]'
+                              : 'bg-[var(--sa-danger-bg)] text-[var(--sa-danger-text)]'
                           }`}
                         >
                           {item.badge}
                         </span>
                       )}
-                      <span className="hidden sm:inline-block rounded-md border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-surface,#FFFFFF)] px-1.5 py-0.5 text-[9px] uppercase font-bold text-[var(--text-muted,#8E9BBF)]">
+                      <span className="hidden sm:inline-block rounded-md border border-[var(--border-primary)] bg-[var(--bg-surface)] px-1.5 py-0.5 text-[9px] uppercase font-bold text-[var(--text-muted)]">
                         {item.type}
                       </span>
                     </div>
@@ -212,9 +212,9 @@ export default function CommandPalette({
           </div>
 
           {/* Footer note */}
-          <div className="border-t border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)]/60 px-4 py-2 text-[11px] text-[var(--text-muted,#8E9BBF)] flex items-center justify-between shrink-0">
+          <div className="border-t border-[var(--border-primary)] bg-[var(--hover-bg)]/60 px-4 py-2 text-[11px] text-[var(--text-muted)] flex items-center justify-between shrink-0">
             <span>
-              Use <kbd className="font-mono bg-[var(--bg-surface,#FFFFFF)] px-1 py-0.5 rounded border border-[var(--border-primary,#E3E8F5)] text-[10px]">↑</kbd> <kbd className="font-mono bg-[var(--bg-surface,#FFFFFF)] px-1 py-0.5 rounded border border-[var(--border-primary,#E3E8F5)] text-[10px]">↓</kbd> to navigate
+              Use <kbd className="font-mono bg-[var(--bg-surface)] px-1 py-0.5 rounded border border-[var(--border-primary)] text-[10px]">↑</kbd> <kbd className="font-mono bg-[var(--bg-surface)] px-1 py-0.5 rounded border border-[var(--border-primary)] text-[10px]">↓</kbd> to navigate
             </span>
             <span className="flex items-center gap-1">
               Select <CornerDownLeft size={11} />

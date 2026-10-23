@@ -63,7 +63,7 @@ export default function InviteOwnerModal({ isOpen, onClose, tenant, onInviteSucc
           </button>
 
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1E3FAE]/10 border border-[#1E3FAE]/20 text-[#1E3FAE] dark:text-[#688bf7]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sa-primary-subtle)] border border-[var(--sa-primary-border)] text-[var(--sa-primary)]">
               <UserPlus size={20} />
             </div>
             <div>
@@ -88,7 +88,7 @@ export default function InviteOwnerModal({ isOpen, onClose, tenant, onInviteSucc
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                Owner Work Email <span className="text-red-500">*</span>
+                Owner Work Email <span className="text-[var(--sa-danger-text)]">*</span>
               </label>
               <div className="relative">
                 <Mail size={15} className="absolute left-3.5 top-3 text-[var(--text-muted)]" />
@@ -118,7 +118,7 @@ export default function InviteOwnerModal({ isOpen, onClose, tenant, onInviteSucc
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[#1E3FAE] px-4 py-2 text-xs font-bold text-white hover:bg-[#17318A] transition disabled:opacity-50 shadow-xs"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--sa-primary)] px-4 py-2 text-xs font-bold text-white hover:bg-[var(--sa-primary-hover)] transition disabled:opacity-50 shadow-xs"
               >
                 {loading && <Loader2 size={13} className="animate-spin" />}
                 Send Invitation

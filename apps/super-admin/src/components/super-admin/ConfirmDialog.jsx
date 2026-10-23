@@ -44,20 +44,20 @@ export default function ConfirmDialog({
       return {
         iconBg: 'bg-[var(--danger-bg)] border-[var(--danger-border)] text-[var(--danger-text)]',
         icon: <ShieldAlert size={22} />,
-        confirmBtn: 'bg-red-600 text-white hover:bg-red-500',
+        confirmBtn: 'bg-[var(--sa-accent)] text-white hover:bg-[var(--sa-accent-hover)]',
       };
     }
     if (isWarning) {
       return {
         iconBg: 'bg-[var(--warning-bg)] border-[var(--warning-border)] text-[var(--warning-text)]',
         icon: <AlertTriangle size={22} />,
-        confirmBtn: 'bg-[#EA580C] text-white hover:bg-[#c2410c]',
+        confirmBtn: 'bg-[var(--sa-warning)] text-white hover:bg-[var(--sa-warning-text)]',
       };
     }
     return {
       iconBg: 'bg-[var(--info-bg)] border-[var(--info-border)] text-[var(--info-text)]',
       icon: <AlertTriangle size={22} />,
-      confirmBtn: 'bg-cyan-600 text-white hover:bg-cyan-500',
+      confirmBtn: 'bg-[var(--sa-primary)] text-white hover:bg-[var(--sa-primary-hover)]',
     };
   };
 
@@ -115,7 +115,7 @@ export default function ConfirmDialog({
           {requireReason && (
             <div className="my-4 space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                Action Reason <span className="text-red-500">*</span>
+                Action Reason <span className="text-[var(--sa-danger-text)]">*</span>
               </label>
 
               {suggestedReasons.length > 0 && (
@@ -128,7 +128,7 @@ export default function ConfirmDialog({
                         setReason(sug);
                         setError('');
                       }}
-                      className="rounded-md border border-[var(--border-primary)] bg-[var(--hover-bg)] px-2 py-1 text-[11px] text-[var(--text-secondary)] hover:border-[#1E3FAE]/40 hover:text-[#1E3FAE] dark:hover:text-[#688bf7] transition"
+                      className="rounded-md border border-[var(--border-primary)] bg-[var(--hover-bg)] px-2 py-1 text-[11px] text-[var(--text-secondary)] hover:border-[var(--sa-primary)]/40 hover:text-[var(--sa-primary)] transition"
                     >
                       {sug}
                     </button>
@@ -147,7 +147,7 @@ export default function ConfirmDialog({
                 className="input-field"
               />
 
-              {error && <p className="text-xs font-medium text-red-500">{error}</p>}
+              {error && <p className="text-xs font-medium text-[var(--sa-danger-text)]">{error}</p>}
               <p className="text-[11px] text-[var(--text-muted)]">
                 This note will be recorded in the immutable platform audit trail for compliance.
               </p>
