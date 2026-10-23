@@ -167,8 +167,9 @@ router.post('/login', async (req, res) => {
       }
     }
 
-    // Reset login lock & failed attempts on successful login (fire-and-forget save and audit)
-    runWithSystemTenantAccess(async () => {
+    // Reset login lock & failed attempts on successful login.
+    // Await this save so it cannot overlap with the refresh-token save in issueSession().
+    await runWithSystemTenantAccess(async () => {
       user.failedLoginAttempts = 0;
       user.loginLockUntil = null;
       await user.save();
