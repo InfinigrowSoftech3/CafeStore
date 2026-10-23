@@ -272,6 +272,21 @@ export default function MenuPage() {
     };
   }, [tenant?.slug]);
 
+  // First real product photo per category, used for the category circles.
+  const categoryImages = useMemo(() => {
+    const imagesByCategoryId = {};
+    products.forEach((product) => {
+      const categoryId = String(
+        typeof product.category === 'object' ? product.category?._id : product.category || ''
+      );
+      const image = product.image || product.imageUrl;
+      if (categoryId && image && !imagesByCategoryId[categoryId]) {
+        imagesByCategoryId[categoryId] = image;
+      }
+    });
+    return imagesByCategoryId;
+  }, [products]);
+
   // Popular items (flags or top items)
   const popularItems = useMemo(() => {
     const flagged = products.filter((p) => p.popular === true);
@@ -499,6 +514,7 @@ export default function MenuPage() {
               <CustomerCategoryCircles
                 categories={categories}
                 selectedCategory={selectedCategory}
+                imagesByCategoryId={categoryImages}
                 onSelectCategory={(catId) => {
                   setShowFullMenu(false);
                   setSelectedCategory(catId);
