@@ -252,18 +252,30 @@ const updateTenantSettings = async (req, res, next, { isPartial = false } = {}) 
         existingCredentials = {};
       }
 
-      const keyId = String(payment.keyId || '').trim();
-      const keySecret = String(payment.keySecret || '').trim();
-      const webhookSecret = String(payment.webhookSecret || '').trim();
-      const clearing = payment.clear === true || (!keyId && !keySecret && !webhookSecret && !payment.preserveExisting);
+      const rawKeyId = payment.keyId !== undefined ? String(payment.keyId).trim() : undefined;
+      const rawKeySecret = payment.keySecret !== undefined ? String(payment.keySecret).trim() : undefined;
+      const rawWebhookSecret = payment.webhookSecret !== undefined ? String(payment.webhookSecret).trim() : undefined;
+
+      const clearing = payment.clear === true ||
+        (rawKeyId === '' && rawKeySecret === '' && rawWebhookSecret === '' && !payment.preserveExisting);
 
       if (clearing) {
         // Optional Razorpay keys: saving empty/cleared is allowed
         patch.paymentCredentialsEncrypted = '';
       } else {
-        const finalKeyId = keyId || existingCredentials.keyId || '';
-        const finalKeySecret = keySecret || existingCredentials.keySecret || '';
-        const finalWebhookSecret = webhookSecret || existingCredentials.webhookSecret || crypto.randomBytes(24).toString('hex');
+        const finalKeyId = rawKeyId !== undefined
+          ? rawKeyId
+          : (payment.preserveExisting ? (existingCredentials.keyId || '') : '');
+
+        const isChangingKey = rawKeyId !== undefined && existingCredentials.keyId && rawKeyId !== existingCredentials.keyId;
+
+        const finalKeySecret = rawKeySecret !== undefined
+          ? rawKeySecret
+          : (!isChangingKey && payment.preserveExisting ? (existingCredentials.keySecret || '') : '');
+
+        const finalWebhookSecret = rawWebhookSecret !== undefined
+          ? rawWebhookSecret
+          : (!isChangingKey && payment.preserveExisting ? (existingCredentials.webhookSecret || '') : '');
 
         // Keys provided: enforce format & completeness
         if (!finalKeyId) {
@@ -274,6 +286,9 @@ const updateTenantSettings = async (req, res, next, { isPartial = false } = {}) 
         }
         if (!finalKeySecret) {
           return res.status(400).json({ error: 'Razorpay Key Secret is required when configuring payments.', field: 'keySecret' });
+        }
+        if (!finalWebhookSecret) {
+          return res.status(400).json({ error: 'Razorpay Webhook Secret is required when configuring payments.', field: 'webhookSecret' });
         }
 
         patch.paymentCredentialsEncrypted = encryptTenantCredentials({
