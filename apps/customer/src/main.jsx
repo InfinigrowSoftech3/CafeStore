@@ -31,5 +31,11 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }, { once: true });
+
+  // When a newly deployed service worker takes control, reload so the page loads
+  // the fresh HTML and assets instead of the previous version's cached shell.
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
 }
 
