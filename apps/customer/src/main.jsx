@@ -34,7 +34,12 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
 
   // When a newly deployed service worker takes control, reload so the page loads
   // the fresh HTML and assets instead of the previous version's cached shell.
+  let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    const isScanning = Boolean(document.querySelector('#qr-reader'));
+    if (isScanning) return;
+    refreshing = true;
     window.location.reload();
   });
 }

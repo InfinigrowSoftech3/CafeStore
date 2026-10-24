@@ -6,12 +6,20 @@ import api from '../../services/api';
 import useCartStore from '../../context/cartStore';
 
 const extractTableToken = (value) => {
+  if (!value) return null;
+  const str = String(value).trim();
   try {
-    const url = new URL(value);
-    return url.searchParams.get('tableToken');
+    const url = new URL(str, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
+    const token = url.searchParams.get('tableToken') || url.searchParams.get('token');
+    if (token) return token;
   } catch {
-    return null;
+    // Non-URL input
   }
+  // Raw token format (signed token or hex/base64 string of 20+ chars)
+  if (/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/.test(str) || (str.length >= 24 && !str.includes(' '))) {
+    return str;
+  }
+  return null;
 };
 
 export default function QrScannerModal({ onClose, onTableFound }) {
@@ -24,28 +32,53 @@ export default function QrScannerModal({ onClose, onTableFound }) {
   const [pendingTable, setPendingTable] = useState(null);
   const { setTable, tableNumber, items, clearCart } = useCartStore();
 
-  useEffect(() => {
-    const scanner = new Html5Qrcode('qr-reader');
-    scannerRef.current = scanner;
+  const safelyStopScanner = async () => {
+    const activeScanner = scannerRef.current;
+    if (!activeScanner) return;
+    try {
+      if (activeScanner.isScanning || (typeof activeScanner.getState === 'function' && activeScanner.getState() === 2)) {
+        await activeScanner.stop().catch(() => {});
+      }
+      try {
+        activeScanner.clear();
+      } catch {
+        // Element may already be unmounted
+      }
+    } catch {
+      // Ignore scanner stop errors on cleanup
+    }
+  };
 
-    scanner.start(
-      { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 240, height: 240 } },
-      async (decodedText) => {
-        if (isProcessingRef.current) return;
-        isProcessingRef.current = true;
-        await handleTableValue(decodedText);
-      },
-      () => {}
-    ).catch(() => {
-      setError('Camera access is unavailable. Please grant camera permissions and try again.');
-    });
+  useEffect(() => {
+    isClosedRef.current = false;
+    let scanner;
+    try {
+      scanner = new Html5Qrcode('qr-reader');
+      scannerRef.current = scanner;
+
+      scanner.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 240, height: 240 } },
+        async (decodedText) => {
+          if (isProcessingRef.current || isClosedRef.current) return;
+          isProcessingRef.current = true;
+          await handleTableValue(decodedText);
+        },
+        () => {}
+      ).catch(() => {
+        if (!isClosedRef.current) {
+          setError('Camera access is unavailable. Please grant camera permissions and try again.');
+        }
+      });
+    } catch {
+      if (!isClosedRef.current) {
+        setError('Unable to initialize camera scanner.');
+      }
+    }
 
     return () => {
-      const activeScanner = scannerRef.current;
-      if (activeScanner?.isScanning) {
-        activeScanner.stop().catch(() => {});
-      }
+      isClosedRef.current = true;
+      safelyStopScanner();
     };
   }, []);
 
@@ -92,9 +125,13 @@ export default function QrScannerModal({ onClose, onTableFound }) {
       });
 
       if (onTableFound) {
-        onTableFound(num, token);
+        try {
+          onTableFound(num, token);
+        } catch {
+          // Guard callback errors
+        }
       }
-      handleClose();
+      await handleClose();
     } catch (err) {
       setError('This table number is not active. Please scan a valid table QR code.');
       setTimeout(() => {
@@ -121,13 +158,10 @@ export default function QrScannerModal({ onClose, onTableFound }) {
     }, 1000);
   };
 
-  const handleClose = () => {
+  const handleClose = async () => {
     if (isClosedRef.current) return;
     isClosedRef.current = true;
-    const activeScanner = scannerRef.current;
-    if (activeScanner?.isScanning) {
-      activeScanner.stop().catch(() => {});
-    }
+    await safelyStopScanner();
     if (typeof onClose === 'function') {
       onClose();
     }

@@ -1,12 +1,15 @@
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
-import { Coffee } from 'lucide-react';
+import { Coffee, QrCode } from 'lucide-react';
 import { useTenant } from '../../context/TenantContext';
+import useCartStore from '../../context/cartStore';
 
 export default function Navbar() {
   const tenant = useTenant();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const currentSearch = searchParams.toString() ? `?${searchParams.toString()}` : '';
+  const tableNumber = useCartStore((state) => state.tableNumber);
+  const openScanner = useCartStore((state) => state.openScanner);
 
   // Focused checkout flows and the immersive About story use their own header.
   if (['/cart', '/checkout', '/about'].includes(location.pathname)) {
@@ -46,6 +49,38 @@ export default function Navbar() {
           </div>
         </Link>
 
+        {/* Connected Table Indicator / Scanner trigger */}
+        <div className="flex flex-shrink-0 items-center">
+          {tableNumber ? (
+            <button
+              type="button"
+              onClick={openScanner}
+              title={`Connected to Table ${tableNumber}. Tap to switch or re-scan table.`}
+              aria-label={`Connected to Table ${tableNumber}. Tap to switch or re-scan table.`}
+              className="group flex min-h-[38px] items-center gap-2 rounded-full border border-emerald-300 bg-emerald-50/90 px-3 py-1 text-emerald-900 shadow-2xs transition hover:bg-emerald-100 hover:border-emerald-400 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
+            >
+              <span className="relative flex h-2.5 w-2.5 flex-shrink-0" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-600" />
+              </span>
+              <div className="flex flex-col items-start leading-none">
+                <span className="text-[9px] font-semibold uppercase tracking-wider text-emerald-700">Connected</span>
+                <span className="font-display text-xs font-bold text-emerald-950">Table {String(tableNumber).padStart(2, '0')}</span>
+              </div>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={openScanner}
+              title="Scan table QR code to order"
+              aria-label="Scan table QR code to order"
+              className="group flex min-h-[38px] items-center gap-1.5 rounded-full border border-[#EFE4D6] bg-[#FBF6EF] px-3 py-1.5 text-xs font-bold text-[#7A3316] shadow-2xs transition hover:bg-[#F3E9DC] hover:border-[#7A3316]/30 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7A3316]"
+            >
+              <QrCode size={16} className="stroke-[2.2] text-[#7A3316]" />
+              <span className="font-display text-xs font-bold">Scan Table</span>
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );

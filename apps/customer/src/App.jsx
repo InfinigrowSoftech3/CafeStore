@@ -70,24 +70,48 @@ class ChunkErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
+      if (this.state.isChunkError) {
+        return (
+          <div className="min-h-[100dvh] bg-[#FAFAF8] text-[#2B1810] flex flex-col items-center justify-center p-6 text-center">
+            <div className="w-14 h-14 rounded-full border border-amber-200 bg-[#F3E9DC] flex items-center justify-center mb-4 text-2xl shadow-xs">
+              ☕
+            </div>
+            <h2 className="text-2xl font-bold font-display text-[#2B1810] mb-2 tracking-tight">Updated Version Available</h2>
+            <p className="text-sm text-stone-600 max-w-sm mb-6 leading-relaxed">
+              A new version of the café site was just deployed. Please refresh to load the updated page.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                sessionStorage.removeItem('chunk_boundary_reload');
+                window.location.reload();
+              }}
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[#7A3316] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#5E2610] active:scale-95"
+            >
+              Refresh Now
+            </button>
+          </div>
+        );
+      }
+
       return (
         <div className="min-h-[100dvh] bg-[#FAFAF8] text-[#2B1810] flex flex-col items-center justify-center p-6 text-center">
           <div className="w-14 h-14 rounded-full border border-amber-200 bg-[#F3E9DC] flex items-center justify-center mb-4 text-2xl shadow-xs">
             ☕
           </div>
-          <h2 className="text-2xl font-bold font-display text-[#2B1810] mb-2 tracking-tight">Updated Version Available</h2>
-          <p className="text-sm text-stone-600 max-w-sm mb-6 leading-relaxed">
-            A new version of the café site was just deployed. Please refresh to load the updated page.
+          <h2 className="text-xl font-bold font-display text-[#2B1810] mb-2">Something went wrong</h2>
+          <p className="text-sm text-stone-600 max-w-sm mb-6">
+            We encountered a temporary issue. Tap below to return to the menu.
           </p>
           <button
             type="button"
             onClick={() => {
-              sessionStorage.removeItem('chunk_boundary_reload');
-              window.location.reload();
+              this.setState({ hasError: false, isChunkError: false });
+              window.location.href = '/menu';
             }}
             className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[#7A3316] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#5E2610] active:scale-95"
           >
-            Refresh Now
+            Back to Menu
           </button>
         </div>
       );
