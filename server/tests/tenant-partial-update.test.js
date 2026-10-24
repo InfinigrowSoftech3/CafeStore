@@ -33,6 +33,9 @@ test('Onboarding Wizard & Tenant Partial Update Validation Suite', async (t) => 
 
   t.after(async () => {
     if (server) await new Promise((resolve) => server.close(resolve));
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.connection.close();
+    }
   });
 
   // Provision test tenant and owner
