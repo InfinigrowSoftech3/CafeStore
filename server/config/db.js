@@ -43,6 +43,7 @@ export const connectDB = async () => {
   if (!cached.promise) {
     const startTime = Date.now();
     const opts = {
+      autoIndex: process.env.NODE_ENV !== 'test',
       maxPoolSize: Number(process.env.MONGO_MAX_POOL_SIZE) || 10,
       minPoolSize: Number(process.env.MONGO_MIN_POOL_SIZE) || 2,
       serverSelectionTimeoutMS: Number(process.env.MONGO_CONNECT_TIMEOUT_MS) || 10000,
@@ -51,11 +52,17 @@ export const connectDB = async () => {
       w: 'majority',
     };
 
+    if (process.env.NODE_ENV === 'test') {
+      mongoose.set('autoIndex', false);
+    }
+
     cached.promise = mongoose.connect(mongoUri, opts).then(async (conn) => {
       const duration = Date.now() - startTime;
       console.log(`DB connected in ${duration}ms`);
       console.log(`✅ MongoDB Connected: ${conn.connection.host} (pool: ${conn.connection.client?.options?.maxPoolSize || 10})`);
-      await dropObsoleteTenantIndexes(conn.connection.db);
+      if (process.env.NODE_ENV !== 'test') {
+        await dropObsoleteTenantIndexes(conn.connection.db);
+      }
       return conn;
     }).catch((error) => {
       cached.promise = null;
