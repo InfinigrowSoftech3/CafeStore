@@ -87,6 +87,10 @@ export default function OrdersPage() {
   const { user } = useAuth();
   const canEditOrRefund = ['owner', 'manager'].includes(effectiveRole(user?.role));
   const audioContext = useRef(null);
+  // Guards against duplicate /session/requests fetches (e.g. mount + immediate
+  // live-stream reconnect both triggering loadServiceRequests).
+  const lastServiceRequestsFetchAt = useRef(0);
+  const SERVICE_REQUESTS_REFETCH_MS = 3000;
 
   const playNewOrderAlert = () => {
     try {
@@ -116,6 +120,9 @@ export default function OrdersPage() {
   });
 
   const loadServiceRequests = async () => {
+    const now = Date.now();
+    if (now - lastServiceRequestsFetchAt.current < SERVICE_REQUESTS_REFETCH_MS) return;
+    lastServiceRequestsFetchAt.current = now;
     try {
       const { data } = await api.get('/session/requests');
       setServiceRequests(data.requests || []);

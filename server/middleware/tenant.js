@@ -80,7 +80,19 @@ export const isCustomerPublicRoute = (req) => {
   if (p.startsWith('/api/orders/') && (p.endsWith('/receipt') || req.query.accessToken)) return true;
   if (p === '/api/tables/qr/validate') return true;
   if (p.startsWith('/api/tables/') && (p.endsWith('/call-waiter') || p.endsWith('/request-bill'))) return true;
-  if (p === '/api/session' || p.startsWith('/api/session/')) return true;
+  // Customer-scoped dining-session endpoints (unauthenticated, tenant-scoped by
+  // slug/tableToken). Staff-only session endpoints are intentionally excluded below
+  // so tenantResolver derives the café from the authenticated staff token instead of
+  // falling back to the default café (which previously caused a misleading 404).
+  if (p === '/api/session' && req.method === 'POST') return true;
+  if (p === '/api/session/validate') return true;
+  if (p === '/api/session/bill') return true;
+  if (p === '/api/session/request' && req.method === 'POST') return true;
+  if (p === '/api/session/bill/receipt-data') return true;
+  if (p === '/api/session/bill/receipt') return true;
+  if (p === '/api/session/bill/cash' && req.method === 'POST') return true;
+  if (p === '/api/session/bill/payment/create' && req.method === 'POST') return true;
+  if (p === '/api/session/bill/payment/verify' && req.method === 'POST') return true;
   if (p === '/api/gallery' && req.method === 'GET') return true;
   if (p === '/api/reviews' && (req.method === 'GET' || req.method === 'POST')) return true;
   if (p === '/api/coupons/validate') return true;
@@ -296,6 +308,21 @@ export const tenantResolver = async (req, res, next) => {
         req.path.startsWith('/api/admin')
       ) {
         return next();
+      }
+      // No café could be resolved. If the client provided no auth credentials, the
+      // route's own auth middleware (protect) is responsible for the response, so
+      // return a proper 401 instead of a misleading "Café not found" 404. If auth
+      // credentials were supplied but still no tenant matched, the café genuinely
+      // does not exist for this caller -> 404.
+      const hasAuth =
+        (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) ||
+        req.cookies?.brewhaus_access_token;
+      if (!hasAuth) {
+        return res.status(401).json({
+          success: false,
+          error: { code: 'UNAUTHENTICATED', message: 'Authentication is required.' },
+          message: 'Authentication is required.',
+        });
       }
       return cleanTenantError(res, 404, 'Café not found. Please scan a table QR code or specify a valid café.');
     }

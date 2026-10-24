@@ -50,6 +50,7 @@ import { requestContext } from './middleware/requestContext.js';
 import { validateRequestEnvelope } from './middleware/requestValidation.js';
 import { tenantResolver } from './middleware/tenant.js';
 import { validateEnv } from './config/env.js';
+import { logRouteNotFound } from './utils/logger.js';
 
 dotenv.config();
 
@@ -492,6 +493,7 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
   });
 
   app.use((req, res) => {
+    logRouteNotFound(req);
     if (req.accepts('html')) {
       return res.status(404).send(`<!DOCTYPE html>
 <html lang="en">

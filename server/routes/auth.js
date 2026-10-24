@@ -22,6 +22,7 @@ import { sendPasswordResetEmail } from '../services/emailService.js';
 import { sendSms } from '../services/smsService.js';
 import { getRedisClient } from '../config/redis.js';
 import { publicTenantSettings } from '../utils/tenantSecrets.js';
+import { logLoginFailure, logLoginSuccess } from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -94,6 +95,7 @@ router.post('/login', async (req, res) => {
       return User.findOne({ email: normalizedEmail }).select('+password +failedLoginAttempts +loginLockUntil +twoFactorSecretEncrypted');
     });
     if (!user) {
+      logLoginFailure(req, 'user_not_found');
       recordLoginAttemptForIp(clientIp, false, normalizedEmail).catch((err) => console.error('[Auth] Lockout record error:', err.message));
       runWithSystemTenantAccess(async () => {
         try {
@@ -116,6 +118,7 @@ router.post('/login', async (req, res) => {
     }
 
     if (user.loginLockUntil && user.loginLockUntil > new Date()) {
+      logLoginFailure(req, 'account_locked');
       recordLoginAttemptForIp(clientIp, false, normalizedEmail).catch((err) => console.error('[Auth] Lockout record error:', err.message));
       return res.status(423).json({ error: 'Login is temporarily locked. Try again later.', code: 'LOGIN_LOCKED' });
     }
@@ -123,12 +126,14 @@ router.post('/login', async (req, res) => {
     if (user.tenantId) {
       const tenant = await runWithSystemTenantAccess(async () => Tenant.findById(user.tenantId).lean());
       if (tenant && tenant.status !== 'active') {
+        logLoginFailure(req, 'tenant_suspended');
         return res.status(423).json({ error: 'This café account is suspended.', code: 'TENANT_SUSPENDED' });
       }
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      logLoginFailure(req, 'invalid_password');
       recordLoginFailure(user).catch((err) => console.error('[Auth] Record login failure error:', err.message));
       recordLoginAttemptForIp(clientIp, false, normalizedEmail).catch((err) => console.error('[Auth] Lockout record error:', err.message));
       runWithSystemTenantAccess(async () => {
@@ -149,6 +154,7 @@ router.post('/login', async (req, res) => {
     if (user.twoFactorEnabled && effectiveRole(user) === 'owner') {
       const secret = decryptTwoFactorSecret(user.twoFactorSecretEncrypted);
       if (!verifyTotpCode(secret, req.body?.twoFactorCode)) {
+        logLoginFailure(req, 'invalid_2fa');
         recordLoginFailure(user).catch((err) => console.error('[Auth] Record login failure error:', err.message));
         recordLoginAttemptForIp(clientIp, false, normalizedEmail).catch((err) => console.error('[Auth] Lockout record error:', err.message));
         runWithSystemTenantAccess(async () => {
@@ -192,6 +198,12 @@ router.post('/login', async (req, res) => {
     const tenant = user.tenantId
       ? await runWithSystemTenantAccess(async () => Tenant.findById(user.tenantId).lean())
       : null;
+
+    logLoginSuccess(req, {
+      userId: String(user._id),
+      tenantId: user.tenantId ? String(user.tenantId) : undefined,
+      role: user.role,
+    });
 
     const userRole = (user.role === 'owner' || user.role === 'admin') ? 'CAFE_ADMIN' : user.role.toUpperCase();
     const cafes = tenant ? [{
