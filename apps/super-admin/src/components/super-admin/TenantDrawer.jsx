@@ -72,17 +72,17 @@ export default function TenantDrawer({
             transition={{ type: 'spring', damping: 30, stiffness: 350 }}
             className="w-screen max-w-full sm:max-w-xl flex flex-col justify-between custom-scrollbar"
             style={{
-              backgroundColor: 'var(--bg-card, #FFFFFF)',
-              borderLeftColor: 'var(--border-primary, #E3E8F5)',
-              color: 'var(--text-primary, #1B2559)',
-              boxShadow: 'var(--popover-shadow, 0 4px 20px -2px rgba(11, 27, 77, 0.06))',
+              backgroundColor: 'var(--bg-card)',
+              borderLeftColor: 'var(--border-primary)',
+              color: 'var(--text-primary)',
+              boxShadow: 'var(--popover-shadow)',
             }}
           >
             {/* Header */}
-            <div className="p-4 sm:p-6 border-b border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)]/80">
+            <div className="p-4 sm:p-6 border-b border-[var(--border-primary)] bg-[var(--hover-bg)]/80">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1E3FAE]/15 to-[#D4AF37]/20 border border-[#E6CF7A]/60 text-[#0B1B4D] font-bold text-sm sm:text-base shadow-inner">
+                  <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--sa-primary-subtle)] to-[var(--sa-primary-tint)] border border-[var(--sa-primary-border)] text-[var(--sa-primary)] font-bold text-sm sm:text-base shadow-inner">
                     {tenant.settings?.logoUrl ? (
                       <img src={tenant.settings.logoUrl} alt="" className="h-full w-full rounded-2xl object-cover" />
                     ) : (
@@ -92,15 +92,15 @@ export default function TenantDrawer({
 
                   <div className="min-w-0 truncate">
                     <div className="flex items-center gap-2">
-                      <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary,#1B2559)] tracking-tight truncate">
+                      <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary)] tracking-tight truncate">
                         {tenant.name}
                       </h2>
                       <span
                         className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border shrink-0"
                         style={{
-                          backgroundColor: isSuspended ? 'var(--status-suspended-bg, rgba(220,38,38,0.1))' : 'var(--status-active-bg, rgba(18,163,122,0.1))',
-                          color: isSuspended ? 'var(--status-suspended-text, #B91C1C)' : 'var(--status-active-text, #0E7D5D)',
-                          borderColor: isSuspended ? 'var(--status-suspended-border, rgba(220,38,38,0.25))' : 'var(--status-active-border, rgba(18,163,122,0.25))',
+                          backgroundColor: isSuspended ? 'var(--status-suspended-bg)' : 'var(--status-active-bg)',
+                          color: isSuspended ? 'var(--status-suspended-text)' : 'var(--status-active-text)',
+                          borderColor: isSuspended ? 'var(--status-suspended-border)' : 'var(--status-active-border)',
                         }}
                       >
                         {tenant.status}
@@ -112,16 +112,16 @@ export default function TenantDrawer({
                         href={liveStorefrontUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-mono text-xs text-[#1E3FAE] hover:underline inline-flex items-center gap-1 font-semibold truncate"
+                        className="font-mono text-xs text-[var(--sa-primary)] hover:underline inline-flex items-center gap-1 font-semibold truncate"
                       >
                         {tenant.slug} <ExternalLink size={10} />
                       </a>
                       <button
                         onClick={handleCopyLink}
-                        className="text-[var(--text-muted,#8E9BBF)] hover:text-[#1E3FAE] transition p-0.5 shrink-0"
+                        className="text-[var(--text-muted)] hover:text-[var(--sa-primary)] transition p-0.5 shrink-0"
                         title="Copy live link"
                       >
-                        {copied ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+                        {copied ? <Check size={11} className="text-[var(--sa-success)]" /> : <Copy size={11} />}
                       </button>
                     </div>
                   </div>
@@ -129,7 +129,7 @@ export default function TenantDrawer({
 
                 <button
                   onClick={onClose}
-                  className="rounded-xl p-2 text-[var(--text-muted,#8E9BBF)] hover:bg-[var(--hover-bg,#EEF2FA)] hover:text-[var(--text-primary,#1B2559)] transition shrink-0"
+                  className="rounded-xl p-2 text-[var(--text-muted)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-primary)] transition shrink-0"
                   aria-label="Close"
                 >
                   <X size={18} />
@@ -140,21 +140,21 @@ export default function TenantDrawer({
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 sm:mt-5">
                 <button
                   onClick={() => onOpenPanel && onOpenPanel(tenant)}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[#1E3FAE]/30 bg-[#1E3FAE]/10 py-2 px-2 text-xs font-semibold text-[#1E3FAE] hover:bg-[#1E3FAE]/20 transition"
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[var(--sa-primary)]/30 bg-[var(--sa-primary-subtle)] py-2 px-2 text-xs font-semibold text-[var(--sa-primary)] hover:bg-[var(--sa-primary-subtle)] hover:opacity-90 transition"
                 >
                   <Eye size={12} /> User Panel
                 </button>
 
                 <button
                   onClick={() => onImpersonate && onImpersonate(tenant)}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-surface,#FFFFFF)] py-2 px-2 text-xs font-semibold text-[var(--text-secondary,#3B4874)] hover:border-[#1E3FAE]/50 hover:text-[#1E3FAE] transition"
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] py-2 px-2 text-xs font-semibold text-[var(--text-secondary)] hover:border-[var(--sa-primary)]/50 hover:text-[var(--sa-primary)] transition"
                 >
                   <ArrowUpRight size={12} /> Impersonate
                 </button>
 
                 <button
                   onClick={() => onChangePlan && onChangePlan(tenant)}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-surface,#FFFFFF)] py-2 px-2 text-xs font-semibold text-[var(--text-secondary,#3B4874)] hover:border-[#1E3FAE]/50 hover:text-[#1E3FAE] transition capitalize"
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] py-2 px-2 text-xs font-semibold text-[var(--text-secondary)] hover:border-[var(--sa-primary)]/50 hover:text-[var(--sa-primary)] transition capitalize"
                 >
                   <Layers size={12} /> Plan ({tenant.plan || 'Starter'})
                 </button>
@@ -163,8 +163,8 @@ export default function TenantDrawer({
                   onClick={() => onToggleStatus && onToggleStatus(tenant)}
                   className={`flex items-center justify-center gap-1.5 rounded-xl py-2 px-2 text-xs font-semibold transition ${
                     isSuspended
-                      ? 'border border-emerald-500/30 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                      : 'border border-red-500/30 bg-red-50 text-red-700 hover:bg-red-100'
+                      ? 'border border-[var(--sa-success-border)] bg-[var(--sa-success-bg)] text-[var(--sa-success-text)] hover:bg-[var(--sa-success-bg)] hover:opacity-90'
+                      : 'border border-[var(--sa-danger-border)] bg-[var(--sa-danger-bg)] text-[var(--sa-danger-text)] hover:bg-[var(--sa-danger-bg)] hover:opacity-90'
                   }`}
                 >
                   <ShieldAlert size={12} /> {isSuspended ? 'Reactivate' : 'Suspend'}
@@ -172,7 +172,7 @@ export default function TenantDrawer({
               </div>
 
               {/* Drawer Tabs Navigation */}
-              <div className="flex border-b border-[var(--border-primary,#E3E8F5)] mt-4 -mb-4 sm:-mb-6 space-x-4 sm:space-x-6 overflow-x-auto no-scrollbar">
+              <div className="flex border-b border-[var(--border-primary)] mt-4 -mb-4 sm:-mb-6 space-x-4 sm:space-x-6 overflow-x-auto no-scrollbar">
                 {[
                   { id: 'overview', label: 'Overview & Usage' },
                   { id: 'settings', label: 'Branding & Info' },
@@ -184,8 +184,8 @@ export default function TenantDrawer({
                     onClick={() => setActiveTab(tab.id)}
                     className={`pb-3 text-xs font-semibold tracking-wide transition border-b-2 -mb-px shrink-0 whitespace-nowrap ${
                       activeTab === tab.id
-                        ? 'border-[#D4AF37] text-[#1E3FAE] font-bold'
-                        : 'border-transparent text-[var(--text-muted,#8E9BBF)] hover:text-[var(--text-primary,#1B2559)]'
+                        ? 'border-[var(--sa-primary)] text-[var(--sa-primary)] font-bold'
+                        : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}
                   >
                     {tab.label}
@@ -201,49 +201,49 @@ export default function TenantDrawer({
                 <div className="space-y-6">
                   {/* Quotas & Counts */}
                   <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted,#8E9BBF)] mb-3">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3">
                       Resource Usage & Allocation
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-2xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-card,#FFFFFF)] p-3 sm:p-4 shadow-xs">
-                        <div className="text-[11px] text-[var(--text-muted,#8E9BBF)]">Total QR Tables</div>
-                        <div className="text-xl sm:text-2xl font-black text-[var(--text-primary,#1B2559)] mt-1 tabular-nums">
+                      <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-3 sm:p-4 shadow-xs">
+                        <div className="text-[11px] text-[var(--text-muted)]">Total QR Tables</div>
+                        <div className="text-xl sm:text-2xl font-black text-[var(--text-primary)] mt-1 tabular-nums">
                           {tenant.tableCount || 0}
                         </div>
-                        <div className="text-[10px] text-[var(--text-muted,#8E9BBF)] mt-0.5">Assigned dine-in stations</div>
+                        <div className="text-[10px] text-[var(--text-muted)] mt-0.5">Assigned dine-in stations</div>
                       </div>
 
-                      <div className="rounded-2xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-card,#FFFFFF)] p-3 sm:p-4 shadow-xs">
-                        <div className="text-[11px] text-[var(--text-muted,#8E9BBF)]">Menu Food & Beverages</div>
-                        <div className="text-xl sm:text-2xl font-black text-[var(--text-primary,#1B2559)] mt-1 tabular-nums">
+                      <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-3 sm:p-4 shadow-xs">
+                        <div className="text-[11px] text-[var(--text-muted)]">Menu Food & Beverages</div>
+                        <div className="text-xl sm:text-2xl font-black text-[var(--text-primary)] mt-1 tabular-nums">
                           {tenant.productCount || 0}
                         </div>
-                        <div className="text-[10px] text-[var(--text-muted,#8E9BBF)] mt-0.5">Active catalog items</div>
+                        <div className="text-[10px] text-[var(--text-muted)] mt-0.5">Active catalog items</div>
                       </div>
                     </div>
                   </div>
 
                   {/* Owner Credentials */}
                   <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted,#8E9BBF)] mb-3">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3">
                       Account Ownership
                     </h3>
-                    <div className="rounded-2xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-card,#FFFFFF)] p-4 space-y-2.5 text-xs shadow-xs">
+                    <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-4 space-y-2.5 text-xs shadow-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-[var(--text-muted,#8E9BBF)]">Owner Name:</span>
-                        <span className="font-semibold text-[var(--text-primary,#1B2559)]">{tenant.ownerName || 'Unassigned'}</span>
+                        <span className="text-[var(--text-muted)]">Owner Name:</span>
+                        <span className="font-semibold text-[var(--text-primary)]">{tenant.ownerName || 'Unassigned'}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-[var(--text-muted,#8E9BBF)]">Contact Email:</span>
-                        <span className="font-mono text-[var(--text-secondary,#3B4874)]">{tenant.ownerEmail || 'Unassigned'}</span>
+                        <span className="text-[var(--text-muted)]">Contact Email:</span>
+                        <span className="font-mono text-[var(--text-secondary)]">{tenant.ownerEmail || 'Unassigned'}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-[var(--text-muted,#8E9BBF)]">Tenant UUID:</span>
-                        <span className="font-mono text-[10px] sm:text-[11px] text-[var(--text-muted,#8E9BBF)] truncate max-w-[200px]">{tenant.id}</span>
+                        <span className="text-[var(--text-muted)]">Tenant UUID:</span>
+                        <span className="font-mono text-[10px] sm:text-[11px] text-[var(--text-muted)] truncate max-w-[200px]">{tenant.id}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-[var(--text-muted,#8E9BBF)]">Registration Date:</span>
-                        <span className="text-[var(--text-secondary,#3B4874)]">{new Date(tenant.createdAt).toLocaleDateString()}</span>
+                        <span className="text-[var(--text-muted)]">Registration Date:</span>
+                        <span className="text-[var(--text-secondary)]">{new Date(tenant.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </div>
@@ -253,15 +253,15 @@ export default function TenantDrawer({
               {/* TAB 2: Settings & Branding */}
               {activeTab === 'settings' && (
                 <div className="space-y-4">
-                  <div className="rounded-2xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-card,#FFFFFF)] p-4 space-y-3 text-xs shadow-xs">
-                    <h4 className="font-bold text-[var(--text-primary,#1B2559)]">Storefront Appearance</h4>
+                  <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-4 space-y-3 text-xs shadow-xs">
+                    <h4 className="font-bold text-[var(--text-primary)]">Storefront Appearance</h4>
                     <div className="flex items-center justify-between">
-                      <span className="text-[var(--text-muted,#8E9BBF)]">Theme Palette:</span>
-                      <span className="font-semibold text-[var(--text-primary,#1B2559)] capitalize">{tenant.settings?.theme || 'Default Emerald'}</span>
+                      <span className="text-[var(--text-muted)]">Theme Palette:</span>
+                      <span className="font-semibold text-[var(--text-primary)] capitalize">{tenant.settings?.theme || 'Default Emerald'}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[var(--text-muted,#8E9BBF)]">Pure Vegetarian Mode:</span>
-                      <span className="font-semibold text-emerald-600">Active (100% Veg Enforced)</span>
+                      <span className="text-[var(--text-muted)]">Pure Vegetarian Mode:</span>
+                      <span className="font-semibold text-[var(--sa-success-text)]">Active (100% Veg Enforced)</span>
                     </div>
                   </div>
                 </div>
@@ -273,15 +273,15 @@ export default function TenantDrawer({
                   {mockRecentOrders.map((ord) => (
                     <div
                       key={ord.id}
-                      className="p-3.5 rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] text-xs flex items-center justify-between"
+                      className="p-3.5 rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] text-xs flex items-center justify-between"
                     >
                       <div>
-                        <div className="font-bold text-[var(--text-primary,#1B2559)]">{ord.id} · {ord.table}</div>
-                        <div className="text-[11px] text-[var(--text-muted,#8E9BBF)]">{ord.items} items · {ord.time}</div>
+                        <div className="font-bold text-[var(--text-primary)]">{ord.id} · {ord.table}</div>
+                        <div className="text-[11px] text-[var(--text-muted)]">{ord.items} items · {ord.time}</div>
                       </div>
                       <div className="text-right">
-                        <div className="font-black text-[#1E3FAE] tabular-nums">{ord.total}</div>
-                        <div className="text-[10px] text-[var(--text-muted,#8E9BBF)]">Paid online</div>
+                        <div className="font-black text-[var(--sa-primary)] tabular-nums">{ord.total}</div>
+                        <div className="text-[10px] text-[var(--text-muted)]">Paid online</div>
                       </div>
                     </div>
                   ))}
@@ -292,26 +292,26 @@ export default function TenantDrawer({
               {activeTab === 'audit' && (
                 <div className="space-y-3">
                   {tenantAuditLogs.length === 0 ? (
-                    <div className="py-8 text-center text-xs text-[var(--text-muted,#8E9BBF)]">
+                    <div className="py-8 text-center text-xs text-[var(--text-muted)]">
                       No specific administrative events logged for this café yet.
                     </div>
                   ) : (
                     tenantAuditLogs.map((log) => (
                       <div
                         key={log._id || Math.random()}
-                        className="p-3.5 rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] text-xs space-y-1"
+                        className="p-3.5 rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] text-xs space-y-1"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-[#1E3FAE]">{log.action}</span>
-                          <span className="text-[10px] text-[var(--text-muted,#8E9BBF)]">
+                          <span className="font-bold text-[var(--sa-primary)]">{log.action}</span>
+                          <span className="text-[10px] text-[var(--text-muted)]">
                             {new Date(log.createdAt).toLocaleString()}
                           </span>
                         </div>
-                        <div className="text-[var(--text-muted,#8E9BBF)] text-[11px]">
-                          Actor: <span className="text-[var(--text-secondary,#3B4874)]">{log.actorEmail}</span>
+                        <div className="text-[var(--text-muted)] text-[11px]">
+                          Actor: <span className="text-[var(--text-secondary)]">{log.actorEmail}</span>
                         </div>
                         {log.details?.reason && (
-                          <div className="text-[var(--text-secondary,#3B4874)] italic text-[11px]">
+                          <div className="text-[var(--text-secondary)] italic text-[11px]">
                             Reason: "{log.details.reason}"
                           </div>
                         )}
@@ -323,11 +323,11 @@ export default function TenantDrawer({
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[var(--text-muted,#5B6585)]">
+            <div className="p-4 border-t border-[var(--border-primary)] bg-[var(--hover-bg)] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[var(--text-muted)]">
               <span className="truncate">Tenant ID: <span className="font-mono text-[10px]">{tenant.id}</span></span>
               <button
                 onClick={onClose}
-                className="w-full sm:w-auto rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-surface,#FFFFFF)] px-4 py-2 font-semibold text-[var(--text-secondary,#3B4874)] hover:bg-[var(--hover-bg,#EEF2FA)] transition text-center"
+                className="w-full sm:w-auto rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] px-4 py-2 font-semibold text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] transition text-center"
               >
                 Close Drawer
               </button>

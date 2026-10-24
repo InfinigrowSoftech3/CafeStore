@@ -46,28 +46,28 @@ export default function KpiCard({
 
     if (isGmv) {
       return {
-        badge: 'bg-[#FBF3D5] text-[#0B1B4D] border-[#E6CF7A]',
-        stroke: 'stroke-[#D4AF37]',
-        icon: 'text-[#0B1B4D]',
-        chip: 'bg-[#FBF3D5] text-[#0B1B4D] border-[#E6CF7A]',
+        badge: 'bg-[var(--sa-primary-tint)] text-[var(--sa-primary)] border-[var(--sa-primary-border)]',
+        stroke: 'stroke-[var(--sa-primary)]',
+        icon: 'text-[var(--sa-primary)]',
+        chip: 'bg-[var(--sa-primary-subtle)] text-[var(--sa-primary)] border-[var(--sa-primary-border)]',
       };
     }
 
     if (isSuspended) {
       return {
         badge: 'bg-[var(--danger-bg)] text-[var(--danger-text)] border-[var(--danger-border)]',
-        stroke: 'stroke-[#DC2626]',
-        icon: 'text-[#DC2626]',
+        stroke: 'stroke-[var(--sa-accent)]',
+        icon: 'text-[var(--sa-accent)]',
         chip: 'bg-[var(--danger-bg)] text-[var(--danger-text)] border-[var(--danger-border)]',
       };
     }
 
     // Default / Positive / Active cards -> Royal blue sparkline, soft blue chip
     return {
-      badge: 'bg-[#1E3FAE]/10 text-[#1E3FAE] border-[#1E3FAE]/20',
-      stroke: 'stroke-[#1E3FAE]',
-      icon: 'text-[#1E3FAE]',
-      chip: 'bg-[#1E3FAE]/10 text-[#1E3FAE] border-[#1E3FAE]/20',
+      badge: 'bg-[var(--sa-primary-subtle)] text-[var(--sa-primary)] border-[var(--sa-primary-border)]',
+      stroke: 'stroke-[var(--sa-primary)]',
+      icon: 'text-[var(--sa-primary)]',
+      chip: 'bg-[var(--sa-primary-subtle)] text-[var(--sa-primary)] border-[var(--sa-primary-border)]',
     };
   };
 

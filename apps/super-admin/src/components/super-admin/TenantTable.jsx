@@ -174,27 +174,27 @@ export default function TenantTable({
   const getStatusStyles = (status) => {
     if (status === 'active') {
       return {
-        bg: 'var(--status-active-bg, rgba(18, 163, 122, 0.10))',
-        text: 'var(--status-active-text, #0E7D5D)',
-        border: 'var(--status-active-border, rgba(18, 163, 122, 0.25))',
-        dot: '#12A37A',
+        bg: 'var(--status-active-bg)',
+        text: 'var(--status-active-text)',
+        border: 'var(--status-active-border)',
+        dot: 'var(--status-active-text)',
       };
     }
     return {
-      bg: 'var(--status-suspended-bg, rgba(220, 38, 38, 0.10))',
-      text: 'var(--status-suspended-text, #B91C1C)',
-      border: 'var(--status-suspended-border, rgba(220, 38, 38, 0.25))',
-      dot: '#DC2626',
+      bg: 'var(--status-suspended-bg)',
+      text: 'var(--status-suspended-text)',
+      border: 'var(--status-suspended-border)',
+      dot: 'var(--status-suspended-text)',
     };
   };
 
   return (
     <div className="space-y-4">
       {/* ── Toolbar ─────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-card,#FFFFFF)] p-3 sm:p-4 shadow-xs md:flex-row md:items-center md:justify-between transition-colors">
+      <div className="flex flex-col gap-3 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-3 sm:p-4 shadow-xs md:flex-row md:items-center md:justify-between transition-colors">
         {/* Left: Search input */}
         <div className="relative flex-1 w-full md:max-w-md">
-          <Search size={15} className="absolute left-3.5 top-3 text-[var(--text-muted,#5B6585)]" />
+          <Search size={15} className="absolute left-3.5 top-3 text-[var(--text-muted)]" />
           <input
             type="text"
             value={search}
@@ -203,7 +203,7 @@ export default function TenantTable({
               setPage(1);
             }}
             placeholder="Search cafés by name, slug, or owner email..."
-            className="w-full rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--input-bg,#FFFFFF)] pl-10 pr-4 py-2 text-xs text-[var(--text-primary,#1B2559)] placeholder-[var(--text-muted,#8E9BBF)] focus:border-[#1E3FAE] focus:outline-none focus:ring-1 focus:ring-[#1E3FAE] transition"
+            className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--input-bg)] pl-10 pr-4 py-2 text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-[var(--sa-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--sa-primary)] transition"
           />
         </div>
 
@@ -216,7 +216,7 @@ export default function TenantTable({
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="flex-1 sm:flex-none rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--input-bg,#FFFFFF)] px-3 py-2 text-xs text-[var(--text-primary,#1B2559)] focus:border-[#1E3FAE] focus:outline-none min-w-[120px]"
+            className="flex-1 sm:flex-none rounded-xl border border-[var(--border-primary)] bg-[var(--input-bg)] px-3 py-2 text-xs text-[var(--text-primary)] focus:border-[var(--sa-primary)] focus:outline-none min-w-[120px]"
           >
             <option value="all">Status: All</option>
             <option value="active">Active Only</option>
@@ -230,7 +230,7 @@ export default function TenantTable({
               setPlanFilter(e.target.value);
               setPage(1);
             }}
-            className="flex-1 sm:flex-none rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--input-bg,#FFFFFF)] px-3 py-2 text-xs text-[var(--text-primary,#1B2559)] focus:border-[#1E3FAE] focus:outline-none min-w-[120px]"
+            className="flex-1 sm:flex-none rounded-xl border border-[var(--border-primary)] bg-[var(--input-bg)] px-3 py-2 text-xs text-[var(--text-primary)] focus:border-[var(--sa-primary)] focus:outline-none min-w-[120px]"
           >
             <option value="all">Plan: All Tiers</option>
             <option value="starter">Starter</option>
@@ -242,7 +242,7 @@ export default function TenantTable({
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="flex-1 sm:flex-none rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--input-bg,#FFFFFF)] px-3 py-2 text-xs text-[var(--text-primary,#1B2559)] focus:border-[#1E3FAE] focus:outline-none min-w-[120px]"
+            className="flex-1 sm:flex-none rounded-xl border border-[var(--border-primary)] bg-[var(--input-bg)] px-3 py-2 text-xs text-[var(--text-primary)] focus:border-[var(--sa-primary)] focus:outline-none min-w-[120px]"
           >
             <option value="newest">Sort: Newest</option>
             <option value="oldest">Sort: Oldest</option>
@@ -253,7 +253,7 @@ export default function TenantTable({
           {/* Density Toggle (Desktop only) */}
           <button
             onClick={() => setDensity((d) => (d === 'normal' ? 'compact' : 'normal'))}
-            className="hidden md:inline-flex rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary,#3B4874)] hover:text-[var(--text-primary,#1B2559)] transition"
+            className="hidden md:inline-flex rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
             title="Toggle Row Density"
           >
             {density === 'normal' ? 'Comfortable' : 'Compact'}
@@ -262,7 +262,7 @@ export default function TenantTable({
           {/* Export CSV */}
           <button
             onClick={handleExportCSV}
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary,#3B4874)] hover:text-[var(--text-primary,#1B2559)] transition w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition w-full sm:w-auto"
           >
             <Download size={13} /> Export CSV
           </button>
@@ -271,28 +271,28 @@ export default function TenantTable({
 
       {/* ── Bulk Actions Floating Bar ────────────────────────────── */}
       {selectedIds.size > 0 && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-2xl border border-[#E6CF7A] bg-[#FBF3D5] dark:bg-[#0B1B4D] px-4 py-2.5 text-xs text-[#0B1B4D] dark:text-slate-200 shadow-md animate-in fade-in duration-150">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-2xl border border-[var(--sa-primary-border)] bg-[var(--sa-primary-subtle)] px-4 py-2.5 text-xs text-[var(--sa-primary)] shadow-md animate-in fade-in duration-150">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-[#0B1B4D] dark:text-[#D4AF37]">{selectedIds.size}</span>
+            <span className="font-bold text-[var(--sa-primary)]">{selectedIds.size}</span>
             <span>café(s) selected across current filter</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => handleBulkStatusChange('active')}
-              className="rounded-lg border border-emerald-500/30 bg-[var(--success-bg,rgba(18,163,122,0.1))] px-3 py-1 font-semibold text-[var(--success-text,#0E7D5D)] hover:bg-emerald-100 transition"
+              className="rounded-lg border border-[var(--sa-success-border)] bg-[var(--sa-success-bg)] px-3 py-1 font-semibold text-[var(--sa-success-text)] hover:bg-[var(--sa-success-bg)] hover:opacity-90 transition"
             >
               Reactivate Selected
             </button>
             <button
               onClick={() => handleBulkStatusChange('suspended')}
-              className="rounded-lg border border-red-500/30 bg-[var(--danger-bg,rgba(220,38,38,0.1))] px-3 py-1 font-semibold text-[var(--danger-text,#B91C1C)] hover:bg-red-100 transition"
+              className="rounded-lg border border-[var(--sa-accent-border)] bg-[var(--sa-accent-subtle)] px-3 py-1 font-semibold text-[var(--sa-accent-text)] hover:bg-[var(--sa-accent-hover-bg)] transition"
             >
               Suspend Selected
             </button>
             <button
               onClick={() => setSelectedIds(new Set())}
-              className="rounded-lg bg-[var(--hover-bg,#EEF2FA)] px-2.5 py-1 text-[var(--text-secondary,#3B4874)] hover:text-[var(--text-primary,#1B2559)] transition"
+              className="rounded-lg bg-[var(--hover-bg)] px-2.5 py-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
             >
               Clear
             </button>
@@ -301,19 +301,19 @@ export default function TenantTable({
       )}
 
       {/* ── Main Table & Mobile Card Card Container ───────────────── */}
-      <div className="rounded-2xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-card,#FFFFFF)] shadow-xs overflow-hidden">
+      <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-[var(--text-muted,#5B6585)] space-y-3">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-[#D4AF37] border-t-transparent" />
+          <div className="p-12 text-center text-[var(--text-muted)] space-y-3">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-[var(--sa-primary)] border-t-transparent" />
             <p className="text-xs">Loading registered platform cafés...</p>
           </div>
         ) : filteredTenants.length === 0 ? (
-          <div className="py-16 text-center text-[var(--text-muted,#5B6585)] space-y-3 px-4">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--hover-bg,#EEF2FA)] text-[var(--text-muted,#5B6585)]">
+          <div className="py-16 text-center text-[var(--text-muted)] space-y-3 px-4">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--hover-bg)] text-[var(--text-muted)]">
               <Store size={24} />
             </div>
-            <div className="text-sm font-bold text-[var(--text-primary,#1B2559)]">No cafés found</div>
-            <p className="text-xs text-[var(--text-muted,#5B6585)] max-w-sm mx-auto">
+            <div className="text-sm font-bold text-[var(--text-primary)]">No cafés found</div>
+            <p className="text-xs text-[var(--text-muted)] max-w-sm mx-auto">
               No registered cafés match your search query or active filter criteria.
             </p>
             <button
@@ -322,7 +322,7 @@ export default function TenantTable({
                 setStatusFilter('all');
                 setPlanFilter('all');
               }}
-              className="rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] px-4 py-1.5 text-xs font-semibold text-[var(--text-secondary,#3B4874)] hover:bg-[var(--border-primary,#E3E8F5)] transition"
+              className="rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] px-4 py-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--border-primary)] transition"
             >
               Reset Filters
             </button>
@@ -330,7 +330,7 @@ export default function TenantTable({
         ) : (
           <>
             {/* ── MOBILE VIEW: Touch-Friendly Card List (< 640px) ───── */}
-            <div className="block sm:hidden divide-y divide-[var(--table-border,#E3E8F5)]">
+            <div className="block sm:hidden divide-y divide-[var(--table-border)]">
               {paginatedTenants.map((t) => {
                 const isSelected = selectedIds.has(t.id);
                 const isSuspended = t.status === 'suspended';
@@ -343,14 +343,14 @@ export default function TenantTable({
                   <div
                     key={t.id}
                     onClick={() => onRowClick && onRowClick(t)}
-                    className={`p-4 space-y-3 transition active:bg-[var(--hover-bg,#EEF2FA)] ${
-                      isSelected ? 'bg-[var(--table-row-selected,#FBF3D5)]' : 'bg-[var(--bg-card,#FFFFFF)]'
+                    className={`p-4 space-y-3 transition active:bg-[var(--hover-bg)] ${
+                      isSelected ? 'bg-[var(--table-row-selected)]' : 'bg-[var(--bg-card)]'
                     }`}
                   >
                     {/* Top Row: Avatar, Name, Status & Checkbox */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#1E3FAE]/15 to-[#D4AF37]/20 border border-[#E6CF7A]/60 text-[#0B1B4D] font-bold text-xs shadow-inner">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--sa-primary-subtle)] to-[var(--sa-primary-tint)] border border-[var(--sa-primary-border)] text-[var(--sa-primary)] font-bold text-xs shadow-inner">
                           {t.settings?.logoUrl ? (
                             <img src={t.settings.logoUrl} alt="" className="h-full w-full rounded-xl object-cover" />
                           ) : (
@@ -359,17 +359,17 @@ export default function TenantTable({
                         </div>
 
                         <div className="min-w-0 truncate">
-                          <h4 className="font-bold text-sm text-[var(--text-primary,#1B2559)] truncate">{t.name}</h4>
+                          <h4 className="font-bold text-sm text-[var(--text-primary)] truncate">{t.name}</h4>
                           <div className="flex items-center gap-1 mt-0.5">
-                            <span className="font-mono text-[11px] text-[var(--text-muted,#8E9BBF)] truncate">
+                            <span className="font-mono text-[11px] text-[var(--text-muted)] truncate">
                               {t.slug}
                             </span>
                             <button
                               onClick={(e) => handleCopySubdomain(e, t.slug)}
-                              className="p-1 text-[var(--text-muted,#8E9BBF)] hover:text-[#1E3FAE] transition"
+                              className="p-1 text-[var(--text-muted)] hover:text-[var(--sa-primary)] transition"
                               title="Copy live link"
                             >
-                              {copiedSlug === t.slug ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                              {copiedSlug === t.slug ? <Check size={12} className="text-[var(--sa-success)]" /> : <Copy size={12} />}
                             </button>
                           </div>
                         </div>
@@ -393,41 +393,41 @@ export default function TenantTable({
                           type="checkbox"
                           checked={isSelected}
                           onChange={(e) => handleToggleSelect(e, t.id)}
-                          className="rounded border-[var(--border-primary,#E3E8F5)] text-[#1E3FAE] focus:ring-[#1E3FAE] h-4 w-4"
+                          className="rounded border-[var(--border-primary)] text-[var(--sa-primary)] focus:ring-[var(--sa-primary)] h-4 w-4"
                         />
                       </div>
                     </div>
 
                     {/* Meta row: Owner & Plan */}
-                    <div className="grid grid-cols-2 gap-2 text-xs border-y border-[var(--border-primary,#E3E8F5)]/60 py-2">
+                    <div className="grid grid-cols-2 gap-2 text-xs border-y border-[var(--border-primary)]/60 py-2">
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-[var(--text-muted,#8E9BBF)] block">Owner</span>
-                        <span className="font-medium text-[var(--text-primary,#1B2559)] truncate block">
+                        <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] block">Owner</span>
+                        <span className="font-medium text-[var(--text-primary)] truncate block">
                           {t.ownerName && t.ownerName !== 'N/A' ? t.ownerName : t.ownerEmail || 'Unassigned'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-[var(--text-muted,#8E9BBF)] block">Plan Tier</span>
-                        <span className="font-bold text-[#1E3FAE] capitalize block">{t.plan || 'Starter'}</span>
+                        <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] block">Plan Tier</span>
+                        <span className="font-bold text-[var(--sa-primary)] capitalize block">{t.plan || 'Starter'}</span>
                       </div>
                     </div>
 
                     {/* Quota meters */}
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-[var(--text-muted,#8E9BBF)]">Tables: {t.tableCount || 0}/{limits.maxTables}</span>
-                        <span className="text-[var(--text-muted,#8E9BBF)]">Items: {t.productCount || 0}/{limits.maxProducts}</span>
+                        <span className="text-[var(--text-muted)]">Tables: {t.tableCount || 0}/{limits.maxTables}</span>
+                        <span className="text-[var(--text-muted)]">Items: {t.productCount || 0}/{limits.maxProducts}</span>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
-                        <div className="h-1.5 w-full rounded-full bg-[var(--border-primary,#E3E8F5)] overflow-hidden">
+                        <div className="h-1.5 w-full rounded-full bg-[var(--border-primary)] overflow-hidden">
                           <div
-                            className={`h-full rounded-full transition-all ${tablePercent > 85 ? 'bg-[#EA580C]' : 'bg-[#1E3FAE]'}`}
+                            className={`h-full rounded-full transition-all ${tablePercent > 85 ? 'bg-[var(--sa-warning-text)]' : 'bg-[var(--sa-primary)]'}`}
                             style={{ width: `${tablePercent}%` }}
                           />
                         </div>
-                        <div className="h-1.5 w-full rounded-full bg-[var(--border-primary,#E3E8F5)] overflow-hidden">
+                        <div className="h-1.5 w-full rounded-full bg-[var(--border-primary)] overflow-hidden">
                           <div
-                            className={`h-full rounded-full transition-all ${productPercent > 85 ? 'bg-[#EA580C]' : 'bg-[#12A37A]'}`}
+                            className={`h-full rounded-full transition-all ${productPercent > 85 ? 'bg-[var(--sa-warning-text)]' : 'bg-[var(--sa-success)]'}`}
                             style={{ width: `${productPercent}%` }}
                           />
                         </div>
@@ -438,19 +438,19 @@ export default function TenantTable({
                     <div className="flex items-center justify-between pt-1 gap-2" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => onRowClick && onRowClick(t)}
-                        className="flex-1 py-1.5 px-2.5 rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] text-xs font-semibold text-[var(--text-secondary,#3B4874)] text-center"
+                        className="flex-1 py-1.5 px-2.5 rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] text-xs font-semibold text-[var(--text-secondary)] text-center"
                       >
                         Details
                       </button>
                       <button
                         onClick={() => onOpenPanel && onOpenPanel(t)}
-                        className="flex-1 py-1.5 px-2.5 rounded-xl border border-[#1E3FAE]/30 bg-[#1E3FAE]/10 text-xs font-semibold text-[#1E3FAE] text-center inline-flex items-center justify-center gap-1"
+                        className="flex-1 py-1.5 px-2.5 rounded-xl border border-[var(--sa-primary)]/30 bg-[var(--sa-primary-subtle)] text-xs font-semibold text-[var(--sa-primary)] text-center inline-flex items-center justify-center gap-1"
                       >
                         <Eye size={12} /> Storefront
                       </button>
                       <button
                         onClick={() => onImpersonate && onImpersonate(t)}
-                        className="flex-1 py-1.5 px-2.5 rounded-xl border border-[#D4AF37]/40 bg-[#FBF3D5] text-xs font-semibold text-[#0B1B4D] text-center inline-flex items-center justify-center gap-1"
+                        className="flex-1 py-1.5 px-2.5 rounded-xl border border-[var(--sa-primary)]/30 bg-[var(--sa-primary-subtle)] text-xs font-semibold text-[var(--sa-primary)] text-center inline-flex items-center justify-center gap-1"
                       >
                         <ArrowUpRight size={12} /> Impersonate
                       </button>
@@ -463,7 +463,7 @@ export default function TenantTable({
             {/* ── DESKTOP VIEW: Full Data Table (>= 640px) ───────────── */}
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-[var(--table-header-bg,#F0F4FC)] border-b border-[var(--table-border,#E3E8F5)]">
+                <thead className="bg-[var(--table-header-bg)] border-b border-[var(--table-border)]">
                   <tr>
                     <th className="py-3 px-4 w-10 text-center">
                       <input
@@ -473,20 +473,20 @@ export default function TenantTable({
                           selectedIds.size === filteredTenants.length
                         }
                         onChange={handleSelectAll}
-                        className="rounded border-[var(--border-primary,#E3E8F5)] bg-[var(--input-bg,#FFFFFF)] text-[#1E3FAE] focus:ring-[#1E3FAE]"
+                        className="rounded border-[var(--border-primary)] bg-[var(--input-bg)] text-[var(--sa-primary)] focus:ring-[var(--sa-primary)]"
                       />
                     </th>
-                    <th className="py-3 px-4 font-bold text-[var(--text-secondary,#3B4874)]">Café & Subdomain</th>
-                    {visibleColumns.owner && <th className="py-3 px-4 font-bold text-[var(--text-secondary,#3B4874)]">Owner</th>}
-                    {visibleColumns.status && <th className="py-3 px-4 font-bold text-[var(--text-secondary,#3B4874)]">Status</th>}
-                    {visibleColumns.plan && <th className="py-3 px-4 font-bold text-[var(--text-secondary,#3B4874)]">Plan</th>}
-                    {visibleColumns.usage && <th className="py-3 px-4 font-bold text-[var(--text-secondary,#3B4874)]">Usage vs Quota</th>}
-                    {visibleColumns.joined && <th className="py-3 px-4 font-bold text-[var(--text-secondary,#3B4874)]">Joined</th>}
-                    <th className="py-3 px-6 font-bold text-[var(--text-secondary,#3B4874)] text-right">Actions</th>
+                    <th className="py-3 px-4 font-bold text-[var(--text-secondary)]">Café & Subdomain</th>
+                    {visibleColumns.owner && <th className="py-3 px-4 font-bold text-[var(--text-secondary)]">Owner</th>}
+                    {visibleColumns.status && <th className="py-3 px-4 font-bold text-[var(--text-secondary)]">Status</th>}
+                    {visibleColumns.plan && <th className="py-3 px-4 font-bold text-[var(--text-secondary)]">Plan</th>}
+                    {visibleColumns.usage && <th className="py-3 px-4 font-bold text-[var(--text-secondary)]">Usage vs Quota</th>}
+                    {visibleColumns.joined && <th className="py-3 px-4 font-bold text-[var(--text-secondary)]">Joined</th>}
+                    <th className="py-3 px-6 font-bold text-[var(--text-secondary)] text-right">Actions</th>
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-[var(--table-border,#E3E8F5)] text-[var(--text-primary,#1B2559)]">
+                <tbody className="divide-y divide-[var(--table-border)] text-[var(--text-primary)]">
                   {paginatedTenants.map((t) => {
                     const isSelected = selectedIds.has(t.id);
                     const isSuspended = t.status === 'suspended';
@@ -502,8 +502,8 @@ export default function TenantTable({
                         onClick={() => onRowClick && onRowClick(t)}
                         className={`cursor-pointer transition group ${
                           isSelected
-                            ? 'bg-[var(--table-row-selected,#FBF3D5)]'
-                            : 'hover:bg-[var(--table-row-hover,#F8FAFD)]'
+                            ? 'bg-[var(--table-row-selected)]'
+                            : 'hover:bg-[var(--table-row-hover)]'
                         }`}
                       >
                         {/* Checkbox */}
@@ -512,14 +512,14 @@ export default function TenantTable({
                             type="checkbox"
                             checked={isSelected}
                             onChange={(e) => handleToggleSelect(e, t.id)}
-                            className="rounded border-[var(--border-primary,#E3E8F5)] bg-[var(--input-bg,#FFFFFF)] text-[#1E3FAE] focus:ring-[#1E3FAE]"
+                            className="rounded border-[var(--border-primary)] bg-[var(--input-bg)] text-[var(--sa-primary)] focus:ring-[var(--sa-primary)]"
                           />
                         </td>
 
                         {/* Café & Subdomain */}
                         <td className={`${density === 'compact' ? 'py-2.5' : 'py-3.5'} px-4`}>
                           <div className="flex items-center gap-3">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#1E3FAE]/15 to-[#D4AF37]/20 border border-[#E6CF7A]/60 text-[#0B1B4D] font-bold text-xs shadow-inner">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--sa-primary-subtle)] to-[var(--sa-primary-tint)] border border-[var(--sa-primary-border)] text-[var(--sa-primary)] font-bold text-xs shadow-inner">
                               {t.settings?.logoUrl ? (
                                 <img src={t.settings.logoUrl} alt="" className="h-full w-full rounded-xl object-cover" />
                               ) : (
@@ -528,20 +528,20 @@ export default function TenantTable({
                             </div>
 
                             <div>
-                              <div className="font-bold text-[var(--text-primary,#1B2559)] group-hover:text-[#1E3FAE] transition flex items-center gap-1.5">
+                              <div className="font-bold text-[var(--text-primary)] group-hover:text-[var(--sa-primary)] transition flex items-center gap-1.5">
                                 <span>{t.name}</span>
                               </div>
 
                               <div className="flex items-center gap-1 mt-0.5">
-                                <span className="font-mono text-[11px] text-[var(--text-muted,#8E9BBF)]">
+                                <span className="font-mono text-[11px] text-[var(--text-muted)]">
                                   {t.slug}
                                 </span>
                                 <button
                                   onClick={(e) => handleCopySubdomain(e, t.slug)}
-                                  className="p-0.5 text-[var(--text-muted,#8E9BBF)] hover:text-[#1E3FAE] transition"
+                                  className="p-0.5 text-[var(--text-muted)] hover:text-[var(--sa-primary)] transition"
                                   title="Copy live storefront link"
                                 >
-                                  {copiedSlug === t.slug ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+                                  {copiedSlug === t.slug ? <Check size={11} className="text-[var(--sa-success)]" /> : <Copy size={11} />}
                                 </button>
                               </div>
                             </div>
@@ -553,22 +553,22 @@ export default function TenantTable({
                           <td className={`${density === 'compact' ? 'py-2.5' : 'py-3.5'} px-4`}>
                             {isOwnerUnassigned ? (
                               <div className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                                <span className="rounded-md border border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted,#8E9BBF)]">
+                                <span className="rounded-md border border-[var(--border-primary)] bg-[var(--hover-bg)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-muted)]">
                                   Unassigned
                                 </span>
                                 <button
                                   onClick={() => onInviteOwner && onInviteOwner(t)}
-                                  className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#1E3FAE] hover:underline"
+                                  className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[var(--sa-primary)] hover:underline"
                                 >
                                   <UserPlus size={11} /> Invite
                                 </button>
                               </div>
                             ) : (
                               <div>
-                                <div className="font-medium text-[var(--text-primary,#1B2559)] truncate max-w-[170px]">
+                                <div className="font-medium text-[var(--text-primary)] truncate max-w-[170px]">
                                   {t.ownerName && t.ownerName !== 'N/A' ? t.ownerName : t.ownerEmail}
                                 </div>
-                                <div className="text-[10px] text-[var(--text-muted,#8E9BBF)] truncate max-w-[170px]">{t.ownerEmail}</div>
+                                <div className="text-[10px] text-[var(--text-muted)] truncate max-w-[170px]">{t.ownerEmail}</div>
                               </div>
                             )}
                           </td>
@@ -602,11 +602,11 @@ export default function TenantTable({
                                 e.stopPropagation();
                                 onChangePlan && onChangePlan(t);
                               }}
-                              className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary,#3B4874)] hover:border-[#1E3FAE]/50 hover:text-[#1E3FAE] transition"
+                              className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-primary)] bg-[var(--hover-bg)] px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)] hover:border-[var(--sa-primary)]/50 hover:text-[var(--sa-primary)] transition"
                               title="Click to change plan"
                             >
                               <span className="capitalize">{t.plan || 'Starter'}</span>
-                              <span className="text-[9px] text-[var(--text-muted,#8E9BBF)]">✎</span>
+                              <span className="text-[9px] text-[var(--text-muted)]">✎</span>
                             </button>
                           </td>
                         )}
@@ -617,15 +617,15 @@ export default function TenantTable({
                             <div className="space-y-1.5 min-w-[120px]">
                               {/* Tables Usage */}
                               <div className="flex items-center justify-between text-[10px]">
-                                <span className="text-[var(--text-muted,#8E9BBF)]">Tables</span>
-                                <span className="font-semibold text-[var(--text-primary,#1B2559)]">
+                                <span className="text-[var(--text-muted)]">Tables</span>
+                                <span className="font-semibold text-[var(--text-primary)]">
                                   {t.tableCount || 0}/{limits.maxTables}
                                 </span>
                               </div>
-                              <div className="h-1.5 w-full rounded-full bg-[var(--border-primary,#E3E8F5)] overflow-hidden">
+                              <div className="h-1.5 w-full rounded-full bg-[var(--border-primary)] overflow-hidden">
                                 <div
                                   className={`h-full rounded-full transition-all duration-300 ${
-                                    tablePercent > 85 ? 'bg-[#EA580C]' : 'bg-[#1E3FAE]'
+                                    tablePercent > 85 ? 'bg-[var(--sa-warning-text)]' : 'bg-[var(--sa-primary)]'
                                   }`}
                                   style={{ width: `${tablePercent}%` }}
                                 />
@@ -633,15 +633,15 @@ export default function TenantTable({
 
                               {/* Products Usage */}
                               <div className="flex items-center justify-between text-[10px] pt-0.5">
-                                <span className="text-[var(--text-muted,#8E9BBF)]">Items</span>
-                                <span className="font-semibold text-[var(--text-primary,#1B2559)]">
+                                <span className="text-[var(--text-muted)]">Items</span>
+                                <span className="font-semibold text-[var(--text-primary)]">
                                   {t.productCount || 0}/{limits.maxProducts}
                                 </span>
                               </div>
-                              <div className="h-1.5 w-full rounded-full bg-[var(--border-primary,#E3E8F5)] overflow-hidden">
+                              <div className="h-1.5 w-full rounded-full bg-[var(--border-primary)] overflow-hidden">
                                 <div
                                   className={`h-full rounded-full transition-all duration-300 ${
-                                    productPercent > 85 ? 'bg-[#EA580C]' : 'bg-[#12A37A]'
+                                    productPercent > 85 ? 'bg-[var(--sa-warning-text)]' : 'bg-[var(--sa-success)]'
                                   }`}
                                   style={{ width: `${productPercent}%` }}
                                 />
@@ -653,10 +653,10 @@ export default function TenantTable({
                         {/* Joined Date */}
                         {visibleColumns.joined && (
                           <td className={`${density === 'compact' ? 'py-2.5' : 'py-3.5'} px-4`}>
-                            <div className="text-[var(--text-primary,#1B2559)]" title={new Date(t.createdAt).toLocaleString()}>
+                            <div className="text-[var(--text-primary)]" title={new Date(t.createdAt).toLocaleString()}>
                               {formatRelativeTime(t.createdAt)}
                             </div>
-                            <div className="text-[10px] text-[var(--text-muted,#8E9BBF)]">
+                            <div className="text-[10px] text-[var(--text-muted)]">
                               {new Date(t.createdAt).toLocaleDateString()}
                             </div>
                           </td>
@@ -671,7 +671,7 @@ export default function TenantTable({
                             {/* Primary: Open User Panel */}
                             <button
                               onClick={() => onOpenPanel && onOpenPanel(t)}
-                              className="inline-flex items-center gap-1 rounded-xl border border-[#1E3FAE]/30 bg-[#1E3FAE]/10 px-3 py-1.5 text-xs font-semibold text-[#1E3FAE] hover:bg-[#1E3FAE]/20 transition"
+                              className="inline-flex items-center gap-1 rounded-xl border border-[var(--sa-primary)]/30 bg-[var(--sa-primary-subtle)] px-3 py-1.5 text-xs font-semibold text-[var(--sa-primary)] hover:bg-[var(--sa-primary-subtle)] hover:opacity-90 transition"
                               title="Open Customer QR Ordering Panel"
                             >
                               <Eye size={13} />
@@ -682,7 +682,7 @@ export default function TenantTable({
                             <div className="relative">
                               <button
                                 onClick={() => setOpenActionId(openActionId === t.id ? null : t.id)}
-                                className="rounded-xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--hover-bg,#EEF2FA)] p-1.5 text-[var(--text-muted,#8E9BBF)] hover:text-[var(--text-primary,#1B2559)] transition"
+                                className="rounded-xl border border-[var(--border-primary)] bg-[var(--hover-bg)] p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition"
                                 title="More options"
                               >
                                 <MoreVertical size={14} />
@@ -691,14 +691,14 @@ export default function TenantTable({
                               {openActionId === t.id && (
                                 <div
                                   onClick={(e) => e.stopPropagation()}
-                                  className="absolute right-0 top-full mt-1.5 w-48 rounded-2xl border border-[var(--border-primary,#E3E8F5)] bg-[var(--popover-bg,#FFFFFF)] p-1.5 shadow-2xl text-xs z-30"
+                                  className="absolute right-0 top-full mt-1.5 w-48 rounded-2xl border border-[var(--border-primary)] bg-[var(--popover-bg)] p-1.5 shadow-2xl text-xs z-30"
                                 >
                                   <button
                                     onClick={() => {
                                       setOpenActionId(null);
                                       onImpersonate && onImpersonate(t);
                                     }}
-                                    className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary,#3B4874)] hover:bg-[var(--hover-bg,#EEF2FA)] hover:text-[#1E3FAE] transition text-left"
+                                    className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] hover:text-[var(--sa-primary)] transition text-left"
                                   >
                                     <ArrowUpRight size={13} /> Impersonate Session
                                   </button>
@@ -708,7 +708,7 @@ export default function TenantTable({
                                       setOpenActionId(null);
                                       onChangePlan && onChangePlan(t);
                                     }}
-                                    className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary,#3B4874)] hover:bg-[var(--hover-bg,#EEF2FA)] hover:text-[#1E3FAE] transition text-left"
+                                    className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] hover:text-[var(--sa-primary)] transition text-left"
                                   >
                                     <Layers size={13} /> Change Plan Tier
                                   </button>
@@ -718,7 +718,7 @@ export default function TenantTable({
                                       setOpenActionId(null);
                                       onRowClick && onRowClick(t);
                                     }}
-                                    className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary,#3B4874)] hover:bg-[var(--hover-bg,#EEF2FA)] hover:text-[#1E3FAE] transition text-left"
+                                    className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] hover:text-[var(--sa-primary)] transition text-left"
                                   >
                                     <Store size={13} /> View Café Drawer
                                   </button>
@@ -728,7 +728,7 @@ export default function TenantTable({
                                       setOpenActionId(null);
                                       onViewAudit && onViewAudit(t);
                                     }}
-                                    className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary,#3B4874)] hover:bg-[var(--hover-bg,#EEF2FA)] hover:text-[#1E3FAE] transition text-left"
+                                    className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] hover:text-[var(--sa-primary)] transition text-left"
                                   >
                                     <Calendar size={13} /> Audit History
                                   </button>
@@ -739,12 +739,12 @@ export default function TenantTable({
                                       navigator.clipboard.writeText(t.id);
                                       toast.success(`Copied ID: ${t.id}`);
                                     }}
-                                    className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary,#3B4874)] hover:bg-[var(--hover-bg,#EEF2FA)] hover:text-[#1E3FAE] transition text-left"
+                                    className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] hover:text-[var(--sa-primary)] transition text-left"
                                   >
                                     <Copy size={13} /> Copy Tenant ID
                                   </button>
 
-                                  <div className="my-1 border-t border-[var(--border-primary,#E3E8F5)]" />
+                                  <div className="my-1 border-t border-[var(--border-primary)]" />
 
                                   <button
                                     onClick={() => {
@@ -753,8 +753,8 @@ export default function TenantTable({
                                     }}
                                     className={`w-full flex items-center gap-2 rounded-xl px-3 py-2 font-semibold transition text-left ${
                                       isSuspended
-                                        ? 'text-emerald-600 hover:bg-emerald-50'
-                                        : 'text-red-600 hover:bg-red-50'
+                                        ? 'text-[var(--sa-success-text)] hover:bg-[var(--sa-success-bg)]'
+                                        : 'text-[var(--sa-danger-text)] hover:bg-[var(--sa-danger-bg)]'
                                     }`}
                                   >
                                     <ShieldAlert size={13} />
@@ -775,21 +775,21 @@ export default function TenantTable({
         )}
 
         {/* ── Pagination Footer ────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-[var(--border-primary,#E3E8F5)]/80 bg-[var(--hover-bg,#EEF2FA)]/70 px-4 sm:px-6 py-4 text-xs text-[var(--text-muted,#5B6585)] transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-[var(--border-primary)]/80 bg-[var(--hover-bg)]/70 px-4 sm:px-6 py-4 text-xs text-[var(--text-muted)] transition-colors">
           <div className="flex flex-wrap items-center gap-3">
             <span>
               Showing{' '}
-              <strong className="text-[var(--text-primary,#1B2559)] font-bold">
+              <strong className="text-[var(--text-primary)] font-bold">
                 {filteredTenants.length === 0 ? 0 : (page - 1) * pageSize + 1}
               </strong>{' '}
               to{' '}
-              <strong className="text-[var(--text-primary,#1B2559)] font-bold">
+              <strong className="text-[var(--text-primary)] font-bold">
                 {Math.min(filteredTenants.length, page * pageSize)}
               </strong>{' '}
-              of <strong className="text-[var(--text-primary,#1B2559)] font-bold">{filteredTenants.length}</strong> cafés
+              of <strong className="text-[var(--text-primary)] font-bold">{filteredTenants.length}</strong> cafés
             </span>
 
-            <div className="flex items-center gap-1.5 pl-3 border-l border-[var(--border-primary,#E3E8F5)]">
+            <div className="flex items-center gap-1.5 pl-3 border-l border-[var(--border-primary)]">
               <span>Per page:</span>
               <select
                 value={pageSize}
@@ -797,7 +797,7 @@ export default function TenantTable({
                   setPageSize(Number(e.target.value));
                   setPage(1);
                 }}
-                className="rounded-lg border border-[var(--border-primary,#E3E8F5)] bg-[var(--input-bg,#FFFFFF)] px-2 py-1 text-xs text-[var(--text-primary,#1B2559)] focus:border-[#1E3FAE] focus:outline-none min-w-[50px]"
+                className="rounded-lg border border-[var(--border-primary)] bg-[var(--input-bg)] px-2 py-1 text-xs text-[var(--text-primary)] focus:border-[var(--sa-primary)] focus:outline-none min-w-[50px]"
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
@@ -810,7 +810,7 @@ export default function TenantTable({
             <button
               onClick={() => setPage(1)}
               disabled={page === 1}
-              className="rounded-lg border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-surface,#FFFFFF)] p-1.5 text-[var(--text-muted,#5B6585)] hover:text-[var(--text-primary,#1B2559)] hover:bg-[var(--hover-bg,#EEF2FA)] disabled:opacity-30 transition"
+              className="rounded-lg border border-[var(--border-primary)] bg-[var(--bg-surface)] p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)] disabled:opacity-30 transition"
               title="First Page"
             >
               <ChevronsLeft size={14} />
@@ -818,20 +818,20 @@ export default function TenantTable({
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="rounded-lg border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-surface,#FFFFFF)] p-1.5 text-[var(--text-muted,#5B6585)] hover:text-[var(--text-primary,#1B2559)] hover:bg-[var(--hover-bg,#EEF2FA)] disabled:opacity-30 transition"
+              className="rounded-lg border border-[var(--border-primary)] bg-[var(--bg-surface)] p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)] disabled:opacity-30 transition"
               title="Previous Page"
             >
               <ChevronLeft size={14} />
             </button>
 
-            <span className="px-2 text-[var(--text-secondary,#3B4874)] font-medium">
+            <span className="px-2 text-[var(--text-secondary)] font-medium">
               Page {page} of {totalPages}
             </span>
 
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="rounded-lg border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-surface,#FFFFFF)] p-1.5 text-[var(--text-muted,#5B6585)] hover:text-[var(--text-primary,#1B2559)] hover:bg-[var(--hover-bg,#EEF2FA)] disabled:opacity-30 transition"
+              className="rounded-lg border border-[var(--border-primary)] bg-[var(--bg-surface)] p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)] disabled:opacity-30 transition"
               title="Next Page"
             >
               <ChevronRight size={14} />
@@ -839,7 +839,7 @@ export default function TenantTable({
             <button
               onClick={() => setPage(totalPages)}
               disabled={page === totalPages}
-              className="rounded-lg border border-[var(--border-primary,#E3E8F5)] bg-[var(--bg-surface,#FFFFFF)] p-1.5 text-[var(--text-muted,#5B6585)] hover:text-[var(--text-primary,#1B2559)] hover:bg-[var(--hover-bg,#EEF2FA)] disabled:opacity-30 transition"
+              className="rounded-lg border border-[var(--border-primary)] bg-[var(--bg-surface)] p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)] disabled:opacity-30 transition"
               title="Last Page"
             >
               <ChevronsRight size={14} />
