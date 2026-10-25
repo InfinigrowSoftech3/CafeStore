@@ -23,6 +23,7 @@ import { publishLiveUpdate, publishTableStatus } from '../services/liveUpdates.j
 import { awardLoyaltyPoints } from '../services/loyaltyService.js';
 import { parsePagination, formatPagination } from '../utils/pagination.js';
 import { syncTableStatusForOrder } from '../services/tableLifecycle.js';
+import { isPaymentsEnabled } from '../config/env.js';
 
 const router = express.Router();
 
@@ -47,6 +48,12 @@ router.get('/validate', async (req, res) => {
 });
 
 const getRazorpay = async (req) => {
+  if (!isPaymentsEnabled()) {
+    const error = new Error('Online payments are currently disabled on this server.');
+    error.code = 'PAYMENTS_DISABLED';
+    error.status = 503;
+    throw error;
+  }
   const tenant = await Tenant.findById(req.tenantId).select('+paymentCredentialsEncrypted').lean();
   let credentials;
   try {
@@ -255,6 +262,9 @@ router.post('/bill/cash', async (req, res) => {
 
 router.post('/bill/payment/create', async (req, res) => {
   try {
+    if (!isPaymentsEnabled()) {
+      return res.status(503).json({ error: 'Online payments are currently disabled on this server.', code: 'PAYMENTS_DISABLED' });
+    }
     const session = await requireActiveDiningSession(req.body.diningSessionToken);
     const bill = await refreshBill(session._id);
     if (bill.dueAmount <= 0) return res.status(400).json({ error: 'This bill has no outstanding balance.' });

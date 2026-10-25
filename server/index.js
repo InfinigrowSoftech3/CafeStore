@@ -49,7 +49,7 @@ import { isEmailConfigured } from './services/emailService.js';
 import { requestContext } from './middleware/requestContext.js';
 import { validateRequestEnvelope } from './middleware/requestValidation.js';
 import { tenantResolver } from './middleware/tenant.js';
-import { validateEnv } from './config/env.js';
+import { validateEnv, isPaymentsEnabled } from './config/env.js';
 import { logRouteNotFound } from './utils/logger.js';
 
 dotenv.config();
@@ -387,6 +387,12 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
   }));
   app.use(express.urlencoded({ extended: false, limit: '100kb' }));
   app.use(validateRequestEnvelope);
+  app.use('/api/payment', (req, res, next) => {
+    if (!isPaymentsEnabled()) {
+      return res.status(503).json({ error: 'Online payments are currently disabled on this server.', code: 'PAYMENTS_DISABLED' });
+    }
+    next();
+  });
   app.use(tenantResolver);
   app.use('/uploads', express.static('uploads', { maxAge: '1d', immutable: true, setHeaders: (res) => res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, immutable') }));
 

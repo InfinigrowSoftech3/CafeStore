@@ -11,6 +11,7 @@ import { generateOrderAccessToken, hashAccessToken } from '../utils/orderSecurit
 import { runWithTenant, runWithSystemTenantAccess } from '../utils/tenantContext.js';
 import { sendApiSuccess, sendApiError } from '../utils/apiResponse.js';
 import { parsePagination, formatPagination } from '../utils/pagination.js';
+import { isPaymentsEnabled } from '../config/env.js';
 
 const router = express.Router();
 
@@ -456,6 +457,9 @@ router.post('/orders', async (req, res, next) => {
 
     // Validate Table
     const { tableId, items, customer, paymentMethod } = req.body;
+    if ((paymentMethod === 'ONLINE' || paymentMethod === 'razorpay') && !isPaymentsEnabled()) {
+      return sendApiError(res, 400, 'PAYMENTS_DISABLED', 'Online payments are currently disabled. Please select cash or another payment method.');
+    }
     if (!tableId) {
       return sendApiError(res, 400, 'VALIDATION_ERROR', 'Table ID is required.', {
         field: 'tableId',

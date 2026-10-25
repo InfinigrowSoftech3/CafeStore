@@ -146,6 +146,112 @@ test('validateEnv enforces payment mode policy and rejects test keys in producti
     },
     (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
   );
+
+  // 8. Intentionally disabled payments via PAYMENT_MODE=disabled must succeed without credentials
+  const disabledRes1 = validateEnv({
+    ...baseConfig,
+    PAYMENT_MODE: 'disabled',
+  });
+  assert.equal(disabledRes1.valid, true);
+
+  // 9. Intentionally disabled payments via PAYMENTS_ENABLED=false must succeed without credentials
+  const disabledRes2 = validateEnv({
+    ...baseConfig,
+    PAYMENTS_ENABLED: 'false',
+  });
+  assert.equal(disabledRes2.valid, true);
+
+  // 10. Conflicting configuration: PAYMENT_MODE=live and PAYMENTS_ENABLED=false must throw
+  assert.throws(
+    () => {
+      validateEnv({
+        ...baseConfig,
+        PAYMENT_MODE: 'live',
+        PAYMENTS_ENABLED: 'false',
+        RAZORPAY_KEY_ID: 'rzp_live_samplekey123',
+        RAZORPAY_KEY_SECRET: 'live_sample_secret_123',
+      });
+    },
+    (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
+  );
+});
+
+test('payment endpoints are safely disabled when online payments are intentionally disabled', async (t) => {
+  const origMode = process.env.PAYMENT_MODE;
+  const origEnabled = process.env.PAYMENTS_ENABLED;
+  process.env.PAYMENTS_ENABLED = 'false';
+  process.env.PAYMENT_MODE = 'disabled';
+
+  t.after(() => {
+    if (origMode !== undefined) process.env.PAYMENT_MODE = origMode;
+    else delete process.env.PAYMENT_MODE;
+    if (origEnabled !== undefined) process.env.PAYMENTS_ENABLED = origEnabled;
+    else delete process.env.PAYMENTS_ENABLED;
+  });
+
+  const server = createApp().listen(0);
+  t.after(async () => {
+    await new Promise((resolve) => server.close(resolve));
+    const { closeRedis } = await import('../config/redis.js');
+    await closeRedis();
+  });
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
+
+  const headers = {
+    Origin: 'https://cafe.infinigrowsoftech.com',
+    'X-Forwarded-Proto': 'https',
+    'Content-Type': 'application/json',
+  };
+
+  // 1. POST /api/payment/create-order returns 503 PAYMENTS_DISABLED
+  const createRes = await fetch(`${baseUrl}/api/payment/create-order`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ orderId: '507f1f77bcf86cd799439011', accessToken: 'dummy' }),
+  });
+  assert.equal(createRes.status, 503);
+  const createJson = await createRes.json();
+  assert.equal(createJson.code, 'PAYMENTS_DISABLED');
+
+  // 2. POST /api/payment/verify returns 503 PAYMENTS_DISABLED
+  const verifyRes = await fetch(`${baseUrl}/api/payment/verify`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ orderId: '507f1f77bcf86cd799439011', accessToken: 'dummy' }),
+  });
+  assert.equal(verifyRes.status, 503);
+  const verifyJson = await verifyRes.json();
+  assert.equal(verifyJson.code, 'PAYMENTS_DISABLED');
+
+  // 3. POST /api/payment/webhook returns 503 PAYMENTS_DISABLED
+  const webhookRes = await fetch(`${baseUrl}/api/payment/webhook`, {
+    method: 'POST',
+    headers: { ...headers, 'x-razorpay-signature': 'dummy_sig' },
+    body: JSON.stringify({ event: 'payment.captured' }),
+  });
+  assert.equal(webhookRes.status, 503);
+  const webhookJson = await webhookRes.json();
+  assert.equal(webhookJson.code, 'PAYMENTS_DISABLED');
+
+  // 4. POST /api/payment/cancel returns 503 PAYMENTS_DISABLED
+  const cancelRes = await fetch(`${baseUrl}/api/payment/cancel`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ orderId: '507f1f77bcf86cd799439011', accessToken: 'dummy' }),
+  });
+  assert.equal(cancelRes.status, 503);
+  const cancelJson = await cancelRes.json();
+  assert.equal(cancelJson.code, 'PAYMENTS_DISABLED');
+
+  // 5. POST /api/billing/webhook returns 503 PAYMENTS_DISABLED
+  const billWebhookRes = await fetch(`${baseUrl}/api/billing/webhook`, {
+    method: 'POST',
+    headers: { ...headers, 'x-razorpay-signature': 'dummy_sig' },
+    body: JSON.stringify({ event: 'subscription.charged' }),
+  });
+  assert.equal(billWebhookRes.status, 503);
+  const billWebhookJson = await billWebhookRes.json();
+  assert.equal(billWebhookJson.code, 'PAYMENTS_DISABLED');
 });
 
 test('validateEnv keeps super-admin bootstrap optional and validates configured pairs', async () => {

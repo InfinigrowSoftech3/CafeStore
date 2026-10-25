@@ -28,7 +28,7 @@ This guide walks through deploying the production-hardened version of the cafe o
 **Create production `.env` file with real values:**
 
 ```bash
-# Server Configuration
+# Server Configuration (Mandatory)
 PORT=5000
 NODE_ENV=production
 SERVER_URL=https://cafe-app-api.onrender.com
@@ -36,28 +36,40 @@ CLIENT_URL=https://cafe.infinigrowsoftech.com
 # Optional: comma-separated exact origins for additional approved deployments.
 # STAGING_ALLOWED_ORIGINS=https://staging-cafe.example.com,https://staging-admin.example.com
 
-# Database
+# Database (Mandatory)
 MONGO_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/cafe_db?retryWrites=true&w=majority
 
-# Authentication (generate using: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+# Authentication Secrets (Mandatory)
+# Generate using: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 JWT_SECRET=<generate-32-char-random-secret-here>
 ADMIN_SETUP_SECRET=<generate-32-char-random-secret-here>
 
-# Razorpay Payment (from Razorpay Dashboard - LIVE MODE)
-RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxxxxxx
-RAZORPAY_KEY_SECRET=<your-razorpay-secret-from-dashboard>
-RAZORPAY_WEBHOOK_SECRET=<generate-32-char-random-secret-here>
-
-# Tenant Encryption (generate: node -e "console.log(require('crypto').randomBytes(32).toString('base64'))")
+# Tenant Encryption & Table QR Signing (Mandatory)
 TENANT_CREDENTIALS_ENCRYPTION_KEY=<32-byte-base64-key>
-
-# Table QR Signing (generate: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
 TABLE_QR_SECRET=<32-char-hex-secret>
 
-# Optional: Sentry Error Tracking
-# SENTRY_DSN=https://<key>@sentry.io/<project>
+# Payment Configuration:
+# Choose Option A (Live Razorpay) or Option B (Disabled/Cash Only)
 
-# Optional: Cloudinary for persistent image storage
+# Option A: Online Payments Enabled (Requires Live Keys)
+# PAYMENT_MODE=live
+# PAYMENTS_ENABLED=true
+# RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxxxxxx
+# RAZORPAY_KEY_SECRET=<your-razorpay-secret-from-dashboard>
+# RAZORPAY_WEBHOOK_SECRET=<generate-32-char-random-secret-here>
+
+# Option B: Online Payments Disabled (For Render initial startup or cash-only cafes)
+PAYMENT_MODE=disabled
+PAYMENTS_ENABLED=false
+
+# Redis & Rate Limiting (Recommended for multi-instance deployments)
+# When REDIS_URL is omitted, single-instance in-memory rate limiting and SSE live updates are used.
+# Configure REDIS_URL for distributed rate limiting across multiple instances.
+# REDIS_URL=rediss://default:<password>@<host>:<port>
+# REQUIRE_REDIS=false
+
+# Optional: Sentry Error Tracking & Cloudinary
+# SENTRY_DSN=https://<key>@sentry.io/<project>
 # CLOUDINARY_URL=cloudinary://<api_key>:<api_secret>@<cloud_name>
 ```
 

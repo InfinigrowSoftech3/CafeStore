@@ -10,6 +10,13 @@ const warnOnce = (message) => {
   console.warn(message);
 };
 
+export const isPaymentsEnabled = (env = process.env) => {
+  const mode = String(env.PAYMENT_MODE || '').trim().toLowerCase();
+  if (mode === 'disabled') return false;
+  if (env.PAYMENTS_ENABLED === 'false' || env.ENABLE_PAYMENTS === 'false') return false;
+  return true;
+};
+
 export const validateEnv = (env = process.env) => {
   if (env.NODE_ENV !== 'production') {
     return { valid: true, errors: [] };
@@ -100,9 +107,11 @@ export const validateEnv = (env = process.env) => {
   const rawPaymentMode = String(env.PAYMENT_MODE || '').trim().toLowerCase();
 
   // Validate explicit payment mode format if supplied
-  if (rawPaymentMode && !['live', 'test'].includes(rawPaymentMode)) {
-    errors.push(`PAYMENT_MODE must be either 'live' or 'test'. Received: '${rawPaymentMode}'.`);
+  if (rawPaymentMode && !['live', 'test', 'disabled'].includes(rawPaymentMode)) {
+    errors.push(`PAYMENT_MODE must be either 'live', 'test', or 'disabled'. Received: '${rawPaymentMode}'.`);
   }
+
+  const isPaymentsDisabled = !isPaymentsEnabled(env);
 
   // Explicit test/sandbox mode requires deliberate opt-in.
   // Hosting on Render or Vercel must NEVER automatically authorize test payment credentials!
@@ -116,47 +125,62 @@ export const validateEnv = (env = process.env) => {
     errors.push("Conflicting payment configuration: PAYMENT_MODE is set to 'live' but ALLOW_TEST_PAYMENTS is 'true'.");
   }
 
-  if (!razorpayKeyId) {
-    if (!isExplicitTestMode) {
-      errors.push('RAZORPAY_KEY_ID is required in production.');
-    } else {
-      warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_ID is missing. Online payments will be disabled in test mode.');
-    }
-  } else if (razorpayKeyId.startsWith('rzp_test_')) {
-    if (!isExplicitTestMode) {
-      errors.push('RAZORPAY_KEY_ID must be a live key in production (cannot start with rzp_test_). For isolated staging or sandbox testing, set PAYMENT_MODE=test or ALLOW_TEST_PAYMENTS=true.');
-    } else {
-      warnOnce('[Brewhaus Config Warning] Running in production with Razorpay TEST key (rzp_test_...). Sandbox payments enabled.');
-    }
-  } else if (razorpayKeyId.includes('xxxx') || razorpayKeyId.includes('placeholder')) {
-    errors.push('RAZORPAY_KEY_ID cannot contain placeholder characters (xxxx).');
+  if (rawPaymentMode === 'live' && isPaymentsDisabled) {
+    errors.push("Conflicting payment configuration: PAYMENT_MODE is set to 'live' but payments are disabled (PAYMENTS_ENABLED=false).");
   }
 
-  if (!razorpayKeySecret) {
-    if (!isExplicitTestMode) {
-      errors.push('RAZORPAY_KEY_SECRET is required in production.');
-    } else {
-      warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_SECRET is missing. Online payments will be disabled in test mode.');
-    }
-  } else if (
-    razorpayKeySecret === 'your_razorpay_secret' ||
-    razorpayKeySecret === 'placeholder_secret'
-  ) {
-    errors.push('RAZORPAY_KEY_SECRET cannot be a placeholder secret in production.');
-  } else if (razorpayKeySecret.startsWith('test_')) {
-    if (!isExplicitTestMode) {
-      errors.push('RAZORPAY_KEY_SECRET cannot be a test secret in live production mode (set PAYMENT_MODE=test or ALLOW_TEST_PAYMENTS=true for sandbox/testing).');
-    } else {
-      warnOnce('[Brewhaus Config Warning] Running with Razorpay test secret. Sandbox payments enabled.');
-    }
+  if (rawPaymentMode === 'test' && isPaymentsDisabled) {
+    errors.push("Conflicting payment configuration: PAYMENT_MODE is set to 'test' but payments are disabled (PAYMENTS_ENABLED=false).");
   }
 
-  // Key and Secret consistency check: both live or both test
-  if (razorpayKeyId && razorpayKeySecret) {
-    const keyIsTest = razorpayKeyId.startsWith('rzp_test_');
-    const secretIsTest = razorpayKeySecret.startsWith('test_');
-    if (!isExplicitTestMode && (keyIsTest || secretIsTest)) {
-      errors.push('Test credentials (rzp_test_ / test_) cannot be used in live production payment mode.');
+  if (isPaymentsDisabled) {
+    warnOnce(
+      '[Brewhaus Config Warning] Online payments are intentionally disabled (PAYMENT_MODE=disabled or PAYMENTS_ENABLED=false). ' +
+      'Payment creation and verification endpoints will safely reject requests with 503 Service Unavailable.'
+    );
+  } else {
+    if (!razorpayKeyId) {
+      if (!isExplicitTestMode) {
+        errors.push('RAZORPAY_KEY_ID is required in production when online payments are enabled. To run without payments, set PAYMENT_MODE=disabled or PAYMENTS_ENABLED=false.');
+      } else {
+        warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_ID is missing. Online payments will be disabled in test mode.');
+      }
+    } else if (razorpayKeyId.startsWith('rzp_test_')) {
+      if (!isExplicitTestMode) {
+        errors.push('RAZORPAY_KEY_ID must be a live key in production (cannot start with rzp_test_). For isolated staging or sandbox testing, set PAYMENT_MODE=test or ALLOW_TEST_PAYMENTS=true.');
+      } else {
+        warnOnce('[Brewhaus Config Warning] Running in production with Razorpay TEST key (rzp_test_...). Sandbox payments enabled.');
+      }
+    } else if (razorpayKeyId.includes('xxxx') || razorpayKeyId.includes('placeholder')) {
+      errors.push('RAZORPAY_KEY_ID cannot contain placeholder characters (xxxx).');
+    }
+
+    if (!razorpayKeySecret) {
+      if (!isExplicitTestMode) {
+        errors.push('RAZORPAY_KEY_SECRET is required in production when online payments are enabled. To run without payments, set PAYMENT_MODE=disabled or PAYMENTS_ENABLED=false.');
+      } else {
+        warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_SECRET is missing. Online payments will be disabled in test mode.');
+      }
+    } else if (
+      razorpayKeySecret === 'your_razorpay_secret' ||
+      razorpayKeySecret === 'placeholder_secret'
+    ) {
+      errors.push('RAZORPAY_KEY_SECRET cannot be a placeholder secret in production.');
+    } else if (razorpayKeySecret.startsWith('test_')) {
+      if (!isExplicitTestMode) {
+        errors.push('RAZORPAY_KEY_SECRET cannot be a test secret in live production mode (set PAYMENT_MODE=test or ALLOW_TEST_PAYMENTS=true for sandbox/testing).');
+      } else {
+        warnOnce('[Brewhaus Config Warning] Running with Razorpay test secret. Sandbox payments enabled.');
+      }
+    }
+
+    // Key and Secret consistency check: both live or both test
+    if (razorpayKeyId && razorpayKeySecret) {
+      const keyIsTest = razorpayKeyId.startsWith('rzp_test_');
+      const secretIsTest = razorpayKeySecret.startsWith('test_');
+      if (!isExplicitTestMode && (keyIsTest || secretIsTest)) {
+        errors.push('Test credentials (rzp_test_ / test_) cannot be used in live production payment mode.');
+      }
     }
   }
 

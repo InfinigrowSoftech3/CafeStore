@@ -19,10 +19,17 @@ import { publishLiveUpdate, publishOrderUpdate } from '../services/liveUpdates.j
 import { writeAuditLog } from '../services/auditLog.js';
 import { awardLoyaltyPoints, reverseLoyaltyPoints } from '../services/loyaltyService.js';
 import { syncTableStatusForOrder } from '../services/tableLifecycle.js';
+import { isPaymentsEnabled } from '../config/env.js';
 
 const router = express.Router();
 
 const getTenantPaymentConfig = async (req) => {
+  if (!isPaymentsEnabled()) {
+    const error = new Error('Online payments are currently disabled on this server.');
+    error.code = 'PAYMENTS_DISABLED';
+    error.status = 503;
+    throw error;
+  }
   const tenant = await Tenant.findById(req.tenantId).select('+paymentCredentialsEncrypted').lean();
   let credentials;
   try {
@@ -166,6 +173,9 @@ const verifyWebhookSignature = (rawBody, signature, secret) => {
 // POST /api/payment/create-order
 router.post('/create-order', async (req, res) => {
   try {
+    if (!isPaymentsEnabled()) {
+      return res.status(503).json({ error: 'Online payments are currently disabled.', code: 'PAYMENTS_DISABLED' });
+    }
     const { orderId, accessToken } = req.body;
     const validOrderId = getOrderId(orderId);
     if (!validOrderId) {
@@ -288,6 +298,9 @@ router.post('/create-order', async (req, res) => {
 // Customer cancelled/dismissed the payment modal.
 router.post('/cancel', async (req, res) => {
   try {
+    if (!isPaymentsEnabled()) {
+      return res.status(503).json({ error: 'Online payments are currently disabled.', code: 'PAYMENTS_DISABLED' });
+    }
     const { orderId, accessToken } = req.body;
     const validOrderId = getOrderId(orderId);
     if (!validOrderId) return res.status(400).json({ error: 'A valid order ID is required.' });
@@ -309,6 +322,9 @@ router.post('/cancel', async (req, res) => {
 // POST /api/payment/webhook — only this signed server-to-server event can mark a Razorpay order paid.
 router.post('/webhook', async (req, res) => {
   try {
+    if (!isPaymentsEnabled()) {
+      return res.status(503).json({ error: 'Online payments are currently disabled.', code: 'PAYMENTS_DISABLED' });
+    }
     const config = await getTenantPaymentConfig(req);
     const secret = config.webhookSecret;
     const signature = req.get('x-razorpay-signature');
@@ -520,6 +536,9 @@ router.post('/webhook', async (req, res) => {
 // POST /api/payment/reconcile — Admin refund and payment reconciliation
 router.post('/reconcile', protect, ownerOrManager, async (req, res) => {
   try {
+    if (!isPaymentsEnabled()) {
+      return res.status(503).json({ error: 'Online payments are currently disabled.', code: 'PAYMENTS_DISABLED' });
+    }
     const { orderId, diningBillId } = req.body || {};
     let paymentRecord;
     if (orderId && mongoose.isValidObjectId(orderId)) {
@@ -563,6 +582,9 @@ router.post('/reconcile', protect, ownerOrManager, async (req, res) => {
 // POST /api/payment/verify
 router.post('/verify', async (req, res) => {
   try {
+    if (!isPaymentsEnabled()) {
+      return res.status(503).json({ error: 'Online payments are currently disabled.', code: 'PAYMENTS_DISABLED' });
+    }
     const validOrderId = getOrderId(req.body?.orderId);
     if (!validOrderId) return res.status(400).json({ error: 'A valid order ID is required.' });
     const order = await requireOrderAccess(req, res, validOrderId, req.body?.accessToken);

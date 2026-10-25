@@ -12,6 +12,7 @@ import { PLANS } from '../config/plans.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { runWithSystemTenantAccess } from '../utils/tenantContext.js';
 import { decryptTenantCredentials } from '../utils/tenantSecrets.js';
+import { isPaymentsEnabled } from '../config/env.js';
 
 const router = express.Router();
 
@@ -68,6 +69,9 @@ const verifyWebhookSignatureForTenant = (rawBody, signature, tenant) => {
 // POST /api/billing/webhook - Razorpay Subscription Webhook
 router.post('/webhook', async (req, res, next) => {
   try {
+    if (!isPaymentsEnabled()) {
+      return res.status(503).json({ error: 'Online payments are currently disabled on this server.', code: 'PAYMENTS_DISABLED' });
+    }
     const signature = req.headers['x-razorpay-signature'];
     if (!signature) {
       const sigError = new Error('Missing Razorpay webhook signature.');

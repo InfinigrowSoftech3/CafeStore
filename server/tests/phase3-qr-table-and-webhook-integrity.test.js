@@ -369,4 +369,55 @@ test('PHASE 3 & 4: QR Table Resolution & Webhook Signature Hardening', async (t)
     });
     assert.equal(alteredRes.status, 400);
   });
+
+  await t.test('13. Order creation rejects online payment method when online payments are disabled, but accepts cash', async () => {
+    const origMode = process.env.PAYMENT_MODE;
+    const origEnabled = process.env.PAYMENTS_ENABLED;
+    process.env.PAYMENTS_ENABLED = 'false';
+    process.env.PAYMENT_MODE = 'disabled';
+
+    try {
+      const validToken = createTableQrToken(tableAlpha1._id, cafeAlpha._id);
+      // Online payment request must be rejected with 400 PAYMENTS_DISABLED
+      const onlineRes = await request('/api/public/orders', {
+        method: 'POST',
+        headers: {
+          'X-Cafe-ID': String(cafeAlpha._id),
+          'X-QR-TOKEN': validToken,
+        },
+        body: {
+          tableId: String(tableAlpha1._id),
+          items: [{ productId: String(productAlpha._id), quantity: 1 }],
+          customer: { name: 'Online Customer', phone: '9876543210' },
+          paymentMethod: 'ONLINE',
+        },
+      });
+      assert.equal(onlineRes.status, 400);
+      assert.equal(onlineRes.data.error.code, 'PAYMENTS_DISABLED');
+
+      // Cash payment request must succeed cleanly
+      const cashRes = await request('/api/public/orders', {
+        method: 'POST',
+        headers: {
+          'X-Cafe-ID': String(cafeAlpha._id),
+          'X-QR-TOKEN': validToken,
+        },
+        body: {
+          tableId: String(tableAlpha1._id),
+          items: [{ productId: String(productAlpha._id), quantity: 1 }],
+          customer: { name: 'Cash Customer', phone: '9876543210' },
+          paymentMethod: 'cash',
+        },
+      });
+      assert.equal(cashRes.status, 201);
+      assert.equal(cashRes.data.success, true);
+      assert.equal(cashRes.data.data.order.status, 'PENDING');
+      assert.equal(cashRes.data.data.order.paymentStatus, 'PENDING');
+    } finally {
+      if (origMode !== undefined) process.env.PAYMENT_MODE = origMode;
+      else delete process.env.PAYMENT_MODE;
+      if (origEnabled !== undefined) process.env.PAYMENTS_ENABLED = origEnabled;
+      else delete process.env.PAYMENTS_ENABLED;
+    }
+  });
 });
