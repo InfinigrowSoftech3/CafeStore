@@ -13,6 +13,7 @@ process.env.RAZORPAY_KEY_SECRET = 'integration-test-razorpay-secret';
 process.env.RAZORPAY_WEBHOOK_SECRET = 'integration-test-webhook-secret';
 process.env.TABLE_QR_SECRET = 'integration-test-table-qr-secret-with-32-bytes';
 process.env.CLIENT_URL = 'https://client-seven-sigma-26.vercel.app';
+process.env.CUSTOMER_APP_URL = 'https://client-seven-sigma-26.vercel.app';
 process.env.SERVER_URL = 'http://127.0.0.1:0';
 process.env.ENABLE_RATE_LIMITING = 'true';
 process.env.RATE_LIMIT_WINDOW_MS = '60000';

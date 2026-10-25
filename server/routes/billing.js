@@ -58,12 +58,35 @@ router.post('/webhook', async (req, res, next) => {
       `${event}_${payload.payload?.subscription?.entity?.id || payload.payload?.payment?.entity?.id || 'evt'}_${payload.created_at || Date.now()}`
     );
 
-    // 1. Idempotency guard: duplicate webhooks are recorded and ignored safely
+    // 1. Resolve tenant and verify webhook signature BEFORE creating event records
+    const subscriptionEntity = payload.payload?.subscription?.entity;
+    const paymentEntity = payload.payload?.payment?.entity;
+    const subId = subscriptionEntity?.id || paymentEntity?.subscription_id;
+    const tenantNotesId = subscriptionEntity?.notes?.tenantId || paymentEntity?.notes?.tenantId;
+
+    const tenant = await runWithSystemTenantAccess(async () => {
+      return getTenantIdFromWebhook(subId, tenantNotesId);
+    });
+
+    if (!verifyWebhookSignatureForTenant(rawBody, signature, tenant)) {
+      const sigError = new Error('Invalid Razorpay webhook signature.');
+      sigError.status = 400;
+      throw sigError;
+    }
+
+    // 2. Idempotency guard: duplicate webhooks are safely ignored without repeated processing
+    const existingEvent = await BillingWebhookEvent.findOne({ eventId });
+    if (existingEvent) {
+      return res.status(200).json({ status: 'ignored', reason: 'duplicate_event', eventId });
+    }
+
     try {
       await BillingWebhookEvent.create({
         eventId,
         eventType: event,
+        tenantId: tenant?._id || null,
         payload,
+        status: 'processed',
       });
     } catch (err) {
       if (err.code === 11000) {
@@ -72,53 +95,32 @@ router.post('/webhook', async (req, res, next) => {
       throw err;
     }
 
-    // 2. Process Subscription Events
-    const subscriptionEntity = payload.payload?.subscription?.entity;
-    const paymentEntity = payload.payload?.payment?.entity;
-    const subId = subscriptionEntity?.id || paymentEntity?.subscription_id;
-    const tenantNotesId = subscriptionEntity?.notes?.tenantId || paymentEntity?.notes?.tenantId;
-
-    await runWithSystemTenantAccess(async () => {
-      const tenant = await getTenantIdFromWebhook(subId, tenantNotesId);
-
-      if (!tenant) {
-        // Acknowledge webhook even if tenant not yet linked to prevent webhook retries
-        return;
-      }
-
-      if (!verifyWebhookSignatureForTenant(rawBody, signature, tenant)) {
-        await BillingWebhookEvent.deleteOne({ eventId });
-        const sigError = new Error('Invalid Razorpay webhook signature.');
-        sigError.status = 400;
-        throw sigError;
-      }
-
-      if (event === 'subscription.charged') {
-        tenant.subscription.status = 'active';
-        tenant.status = 'active';
-        tenant.subscription.gracePeriodUntil = null;
-        if (subscriptionEntity?.current_end) {
-          tenant.subscription.currentPeriodEnd = new Date(subscriptionEntity.current_end * 1000);
+    // 3. Process Subscription Events
+    if (tenant) {
+      await runWithSystemTenantAccess(async () => {
+        if (event === 'subscription.charged') {
+          tenant.subscription.status = 'active';
+          tenant.status = 'active';
+          tenant.subscription.gracePeriodUntil = null;
+          if (subscriptionEntity?.current_end) {
+            tenant.subscription.currentPeriodEnd = new Date(subscriptionEntity.current_end * 1000);
+          }
+          await tenant.save();
+        } else if (event === 'payment.failed') {
+          tenant.subscription.status = 'past_due';
+          if (!tenant.subscription.gracePeriodUntil) {
+            tenant.subscription.gracePeriodUntil = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+          }
+          await tenant.save();
+        } else if (event === 'subscription.halted' || event === 'subscription.cancelled') {
+          tenant.subscription.status = 'suspended';
+          tenant.status = 'suspended';
+          await tenant.save();
         }
-        await tenant.save();
-      } else if (event === 'payment.failed') {
-        tenant.subscription.status = 'past_due';
-        if (!tenant.subscription.gracePeriodUntil) {
-          // 3-day grace period
-          tenant.subscription.gracePeriodUntil = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-        }
-        await tenant.save();
-      } else if (event === 'subscription.halted' || event === 'subscription.cancelled') {
-        tenant.subscription.status = 'suspended';
-        tenant.status = 'suspended';
-        await tenant.save();
-      }
+      });
+    }
 
-      // Update event record with resolved tenant
-      await BillingWebhookEvent.updateOne({ eventId }, { $set: { tenantId: tenant._id, status: 'processed' } });
-    });
-
-    res.status(200).json({ status: 'processed', eventId });
+    return res.status(200).json({ status: 'processed', eventId });
   } catch (error) {
     next(error);
   }

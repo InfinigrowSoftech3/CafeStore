@@ -5,6 +5,7 @@ process.env.NODE_ENV = 'production';
 process.env.JWT_SECRET = 'a'.repeat(32);
 process.env.TABLE_QR_SECRET = 'b'.repeat(32);
 process.env.TENANT_CREDENTIALS_ENCRYPTION_KEY = 'c'.repeat(32);
+process.env.SUPER_ADMIN_EMAIL = 'admin@infinigrowsoftech.com';
 process.env.SUPER_ADMIN_PASSWORD = 'ProductionSecurePassword123!';
 process.env.MONGO_URI = 'mongodb://127.0.0.1:27017/cafe_prod_test';
 process.env.REDIS_URL = 'redis://127.0.0.1:6379';

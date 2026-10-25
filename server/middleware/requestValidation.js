@@ -38,11 +38,7 @@ export const validateRequestEnvelope = (req, res, next) => {
       req.path.startsWith('/api/session');
 
     // 1. Tenant / Cafe isolation: clients cannot inject tenantId or cafeId in body unless platform route.
-    // On customer order/payment/session endpoints, safely strip tenantId/cafeId so legacy/cached clients do not fail.
-    if (isCustomerOrderOrPayment) {
-      if ('tenantId' in req.body) delete req.body.tenantId;
-      if ('cafeId' in req.body) delete req.body.cafeId;
-    } else if (!isPlatform && (Object.prototype.hasOwnProperty.call(req.body, 'tenantId') || Object.prototype.hasOwnProperty.call(req.body, 'cafeId'))) {
+    if (!isPlatform && (Object.prototype.hasOwnProperty.call(req.body, 'tenantId') || Object.prototype.hasOwnProperty.call(req.body, 'cafeId'))) {
       return sendApiError(res, 400, 'MASS_ASSIGNMENT_FORBIDDEN', 'Field tenantId/cafeId cannot be modified or injected via request body.');
     }
 

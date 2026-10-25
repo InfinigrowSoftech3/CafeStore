@@ -26,12 +26,7 @@ router.get('/events', protect, ownerOrManager, (req, res) => openLiveStream(req,
 
 const getTrustedClientUrl = () => {
   let configured = String(process.env.CUSTOMER_APP_URL || process.env.CLIENT_URL || 'https://cafestore-customer.vercel.app').trim();
-  if (
-    !configured ||
-    configured.includes('infinigrowsoftech.com') ||
-    configured.includes('client-ten-peach-93.vercel.app') ||
-    configured.includes('cafe-client-app.vercel.app')
-  ) {
+  if (!configured) {
     configured = 'https://cafestore-customer.vercel.app';
   }
 

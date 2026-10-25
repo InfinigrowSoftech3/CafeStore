@@ -110,7 +110,7 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     'https://cafestore-customer.vercel.app',
     'https://cafe-client-app.vercel.app',
     'https://admincafe-panel.vercel.app',
-    'http://admincafe-panel.vercel.app',
+
     'https://cafe.infinigrowsoftech.com',
     'https://admin-cafe.infinigrowsoftech.com',
     ...[
@@ -122,6 +122,10 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
       process.env.ADMIN_APP_URL,
       process.env.CLIENT_URLS,
       process.env.ADMIN_CLIENT_URLS,
+      process.env.SUPER_ADMIN_APP_URL,
+      process.env.SUPERADMIN_CLIENT_URL,
+      process.env.ALLOWED_ORIGINS,
+      process.env.STAGING_ALLOWED_ORIGINS,
     ]
       .flatMap((v) => String(v || '').split(','))
       .map(normalizeOrigin)
@@ -132,8 +136,8 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     const normalized = normalizeOrigin(origin);
     try {
       const parsed = new URL(normalized);
-      if (parsed.hostname === 'localhost' || parsed.hostname.endsWith('.localhost') || parsed.hostname === '127.0.0.1') return true;
-      if (parsed.hostname.endsWith('.vercel.app')) return true;
+      if (process.env.NODE_ENV !== 'production' && (parsed.hostname === 'localhost' || parsed.hostname.endsWith('.localhost') || parsed.hostname === '127.0.0.1')) return true;
+
     } catch { /* ignore parsing errors */ }
     const tenantBaseDomain = String(process.env.TENANT_BASE_DOMAIN || '').trim().toLowerCase().replace(/^\.+|\.+$/g, '');
     let tenantCustomerOrigin = false;
@@ -191,16 +195,17 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
 
   // ── Unauthenticated, un-rate-limited health & readiness probes ─────────────
   // GET /health - Instant response, no DB check, unauthenticated, excluded from rate limiting
-  app.get(['/health', '/api/health'], (req, res) => {
+  app.get('/health', (req, res) => {
     res.status(200).json({
       status: 'ok',
+      database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
       version: '1.0.0',
       timestamp: new Date().toISOString(),
     });
   });
 
   // GET /ready - MongoDB ping probe (returns 503 if ping fails), excluded from rate limiting
-  app.get(['/ready', '/api/ready'], async (req, res) => {
+  app.get('/ready', async (req, res) => {
     try {
       if (mongoose.connection.readyState !== 1 || !mongoose.connection.db) {
         return res.status(503).json({
@@ -211,7 +216,7 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
       await mongoose.connection.db.admin().ping();
       return res.status(200).json({
         status: 'ok',
-        database: 'connected',
+      database: 'connected',
       });
     } catch (err) {
       return res.status(503).json({
@@ -267,7 +272,7 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     const sensitiveStore = createRateLimitStore('rl:sensitive:');
 
     // Paths that have their own dedicated limiter, so the general apiLimiter skips them (no double counting)
-    const OWN_LIMITER = /^\/(health|ready|livez|readyz|auth|payment|contact|ai|platform\/auth|menu|categories|session|tables|gallery|public|tenant)(\/|$)/;
+    const OWN_LIMITER = /^\/(ready|livez|readyz|auth|payment|contact|ai|platform\/auth|menu|categories|session|tables|gallery|public|tenant)(\/|$)/;
 
     // General baseline for authenticated panel traffic (polling, dashboards, CRUD)
     // Fail-open when Redis is unavailable so administrative work is never interrupted
@@ -339,6 +344,39 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     // Sensitive mutation endpoints
     app.use(['/api/payment', '/api/contact', '/api/ai'], sensitiveLimiter);
   }
+
+  // API health & ready endpoints (under /api so they respect apiLimiter when enabled)
+  app.get('/api/health', (req, res) => {
+    const ready = mongoose.connection.readyState === 1;
+    res.status(200).json({
+      status: 'ok',
+      database: ready ? 'connected' : 'disconnected',
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  app.get('/api/ready', async (req, res) => {
+    try {
+      if (mongoose.connection.readyState !== 1 || !mongoose.connection.db) {
+        return res.status(503).json({
+          status: 'unavailable',
+          database: 'disconnected',
+        });
+      }
+      await mongoose.connection.db.admin().ping();
+      return res.status(200).json({
+        status: 'ok',
+        database: 'connected',
+      });
+    } catch (err) {
+      return res.status(503).json({
+        status: 'unavailable',
+        database: 'disconnected',
+        error: err.message,
+      });
+    }
+  });
 
   app.use(express.json({
     limit: '100kb',
@@ -423,6 +461,7 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
   app.get(['/livez', '/api/livez'], (req, res) => {
     return res.status(200).json({
       status: 'ok',
+      database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
       version: '1.0.0',
       timestamp: new Date().toISOString(),
     });

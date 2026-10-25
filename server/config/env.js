@@ -101,9 +101,9 @@ export const validateEnv = (env = process.env) => {
     env.ALLOW_TEST_PAYMENTS === 'true' ||
     env.ALLOW_TEST_KEYS === 'true' ||
     env.DEMO_PAYMENTS_ENABLED === 'true' ||
-    Boolean(env.RENDER) ||
-    Boolean(env.VERCEL) ||
-    Boolean(env.SERVER_URL && env.SERVER_URL.includes('onrender.com'));
+    (env.PAYMENT_MODE === 'test') || Boolean(env.RENDER) ||
+
+    false;
 
   if (!razorpayKeyId) {
     if (!allowTestPayments) {

@@ -38,7 +38,8 @@ export const checkLoginLockout = async (ip, account) => {
   if (!ip || ip === 'unknown') return false;
 
   const redis = getRedisClient();
-  if (!redis || redis.status !== 'ready') return false;
+  if (!redis || typeof redis.get !== 'function') return false;
+  if (redis.status && !['ready', 'connect', 'connecting'].includes(redis.status)) return false;
 
   const { attemptsKey, lockoutKey } = getLockoutKeys(ip, account);
   try {

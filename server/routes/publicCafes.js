@@ -113,11 +113,16 @@ router.get('/cafes/resolve', async (req, res, next) => {
       if (!cafe) {
         cafe = await Tenant.findOne({ slug: cafeSlug.toLowerCase() }).lean();
       }
+      if (!cafe) {
+        return sendApiError(res, 404, 'CAFE_NOT_FOUND', 'The cafe associated with this QR code was not found.');
+      }
     }
 
     // Graceful fallback for brand slug or default
     if (!cafe) {
-      cafe = await findDefaultTenant();
+      if (!cafeSlug) {
+        cafe = await findDefaultTenant();
+      }
     }
 
     if (!cafe) {
@@ -149,7 +154,10 @@ router.get('/cafes/resolve', async (req, res, next) => {
         if (t) return t;
       }
       // If table number not found, pick first active table of this cafe
-      return Table.findOne({ active: true }).sort({ tableNumber: 1 }).lean();
+      if (!tableSlug) {
+        return Table.findOne({ active: true }).sort({ tableNumber: 1 }).lean();
+      }
+      return null;
     });
 
     if (!table) {
@@ -162,7 +170,7 @@ router.get('/cafes/resolve', async (req, res, next) => {
       if (foreignTable && String(foreignTable.tenantId) !== String(cafe._id)) {
         return sendApiError(res, 409, 'TABLE_CAFE_MISMATCH', 'The table does not belong to the specified cafe.');
       }
-      return sendApiError(res, 404, 'QR_NOT_FOUND', 'QR code was not found or is no longer valid.');
+      return sendApiError(res, 404, tableSlug ? 'TABLE_NOT_FOUND' : 'QR_NOT_FOUND', tableSlug ? 'The requested table could not be found.' : 'QR code was not found or is no longer valid.');
     }
 
     if (!table.active) {
@@ -519,11 +527,21 @@ router.post('/orders', async (req, res, next) => {
     }
 
     // Calculate totals securely
+    // Calculate totals securely
     let subtotal = 0;
     const orderItems = [];
     for (const item of items) {
+      const qty = Number(item.quantity);
+      if (!Number.isInteger(qty) || qty < 1 || qty > 999) {
+        return sendApiError(res, 400, 'VALIDATION_ERROR', 'Quantity must be an integer between 1 and 999.', {
+          field: 'quantity',
+          reason: 'Quantity must be an integer between 1 and 999.',
+        });
+      }
       const prod = validProductsMap.get(String(item.productId));
-      const qty = Number(item.quantity) || 1;
+      if (!prod.available) {
+        return sendApiError(res, 400, 'PRODUCT_UNAVAILABLE', `Product is not available: ${prod.name}`);
+      }
       const price = prod.price;
       const itemTotal = price * qty;
       subtotal += itemTotal;

@@ -9,6 +9,7 @@ import Tenant from '../models/Tenant.js';
 import { decryptTenantCredentials } from '../utils/tenantSecrets.js';
 import DiningBill from '../models/DiningBill.js';
 import DiningSession from '../models/DiningSession.js';
+import { protect, ownerOrManager } from '../middleware/auth.js';
 import {
   verifyAccessToken,
 } from '../utils/orderSecurity.js';
@@ -32,14 +33,17 @@ const getTenantPaymentConfig = async (req) => {
 
   const keyId = credentials?.keyId || (process.env.RAZORPAY_KEY_ID && !process.env.RAZORPAY_KEY_ID.includes('xxxx') ? process.env.RAZORPAY_KEY_ID : '');
   const keySecret = credentials?.keySecret || (process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_KEY_SECRET !== 'your_razorpay_secret' ? process.env.RAZORPAY_KEY_SECRET : '');
-  const webhookSecret = credentials?.webhookSecret || process.env.RAZORPAY_WEBHOOK_SECRET || process.env.JWT_SECRET || 'brewhaus_webhook_secret_32_characters_long';
+  const webhookSecret = credentials?.webhookSecret ||
+    process.env.RAZORPAY_WEBHOOK_SECRET ||
+    (process.env.NODE_ENV !== 'production' ? (process.env.JWT_SECRET || 'brewhaus_webhook_secret_32_characters_long') : '');
 
   const activeConfig = { keyId, keySecret, webhookSecret };
 
   if (
     !activeConfig.keyId ||
     !activeConfig.keySecret ||
-    activeConfig.keySecret === 'placeholder_secret'
+    activeConfig.keySecret === 'placeholder_secret' ||
+    (process.env.NODE_ENV === 'production' && !activeConfig.webhookSecret)
   ) {
     const error = new Error('Online payments are not configured for this café. Please configure your Razorpay Key ID and Secret in Café Admin Settings.');
     error.code = 'PAYMENT_CONFIG_INVALID';
@@ -126,6 +130,11 @@ const requireOrderAccess = async (req, res, orderId, accessToken) => {
 
   const order = await Order.findById(orderId);
   if (!order) {
+    res.status(404).json({ error: 'Order not found.' });
+    return null;
+  }
+
+  if (req.tenantId && order.tenantId && String(order.tenantId) !== String(req.tenantId)) {
     res.status(404).json({ error: 'Order not found.' });
     return null;
   }
@@ -509,21 +518,28 @@ router.post('/webhook', async (req, res) => {
 });
 
 // POST /api/payment/reconcile — Admin refund and payment reconciliation
-router.post('/reconcile', async (req, res) => {
+router.post('/reconcile', protect, ownerOrManager, async (req, res) => {
   try {
     const { orderId, diningBillId } = req.body || {};
     let paymentRecord;
     if (orderId && mongoose.isValidObjectId(orderId)) {
-      paymentRecord = await Payment.findOne({ orderId });
+      paymentRecord = await Payment.findOne({ orderId, tenantId: req.tenantId });
     } else if (diningBillId && mongoose.isValidObjectId(diningBillId)) {
-      paymentRecord = await Payment.findOne({ diningBillId });
+      paymentRecord = await Payment.findOne({ diningBillId, tenantId: req.tenantId });
     }
 
     if (!paymentRecord) {
       return res.status(404).json({ error: 'Payment record not found for reconciliation.' });
     }
 
-    const ledger = await PaymentLedger.find({ paymentId: paymentRecord._id }).sort({ recordedAt: 1 }).lean();
+    if (req.user?.branchId && paymentRecord.orderId) {
+      const order = await Order.findOne({ _id: paymentRecord.orderId, tenantId: req.tenantId });
+      if (order && order.branchId && String(order.branchId) !== String(req.user.branchId)) {
+        return res.status(403).json({ error: 'Access denied to payments outside your assigned branch.' });
+      }
+    }
+
+    const ledger = await PaymentLedger.find({ paymentId: paymentRecord._id, tenantId: req.tenantId }).sort({ recordedAt: 1 }).lean();
 
     return res.json({
       reconciled: true,

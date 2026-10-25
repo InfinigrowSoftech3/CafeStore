@@ -30,6 +30,7 @@ const {
   executeCampaign,
   getEstimatedAudienceCount,
   getEligiblePushSubscriptions,
+  stopCampaignScheduler,
 } = await import('../services/campaignRunner.js');
 
 let baseUrl;
@@ -129,8 +130,12 @@ test('Brewhaus Café Website Notification System Suite (Phase 1 to 28)', async (
   });
 
   t.after(async () => {
-    if (httpServer) httpServer.close();
-    await mongoose.connection.close();
+    stopCampaignScheduler();
+    if (httpServer) await new Promise((resolve) => httpServer.close(resolve));
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.connection.close();
+    }
   });
 
   // ── TEST 1: New customer places an order -> Customer created in MongoDB ───────
@@ -418,6 +423,7 @@ test('Brewhaus Café Website Notification System Suite (Phase 1 to 28)', async (
 
     assert.equal(singleCampRes.status, 201);
     assert.ok(singleCampRes.data.campaign);
+    await new Promise((resolve) => setTimeout(resolve, 200));
   });
 });
 
