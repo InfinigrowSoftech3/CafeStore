@@ -382,7 +382,7 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     limit: '100kb',
     verify: (req, res, buffer) => {
       const pathOnly = req.originalUrl.split('?')[0];
-      if (pathOnly === '/api/payment/webhook' || pathOnly === '/api/billing/webhook') req.rawBody = Buffer.from(buffer);
+      if (pathOnly === '/api/payment/webhook' || pathOnly === '/api/billing/webhook' || pathOnly.endsWith('/webhook')) req.rawBody = Buffer.from(buffer);
     },
   }));
   app.use(express.urlencoded({ extended: false, limit: '100kb' }));

@@ -48,43 +48,100 @@ test('production API requires HTTPS and rejects origins outside the two-site all
   assert.ok(forwardedHttps.headers.get('strict-transport-security'));
 });
 
-test('validateEnv accepts fallback secrets and sandbox mode in staging/Render deployments', async () => {
+test('validateEnv enforces payment mode policy and rejects test keys in production even on Render', async () => {
   const { validateEnv } = await import('../config/env.js');
 
-  // Should succeed with fallbacks to JWT_SECRET and no REDIS_URL when ALLOW_TEST_PAYMENTS is true
-  const res1 = validateEnv({
+  const baseConfig = {
     NODE_ENV: 'production',
     JWT_SECRET: 'd'.repeat(32),
     MONGO_URI: 'mongodb://127.0.0.1:27017/prod',
     CLIENT_URL: 'https://cafe.infinigrowsoftech.com',
+  };
+
+  // 1. Valid live credentials in production must pass
+  const liveRes = validateEnv({
+    ...baseConfig,
+    RAZORPAY_KEY_ID: 'rzp_live_samplekey123',
+    RAZORPAY_KEY_SECRET: 'live_sample_secret_123',
+  });
+  assert.equal(liveRes.valid, true);
+
+  // 2. Hosting provider detection (RENDER=true) must NOT automatically authorize test payments
+  assert.throws(
+    () => {
+      validateEnv({
+        ...baseConfig,
+        RAZORPAY_KEY_ID: 'rzp_test_samplekey123',
+        RAZORPAY_KEY_SECRET: 'test_sample_secret_123',
+        RENDER: 'true',
+      });
+    },
+    (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
+  );
+
+  // 3. Reject missing credentials in live production
+  assert.throws(
+    () => {
+      validateEnv({
+        ...baseConfig,
+        RAZORPAY_KEY_ID: '',
+        RAZORPAY_KEY_SECRET: '',
+      });
+    },
+    (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
+  );
+
+  // 4. Reject placeholder credentials in live production
+  assert.throws(
+    () => {
+      validateEnv({
+        ...baseConfig,
+        RAZORPAY_KEY_ID: 'rzp_live_xxxx',
+        RAZORPAY_KEY_SECRET: 'placeholder_secret',
+      });
+    },
+    (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
+  );
+
+  // 5. Test credentials must only be permitted when explicitly configured via ALLOW_TEST_PAYMENTS=true or PAYMENT_MODE=test
+  const testRes1 = validateEnv({
+    ...baseConfig,
     RAZORPAY_KEY_ID: 'rzp_test_samplekey123',
     RAZORPAY_KEY_SECRET: 'test_sample_secret_123',
     ALLOW_TEST_PAYMENTS: 'true',
   });
-  assert.equal(res1.valid, true);
+  assert.equal(testRes1.valid, true);
 
-  // Should succeed when running on Render environment with rzp_test_ keys
-  const res2 = validateEnv({
-    NODE_ENV: 'production',
-    JWT_SECRET: 'd'.repeat(32),
-    MONGO_URI: 'mongodb://127.0.0.1:27017/prod',
-    CLIENT_URL: 'https://cafe.infinigrowsoftech.com',
+  const testRes2 = validateEnv({
+    ...baseConfig,
     RAZORPAY_KEY_ID: 'rzp_test_samplekey123',
     RAZORPAY_KEY_SECRET: 'test_sample_secret_123',
-    RENDER: 'true',
+    PAYMENT_MODE: 'test',
   });
-  assert.equal(res2.valid, true);
+  assert.equal(testRes2.valid, true);
 
-  // Should throw when live keys are enforced and test key is provided without bypass flag
+  // 6. Conflicting configuration: PAYMENT_MODE=live but ALLOW_TEST_PAYMENTS=true must throw
   assert.throws(
     () => {
       validateEnv({
-        NODE_ENV: 'production',
-        JWT_SECRET: 'd'.repeat(32),
-        MONGO_URI: 'mongodb://127.0.0.1:27017/prod',
-        CLIENT_URL: 'https://cafe.infinigrowsoftech.com',
-        RAZORPAY_KEY_ID: 'rzp_test_samplekey123',
-        RAZORPAY_KEY_SECRET: 'test_sample_secret_123',
+        ...baseConfig,
+        RAZORPAY_KEY_ID: 'rzp_live_samplekey123',
+        RAZORPAY_KEY_SECRET: 'live_sample_secret_123',
+        PAYMENT_MODE: 'live',
+        ALLOW_TEST_PAYMENTS: 'true',
+      });
+    },
+    (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'
+  );
+
+  // 7. Invalid PAYMENT_MODE string must throw
+  assert.throws(
+    () => {
+      validateEnv({
+        ...baseConfig,
+        RAZORPAY_KEY_ID: 'rzp_live_samplekey123',
+        RAZORPAY_KEY_SECRET: 'live_sample_secret_123',
+        PAYMENT_MODE: 'invalid_mode',
       });
     },
     (err) => err.code === 'UNSAFE_PRODUCTION_CONFIG'

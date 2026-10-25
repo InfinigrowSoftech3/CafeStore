@@ -52,79 +52,76 @@ router.get('/cafes/resolve', async (req, res, next) => {
     const cafeSlugParam = String(req.query.cafeSlug || req.query.cafe || req.query.cafeId || '').trim();
     const tableSlugParam = String(req.query.tableSlug || req.query.table || req.query.tableId || '').trim();
 
+    // 1. Resolve via cryptographically verified QR Token
     if (token) {
       const result = verifyTableQrTokenDetailed(token);
-      if (result.valid) {
-        const cafe = await Tenant.findById(result.tenantId).lean();
-        if (cafe && cafe.status === 'active') {
-          const table = await runWithSystemTenantAccess(async () => {
-            return Table.findById(result.tableId).lean();
-          });
-
-          if (table && table.active && String(table.tenantId) === String(cafe._id)) {
-            return sendApiSuccess(res, 200, {
-              cafe: {
-                id: String(cafe._id),
-                name: cafe.settings?.cafeName || cafe.name,
-                slug: cafe.slug,
-                logo: cafe.settings?.logoUrl || '',
-                branding: {
-                  primaryColor: cafe.settings?.primaryColor || '#c96b18',
-                  secondaryColor: cafe.settings?.accentColor || '#1a0f08',
-                },
-              },
-              table: {
-                id: String(table._id),
-                name: table.label || `Table ${table.tableNumber}`,
-                number: table.tableNumber,
-              },
-              qr: {
-                id: String(table._id),
-                token,
-              },
-            });
-          }
-        }
-      }
-
-      // If token verification was unsuccessful but NO fallback cafe/table params were provided, return error
-      if (!cafeSlugParam && !tableSlugParam) {
+      if (!result.valid) {
         if (result.reason === 'EXPIRED') {
           return sendApiError(res, 410, 'QR_EXPIRED', 'This QR code has expired or has been disabled.');
         }
         return sendApiError(res, 404, 'QR_NOT_FOUND', 'QR code was not found or is no longer valid.');
       }
-      // Otherwise, gracefully fall through to resolve by cafeSlug and tableSlug below!
-    }
 
-    // Alternative: cafeSlug and tableSlug
-    const cafeSlug = cafeSlugParam;
-    const tableSlug = tableSlugParam;
-
-    if (!cafeSlug && !tableSlug) {
-      return sendApiError(res, 404, 'QR_NOT_FOUND', 'QR code was not found or is no longer valid.');
-    }
-
-    let cafe = null;
-    if (cafeSlug) {
-      if (mongoose.isValidObjectId(cafeSlug)) {
-        cafe = await Tenant.findById(cafeSlug).lean();
-      }
-      if (!cafe) {
-        cafe = await Tenant.findOne({ slug: cafeSlug.toLowerCase() }).lean();
-      }
+      const cafe = await Tenant.findById(result.tenantId).lean();
       if (!cafe) {
         return sendApiError(res, 404, 'CAFE_NOT_FOUND', 'The cafe associated with this QR code was not found.');
       }
-    }
-
-    // Graceful fallback for brand slug or default
-    if (!cafe) {
-      if (!cafeSlug) {
-        cafe = await findDefaultTenant();
+      if (cafe.status !== 'active') {
+        return sendApiError(res, 410, 'QR_EXPIRED', 'This QR code has expired or has been disabled.');
       }
+
+      const table = await runWithSystemTenantAccess(async () => {
+        return Table.findById(result.tableId).lean();
+      });
+
+      if (!table) {
+        return sendApiError(res, 404, 'TABLE_NOT_FOUND', 'The requested table could not be found.');
+      }
+      if (String(table.tenantId) !== String(cafe._id)) {
+        return sendApiError(res, 409, 'TABLE_CAFE_MISMATCH', 'The table does not belong to the specified cafe.');
+      }
+      if (!table.active) {
+        return sendApiError(res, 410, 'QR_EXPIRED', 'This QR code has expired or has been disabled.');
+      }
+
+      return sendApiSuccess(res, 200, {
+        cafe: {
+          id: String(cafe._id),
+          name: cafe.settings?.cafeName || cafe.name,
+          slug: cafe.slug,
+          logo: cafe.settings?.logoUrl || '',
+          branding: {
+            primaryColor: cafe.settings?.primaryColor || '#c96b18',
+            secondaryColor: cafe.settings?.accentColor || '#1a0f08',
+          },
+        },
+        table: {
+          id: String(table._id),
+          name: table.label || `Table ${table.tableNumber}`,
+          number: table.tableNumber,
+        },
+        qr: {
+          id: String(table._id),
+          token,
+        },
+      });
     }
 
+    // 2. Resolve via explicit cafeSlug and tableSlug
+    const cafeSlug = cafeSlugParam;
+    const tableSlug = tableSlugParam;
+
+    if (!cafeSlug) {
+      return sendApiError(res, 404, 'CAFE_NOT_FOUND', 'A cafe identifier or QR token is required.');
+    }
+
+    let cafe = null;
+    if (mongoose.isValidObjectId(cafeSlug)) {
+      cafe = await Tenant.findById(cafeSlug).lean();
+    }
+    if (!cafe) {
+      cafe = await Tenant.findOne({ slug: cafeSlug.toLowerCase() }).lean();
+    }
     if (!cafe) {
       return sendApiError(res, 404, 'CAFE_NOT_FOUND', 'The cafe associated with this QR code was not found.');
     }
@@ -132,16 +129,18 @@ router.get('/cafes/resolve', async (req, res, next) => {
       return sendApiError(res, 410, 'QR_EXPIRED', 'This QR code has expired or has been disabled.');
     }
 
+    if (!tableSlug) {
+      return sendApiError(res, 404, 'TABLE_NOT_FOUND', 'A table identifier is required.');
+    }
+
     let tableNum = null;
-    if (tableSlug) {
-      const numMatch = tableSlug.match(/\d+/);
-      if (numMatch) {
-        tableNum = Number(numMatch[0]);
-      }
+    const numMatch = tableSlug.match(/\d+/);
+    if (numMatch) {
+      tableNum = Number(numMatch[0]);
     }
 
     let table = await runWithTenant(cafe._id, async () => {
-      if (tableSlug && mongoose.isValidObjectId(tableSlug)) {
+      if (mongoose.isValidObjectId(tableSlug)) {
         const t = await Table.findById(tableSlug).lean();
         if (t) return t;
       }
@@ -149,28 +148,22 @@ router.get('/cafes/resolve', async (req, res, next) => {
         const t = await Table.findOne({ tableNumber: tableNum }).lean();
         if (t) return t;
       }
-      if (tableSlug) {
-        const t = await Table.findOne({ label: tableSlug }).lean();
-        if (t) return t;
-      }
-      // If table number not found, pick first active table of this cafe
-      if (!tableSlug) {
-        return Table.findOne({ active: true }).sort({ tableNumber: 1 }).lean();
-      }
+      const t = await Table.findOne({ label: tableSlug }).lean();
+      if (t) return t;
       return null;
     });
 
     if (!table) {
       // Check if table exists under another cafe for mismatch reporting
       let foreignTable = await runWithSystemTenantAccess(async () => {
-        if (tableSlug && mongoose.isValidObjectId(tableSlug)) return Table.findById(tableSlug).lean();
+        if (mongoose.isValidObjectId(tableSlug)) return Table.findById(tableSlug).lean();
         if (tableNum !== null) return Table.findOne({ tableNumber: tableNum }).lean();
         return null;
       });
       if (foreignTable && String(foreignTable.tenantId) !== String(cafe._id)) {
         return sendApiError(res, 409, 'TABLE_CAFE_MISMATCH', 'The table does not belong to the specified cafe.');
       }
-      return sendApiError(res, 404, tableSlug ? 'TABLE_NOT_FOUND' : 'QR_NOT_FOUND', tableSlug ? 'The requested table could not be found.' : 'QR code was not found or is no longer valid.');
+      return sendApiError(res, 404, 'TABLE_NOT_FOUND', 'The requested table could not be found.');
     }
 
     if (!table.active) {

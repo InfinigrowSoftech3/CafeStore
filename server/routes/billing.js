@@ -11,12 +11,33 @@ import BillingWebhookEvent from '../models/BillingWebhookEvent.js';
 import { PLANS } from '../config/plans.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { runWithSystemTenantAccess } from '../utils/tenantContext.js';
+import { decryptTenantCredentials } from '../utils/tenantSecrets.js';
 
 const router = express.Router();
 
 const getTenantWebhookSecret = (tenant) => {
-  // Per-tenant webhook secret takes precedence, fallback to platform secret
-  return tenant?.razorpayWebhookSecret || process.env.RAZORPAY_WEBHOOK_SECRET || process.env.JWT_SECRET || 'brewhaus-billing-webhook-secret-min32chars';
+  // 1. Tenant-specific webhook secret (decrypted from encrypted credentials or direct field)
+  let secret = tenant?.razorpayWebhookSecret;
+  if (!secret && tenant?.paymentCredentialsEncrypted) {
+    try {
+      const creds = decryptTenantCredentials(tenant.paymentCredentialsEncrypted);
+      secret = creds?.webhookSecret;
+    } catch { /* ignore */ }
+  }
+  if (secret && typeof secret === 'string' && secret.trim()) {
+    return secret.trim();
+  }
+
+  // 2. Platform webhook secret
+  const platformSecret = (process.env.RAZORPAY_WEBHOOK_SECRET || process.env.BILLING_WEBHOOK_SECRET || '').trim();
+  if (platformSecret) return platformSecret;
+
+  // Never fall back to JWT_SECRET or hardcoded secret in production!
+  if (process.env.NODE_ENV === 'production') {
+    return '';
+  }
+
+  return (process.env.TEST_WEBHOOK_SECRET || '').trim();
 };
 
 const verifyWebhookSignature = (rawBody, signature, secret) => {
@@ -30,10 +51,10 @@ const verifyWebhookSignature = (rawBody, signature, secret) => {
 const getTenantIdFromWebhook = async (subId, tenantNotesId) => {
   let tenant = null;
   if (subId) {
-    tenant = await Tenant.findOne({ 'subscription.razorpaySubscriptionId': subId });
+    tenant = await Tenant.findOne({ 'subscription.razorpaySubscriptionId': subId }).select('+razorpayWebhookSecret +paymentCredentialsEncrypted');
   }
   if (!tenant && tenantNotesId) {
-    tenant = await Tenant.findById(tenantNotesId);
+    tenant = await Tenant.findById(tenantNotesId).select('+razorpayWebhookSecret +paymentCredentialsEncrypted');
   }
   return tenant;
 };
@@ -48,7 +69,21 @@ const verifyWebhookSignatureForTenant = (rawBody, signature, tenant) => {
 router.post('/webhook', async (req, res, next) => {
   try {
     const signature = req.headers['x-razorpay-signature'];
-    const rawBody = req.rawBody || Buffer.from(JSON.stringify(req.body));
+    if (!signature) {
+      const sigError = new Error('Missing Razorpay webhook signature.');
+      sigError.status = 400;
+      throw sigError;
+    }
+
+    const rawBody = req.rawBody;
+    if (!rawBody || !Buffer.isBuffer(rawBody)) {
+      if (process.env.NODE_ENV === 'production') {
+        const rawError = new Error('Raw body capture failed for webhook verification.');
+        rawError.status = 400;
+        throw rawError;
+      }
+    }
+    const effectiveRawBody = rawBody || Buffer.from(JSON.stringify(req.body));
 
     const payload = req.body || {};
     const event = String(payload.event || '');
@@ -68,7 +103,7 @@ router.post('/webhook', async (req, res, next) => {
       return getTenantIdFromWebhook(subId, tenantNotesId);
     });
 
-    if (!verifyWebhookSignatureForTenant(rawBody, signature, tenant)) {
+    if (!verifyWebhookSignatureForTenant(effectiveRawBody, signature, tenant)) {
       const sigError = new Error('Invalid Razorpay webhook signature.');
       sigError.status = 400;
       throw sigError;

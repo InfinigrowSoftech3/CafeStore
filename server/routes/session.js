@@ -57,7 +57,9 @@ const getRazorpay = async (req) => {
 
   const keyId = credentials?.keyId || (process.env.RAZORPAY_KEY_ID && !process.env.RAZORPAY_KEY_ID.includes('xxxx') ? process.env.RAZORPAY_KEY_ID : '');
   const keySecret = credentials?.keySecret || (process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_KEY_SECRET !== 'your_razorpay_secret' ? process.env.RAZORPAY_KEY_SECRET : '');
-  const webhookSecret = credentials?.webhookSecret || process.env.RAZORPAY_WEBHOOK_SECRET || process.env.JWT_SECRET || 'brewhaus_webhook_secret_32_characters_long';
+  const webhookSecret = credentials?.webhookSecret ||
+    process.env.RAZORPAY_WEBHOOK_SECRET ||
+    (process.env.NODE_ENV !== 'production' ? (process.env.TEST_WEBHOOK_SECRET || '') : '');
 
   const activeConfig = { keyId, keySecret, webhookSecret };
 

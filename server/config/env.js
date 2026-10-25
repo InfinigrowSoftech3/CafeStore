@@ -94,53 +94,69 @@ export const validateEnv = (env = process.env) => {
     errors.push('CORS origins are required in production (CLIENT_URL must be configured).');
   }
 
-  // 8. Razorpay Keys
+  // 8. Razorpay Keys & Payment Mode Policy
   const razorpayKeyId = env.RAZORPAY_KEY_ID || '';
   const razorpayKeySecret = env.RAZORPAY_KEY_SECRET || '';
-  const allowTestPayments =
+  const rawPaymentMode = String(env.PAYMENT_MODE || '').trim().toLowerCase();
+
+  // Validate explicit payment mode format if supplied
+  if (rawPaymentMode && !['live', 'test'].includes(rawPaymentMode)) {
+    errors.push(`PAYMENT_MODE must be either 'live' or 'test'. Received: '${rawPaymentMode}'.`);
+  }
+
+  // Explicit test/sandbox mode requires deliberate opt-in.
+  // Hosting on Render or Vercel must NEVER automatically authorize test payment credentials!
+  const isExplicitTestMode =
+    rawPaymentMode === 'test' ||
     env.ALLOW_TEST_PAYMENTS === 'true' ||
     env.ALLOW_TEST_KEYS === 'true' ||
-    env.DEMO_PAYMENTS_ENABLED === 'true' ||
-    (env.PAYMENT_MODE === 'test') || Boolean(env.RENDER) ||
+    env.DEMO_PAYMENTS_ENABLED === 'true';
 
-    false;
+  if (rawPaymentMode === 'live' && env.ALLOW_TEST_PAYMENTS === 'true') {
+    errors.push("Conflicting payment configuration: PAYMENT_MODE is set to 'live' but ALLOW_TEST_PAYMENTS is 'true'.");
+  }
 
   if (!razorpayKeyId) {
-    if (!allowTestPayments) {
+    if (!isExplicitTestMode) {
       errors.push('RAZORPAY_KEY_ID is required in production.');
     } else {
-      warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_ID is missing. Online payments will be disabled.');
+      warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_ID is missing. Online payments will be disabled in test mode.');
     }
   } else if (razorpayKeyId.startsWith('rzp_test_')) {
-    if (!allowTestPayments) {
-      errors.push('RAZORPAY_KEY_ID must be a live key in production (cannot start with rzp_test_), or set ALLOW_TEST_PAYMENTS=true for sandbox/testing.');
+    if (!isExplicitTestMode) {
+      errors.push('RAZORPAY_KEY_ID must be a live key in production (cannot start with rzp_test_). For isolated staging or sandbox testing, set PAYMENT_MODE=test or ALLOW_TEST_PAYMENTS=true.');
     } else {
       warnOnce('[Brewhaus Config Warning] Running in production with Razorpay TEST key (rzp_test_...). Sandbox payments enabled.');
     }
-  } else if (razorpayKeyId.includes('xxxx')) {
+  } else if (razorpayKeyId.includes('xxxx') || razorpayKeyId.includes('placeholder')) {
     errors.push('RAZORPAY_KEY_ID cannot contain placeholder characters (xxxx).');
   }
 
   if (!razorpayKeySecret) {
-    if (!allowTestPayments) {
+    if (!isExplicitTestMode) {
       errors.push('RAZORPAY_KEY_SECRET is required in production.');
     } else {
-      warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_SECRET is missing. Online payments will be disabled.');
+      warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_SECRET is missing. Online payments will be disabled in test mode.');
     }
   } else if (
     razorpayKeySecret === 'your_razorpay_secret' ||
     razorpayKeySecret === 'placeholder_secret'
   ) {
-    if (!allowTestPayments) {
-      errors.push('RAZORPAY_KEY_SECRET cannot be a placeholder secret in production.');
-    } else {
-      warnOnce('[Brewhaus Config Warning] RAZORPAY_KEY_SECRET is a placeholder secret. Online payments will fail until configured.');
-    }
+    errors.push('RAZORPAY_KEY_SECRET cannot be a placeholder secret in production.');
   } else if (razorpayKeySecret.startsWith('test_')) {
-    if (!allowTestPayments) {
-      errors.push('RAZORPAY_KEY_SECRET cannot be a test secret in production (set ALLOW_TEST_PAYMENTS=true for sandbox/testing).');
+    if (!isExplicitTestMode) {
+      errors.push('RAZORPAY_KEY_SECRET cannot be a test secret in live production mode (set PAYMENT_MODE=test or ALLOW_TEST_PAYMENTS=true for sandbox/testing).');
     } else {
       warnOnce('[Brewhaus Config Warning] Running with Razorpay test secret. Sandbox payments enabled.');
+    }
+  }
+
+  // Key and Secret consistency check: both live or both test
+  if (razorpayKeyId && razorpayKeySecret) {
+    const keyIsTest = razorpayKeyId.startsWith('rzp_test_');
+    const secretIsTest = razorpayKeySecret.startsWith('test_');
+    if (!isExplicitTestMode && (keyIsTest || secretIsTest)) {
+      errors.push('Test credentials (rzp_test_ / test_) cannot be used in live production payment mode.');
     }
   }
 
