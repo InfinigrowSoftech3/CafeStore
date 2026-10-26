@@ -80,7 +80,7 @@ export default function CustomSelect({
       {isOpen && (
         <div
           role="listbox"
-          className={`absolute top-full mt-1.5 z-50 min-w-full w-max max-w-[280px] max-h-64 overflow-y-auto rounded-2xl border border-stone-200 bg-white p-1.5 shadow-xl custom-scrollbar animate-in fade-in-0 zoom-in-95 duration-100 ${
+          className={`absolute top-full mt-1.5 z-50 min-w-full w-max max-w-[min(280px,calc(100vw-2rem))] max-h-64 overflow-y-auto rounded-2xl border border-stone-200 bg-white p-1.5 shadow-xl custom-scrollbar touch-scroll animate-in fade-in-0 zoom-in-95 duration-100 ${
             align === 'right' ? 'right-0' : 'left-0'
           } ${dropdownClassName}`}
           style={{ boxShadow: '0 12px 32px -4px rgba(15, 61, 46, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06)' }}

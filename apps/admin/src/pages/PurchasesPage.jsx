@@ -233,11 +233,11 @@ export default function PurchasesPage() {
 
       {/* Filter Bar */}
       <div className="rounded-2xl border border-stone-200/80 bg-white p-3.5 shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="rounded-xl border border-stone-200 px-3 py-1.5 text-xs font-semibold text-stone-700 bg-stone-50 focus:outline-none"
+            className="w-full sm:w-auto flex-1 sm:flex-initial rounded-xl border border-stone-200 px-3 py-1.5 text-xs font-semibold text-stone-700 bg-stone-50 focus:outline-none"
           >
             <option value="ALL">All Statuses</option>
             <option value="draft">Draft</option>
@@ -249,7 +249,7 @@ export default function PurchasesPage() {
           <select
             value={selectedSupplier}
             onChange={(e) => setSelectedSupplier(e.target.value)}
-            className="rounded-xl border border-stone-200 px-3 py-1.5 text-xs font-semibold text-stone-700 bg-stone-50 focus:outline-none"
+            className="w-full sm:w-auto flex-1 sm:flex-initial rounded-xl border border-stone-200 px-3 py-1.5 text-xs font-semibold text-stone-700 bg-stone-50 focus:outline-none"
           >
             <option value="ALL">All Suppliers</option>
             {suppliers.map((s) => (
@@ -272,8 +272,8 @@ export default function PurchasesPage() {
             onAction={() => { resetPOForm(); setShowCreateDrawer(true); }}
           />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto touch-scroll">
+            <table className="w-full text-left text-xs min-w-[650px]">
               <thead className="border-b border-stone-200 bg-stone-50/70 font-bold uppercase tracking-wider text-stone-400">
                 <tr>
                   <th className="py-3 px-4">PO Number</th>

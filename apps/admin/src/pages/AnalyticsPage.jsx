@@ -271,7 +271,7 @@ export default function AnalyticsPage() {
 
       {/* Tabs navigation */}
       <div className="border-b border-stone-200">
-        <nav className="flex space-x-6 overflow-x-auto pb-1 text-xs font-semibold">
+        <nav className="flex space-x-6 overflow-x-auto no-scrollbar touch-scroll pb-1 text-xs font-semibold">
           {[
             { id: 'sales', label: 'Sales & Trends' },
             { id: 'items', label: 'Top Menu Items' },
@@ -404,8 +404,8 @@ export default function AnalyticsPage() {
             </h3>
             <span className="text-xs text-stone-500 font-medium">Ranked by units ordered</span>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto touch-scroll">
+            <table className="w-full text-left text-xs min-w-[500px]">
               <thead className="border-b border-stone-200 bg-stone-50/70 font-bold uppercase tracking-wider text-stone-400">
                 <tr>
                   <th className="py-3 px-4">Rank</th>

@@ -266,8 +266,8 @@ export default function TeamPage() {
         {loading ? (
           <div className="p-8 text-center text-xs text-stone-400">Loading team...</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto touch-scroll">
+            <table className="w-full text-left text-xs min-w-[550px]">
               <thead className="border-b border-stone-200 bg-stone-50/70 font-bold uppercase tracking-wider text-stone-400">
                 <tr>
                   <th className="py-3 px-4">Member</th>

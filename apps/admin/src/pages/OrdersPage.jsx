@@ -476,9 +476,9 @@ export default function OrdersPage() {
         </div>
 
         {/* Date Filter & Status Filter Chips */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-stone-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-stone-100">
           {/* Date Chips */}
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
             <span className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mr-1">Period:</span>
             {DATE_FILTERS.map(({ value, label }) => (
               <button
@@ -497,7 +497,7 @@ export default function OrdersPage() {
           </div>
 
           {/* Status Chips */}
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
             <span className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mr-1">Status:</span>
             <button
               type="button"
@@ -753,7 +753,7 @@ export default function OrdersPage() {
                       </div>
 
                       {/* Actions row */}
-                      <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <button
                             type="button"

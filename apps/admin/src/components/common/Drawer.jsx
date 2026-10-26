@@ -52,7 +52,7 @@ export default function Drawer({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 240 }}
-            className={`relative z-10 flex h-full w-full ${width} flex-col custom-scrollbar`}
+            className={`relative z-10 flex h-full w-full sm:${width} max-w-full flex-col custom-scrollbar touch-scroll`}
             style={{
               backgroundColor: 'var(--bg-card)',
               borderColor: 'var(--border-primary)',
@@ -61,15 +61,15 @@ export default function Drawer({
             }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b px-6 py-5 shrink-0"
+            <div className="flex items-center justify-between border-b px-4 sm:px-6 py-4 sm:py-5 pt-[max(1rem,env(safe-area-inset-top))] shrink-0"
               style={{ borderColor: 'var(--border-primary)', backgroundColor: 'var(--hover-bg)/50' }}
             >
-              <div>
-                <h2 className="font-display text-lg font-bold text-[var(--text-primary)] tracking-tight">
+              <div className="min-w-0 pr-2">
+                <h2 className="font-display text-base sm:text-lg font-bold text-[var(--text-primary)] tracking-tight truncate">
                   {title}
                 </h2>
                 {subtitle && (
-                  <p className="mt-1 text-xs text-[var(--text-muted)] font-medium leading-relaxed">
+                  <p className="mt-0.5 text-xs text-[var(--text-muted)] font-medium leading-relaxed truncate">
                     {subtitle}
                   </p>
                 )}
@@ -85,13 +85,13 @@ export default function Drawer({
             </div>
 
             {/* Scrollable Body */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5 touch-scroll">
               {children}
             </div>
 
             {/* Footer */}
             {footer && (
-              <div className="border-t px-6 py-4"
+              <div className="border-t px-4 sm:px-6 py-3.5 sm:py-4 pb-[max(1rem,env(safe-area-inset-bottom))] shrink-0"
                 style={{ borderColor: 'var(--border-primary)/80', backgroundColor: 'var(--hover-bg)/80' }}
               >
                 {footer}

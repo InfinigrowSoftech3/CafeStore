@@ -451,7 +451,7 @@ export default function TablesPage() {
       <div className="rounded-2xl border border-stone-200/80 bg-white p-3.5 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           {/* Floor Selection */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-scroll pb-1 sm:pb-0">
             <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mr-1">Floor:</span>
             <button
               type="button"
@@ -484,11 +484,11 @@ export default function TablesPage() {
           </div>
 
           {/* View Mode Switcher */}
-          <div className="flex items-center self-end sm:self-auto rounded-xl border border-stone-200 bg-stone-50 p-1">
+          <div className="flex items-center w-full sm:w-auto overflow-x-auto no-scrollbar touch-scroll rounded-xl border border-stone-200 bg-stone-50 p-1">
             <button
               type="button"
               onClick={() => setViewMode('canvas')}
-              className={`rounded-lg px-3 py-1 text-xs font-semibold transition flex items-center gap-1.5 ${
+              className={`rounded-lg px-3 py-1 text-xs font-semibold transition flex-1 sm:flex-initial justify-center flex items-center gap-1.5 ${
                 viewMode === 'canvas'
                   ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                   : 'text-stone-500 hover:text-stone-800'
@@ -499,7 +499,7 @@ export default function TablesPage() {
             <button
               type="button"
               onClick={() => setViewMode('cards')}
-              className={`rounded-lg px-3 py-1 text-xs font-semibold transition flex items-center gap-1.5 ${
+              className={`rounded-lg px-3 py-1 text-xs font-semibold transition flex-1 sm:flex-initial justify-center flex items-center gap-1.5 ${
                 viewMode === 'cards'
                   ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                   : 'text-stone-500 hover:text-stone-800'
@@ -510,7 +510,7 @@ export default function TablesPage() {
             <button
               type="button"
               onClick={() => setViewMode('qr')}
-              className={`rounded-lg px-3 py-1 text-xs font-semibold transition flex items-center gap-1.5 ${
+              className={`rounded-lg px-3 py-1 text-xs font-semibold transition flex-1 sm:flex-initial justify-center flex items-center gap-1.5 ${
                 viewMode === 'qr'
                   ? 'bg-white text-[#0F3D2E] font-bold shadow-xs'
                   : 'text-stone-500 hover:text-stone-800'
@@ -522,7 +522,7 @@ export default function TablesPage() {
         </div>
 
         {/* Status Filters */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-stone-100">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-scroll pt-2 border-t border-stone-100">
           <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mr-1">Status:</span>
           {['ALL', 'AVAILABLE', 'OCCUPIED', 'WAITING_PAYMENT', 'RESERVED', 'CLEANING', 'DISABLED'].map(st => {
             const isAll = st === 'ALL';

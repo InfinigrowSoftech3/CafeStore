@@ -322,11 +322,20 @@ export default function TenantSettingsPage() {
         ]}
         actions={
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving}
+              className="btn-primary rounded-xl px-4 py-2 text-xs font-bold shadow-md flex items-center gap-1.5"
+            >
+              {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
+              <span>{saving ? 'Saving...' : 'Save Settings'}</span>
+            </button>
             <a
               href={env.customerUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition"
               title="Open Live Customer Storefront"
             >
               <ExternalLink size={14} className="text-emerald-700" />
@@ -339,7 +348,7 @@ export default function TenantSettingsPage() {
       {/* Main 2-column layout: Left sub-navigation + Right active section panel */}
       <div className="grid gap-6 md:grid-cols-4 items-start">
         {/* Left Sub-nav */}
-        <div className="md:col-span-1 rounded-3xl border border-stone-200/90 bg-white p-2 shadow-xs space-y-1">
+        <div className="md:col-span-1 flex md:flex-col overflow-x-auto gap-1.5 p-2 bg-white rounded-2xl md:rounded-3xl border border-stone-200/90 shadow-xs no-scrollbar touch-scroll">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -348,10 +357,10 @@ export default function TenantSettingsPage() {
                 key={item.id}
                 type="button"
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-2.5 rounded-2xl px-3.5 py-2.5 text-xs font-bold transition text-left ${
+                className={`flex items-center gap-2 rounded-xl md:rounded-2xl px-3 py-2 md:px-3.5 md:py-2.5 text-xs font-bold transition text-left shrink-0 md:shrink md:w-full whitespace-nowrap ${
                   isActive
                     ? 'bg-espresso-950 text-white shadow-xs'
-                    : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
+                    : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900 bg-stone-50/60 md:bg-transparent'
                 }`}
               >
                 <Icon size={15} className={isActive ? 'text-amber-400' : 'text-stone-400'} />
@@ -895,7 +904,7 @@ export default function TenantSettingsPage() {
       </div>
 
       {/* Sticky Bottom Save Bar with Dirty State & Ctrl+S indicator */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md border-t border-stone-200/90 py-3.5 px-6 shadow-lg">
+      <div className="fixed bottom-16 md:bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200/90 py-2.5 sm:py-3.5 px-3 sm:px-6 shadow-lg">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-xs text-stone-500">
             {isDirty ? (

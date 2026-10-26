@@ -190,7 +190,7 @@ export default function ReviewsPage() {
 
       {/* Filter Chips Bar */}
       <div className="rounded-2xl border border-stone-200/80 bg-white p-3.5 shadow-xs flex items-center justify-between">
-        <div className="flex items-center gap-1.5 overflow-x-auto">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-scroll">
           <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mr-1">Filter Stars:</span>
           {['ALL', '5', '4', '3', '2', '1'].map((star) => (
             <button

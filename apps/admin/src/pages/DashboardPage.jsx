@@ -295,7 +295,7 @@ export default function DashboardPage() {
       )}
 
       {/* ── 3. 5 KPI Cards with trends ──────────────────────────── */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-5">
         <KpiCard
           icon={ShoppingBag}
           label="Today's Orders"
@@ -314,7 +314,7 @@ export default function DashboardPage() {
           icon={Clock}
           label="Pending / Kitchen"
           value={stats.pending}
-          sublabel="Actively being cooked"
+          sublabel="Actively cooked"
           badge={stats.pending > 0 ? 'Active' : null}
         />
         <KpiCard
@@ -324,14 +324,16 @@ export default function DashboardPage() {
           change={+8.0}
           changeLabel="served today"
         />
-        <KpiCard
-          icon={TrendingUp}
-          label="Avg Order Value"
-          value={formatMoney(stats.avgOrderValue, currency)}
-          sublabel="Per table basket"
-          change={+4.5}
-          changeLabel="AOV trend"
-        />
+        <div className="col-span-2 lg:col-span-1">
+          <KpiCard
+            icon={TrendingUp}
+            label="Avg Order Value"
+            value={formatMoney(stats.avgOrderValue, currency)}
+            sublabel="Per table basket"
+            change={+4.5}
+            changeLabel="AOV trend"
+          />
+        </div>
       </div>
 
       {/* ── 4. Main Two-Column Row: Live Orders Board + Hourly Chart ─ */}

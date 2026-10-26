@@ -134,6 +134,11 @@ export default function AdminLayout({ children, title }) {
     };
   }, []);
 
+  // Close mobile drawer on route navigation
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
   // Load branches
   useEffect(() => {
     api.get('/branches').then(res => {
@@ -365,7 +370,7 @@ export default function AdminLayout({ children, title }) {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-              className="fixed inset-y-0 left-0 z-50 w-[calc(100vw-2rem)] max-w-72 md:hidden flex flex-col bg-white border-r border-slate-200 text-slate-800 custom-scrollbar"
+              className="fixed inset-y-0 left-0 z-50 w-[calc(100vw-2.5rem)] max-w-72 md:hidden flex flex-col bg-white border-r border-slate-200 text-slate-800 custom-scrollbar touch-scroll pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
             >
               {/* Mobile Header */}
               <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-slate-200">
@@ -547,7 +552,7 @@ export default function AdminLayout({ children, title }) {
                 <span>/</span>
                 <span className="text-[var(--header-text)]">{title}</span>
               </div>
-              <h1 className="min-w-0 truncate font-display text-base font-bold text-[var(--header-text)] sm:text-xl leading-tight">
+              <h1 className="min-w-0 truncate font-display text-sm sm:text-base md:text-xl font-bold text-[var(--header-text)] leading-tight">
                 {title}
               </h1>
             </div>
@@ -560,7 +565,7 @@ export default function AdminLayout({ children, title }) {
               href={`${env.customerUrl}/menu?cafe=${tenant.slug || ''}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-emerald-300 bg-emerald-50 px-3 text-xs font-bold text-emerald-900 hover:bg-emerald-100 hover:border-emerald-400 transition shadow-2xs"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-emerald-300 bg-emerald-50 px-2.5 sm:px-3 text-xs font-bold text-emerald-900 hover:bg-emerald-100 hover:border-emerald-400 transition shadow-2xs"
               title="Open Live Customer Ordering Storefront in new tab"
             >
               <ExternalLink size={13} className="text-emerald-700" />
@@ -582,20 +587,22 @@ export default function AdminLayout({ children, title }) {
               </kbd>
             </button>
 
-            {/* Branch Switcher */}
+            {/* Branch Switcher (Desktop / Tablet only — on mobile it is in the drawer) */}
             {branches.length > 0 && (
-              <CustomSelect
-                value={selectedBranchId}
-                onChange={(val) => handleBranchChange(typeof val === 'object' ? val.target.value : val)}
-                options={branches.map((b) => ({
-                  value: b._id,
-                  label: `${b.name} (${b.code})${b.isMain ? ' ★' : ''}`,
-                  dot: b.isMain ? 'bg-amber-500' : 'bg-emerald-500',
-                }))}
-                icon={Store}
-                className="bg-slate-50 border-slate-200 text-slate-800 max-w-[210px]"
-                title="Switch Branch Outlet"
-              />
+              <div className="hidden md:block">
+                <CustomSelect
+                  value={selectedBranchId}
+                  onChange={(val) => handleBranchChange(typeof val === 'object' ? val.target.value : val)}
+                  options={branches.map((b) => ({
+                    value: b._id,
+                    label: `${b.name} (${b.code})${b.isMain ? ' ★' : ''}`,
+                    dot: b.isMain ? 'bg-amber-500' : 'bg-emerald-500',
+                  }))}
+                  icon={Store}
+                  className="bg-slate-50 border-slate-200 text-slate-800 max-w-[210px]"
+                  title="Switch Branch Outlet"
+                />
+              </div>
             )}
 
             {/* Online / Sync Badge */}
@@ -631,12 +638,12 @@ export default function AdminLayout({ children, title }) {
                 href={getAppHref(env.posUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-3.5 text-xs font-bold text-white shadow-xs hover:bg-[#165a44] active:scale-98 transition"
+                className="hidden sm:inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-3.5 text-xs font-bold text-white shadow-xs hover:bg-[#165a44] active:scale-98 transition"
                 title="Launch Fast POS Terminal"
                 style={{ backgroundColor: '#0F3D2E' }}
               >
                 <Monitor size={14} />
-                <span className="hidden sm:inline">Open POS</span>
+                <span>Open POS</span>
               </a>
             )}
 
@@ -646,7 +653,7 @@ export default function AdminLayout({ children, title }) {
               onClick={handleRefresh}
               disabled={refreshing}
               title="Refresh all admin data"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 disabled:cursor-wait transition shadow-2xs"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 disabled:cursor-wait transition shadow-2xs"
             >
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
             </button>
@@ -654,9 +661,85 @@ export default function AdminLayout({ children, title }) {
         </header>
 
         {/* Main Body */}
-        <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-canvas)' }}>
+        <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-3.5 pb-24 sm:p-6 sm:pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:p-8 touch-scroll" style={{ backgroundColor: 'var(--bg-canvas)' }}>
           {children}
         </main>
+
+        {/* Mobile Bottom Navigation Bar (Shown on phones < 768px) */}
+        <nav
+          className="fixed bottom-0 left-0 right-0 z-40 flex h-16 items-center justify-around border-t border-slate-200 bg-white/95 backdrop-blur-md px-1 pb-[env(safe-area-inset-bottom)] shadow-lg md:hidden select-none"
+          aria-label="Mobile Bottom Navigation"
+        >
+          {/* 1. Dashboard */}
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `flex flex-1 flex-col items-center justify-center py-1 text-[10px] font-semibold transition ${
+                isActive ? 'text-[#0F3D2E] font-bold' : 'text-slate-500 hover:text-slate-900'
+              }`
+            }
+          >
+            <LayoutDashboard size={18} className="mb-0.5" />
+            <span>Home</span>
+          </NavLink>
+
+          {/* 2. Orders with pending count */}
+          <NavLink
+            to="/orders"
+            className={({ isActive }) =>
+              `relative flex flex-1 flex-col items-center justify-center py-1 text-[10px] font-semibold transition ${
+                isActive ? 'text-[#0F3D2E] font-bold' : 'text-slate-500 hover:text-slate-900'
+              }`
+            }
+          >
+            <div className="relative">
+              <ShoppingBag size={18} className="mb-0.5" />
+              {pendingOrdersCount > 0 && (
+                <span className="absolute -top-1 -right-2 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-red-600 px-1 text-[8px] font-extrabold text-white animate-bounce">
+                  {pendingOrdersCount}
+                </span>
+              )}
+            </div>
+            <span>Orders</span>
+          </NavLink>
+
+          {/* 3. Products / Menu */}
+          <NavLink
+            to="/products"
+            className={({ isActive }) =>
+              `flex flex-1 flex-col items-center justify-center py-1 text-[10px] font-semibold transition ${
+                isActive ? 'text-[#0F3D2E] font-bold' : 'text-slate-500 hover:text-slate-900'
+              }`
+            }
+          >
+            <UtensilsCrossed size={18} className="mb-0.5" />
+            <span>Menu</span>
+          </NavLink>
+
+          {/* 4. Tables & Floor */}
+          <NavLink
+            to="/tables"
+            className={({ isActive }) =>
+              `flex flex-1 flex-col items-center justify-center py-1 text-[10px] font-semibold transition ${
+                isActive ? 'text-[#0F3D2E] font-bold' : 'text-slate-500 hover:text-slate-900'
+              }`
+            }
+          >
+            <Layers size={18} className="mb-0.5" />
+            <span>Tables</span>
+          </NavLink>
+
+          {/* 5. More Menu Drawer Toggle */}
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="flex flex-1 flex-col items-center justify-center py-1 text-[10px] font-semibold text-slate-500 hover:text-slate-900 transition cursor-pointer"
+            aria-label="Open navigation menu"
+          >
+            <Menu size={18} className="mb-0.5" />
+            <span>More</span>
+          </button>
+        </nav>
 
         {/* Global Modals */}
         <CommandPaletteModal isOpen={showCommandPalette} onClose={() => setShowCommandPalette(false)} />

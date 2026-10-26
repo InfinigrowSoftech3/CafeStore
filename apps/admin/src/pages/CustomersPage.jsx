@@ -302,7 +302,7 @@ export default function CustomersPage() {
           </div>
 
           {/* Quick Filter Selectors */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
             <CustomSelect
               value={consentFilter}
               onChange={(val) => {
@@ -315,7 +315,7 @@ export default function CustomersPage() {
                 { value: 'true', label: 'Marketing Opted-In' },
                 { value: 'false', label: 'Opted-Out' },
               ]}
-              className="min-w-[155px]"
+              className="flex-1 sm:flex-initial min-w-[145px]"
             />
 
             <CustomSelect
@@ -331,7 +331,7 @@ export default function CustomersPage() {
                 { value: 'repeat', label: 'Repeat (2 Visits)' },
                 { value: 'one-time', label: 'First Time (1 Visit)' },
               ]}
-              className="min-w-[150px]"
+              className="flex-1 sm:flex-initial min-w-[140px]"
             />
           </div>
         </div>
@@ -369,8 +369,8 @@ export default function CustomersPage() {
       ) : (
         /* Table with Avatar Rows, Loyalty Tags, and Consent Badges */
         <div className="overflow-hidden rounded-3xl border border-stone-200/90 bg-white shadow-xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto touch-scroll">
+            <table className="w-full text-left text-xs min-w-[650px]">
               <thead className="border-b border-stone-200 bg-stone-50/70 font-bold uppercase tracking-wider text-stone-400">
                 <tr>
                   <th className="py-3 px-4">Guest</th>

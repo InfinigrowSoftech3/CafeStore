@@ -445,8 +445,8 @@ export default function ExpensesPage() {
         </div>
 
         {/* Search Input */}
-        <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
-          <div className="w-56 sm:w-64">
+        <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="w-full sm:w-64">
             <SearchInput
               size="sm"
               placeholder="Search vendor / description..."
@@ -484,8 +484,8 @@ export default function ExpensesPage() {
             }}
           />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+          <div className="overflow-x-auto touch-scroll">
+            <table className="w-full text-left border-collapse text-xs min-w-[650px]">
               <thead>
                 <tr className="bg-stone-50/80 border-b border-stone-200 text-stone-500 uppercase tracking-wider font-semibold">
                   <th className="py-3 px-4">Date</th>

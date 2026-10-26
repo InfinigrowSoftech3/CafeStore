@@ -86,7 +86,7 @@ export default function CommandPaletteModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4"
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-20 p-3 sm:p-4"
       style={{ backgroundColor: 'var(--modal-backdrop)', backdropFilter: 'blur(4px)' }}
     >
       <div className="w-full max-w-xl rounded-3xl border shadow-2xl overflow-hidden custom-scrollbar"
@@ -117,6 +117,14 @@ export default function CommandPaletteModal({ isOpen, onClose }) {
           >
             ESC
           </kbd>
+          <button
+            type="button"
+            onClick={onClose}
+            className="sm:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+            aria-label="Close command palette"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         {/* Results List */}

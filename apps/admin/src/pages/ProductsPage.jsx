@@ -215,7 +215,7 @@ export default function ProductsPage() {
           </div>
 
           {/* Category Dropdown & View Mode Switcher */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-start">
             <CustomSelect
               value={selectedCategory}
               onChange={(val) => setSelectedCategory(typeof val === 'object' ? val.target.value : val)}
@@ -227,7 +227,7 @@ export default function ProductsPage() {
                   label: category.name,
                 })),
               ]}
-              className="min-w-[170px]"
+              className="flex-1 sm:w-auto sm:min-w-[170px]"
             />
 
             <div className="flex items-center rounded-xl border border-stone-200 bg-stone-50 p-1">
@@ -400,8 +400,8 @@ export default function ProductsPage() {
       ) : (
         /* TABLE VIEW */
         <div className="overflow-hidden rounded-3xl border border-stone-200/90 bg-white shadow-xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto touch-scroll">
+            <table className="w-full text-left text-xs min-w-[620px]">
               <thead className="border-b border-stone-200 bg-stone-50/80 font-bold uppercase tracking-wider text-stone-400">
                 <tr>
                   <th className="py-3 px-4">Item</th>
