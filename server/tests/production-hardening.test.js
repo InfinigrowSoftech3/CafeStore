@@ -41,6 +41,17 @@ test('production API requires HTTPS and rejects origins outside the two-site all
   });
   assert.equal(subdomainBypass.status, 403);
 
+  const evilVercel = await fetch(`${baseUrl}/api/health`, {
+    headers: { Origin: 'https://evil.vercel.app', 'X-Forwarded-Proto': 'https' },
+  });
+  assert.equal(evilVercel.status, 403);
+
+  const superAdminOrigin = await fetch(`${baseUrl}/api/health`, {
+    headers: { Origin: 'https://cafestore-superadmin.vercel.app', 'X-Forwarded-Proto': 'https' },
+  });
+  assert.equal(superAdminOrigin.status, 200);
+  assert.equal(superAdminOrigin.headers.get('access-control-allow-origin'), 'https://cafestore-superadmin.vercel.app');
+
   const forwardedHttps = await fetch(`${baseUrl}/api/readyz`, {
     headers: { Origin: 'https://cafe.infinigrowsoftech.com', 'X-Forwarded-Proto': 'https' },
   });

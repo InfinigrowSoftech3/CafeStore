@@ -108,11 +108,15 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
     'https://cafestore-pos.vercel.app',
     'https://cafestore-kds.vercel.app',
     'https://cafestore-customer.vercel.app',
+    'https://cafestore-superadmin.vercel.app',
     'https://cafe-client-app.vercel.app',
     'https://admincafe-panel.vercel.app',
 
     'https://cafe.infinigrowsoftech.com',
     'https://admin-cafe.infinigrowsoftech.com',
+    'https://superadmin-cafe.infinigrowsoftech.com',
+    'https://superadmin.infinigrowsoftech.com',
+    'https://super-admin.infinigrowsoftech.com',
     ...[
       process.env.CLIENT_URL,
       process.env.CUSTOMER_APP_URL,
@@ -149,19 +153,37 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
         tenantCustomerOrigin = parsed.protocol === 'https:' && Boolean(prefix) && !prefix.includes('.') && prefix !== 'admin';
       } catch { tenantCustomerOrigin = false; }
     }
+    let isCafestoreVercel = false;
+    try {
+      const parsed = new URL(normalized);
+      if (parsed.protocol === 'https:' && /^cafestore-(customer|admin|pos|kds|superadmin)(-[a-z0-9-]+)?\.vercel\.app$/.test(parsed.hostname)) {
+        isCafestoreVercel = true;
+      }
+    } catch { /* ignore parsing errors */ }
     if (process.env.NODE_ENV === 'production') {
-      return productionOrigins.has(normalized) || tenantCustomerOrigin;
+      return productionOrigins.has(normalized) || tenantCustomerOrigin || isCafestoreVercel;
     }
     // Development/staging: allow configured origins + localhost
     const devOrigins = new Set([
-      ...[process.env.CLIENT_URL, process.env.CUSTOMER_APP_URL, process.env.ADMIN_CLIENT_URL, process.env.ADMIN_APP_URL]
+      ...[
+        process.env.CLIENT_URL,
+        process.env.CUSTOMER_APP_URL,
+        process.env.ADMIN_CLIENT_URL,
+        process.env.ADMIN_APP_URL,
+        process.env.SUPER_ADMIN_APP_URL,
+        process.env.SUPERADMIN_CLIENT_URL,
+      ]
         .flatMap((v) => String(v || '').split(','))
         .map(normalizeOrigin)
         .filter(Boolean),
-      'http://localhost:5173', 'http://localhost:4173', 'http://localhost:5174',
-      'http://localhost:4174', 'http://localhost:5175', 'http://localhost:3000',
+      'http://localhost:5173', 'http://localhost:4173',
+      'http://localhost:5174', 'http://localhost:4174',
+      'http://localhost:5175', 'http://localhost:4175',
+      'http://localhost:5176', 'http://localhost:4176',
+      'http://localhost:5177', 'http://localhost:4177',
+      'http://localhost:3000',
     ]);
-    return devOrigins.has(normalized) || productionOrigins.has(normalized) || tenantCustomerOrigin;
+    return devOrigins.has(normalized) || productionOrigins.has(normalized) || tenantCustomerOrigin || isCafestoreVercel;
   };
 
   // Production allows the existing customer/admin origins plus one-label tenant customer subdomains.

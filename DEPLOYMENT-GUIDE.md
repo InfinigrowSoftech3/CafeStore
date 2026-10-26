@@ -15,6 +15,7 @@ This guide walks through deploying the production-hardened version of the cafe o
 - Admin: https://cafestore-admin.vercel.app
 - POS: https://cafestore-pos.vercel.app
 - KDS: https://cafestore-kds.vercel.app
+- Super Admin: https://cafestore-superadmin.vercel.app
 - API: https://cafestore-nmue.onrender.com
 
 **Last Updated:** 2026-10-20
