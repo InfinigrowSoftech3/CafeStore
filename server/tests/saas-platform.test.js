@@ -429,6 +429,32 @@ test('SaaS Platform: Self-Signup, Setup Auto-provisioning, Plan Limits, Billing 
     assert.equal(impersonateLog.actorEmail, process.env.SUPER_ADMIN_EMAIL);
   });
 
+  await t.test('6. Super-Admin updates and authenticates dynamically when configured credentials change', async () => {
+    const origEmail = process.env.SUPER_ADMIN_EMAIL;
+    const origPass = process.env.SUPER_ADMIN_PASSWORD;
+
+    try {
+      process.env.SUPER_ADMIN_EMAIL = 'infinigrowsoftech@gmail.com';
+      process.env.SUPER_ADMIN_PASSWORD = 'Infini@1214';
+
+      const resLogin = await request('/api/platform/admin/login', {
+        method: 'POST',
+        body: {
+          email: 'infinigrowsoftech@gmail.com',
+          password: 'Infini@1214',
+        },
+      });
+
+      assert.equal(resLogin.status, 200);
+      assert.ok(resLogin.body.token);
+      assert.equal(resLogin.body.admin.email, 'infinigrowsoftech@gmail.com');
+      assert.equal(resLogin.body.admin.role, 'super_admin');
+    } finally {
+      process.env.SUPER_ADMIN_EMAIL = origEmail;
+      process.env.SUPER_ADMIN_PASSWORD = origPass;
+    }
+  });
+
   server.close();
   await mongoose.disconnect();
 });

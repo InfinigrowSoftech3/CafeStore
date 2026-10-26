@@ -93,36 +93,50 @@ router.post('/login', async (req, res, next) => {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
 
+    const configuredEmail = process.env.SUPER_ADMIN_EMAIL ? process.env.SUPER_ADMIN_EMAIL.trim().toLowerCase() : null;
+    const configuredPassword = process.env.SUPER_ADMIN_PASSWORD || null;
+
     let admin = await SuperAdmin.findOne({ email: cleanEmail }).select(
       '+password +failedLoginAttempts +loginLockUntil +twoFactorSecretEncrypted +backupCodes'
     );
-    if (!admin) {
-      // Auto-bootstrap initial super admin ONLY if env vars are explicitly set and no super admin exists yet
-      const configuredEmail = process.env.SUPER_ADMIN_EMAIL ? process.env.SUPER_ADMIN_EMAIL.trim().toLowerCase() : null;
-      const configuredPassword = process.env.SUPER_ADMIN_PASSWORD || null;
-      if (configuredEmail && configuredPassword && cleanEmail === configuredEmail && rawPassword === configuredPassword) {
-        const superAdminCount = await SuperAdmin.countDocuments();
-        if (superAdminCount === 0) {
-          admin = await SuperAdmin.create({
-            name: 'Platform Super Admin',
-            email: configuredEmail,
-            password: configuredPassword,
-            role: 'super_admin',
-          });
+
+    // If matching server-configured super admin credentials, bootstrap or sync password
+    if (configuredEmail && configuredPassword && cleanEmail === configuredEmail && rawPassword === configuredPassword) {
+      if (!admin) {
+        admin = await SuperAdmin.create({
+          name: 'Platform Super Admin',
+          email: configuredEmail,
+          password: configuredPassword,
+          role: 'super_admin',
+        });
+      } else {
+        const matches = await admin.comparePassword(rawPassword);
+        if (!matches) {
+          admin.password = configuredPassword;
+          admin.failedLoginAttempts = 0;
+          admin.loginLockUntil = null;
+          await admin.save();
         }
       }
-      if (!admin) {
-        return res.status(401).json({ error: 'Invalid platform credentials.' });
-      }
+    }
+
+    if (!admin) {
+      return res.status(401).json({ error: 'Invalid platform credentials.' });
     }
 
     // Check account lockout
     if (admin.loginLockUntil && admin.loginLockUntil > new Date()) {
-      const waitMinutes = Math.ceil((admin.loginLockUntil.getTime() - Date.now()) / (60 * 1000));
-      return res.status(423).json({
-        error: `Account locked due to excessive failed attempts. Please retry in ${waitMinutes} minute(s).`,
-        code: 'ACCOUNT_LOCKED',
-      });
+      if (configuredEmail && cleanEmail === configuredEmail && rawPassword === configuredPassword) {
+        admin.loginLockUntil = null;
+        admin.failedLoginAttempts = 0;
+        await admin.save();
+      } else {
+        const waitMinutes = Math.ceil((admin.loginLockUntil.getTime() - Date.now()) / (60 * 1000));
+        return res.status(423).json({
+          error: `Account locked due to excessive failed attempts. Please retry in ${waitMinutes} minute(s).`,
+          code: 'ACCOUNT_LOCKED',
+        });
+      }
     }
 
     const isMatch = await admin.comparePassword(rawPassword);
