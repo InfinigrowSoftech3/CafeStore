@@ -36,12 +36,21 @@ import Product from '../models/Product.js';
  * @param {string|ObjectId} options.performedBy - User ID if performed by staff/admin
  * @returns {Promise<{ order: Object, deducted: boolean, alreadyProcessed: boolean }>}
  */
-export const confirmOrderAndDeduct = async (orderId, { additionalUpdates = {}, performedBy = null } = {}) => {
-  const order = await Order.findById(orderId);
+export const confirmOrderAndDeduct = async (orderOrId, { additionalUpdates = {}, performedBy = null } = {}) => {
+  let order;
+  if (orderOrId && typeof orderOrId === 'object' && Array.isArray(orderOrId.items)) {
+    order = orderOrId;
+  } else {
+    const id = orderOrId?._id || orderOrId;
+    order = await Order.findById(id);
+  }
   if (!order) {
-    const error = new Error(`Order ${orderId} not found.`);
+    const error = new Error(`Order ${orderOrId?._id || orderOrId} not found.`);
     error.statusCode = 404;
     throw error;
+  }
+  if (!Array.isArray(order.items)) {
+    order.items = [];
   }
 
   // Idempotency: If already confirmed AND inventory was already processed, do nothing to inventory.
@@ -145,7 +154,9 @@ export const confirmOrderAndDeduct = async (orderId, { additionalUpdates = {}, p
   if (requiredMap.size === 0) {
     order.orderStatus = 'confirmed';
     order.inventoryProcessed = true;
+    order.inventoryProcessingStatus = 'processed';
     order.inventoryProcessedAt = new Date();
+    order.inventoryError = null;
     if (additionalUpdates && Object.keys(additionalUpdates).length > 0) {
       Object.assign(order, additionalUpdates);
     }
@@ -201,7 +212,9 @@ export const confirmOrderAndDeduct = async (orderId, { additionalUpdates = {}, p
       // Mark order as confirmed and inventoryProcessed = true within the exact same transaction
       order.orderStatus = 'confirmed';
       order.inventoryProcessed = true;
+      order.inventoryProcessingStatus = 'processed';
       order.inventoryProcessedAt = new Date();
+      order.inventoryError = null;
       if (additionalUpdates && Object.keys(additionalUpdates).length > 0) {
         Object.assign(order, additionalUpdates);
       }
@@ -278,7 +291,9 @@ async function executeNonReplicaFallback({ order, requiredMap, additionalUpdates
 
     order.orderStatus = 'confirmed';
     order.inventoryProcessed = true;
+    order.inventoryProcessingStatus = 'processed';
     order.inventoryProcessedAt = new Date();
+    order.inventoryError = null;
     if (additionalUpdates && Object.keys(additionalUpdates).length > 0) {
       Object.assign(order, additionalUpdates);
     }
@@ -380,6 +395,7 @@ export const restoreForOrder = async (orderId, { performedBy = null, reason = 'O
   }
 
   order.inventoryRestored = true;
+  order.inventoryProcessingStatus = 'restored';
   order.inventoryRestoredAt = new Date();
   await order.save();
 

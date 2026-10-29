@@ -77,12 +77,18 @@ export const validateAndFetchProductPrices = async (items, Product, expectedTena
     // Validate quantity
     const qty = Number(quantity);
     if (!Number.isInteger(qty) || qty < 1 || qty > 999) {
-      throw new Error('Quantity must be an integer between 1 and 999.');
+      const err = new Error('Quantity must be an integer between 1 and 999.');
+      err.status = 400;
+      err.code = 'INVALID_QUANTITY';
+      throw err;
     }
 
     // Validate productId
     if (!productId || typeof productId !== 'string' || !mongoose.isValidObjectId(productId)) {
-      throw new Error('Product ID is required and must be a string.');
+      const err = new Error('Product ID is required and must be a string.');
+      err.status = 400;
+      err.code = 'INVALID_PRODUCT_ID';
+      throw err;
     }
 
     // Fetch product from database

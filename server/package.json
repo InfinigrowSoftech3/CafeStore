@@ -9,6 +9,8 @@
     "seed:food": "node scripts/seedAllCafesFood.js",
     "seed:products": "node scripts/seed-products.js",
     "test": "node --import ./tests/setup.js --test --test-concurrency=1 tests/*.test.js",
+    "test:pos": "node --import ./tests/setup.js --test tests/pos-production-integrity.test.js tests/posAndOfflineSync.test.js",
+    "test:fast": "node --import ./tests/setup.js --test tests/pos-production-integrity.test.js tests/posAndOfflineSync.test.js tests/order-lifecycle.test.js",
     "migrate:phase1": "node migrations/20261004_phase1_payment_integrity.js",
     "migrate:phase2": "node migrations/20261004_phase2_live_order_flow.js",
     "migrate:phase3": "node migrations/20261004_phase3_admin_security.js",

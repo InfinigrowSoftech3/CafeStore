@@ -43,6 +43,11 @@ const tenantSchema = new mongoose.Schema({
       autoAcceptOrders: { type: Boolean, default: false },
       printReceiptOnOrder: { type: Boolean, default: true },
       defaultStation: { type: String, default: 'KITCHEN' },
+      maxCashierDiscountPercent: { type: Number, default: 20, min: 0, max: 100 },
+      maxCashierDiscountAmount: { type: Number, default: 500, min: 0 },
+      allowStackingDiscountAndCoupon: { type: Boolean, default: false },
+      requireManagerDiscountApproval: { type: Boolean, default: true },
+      requireOfflineCashReconciliation: { type: Boolean, default: true },
     },
     tableSettings: {
       cleaningStepEnabled: { type: Boolean, default: true },

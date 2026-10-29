@@ -14,6 +14,7 @@ import {
   saveOfflineOrder,
   getPendingOfflineOrders,
   removeOfflineOrder,
+  updateOfflineOrderStatus,
   cacheCatalog,
   getCachedCatalog,
 } from '../utils/posOfflineStorage';
@@ -95,6 +96,8 @@ export default function POSPage() {
   const [lastReceipt, setLastReceipt] = useState(null);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [processingOrder, setProcessingOrder] = useState(false);
+  const [checkoutError, setCheckoutError] = useState(null);
+  const [activeCheckoutSyncId, setActiveCheckoutSyncId] = useState(null);
 
   // Connectivity
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
@@ -150,7 +153,16 @@ export default function POSPage() {
         toast.success(`Successfully synced ${data.synced.length} offline order(s)!`);
       }
       if (data.failed && data.failed.length > 0) {
-        toast.error(`${data.failed.length} offline order(s) failed to sync.`);
+        for (const failItem of data.failed) {
+          if (failItem.syncId) {
+            await updateOfflineOrderStatus(failItem.syncId, {
+              status: 'sync_failed',
+              lastError: failItem.error || 'Sync validation failed',
+              errorCode: failItem.code || 'SYNC_ERROR',
+            });
+          }
+        }
+        toast.error(`${data.failed.length} offline order(s) failed to sync and remain preserved.`);
       }
       await checkPendingOfflineQueue();
     } catch (err) {
@@ -357,6 +369,8 @@ export default function POSPage() {
     setCouponCode('');
     setOrderNotes('');
     setIsMobileCartOpen(false);
+    setActiveCheckoutSyncId(null);
+    setCheckoutError(null);
   };
 
   // Pricing & Tax Calculations
@@ -464,7 +478,49 @@ export default function POSPage() {
     }
 
     setProcessingOrder(true);
-    const syncId = `pos_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    setCheckoutError(null);
+
+    // DEMO SIMULATION: Strictly client-side simulation. Never touches real backend/database/stock.
+    if (user?.isDemo || user?._id?.startsWith('demo')) {
+      const demoOrderNumber = `DEMO-${Math.floor(1000 + Math.random() * 9000)}`;
+      const demoOrder = {
+        _id: `sim_${Date.now()}`,
+        isDemo: true,
+        orderNumber: demoOrderNumber,
+        orderType,
+        tableNumber: Number(tableNumber) || null,
+        items: cart.map(i => ({
+          name: i.name,
+          quantity: i.quantity,
+          price: i.unitPrice,
+          itemTotal: i.itemTotal,
+          variant: i.variant,
+          addons: i.addons,
+        })),
+        subtotal,
+        taxAmount,
+        totalAmount,
+        discountAmount,
+        paymentMethod,
+        createdAt: new Date().toISOString(),
+        customer: {
+          name: customerName || 'Walk-in Customer',
+          phone: customerPhone || '9999999999',
+        },
+      };
+
+      toast.success(`Demo Order #${demoOrderNumber} simulated!`, { icon: '🧪' });
+      setLastReceipt({ isDemo: true, order: demoOrder });
+      setShowReceiptModal(true);
+      setShowCashModal(false);
+      clearCart();
+      setProcessingOrder(false);
+      return;
+    }
+
+    // Stable idempotency/syncId for this checkout attempt to prevent duplicates on retry
+    const syncId = activeCheckoutSyncId || `pos_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    setActiveCheckoutSyncId(syncId);
 
     const orderPayload = {
       tableNumber: Number(tableNumber) || 0,
@@ -486,8 +542,10 @@ export default function POSPage() {
       manualDiscount: discountAmount,
       couponCode,
       notes: orderNotes,
-      autoComplete: true,
-      isPaid: true,
+      tenderedAmount: paymentMethod === 'cash' ? (Number(cashTendered) || totalAmount) : undefined,
+      externalPaymentReference: ['upi', 'card'].includes(paymentMethod)
+        ? `POS-${paymentMethod.toUpperCase()}-${Date.now()}`
+        : undefined,
       syncId,
     };
 
@@ -497,6 +555,7 @@ export default function POSPage() {
         await checkPendingOfflineQueue();
         toast.success('Order saved locally! Will sync when reconnected.', { icon: '💾' });
         clearCart();
+        setActiveCheckoutSyncId(null);
       } catch (err) {
         toast.error('Failed to store offline order: ' + err.message);
       } finally {
@@ -508,46 +567,27 @@ export default function POSPage() {
     try {
       const { data } = await api.post('/pos/orders', orderPayload);
       toast.success(`Order #${data.order.orderNumber} confirmed!`, { icon: '✅' });
-      setLastReceipt(data.receipt || { order: data.order });
+      setLastReceipt({ isDemo: false, order: data.order, receipt: data.receipt });
       setShowReceiptModal(true);
       setShowCashModal(false);
       clearCart();
+      setActiveCheckoutSyncId(null);
+      setCheckoutError(null);
     } catch (err) {
-      if (user?._id?.startsWith('demo') || err.response?.status === 401 || err.response?.status === 404 || !err.response) {
-        const demoOrderNumber = Math.floor(1000 + Math.random() * 9000);
-        const demoOrder = {
-          _id: `ord_local_${Date.now()}`,
-          orderNumber: demoOrderNumber,
-          orderType,
-          tableNumber: Number(tableNumber) || null,
-          items: cart.map(i => ({
-            name: i.name,
-            quantity: i.quantity,
-            price: i.unitPrice,
-            itemTotal: i.itemTotal,
-            variant: i.variant,
-            addons: i.addons,
-          })),
-          subtotal,
-          taxAmount,
-          totalAmount,
-          discountAmount,
-          paymentMethod,
-          createdAt: new Date().toISOString(),
-          customer: {
-            name: customerName || 'Walk-in Customer',
-            phone: customerPhone || '9999999999',
-          },
-        };
-        toast.success(`Order #${demoOrderNumber} confirmed!`, { icon: '✅' });
-        setLastReceipt({ order: demoOrder });
-        setShowReceiptModal(true);
-        setShowCashModal(false);
-        clearCart();
-      } else {
-        const msg = (typeof err.response?.data?.error === 'string' ? err.response.data.error : err.response?.data?.error?.message) || err.message || 'Checkout failed';
-        toast.error(msg);
-      }
+      // PRESERVE CART ON FAILURE — Never generate a fake live success receipt!
+      const rawError = err.response?.data?.error;
+      const safeMsg = (typeof rawError === 'string' ? rawError : rawError?.message) ||
+        (err.status === 401 ? 'Session expired. Please sign in again.' : null) ||
+        (err.status === 403 ? 'You are not authorized to complete this checkout.' : null) ||
+        err.message ||
+        'Checkout failed. Your cart is preserved — please retry.';
+
+      setCheckoutError({
+        message: safeMsg,
+        code: err.code || err.status || err.response?.status,
+        canRetry: true,
+      });
+      toast.error(safeMsg);
     } finally {
       setProcessingOrder(false);
     }
@@ -796,6 +836,27 @@ export default function POSPage() {
           </div>
         </div>
 
+        {/* Checkout Failure Notification with Safe Retry */}
+        {checkoutError && (
+          <div className="p-3 rounded-2xl border border-rose-400/50 bg-rose-500/10 text-rose-900 text-xs flex items-start gap-2">
+            <AlertCircle size={16} className="text-rose-600 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <div className="font-bold">Checkout Interrupted (Cart Safe)</div>
+              <div className="mt-0.5 text-[11px] opacity-90 truncate">{checkoutError.message}</div>
+            </div>
+            {checkoutError.canRetry && (
+              <button
+                type="button"
+                onClick={() => handleCheckout('cash')}
+                disabled={processingOrder}
+                className="px-2.5 py-1 rounded-lg bg-pos-accent text-white text-[11px] font-bold hover:opacity-90 transition shrink-0 cursor-pointer disabled:opacity-50"
+              >
+                {processingOrder ? '...' : 'Retry'}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Master Sticky Charge Action (56px tall) */}
         <Button
           variant="primary"
@@ -871,6 +932,17 @@ export default function POSPage() {
 
   return (
     <div className="flex flex-col h-full flex-1 overflow-hidden bg-pos-bg text-pos-text">
+      {/* ── Persistent Demo Mode Banner ────────────────────────────── */}
+      {(user?.isDemo || user?._id?.startsWith('demo')) && (
+        <div className="bg-amber-500/20 border-b border-amber-500/40 px-4 py-1.5 text-center text-xs font-bold text-amber-900 flex items-center justify-center gap-2 shrink-0 select-none z-20">
+          <AlertCircle size={15} className="text-amber-700 shrink-0" />
+          <span>DEMO WORKSTATION — SIMULATION MODE ONLY (NOT A REAL SALE)</span>
+          <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-950 font-extrabold">
+            SIMULATION
+          </span>
+        </div>
+      )}
+
       {/* ── Station & Order Type Subheader ──────────────────────────── */}
       <div className="bg-pos-surface border-b border-pos-border px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-2 overflow-x-auto pos-scrollbar py-0.5">
@@ -1400,8 +1472,8 @@ export default function POSPage() {
       <Modal
         isOpen={showReceiptModal && Boolean(lastReceipt)}
         onClose={() => setShowReceiptModal(false)}
-        title="Order Confirmed"
-        subtitle="Receipt generated successfully"
+        title={lastReceipt?.isDemo || lastReceipt?.order?.isDemo ? 'Demo Simulation Ticket' : 'Order Confirmed'}
+        subtitle={lastReceipt?.isDemo || lastReceipt?.order?.isDemo ? 'DEMO — NOT A REAL SALE' : 'Receipt generated successfully'}
         maxWidth="max-w-md"
         showClose={false}
         footer={
@@ -1433,13 +1505,32 @@ export default function POSPage() {
         }
       >
         {lastReceipt && (
-          <div className="text-center space-y-4 py-2">
-            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-pos-success/10 text-pos-success mx-auto border border-pos-success/30">
+          <div className="text-center space-y-4 py-2 relative">
+            {/* Highly Visible Watermark Badge for Demo Transactions */}
+            {(lastReceipt.isDemo || lastReceipt.order?.isDemo) && (
+              <div className="p-3 rounded-2xl bg-amber-500/15 border-2 border-dashed border-amber-500 text-amber-900 text-center space-y-1">
+                <div className="flex items-center justify-center gap-1.5 font-black text-sm uppercase tracking-wider text-amber-800">
+                  <AlertCircle size={16} className="text-amber-700 shrink-0" />
+                  <span>DEMO — NOT A REAL SALE</span>
+                </div>
+                <div className="text-[11px] font-semibold text-amber-900/80">
+                  Simulated training transaction. No live order was created & no payment was settled.
+                </div>
+              </div>
+            )}
+
+            <div className={`flex items-center justify-center w-16 h-16 rounded-full mx-auto border ${
+              lastReceipt.isDemo || lastReceipt.order?.isDemo
+                ? 'bg-amber-500/10 text-amber-700 border-amber-500/30'
+                : 'bg-pos-success/10 text-pos-success border-pos-success/30'
+            }`}>
               <CheckCircle2 size={36} />
             </div>
 
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-pos-muted">Order Ticket</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-pos-muted">
+                {lastReceipt.isDemo || lastReceipt.order?.isDemo ? 'Demo Ticket (Simulation)' : 'Order Ticket'}
+              </span>
               <h3 className="font-display font-extrabold text-3xl text-pos-text mt-1">
                 #{lastReceipt.order?.orderNumber}
               </h3>
@@ -1455,7 +1546,7 @@ export default function POSPage() {
                 <span className="font-bold text-pos-text capitalize">{lastReceipt.order?.orderType || 'Counter'}</span>
               </div>
               <div className="flex justify-between pt-2 border-t border-pos-border text-sm font-bold text-pos-text">
-                <span>Total Paid:</span>
+                <span>{lastReceipt.isDemo || lastReceipt.order?.isDemo ? 'Simulated Total:' : 'Total Paid:'}</span>
                 <span className="text-pos-accent font-extrabold tabular-nums">
                   {formatMoney(lastReceipt.order?.total || lastReceipt.order?.totalAmount || 0, currency)}
                 </span>

@@ -63,15 +63,18 @@ export function AuthProvider({ children }) {
   };
 
   const demoLogin = (role = 'cashier') => {
+    // Clear any production access token to prevent demo user from performing authenticated backend actions
+    setAccessToken(null);
     const demoUser = {
       _id: 'demo-staff-pos',
-      name: role === 'cashier' ? 'Pooja (Cashier)' : 'Rahul (Store Manager)',
+      name: role === 'cashier' ? 'Pooja (Cashier Demo)' : 'Rahul (Store Manager Demo)',
       email: role === 'cashier' ? 'cashier@brewhaus.com' : 'manager@brewhaus.com',
       role: role,
-      tenantName: 'Brewhaus Café',
+      isDemo: true,
+      tenantName: 'Brewhaus Café (DEMO)',
       tenantId: 'demo-tenant',
       tenant: {
-        name: 'Brewhaus Café',
+        name: 'Brewhaus Café (DEMO)',
         currency: '₹',
         primaryColor: '#0F3D2E',
       },

@@ -72,6 +72,24 @@ export const removeOfflineOrder = async (syncId) => {
   });
 };
 
+export const updateOfflineOrderStatus = async (syncId, updates = {}) => {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_OFFLINE_ORDERS, 'readwrite');
+    const store = tx.objectStore(STORE_OFFLINE_ORDERS);
+    const getReq = store.get(syncId);
+    getReq.onsuccess = () => {
+      const record = getReq.result;
+      if (!record) return resolve(null);
+      const updated = { ...record, ...updates, updatedAt: Date.now() };
+      const putReq = store.put(updated);
+      putReq.onsuccess = () => resolve(updated);
+      putReq.onerror = () => reject(putReq.error);
+    };
+    getReq.onerror = () => reject(getReq.error);
+  });
+};
+
 export const cacheCatalog = async (categories = [], products = []) => {
   const db = await openDb();
   return new Promise((resolve, reject) => {

@@ -92,6 +92,13 @@ const orderSchema = new mongoose.Schema({
     offlineSyncId: { type: String, default: '' },
     heldAt: { type: Date, default: null },
     isHeld: { type: Boolean, default: false },
+    settledBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    settledAt: { type: Date, default: null },
+    cashierAttestation: { type: mongoose.Schema.Types.Mixed, default: null },
+    externalTerminalAttestation: { type: mongoose.Schema.Types.Mixed, default: null },
+    splitSettlement: { type: mongoose.Schema.Types.Mixed, default: null },
+    reconciliationRequired: { type: Boolean, default: false },
+    reconciliationReason: { type: String, default: '' },
   },
   statusHistory: [{
     status: { type: String, required: true },
@@ -100,10 +107,35 @@ const orderSchema = new mongoose.Schema({
     changedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     reason: { type: String, default: '' },
   }],
+  discountDetails: {
+    appliedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    reason: { type: String, default: '' },
+    approvalType: { type: String, default: '' },
+    manualDiscount: { type: Number, default: 0 },
+    couponDiscount: { type: Number, default: 0 },
+  },
   inventoryProcessed: { type: Boolean, default: false },
+  inventoryProcessingStatus: {
+    type: String,
+    enum: ['not_required', 'pending', 'processed', 'failed', 'restored'],
+    default: 'pending',
+  },
   inventoryProcessedAt: { type: Date, default: null },
   inventoryRestored: { type: Boolean, default: false },
   inventoryRestoredAt: { type: Date, default: null },
+  inventoryError: {
+    message: { type: String, default: '' },
+    code: { type: String, default: '' },
+    failedAt: { type: Date, default: null },
+    details: { type: mongoose.Schema.Types.Mixed, default: null },
+  },
+  paymentReconciliationStatus: {
+    type: String,
+    enum: ['not_required', 'pending', 'reconciled', 'mismatch', 'reconciliation_required'],
+    default: 'not_required',
+  },
+  reconciliationNotes: { type: String, default: '' },
   idempotencyKey: { type: String, sparse: true },
   razorpayOrderId: { type: String, default: '' },
   razorpayPaymentId: { type: String, default: '' },
@@ -167,6 +199,8 @@ orderSchema.index({ tableNumber: 1, createdAt: -1 });
 orderSchema.index({ orderStatus: 1, createdAt: -1 });
 orderSchema.index({ paymentStatus: 1 });
 orderSchema.index({ createdAt: -1 });
+orderSchema.index({ tenantId: 1, 'posMetadata.offlineSyncId': 1 }, { sparse: true });
+orderSchema.index({ tenantId: 1, inventoryProcessingStatus: 1 });
 orderSchema.index({ razorpayOrderId: 1 }, { sparse: true });
 
 export const initializeOrderNumberCounter = async (tenantId) => {

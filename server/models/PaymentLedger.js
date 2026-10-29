@@ -11,6 +11,8 @@ const paymentLedgerSchema = new mongoose.Schema({
       'payment_created',
       'payment_authorized',
       'payment_captured',
+      'payment_attested',
+      'reconciliation_recorded',
       'payment_failed',
       'refund_requested',
       'refund_processed',

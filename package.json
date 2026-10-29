@@ -24,6 +24,8 @@
     "lint": "eslint .",
     "build:client": "npm run build:customer",
     "test": "cd server && npm test",
+    "test:pos": "cd server && npm run test:pos",
+    "test:fast": "cd server && npm run test:fast",
     "seed": "cd server && npm run seed",
     "clean:db": "cd server && npm run clean:db"
   },
