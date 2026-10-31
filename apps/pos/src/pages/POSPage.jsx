@@ -1,9 +1,25 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
-  Search, ShoppingCart, Plus, Minus, Trash2, PauseCircle,
-  Printer, CheckCircle2, AlertCircle, Wifi, WifiOff, X, CreditCard,
-  Banknote, QrCode, Split, User, Phone, Tag, Clock, RefreshCw,
-  UtensilsCrossed, Check, ArrowRight, Delete, RotateCcw
+  Search,
+  ShoppingCart,
+  Trash2,
+  PauseCircle,
+  Receipt,
+  UtensilsCrossed,
+  Plus,
+  Minus,
+  Check,
+  Zap,
+  ShoppingBag,
+  Bike,
+  Users,
+  LayoutGrid,
+  RefreshCw,
+  AlertCircle,
+  Wifi,
+  WifiOff,
+  Clock,
+  Sparkles,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../services/api';
@@ -23,35 +39,93 @@ import {
   SAMPLE_PRODUCTS,
   SAMPLE_TABLES,
 } from '../data/sampleCatalog';
+
+// UI & Modular POS Components
+import POSHeader from '../components/POSHeader';
+import POSSidebar from '../components/POSSidebar';
+import CheckoutPanel from '../components/CheckoutPanel';
+import ProductModifierModal from '../components/ProductModifierModal';
+import CashPaymentModal from '../components/CashPaymentModal';
+import SplitPaymentModal from '../components/SplitPaymentModal';
+import HeldOrdersModal from '../components/HeldOrdersModal';
+import RecentOrdersModal from '../components/RecentOrdersModal';
+import TablesFloorModal from '../components/TablesFloorModal';
+import CustomersModal from '../components/CustomersModal';
+import ShiftReportsModal from '../components/ShiftReportsModal';
+import StationSettingsModal from '../components/StationSettingsModal';
+import ScanQrModal from '../components/ScanQrModal';
+import ReceiptModal from '../components/ReceiptModal';
+
 import {
-  Button,
-  Input,
-  SearchInput,
   CategoryChip,
   ProductCard,
-  QuantityStepper,
-  Badge,
-  Modal,
+  SearchInput,
+  Button,
   ProductCardSkeleton,
   CategoryChipSkeleton,
   EmptyState,
   ErrorState,
+  Modal,
 } from '../components/ui';
 
 const STATIONS = ['ALL', 'KITCHEN', 'BAR', 'BAKERY', 'DESSERT'];
-const ORDER_TYPES = [
-  { id: 'counter', label: 'Counter ⚡' },
-  { id: 'dine_in', label: 'Dine-in 🍽️' },
-  { id: 'takeaway', label: 'Takeaway 🛍️' },
-  { id: 'delivery', label: 'Delivery 🛵' },
+const ORDER_MODES = [
+  { id: 'counter', label: 'Counter', icon: Zap },
+  { id: 'dine_in', label: 'Dine-in', icon: UtensilsCrossed },
+  { id: 'takeaway', label: 'Takeaway', icon: ShoppingBag },
+  { id: 'delivery', label: 'Delivery', icon: Bike },
 ];
 
-export default function POSPage() {
-  const { user } = useAuth();
+// Synthesized audio feedback (No external asset dependency)
+function playCashRegisterChime() {
+  try {
+    const soundEnabled = localStorage.getItem('pos:soundEnabled') !== 'false';
+    if (!soundEnabled) return;
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc1.type = 'triangle';
+    osc1.frequency.setValueAtTime(587.33, now); // D5
+    osc1.frequency.exponentialRampToValueAtTime(880, now + 0.15); // A5
+
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(880, now); // A5
+    osc2.frequency.exponentialRampToValueAtTime(1174.66, now + 0.2); // D6
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.45);
+    osc2.stop(now + 0.45);
+  } catch (_e) {
+    // Best-effort audio chime
+  }
+}
+
+export default function POSPage({ onLogout, user: propUser }) {
+  const { user: authUser, logout } = useAuth();
+  const user = propUser || authUser;
   const tenant = useTenant();
   const currency = tenant?.currency || '₹';
 
-  // Catalog State
+  const searchInputRef = useRef(null);
+
+  // ── Layout & Responsive States ──────────────────────────────────
+  const [activeNav, setActiveNav] = useState('counter');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
+
+  // ── Catalog State ───────────────────────────────────────────────
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -60,7 +134,7 @@ export default function POSPage() {
   const [loadingCatalog, setLoadingCatalog] = useState(true);
   const [catalogError, setCatalogError] = useState(null);
 
-  // Cart / Current Order State
+  // ── Current Ticket / Cart State ─────────────────────────────────
   const [cart, setCart] = useState([]);
   const [orderType, setOrderType] = useState('counter');
   const [tableNumber, setTableNumber] = useState('');
@@ -68,52 +142,44 @@ export default function POSPage() {
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [customerGstin, setCustomerGstin] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
   const [manualDiscount, setManualDiscount] = useState('');
   const [couponCode, setCouponCode] = useState('');
   const [orderNotes, setOrderNotes] = useState('');
 
-  // Mobile Bottom Sheet
-  const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
-
-  // Modals & UI States
+  // ── Modals State ────────────────────────────────────────────────
   const [activeProductForModifier, setActiveProductForModifier] = useState(null);
-  const [selectedVariant, setSelectedVariant] = useState(null);
-  const [selectedAddons, setSelectedAddons] = useState([]);
-  const [modifierNote, setModifierNote] = useState('');
-  const [modifierQty, setModifierQty] = useState(1);
-
-  const [heldOrders, setHeldOrders] = useState([]);
-  const [showHeldModal, setShowHeldModal] = useState(false);
-  const [showSplitModal, setShowSplitModal] = useState(false);
-  const [splitCashAmount, setSplitCashAmount] = useState('');
-  const [splitUpiAmount, setSplitUpiAmount] = useState('');
-  const [splitCardAmount, setSplitCardAmount] = useState('');
-
-  // Cash Payment Keypad Modal
   const [showCashModal, setShowCashModal] = useState(false);
-  const [cashTendered, setCashTendered] = useState('');
-
-  const [lastReceipt, setLastReceipt] = useState(null);
+  const [showSplitModal, setShowSplitModal] = useState(false);
+  const [showHeldModal, setShowHeldModal] = useState(false);
+  const [showRecentOrdersModal, setShowRecentOrdersModal] = useState(false);
+  const [showTablesModal, setShowTablesModal] = useState(false);
+  const [showCustomersModal, setShowCustomersModal] = useState(false);
+  const [showShiftReportsModal, setShowShiftReportsModal] = useState(false);
+  const [showStationSettingsModal, setShowStationSettingsModal] = useState(false);
+  const [showScanQrModal, setShowScanQrModal] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [lastReceipt, setLastReceipt] = useState(null);
+
+  // ── Held Orders & Sync ──────────────────────────────────────────
+  const [heldOrders, setHeldOrders] = useState([]);
   const [processingOrder, setProcessingOrder] = useState(false);
   const [checkoutError, setCheckoutError] = useState(null);
   const [activeCheckoutSyncId, setActiveCheckoutSyncId] = useState(null);
-
-  // Connectivity
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [pendingSyncCount, setPendingSyncCount] = useState(0);
   const [syncingOffline, setSyncingOffline] = useState(false);
 
-  // Sync offline connectivity status
+  // ── Online / Offline Synchronization Listener ────────────────────
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      toast.success('Internet restored. Syncing offline orders...');
+      toast.success('Internet connection restored. Synchronizing station queue...');
       syncPendingOfflineOrders();
     };
     const handleOffline = () => {
       setIsOnline(false);
-      toast.error('Offline mode: Orders will be queued and synced automatically.');
+      toast.error('Station in Offline Mode. Sales are saved locally and will auto-sync.');
     };
 
     window.addEventListener('online', handleOnline);
@@ -131,7 +197,7 @@ export default function POSPage() {
       const pending = await getPendingOfflineOrders();
       setPendingSyncCount(pending.length);
     } catch (_err) {
-      // Best-effort offline queue check
+      // Best-effort
     }
   };
 
@@ -150,30 +216,28 @@ export default function POSPage() {
         for (const item of data.synced) {
           await removeOfflineOrder(item.syncId);
         }
-        toast.success(`Successfully synced ${data.synced.length} offline order(s)!`);
+        toast.success(`Successfully synced ${data.synced.length} offline orders!`);
       }
       if (data.failed && data.failed.length > 0) {
         for (const failItem of data.failed) {
           if (failItem.syncId) {
             await updateOfflineOrderStatus(failItem.syncId, {
               status: 'sync_failed',
-              lastError: failItem.error || 'Sync validation failed',
+              lastError: failItem.error || 'Sync validation error',
               errorCode: failItem.code || 'SYNC_ERROR',
             });
           }
         }
-        toast.error(`${data.failed.length} offline order(s) failed to sync and remain preserved.`);
       }
       await checkPendingOfflineQueue();
     } catch (err) {
-      console.warn('[POS Sync Error]:', err.message);
-      toast.error('Sync failed: ' + (err.response?.data?.error || err.message));
+      console.warn('[POS Offline Sync]:', err.message);
     } finally {
       setSyncingOffline(false);
     }
   };
 
-  // Fetch Menu, Tables, and Held orders
+  // ── Load Menu, Tables & Held Orders ─────────────────────────────
   const loadInitialData = async () => {
     setLoadingCatalog(true);
     setCatalogError(null);
@@ -248,7 +312,60 @@ export default function POSPage() {
     loadInitialData();
   }, []);
 
-  // Filtered Products
+  // ── Keyboard Shortcuts (Section 18) ─────────────────────────────
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ctrl + K or Cmd + K: Focus product search
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const searchEl = document.querySelector('input[placeholder*="Search"]');
+        if (searchEl) searchEl.focus();
+      }
+
+      // Escape: Close any open modal or clear search
+      if (e.key === 'Escape') {
+        if (activeProductForModifier) setActiveProductForModifier(null);
+        else if (showCashModal) setShowCashModal(false);
+        else if (showSplitModal) setShowSplitModal(false);
+        else if (showHeldModal) setShowHeldModal(false);
+        else if (showRecentOrdersModal) setShowRecentOrdersModal(false);
+        else if (showTablesModal) setShowTablesModal(false);
+        else if (showCustomersModal) setShowCustomersModal(false);
+        else if (showShiftReportsModal) setShowShiftReportsModal(false);
+        else if (showStationSettingsModal) setShowStationSettingsModal(false);
+        else if (showScanQrModal) setShowScanQrModal(false);
+        else if (showReceiptModal) setShowReceiptModal(false);
+        else if (searchQuery) setSearchQuery('');
+      }
+
+      // Ctrl + Enter: Quick checkout with cash keypad if cart is valid
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        if (cart.length > 0 && !processingOrder) {
+          setShowCashModal(true);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    activeProductForModifier,
+    showCashModal,
+    showSplitModal,
+    showHeldModal,
+    showRecentOrdersModal,
+    showTablesModal,
+    showCustomersModal,
+    showShiftReportsModal,
+    showStationSettingsModal,
+    showScanQrModal,
+    showReceiptModal,
+    searchQuery,
+    cart.length,
+    processingOrder,
+  ]);
+
+  // ── Filter Products ─────────────────────────────────────────────
   const filteredProducts = useMemo(() => {
     return (products || []).filter((prod) => {
       if (!prod) return false;
@@ -263,13 +380,14 @@ export default function POSPage() {
         const q = searchQuery.toLowerCase();
         const matchesName = String(prod.name || '').toLowerCase().includes(q);
         const matchesSku = String(prod.sku || '').toLowerCase().includes(q);
-        return matchesName || matchesSku;
+        const matchesDesc = String(prod.description || '').toLowerCase().includes(q);
+        return matchesName || matchesSku || matchesDesc;
       }
       return true;
     });
   }, [products, selectedCategory, selectedStation, searchQuery]);
 
-  // Cart Management
+  // ── Cart Quantity Map ───────────────────────────────────────────
   const cartQuantityByProduct = useMemo(() => {
     const map = {};
     for (const item of cart) {
@@ -278,16 +396,13 @@ export default function POSPage() {
     return map;
   }, [cart]);
 
-  const handleProductClick = (prod) => {
+  // ── Cart Operations ─────────────────────────────────────────────
+  const handleProductCardClick = (prod) => {
     const hasVariants = prod.variants && prod.variants.length > 0;
     const hasAddons = prod.addons && prod.addons.length > 0;
 
     if (hasVariants || hasAddons) {
       setActiveProductForModifier(prod);
-      setSelectedVariant(hasVariants ? prod.variants[0] : null);
-      setSelectedAddons([]);
-      setModifierNote('');
-      setModifierQty(1);
     } else {
       addToCartDirect(prod);
     }
@@ -295,13 +410,13 @@ export default function POSPage() {
 
   const addToCartDirect = (prod, qty = 1, variant = null, addons = [], notes = '') => {
     const variantPrice = variant ? variant.price : prod.price;
-    const addonsPrice = addons.reduce((sum, a) => sum + (a.price || 0), 0);
+    const addonsPrice = addons.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
     const unitPrice = variantPrice + addonsPrice;
 
-    const cartKey = `${prod._id}_${variant?._id || 'novar'}_${addons.map(a => a._id).sort().join('-')}_${notes}`;
+    const cartKey = `${prod._id}_${variant?._id || 'novar'}_${addons.map((a) => a._id).sort().join('-')}_${notes}`;
 
     setCart((prev) => {
-      const existingIdx = prev.findIndex(item => item.cartKey === cartKey);
+      const existingIdx = prev.findIndex((item) => item.cartKey === cartKey);
       if (existingIdx > -1) {
         const updated = [...prev];
         updated[existingIdx].quantity += qty;
@@ -327,18 +442,6 @@ export default function POSPage() {
     });
   };
 
-  const handleConfirmModifier = () => {
-    if (!activeProductForModifier) return;
-    addToCartDirect(
-      activeProductForModifier,
-      modifierQty,
-      selectedVariant,
-      selectedAddons,
-      modifierNote
-    );
-    setActiveProductForModifier(null);
-  };
-
   const updateCartQty = (cartKey, delta) => {
     setCart((prev) => {
       return prev
@@ -356,7 +459,7 @@ export default function POSPage() {
   };
 
   const removeCartItem = (cartKey) => {
-    setCart(prev => prev.filter(item => item.cartKey !== cartKey));
+    setCart((prev) => prev.filter((item) => item.cartKey !== cartKey));
   };
 
   const clearCart = () => {
@@ -365,6 +468,7 @@ export default function POSPage() {
     setCustomerPhone('');
     setCustomerName('');
     setCustomerGstin('');
+    setDeliveryAddress('');
     setManualDiscount('');
     setCouponCode('');
     setOrderNotes('');
@@ -373,7 +477,7 @@ export default function POSPage() {
     setCheckoutError(null);
   };
 
-  // Pricing & Tax Calculations
+  // ── Pricing & Tax Calculations (Section 11) ─────────────────────
   const subtotal = useMemo(() => {
     return cart.reduce((sum, item) => sum + item.itemTotal, 0);
   }, [cart]);
@@ -388,7 +492,7 @@ export default function POSPage() {
   const taxAmount = Number(((taxableAmount * taxRate) / 100).toFixed(2));
   const totalAmount = Number((taxableAmount + taxAmount).toFixed(2));
 
-  // Customer phone lookup
+  // ── Customer Phone Lookup (Section 17) ──────────────────────────
   const handlePhoneChange = async (val) => {
     setCustomerPhone(val);
     const clean = val.replace(/\D/g, '');
@@ -397,18 +501,53 @@ export default function POSPage() {
         const { data } = await api.get(`/customers/lookup?phone=${clean}`).catch(() => ({ data: null }));
         if (data?.customer?.name) {
           setCustomerName(data.customer.name);
-          toast.success(`Customer found: ${data.customer.name}`);
+          toast.success(`Patron found: ${data.customer.name}`);
         }
       } catch (_err) {
-        // Customer lookup is best effort
+        // Best-effort lookup
       }
     }
   };
 
-  // Hold Order
+  // ── Navigation Switching ────────────────────────────────────────
+  const handleSelectNav = (navId) => {
+    setActiveNav(navId);
+    if (['counter', 'dine_in', 'takeaway', 'delivery'].includes(navId)) {
+      setOrderType(navId);
+      setIsMobileSidebarOpen(false);
+      if (navId === 'dine_in' && !tableNumber) {
+        setShowTablesModal(true);
+      }
+    } else if (navId === 'orders') {
+      setShowRecentOrdersModal(true);
+      setIsMobileSidebarOpen(false);
+    } else if (navId === 'customers') {
+      setShowCustomersModal(true);
+      setIsMobileSidebarOpen(false);
+    } else if (navId === 'tables') {
+      setShowTablesModal(true);
+      setIsMobileSidebarOpen(false);
+    } else if (navId === 'reports') {
+      setShowShiftReportsModal(true);
+      setIsMobileSidebarOpen(false);
+    } else if (navId === 'settings') {
+      setShowStationSettingsModal(true);
+      setIsMobileSidebarOpen(false);
+    }
+  };
+
+  const handleSelectOrderMode = (modeId) => {
+    setOrderType(modeId);
+    setActiveNav(modeId);
+    if (modeId === 'dine_in' && !tableNumber) {
+      setShowTablesModal(true);
+    }
+  };
+
+  // ── Hold & Resume Orders (Section 14) ───────────────────────────
   const handleHoldOrder = async () => {
     if (cart.length === 0) {
-      toast.error('Add items to hold this order');
+      toast.error('Add items to order before holding');
       return;
     }
 
@@ -417,34 +556,36 @@ export default function POSPage() {
         tableNumber: Number(tableNumber) || 0,
         orderType,
         customer: { name: customerName, phone: customerPhone },
-        items: cart.map(item => ({
+        deliveryAddress: orderType === 'delivery' ? deliveryAddress : undefined,
+        items: cart.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
           variantId: item.variant?._id,
-          addonIds: item.addons.map(a => a._id),
+          addonIds: item.addons.map((a) => a._id),
           specialInstructions: item.specialInstructions,
         })),
         notes: orderNotes,
       };
 
       const { data } = await api.post('/pos/orders/hold', payload);
-      setHeldOrders(prev => [data.order, ...prev]);
+      setHeldOrders((prev) => [data.order, ...prev]);
       clearCart();
-      toast.success('Order held on station');
+      toast.success('Ticket paused on station');
     } catch (err) {
       toast.error(err.message || 'Failed to hold order');
     }
   };
 
-  // Resume Held Order
   const handleResumeHeldOrder = (held) => {
     setOrderType(held.orderType || 'counter');
+    setActiveNav(held.orderType || 'counter');
     setTableNumber(held.tableNumber ? String(held.tableNumber) : '');
     setCustomerName(held.customer?.name || '');
     setCustomerPhone(held.customer?.phone || '');
+    setDeliveryAddress(held.deliveryAddress || '');
     setOrderNotes(held.notes || '');
 
-    const restoredCart = (held.items || []).map(item => ({
+    const restoredCart = (held.items || []).map((item) => ({
       cartKey: `${item.product?._id || item.product}_${Date.now()}_${Math.random()}`,
       productId: item.product?._id || item.product,
       name: item.name,
@@ -454,33 +595,44 @@ export default function POSPage() {
       variant: item.variant,
       addons: item.addons || [],
       specialInstructions: item.specialInstructions || '',
-      itemTotal: item.itemTotal || (item.price * item.quantity),
+      itemTotal: item.itemTotal || item.price * item.quantity,
       kitchenStation: 'KITCHEN',
     }));
 
     setCart(restoredCart);
     setShowHeldModal(false);
     api.delete(`/pos/held-orders/${held._id}`).catch(() => {});
-    setHeldOrders(prev => prev.filter(o => o._id !== held._id));
-    toast.success('Held order resumed');
+    setHeldOrders((prev) => prev.filter((o) => o._id !== held._id));
+    toast.success('Resumed held ticket');
   };
 
-  // Submit Order & Process Payment
-  const handleCheckout = async (paymentMethod, splitPayments = []) => {
+  const handleDiscardHeldOrder = async (heldId) => {
+    try {
+      await api.delete(`/pos/held-orders/${heldId}`);
+      setHeldOrders((prev) => prev.filter((o) => o._id !== heldId));
+      toast.success('Held order discarded');
+    } catch (_err) {
+      setHeldOrders((prev) => prev.filter((o) => o._id !== heldId));
+    }
+  };
+
+  // ── Checkout & Payment (Sections 12, 15, 16) ───────────────────
+  const handleCheckout = async (paymentMethod, splitPayments = [], tendered = null) => {
     if (cart.length === 0) {
       toast.error('Cart is empty');
       return;
     }
 
     if (orderType === 'dine_in' && !tableNumber) {
-      toast.error('Please select a Table for Dine-in');
+      toast.error('Please assign a Table for Dine-in');
+      setShowTablesModal(true);
       return;
     }
 
     setProcessingOrder(true);
     setCheckoutError(null);
 
-    // DEMO SIMULATION: Strictly client-side simulation. Never touches real backend/database/stock.
+    // DEMO SIMULATION (Safely isolated, never touches live database/inventory)
     if (user?.isDemo || user?._id?.startsWith('demo')) {
       const demoOrderNumber = `DEMO-${Math.floor(1000 + Math.random() * 9000)}`;
       const demoOrder = {
@@ -489,7 +641,7 @@ export default function POSPage() {
         orderNumber: demoOrderNumber,
         orderType,
         tableNumber: Number(tableNumber) || null,
-        items: cart.map(i => ({
+        items: cart.map((i) => ({
           name: i.name,
           quantity: i.quantity,
           price: i.unitPrice,
@@ -504,12 +656,13 @@ export default function POSPage() {
         paymentMethod,
         createdAt: new Date().toISOString(),
         customer: {
-          name: customerName || 'Walk-in Customer',
+          name: customerName || 'Walk-in Guest',
           phone: customerPhone || '9999999999',
         },
       };
 
-      toast.success(`Demo Order #${demoOrderNumber} simulated!`, { icon: '🧪' });
+      playCashRegisterChime();
+      toast.success(`Demo Ticket #${demoOrderNumber} completed!`, { icon: '🧪' });
       setLastReceipt({ isDemo: true, order: demoOrder });
       setShowReceiptModal(true);
       setShowCashModal(false);
@@ -518,7 +671,7 @@ export default function POSPage() {
       return;
     }
 
-    // Stable idempotency/syncId for this checkout attempt to prevent duplicates on retry
+    // Stable Idempotency / Sync ID to prevent duplicate kitchen tickets or charges
     const syncId = activeCheckoutSyncId || `pos_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
     setActiveCheckoutSyncId(syncId);
 
@@ -526,15 +679,16 @@ export default function POSPage() {
       tableNumber: Number(tableNumber) || 0,
       orderType,
       customer: {
-        name: customerName || 'Walk-in Customer',
+        name: customerName || 'Walk-in Guest',
         phone: customerPhone || '9999999999',
       },
       customerGstin: (customerGstin || '').trim().toUpperCase(),
-      items: cart.map(item => ({
+      deliveryAddress: orderType === 'delivery' ? deliveryAddress : undefined,
+      items: cart.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
         variantId: item.variant?._id,
-        addonIds: item.addons.map(a => a._id),
+        addonIds: item.addons.map((a) => a._id),
         specialInstructions: item.specialInstructions,
       })),
       paymentMethod,
@@ -542,18 +696,20 @@ export default function POSPage() {
       manualDiscount: discountAmount,
       couponCode,
       notes: orderNotes,
-      tenderedAmount: paymentMethod === 'cash' ? (Number(cashTendered) || totalAmount) : undefined,
+      tenderedAmount: paymentMethod === 'cash' ? (tendered || totalAmount) : undefined,
       externalPaymentReference: ['upi', 'card'].includes(paymentMethod)
         ? `POS-${paymentMethod.toUpperCase()}-${Date.now()}`
         : undefined,
       syncId,
     };
 
+    // Offline Save
     if (!isOnline) {
       try {
         await saveOfflineOrder(orderPayload);
         await checkPendingOfflineQueue();
-        toast.success('Order saved locally! Will sync when reconnected.', { icon: '💾' });
+        playCashRegisterChime();
+        toast.success('Order stored in local offline queue! Will auto-sync on reconnect.', { icon: '💾' });
         clearCart();
         setActiveCheckoutSyncId(null);
       } catch (err) {
@@ -564,8 +720,10 @@ export default function POSPage() {
       return;
     }
 
+    // Live Server Submission (triggers inventory deduction & KDS broadcast)
     try {
       const { data } = await api.post('/pos/orders', orderPayload);
+      playCashRegisterChime();
       toast.success(`Order #${data.order.orderNumber} confirmed!`, { icon: '✅' });
       setLastReceipt({ isDemo: false, order: data.order, receipt: data.receipt });
       setShowReceiptModal(true);
@@ -574,13 +732,14 @@ export default function POSPage() {
       setActiveCheckoutSyncId(null);
       setCheckoutError(null);
     } catch (err) {
-      // PRESERVE CART ON FAILURE — Never generate a fake live success receipt!
+      // Preserve cart state on checkout error!
       const rawError = err.response?.data?.error;
-      const safeMsg = (typeof rawError === 'string' ? rawError : rawError?.message) ||
+      const safeMsg =
+        (typeof rawError === 'string' ? rawError : rawError?.message) ||
         (err.status === 401 ? 'Session expired. Please sign in again.' : null) ||
-        (err.status === 403 ? 'You are not authorized to complete this checkout.' : null) ||
+        (err.status === 403 ? 'You are not authorized for this transaction.' : null) ||
         err.message ||
-        'Checkout failed. Your cart is preserved — please retry.';
+        'Checkout interrupted. Cart preserved for retry.';
 
       setCheckoutError({
         message: safeMsg,
@@ -593,442 +752,168 @@ export default function POSPage() {
     }
   };
 
-  // Trigger Cash Modal
-  const openCashKeypad = () => {
-    if (cart.length === 0) {
-      toast.error('Add items to order first');
-      return;
-    }
-    setCashTendered(String(totalAmount));
-    setShowCashModal(true);
+  // Helper to get category icon
+  const getCategoryIcon = (catName) => {
+    const n = String(catName || '').toLowerCase();
+    if (n.includes('coffee') || n.includes('brew')) return '☕';
+    if (n.includes('cold') || n.includes('tonic') || n.includes('drink') || n.includes('beverage')) return '🧊';
+    if (n.includes('bakery') || n.includes('toast') || n.includes('croissant')) return '🥐';
+    if (n.includes('meal') || n.includes('pizza') || n.includes('burger') || n.includes('bites')) return '🍕';
+    if (n.includes('dessert') || n.includes('cake') || n.includes('sweet')) return '🍰';
+    return '🍽️';
   };
-
-  const handleKeypadPress = (val) => {
-    if (val === 'C') {
-      setCashTendered('');
-      return;
-    }
-    if (val === 'BACK') {
-      setCashTendered(prev => prev.slice(0, -1));
-      return;
-    }
-    if (val === '.' && cashTendered.includes('.')) return;
-    setCashTendered(prev => prev + val);
-  };
-
-  const tenderedNum = Number(cashTendered) || 0;
-  const changeDue = Math.max(0, tenderedNum - totalAmount);
-
-  // Handle Split Payment Submit
-  const handleConfirmSplitPayment = () => {
-    const cash = Number(splitCashAmount) || 0;
-    const upi = Number(splitUpiAmount) || 0;
-    const card = Number(splitCardAmount) || 0;
-    const splitSum = cash + upi + card;
-
-    if (Math.abs(splitSum - totalAmount) > 0.01) {
-      toast.error(`Split amounts (${currency}${splitSum}) must equal total (${currency}${totalAmount})`);
-      return;
-    }
-
-    const splits = [];
-    if (cash > 0) splits.push({ method: 'cash', amount: cash });
-    if (upi > 0) splits.push({ method: 'upi', amount: upi });
-    if (card > 0) splits.push({ method: 'card', amount: card });
-
-    setShowSplitModal(false);
-    handleCheckout('split', splits);
-  };
-
-  // Reusable Order Panel Contents (rendered persistent on tablet/desktop, in bottom sheet on mobile)
-  const renderOrderPanel = () => (
-    <div className="flex flex-col h-full overflow-hidden bg-pos-surface text-pos-text select-none">
-      {/* ── Order Header & Mode Selector ──────────────────────── */}
-      <div className="p-4 border-b border-pos-border bg-pos-raised/40 space-y-3 shrink-0">
-        <div className="flex items-center justify-between">
-          <span className="font-display font-bold text-sm tracking-tight text-pos-text">
-            Current Ticket
-          </span>
-          {cart.length > 0 && (
-            <button
-              onClick={clearCart}
-              className="text-xs font-semibold text-pos-danger hover:underline touch-press min-h-[32px] px-2 flex items-center gap-1"
-            >
-              <Trash2 size={13} /> Clear
-            </button>
-          )}
-        </div>
-
-        {/* Table & Customer Inputs */}
-        <div className="grid grid-cols-2 gap-2">
-          {orderType === 'dine_in' ? (
-            <div>
-              <label className="text-[10px] font-bold uppercase text-pos-muted block mb-1">
-                Table *
-              </label>
-              <select
-                value={tableNumber}
-                onChange={e => setTableNumber(e.target.value)}
-                className="w-full bg-pos-surface border border-pos-border rounded-xl py-2 px-2.5 text-xs font-bold text-pos-text focus:outline-none focus:border-pos-accent min-h-[44px]"
-              >
-                <option value="">Choose Table</option>
-                {(tables || []).map((t, idx) => {
-                  const num = t.tableNumber || t.number || (idx + 1);
-                  return (
-                    <option key={t._id || `tbl_${num}`} value={num} className="bg-pos-surface text-pos-text">
-                      {t.label || `Table ${num}`} ({t.seats || 4} Seats)
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-          ) : (
-            <div>
-              <label className="text-[10px] font-bold uppercase text-pos-muted block mb-1">
-                Mode
-              </label>
-              <div className="w-full bg-pos-raised border border-pos-border rounded-xl py-2 px-2.5 text-xs font-bold text-pos-text capitalize truncate min-h-[44px] flex items-center">
-                {(orderType || 'counter').replace('_', ' ')}
-              </div>
-            </div>
-          )}
-
-          <div>
-            <label className="text-[10px] font-bold uppercase text-pos-muted block mb-1">
-              Customer Mobile
-            </label>
-            <div className="relative">
-              <Phone size={13} className="absolute left-3 top-3 text-pos-muted pointer-events-none" />
-              <input
-                type="tel"
-                maxLength={10}
-                placeholder="Phone"
-                value={customerPhone}
-                onChange={e => handlePhoneChange(e.target.value)}
-                className="w-full bg-pos-surface border border-pos-border rounded-xl py-2 pl-8 pr-2 text-xs font-semibold text-pos-text placeholder:text-pos-muted/60 focus:outline-none focus:border-pos-accent min-h-[44px]"
-              />
-            </div>
-          </div>
-        </div>
-
-        {customerName && (
-          <div className="flex items-center gap-1.5 text-xs text-pos-success font-semibold bg-pos-success/10 border border-pos-success/30 px-2.5 py-1.5 rounded-xl">
-            <Check size={13} />
-            <span className="truncate">Customer: {customerName}</span>
-          </div>
-        )}
-      </div>
-
-      {/* ── Cart Line Items List ──────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2.5 pos-scrollbar">
-        {cart.length === 0 ? (
-          <EmptyState
-            icon={ShoppingCart}
-            title="Ticket is empty"
-            description="Tap items from the menu to build the order."
-            className="my-auto py-10"
-          />
-        ) : (
-          cart.map((item) => (
-            <div
-              key={item.cartKey}
-              className="bg-pos-raised border border-pos-border rounded-2xl p-3 space-y-2 shadow-xs transition-colors hover:border-pos-accent/40"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <div className="font-bold text-sm text-pos-text leading-tight truncate">
-                    {item.name}
-                  </div>
-                  {item.variant && (
-                    <div className="text-xs text-pos-accent font-medium mt-0.5">
-                      Size: {item.variant.name}
-                    </div>
-                  )}
-                  {item.addons && item.addons.length > 0 && (
-                    <div className="text-[11px] text-pos-muted mt-0.5">
-                      +{item.addons.map(a => a.name).join(', ')}
-                    </div>
-                  )}
-                  {item.specialInstructions && (
-                    <div className="text-[11px] text-pos-warning italic mt-0.5">
-                      "{item.specialInstructions}"
-                    </div>
-                  )}
-                </div>
-
-                <div className="text-right shrink-0">
-                  <span className="font-bold text-sm text-pos-text tabular-nums">
-                    {formatMoney(item.itemTotal, currency)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Stepper & Line Delete */}
-              <div className="flex items-center justify-between pt-1.5 border-t border-pos-border/60">
-                <QuantityStepper
-                  quantity={item.quantity}
-                  onDecrease={() => updateCartQty(item.cartKey, -1)}
-                  onIncrease={() => updateCartQty(item.cartKey, 1)}
-                />
-                <button
-                  onClick={() => removeCartItem(item.cartKey)}
-                  aria-label={`Remove ${item.name}`}
-                  className="p-2 text-pos-muted hover:text-pos-danger rounded-xl hover:bg-pos-surface touch-press transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* ── Pricing Breakdown & Sticky Charge CTA ─────────────── */}
-      <div className="p-4 bg-pos-surface border-t border-pos-border space-y-3 shrink-0 shadow-elevation2">
-        {/* Quick Discounts */}
-        <div className="flex items-center gap-1.5 text-xs overflow-x-auto pb-0.5">
-          <span className="text-pos-muted font-semibold text-[11px] shrink-0">Discount:</span>
-          {[
-            { label: '5%', val: Math.round(subtotal * 0.05) },
-            { label: '10%', val: Math.round(subtotal * 0.10) },
-            { label: `${currency}50`, val: 50 },
-          ].map((d, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setManualDiscount(String(d.val))}
-              className="px-2.5 py-1 rounded-lg bg-pos-raised text-pos-text hover:bg-pos-border border border-pos-border/80 font-bold text-[11px] touch-press min-h-[32px]"
-            >
-              {d.label}
-            </button>
-          ))}
-          {discountAmount > 0 && (
-            <button
-              onClick={() => setManualDiscount('')}
-              className="text-pos-danger font-bold text-[11px] ml-auto hover:underline"
-            >
-              Reset
-            </button>
-          )}
-        </div>
-
-        {/* Breakdown */}
-        <div className="space-y-1.5 text-xs text-pos-muted">
-          <div className="flex justify-between">
-            <span>Subtotal</span>
-            <span className="tabular-nums font-semibold text-pos-text">{formatMoney(subtotal, currency)}</span>
-          </div>
-          {discountAmount > 0 && (
-            <div className="flex justify-between text-pos-success font-semibold">
-              <span>Discount</span>
-              <span className="tabular-nums">-{formatMoney(discountAmount, currency)}</span>
-            </div>
-          )}
-          <div className="flex justify-between text-[11px]">
-            <span>GST / Tax ({taxRate}%)</span>
-            <span className="tabular-nums">+{formatMoney(taxAmount, currency)}</span>
-          </div>
-          <div className="flex justify-between items-baseline pt-2 border-t border-pos-border">
-            <span className="font-display font-bold text-base text-pos-text">Total Payable</span>
-            <span className="font-display font-extrabold text-2xl text-pos-accent tabular-nums">
-              {formatMoney(totalAmount, currency)}
-            </span>
-          </div>
-        </div>
-
-        {/* Checkout Failure Notification with Safe Retry */}
-        {checkoutError && (
-          <div className="p-3 rounded-2xl border border-rose-400/50 bg-rose-500/10 text-rose-900 text-xs flex items-start gap-2">
-            <AlertCircle size={16} className="text-rose-600 shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <div className="font-bold">Checkout Interrupted (Cart Safe)</div>
-              <div className="mt-0.5 text-[11px] opacity-90 truncate">{checkoutError.message}</div>
-            </div>
-            {checkoutError.canRetry && (
-              <button
-                type="button"
-                onClick={() => handleCheckout('cash')}
-                disabled={processingOrder}
-                className="px-2.5 py-1 rounded-lg bg-pos-accent text-white text-[11px] font-bold hover:opacity-90 transition shrink-0 cursor-pointer disabled:opacity-50"
-              >
-                {processingOrder ? '...' : 'Retry'}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Master Sticky Charge Action (56px tall) */}
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={openCashKeypad}
-          disabled={cart.length === 0 || processingOrder}
-          className="w-full flex items-center justify-between px-5 font-bold tracking-wide"
-        >
-          <span className="uppercase tracking-wider text-xs font-extrabold text-white/90">Pay Now</span>
-          <span className="text-lg font-bold tabular-nums">Charge {formatMoney(totalAmount, currency)} →</span>
-        </Button>
-
-        {/* 4 Large Payment Method Buttons (min 48px) */}
-        <div className="grid grid-cols-4 gap-2">
-          <button
-            type="button"
-            onClick={openCashKeypad}
-            disabled={cart.length === 0 || processingOrder}
-            className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-pos-raised hover:bg-pos-raised/80 text-pos-success border border-pos-border hover:border-pos-success touch-press disabled:opacity-40 min-h-[50px]"
-          >
-            <Banknote size={18} />
-            <span className="text-[11px] font-bold mt-1 text-pos-text">Cash</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleCheckout('upi')}
-            disabled={cart.length === 0 || processingOrder}
-            className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-pos-raised hover:bg-pos-raised/80 text-purple-400 border border-pos-border hover:border-purple-400 touch-press disabled:opacity-40 min-h-[50px]"
-          >
-            <QrCode size={18} />
-            <span className="text-[11px] font-bold mt-1 text-pos-text">UPI</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleCheckout('card')}
-            disabled={cart.length === 0 || processingOrder}
-            className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-pos-raised hover:bg-pos-raised/80 text-blue-400 border border-pos-border hover:border-blue-400 touch-press disabled:opacity-40 min-h-[50px]"
-          >
-            <CreditCard size={18} />
-            <span className="text-[11px] font-bold mt-1 text-pos-text">Card</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSplitCashAmount('');
-              setSplitUpiAmount('');
-              setSplitCardAmount('');
-              setShowSplitModal(true);
-            }}
-            disabled={cart.length === 0 || processingOrder}
-            className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-pos-raised hover:bg-pos-raised/80 text-pos-warning border border-pos-border hover:border-pos-warning touch-press disabled:opacity-40 min-h-[50px]"
-          >
-            <Split size={18} />
-            <span className="text-[11px] font-bold mt-1 text-pos-text">Split</span>
-          </button>
-        </div>
-
-        {/* Hold Action */}
-        <div className="pt-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleHoldOrder}
-            disabled={cart.length === 0}
-            className="w-full text-xs text-pos-muted hover:text-pos-text border border-pos-border hover:border-pos-accent"
-          >
-            Hold Order for Later
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
-    <div className="flex flex-col h-full flex-1 overflow-hidden bg-pos-bg text-pos-text">
-      {/* ── Persistent Demo Mode Banner ────────────────────────────── */}
+    <div className="flex flex-col h-full w-full overflow-hidden bg-[#FAF8F3] text-[#18251F] font-sans select-none">
+      {/* ── Top Header ────────────────────────────────────────────── */}
+      <POSHeader
+        tenant={tenant}
+        user={user}
+        onLogout={onLogout || logout}
+        onOpenScanQr={() => setShowScanQrModal(true)}
+        onToggleMobileSidebar={() => setIsMobileSidebarOpen((prev) => !prev)}
+      />
+
+      {/* ── Persistent Demo Mode Watermark ─────────────────────────── */}
       {(user?.isDemo || user?._id?.startsWith('demo')) && (
         <div className="bg-amber-500/20 border-b border-amber-500/40 px-4 py-1.5 text-center text-xs font-bold text-amber-900 flex items-center justify-center gap-2 shrink-0 select-none z-20">
           <AlertCircle size={15} className="text-amber-700 shrink-0" />
-          <span>DEMO WORKSTATION — SIMULATION MODE ONLY (NOT A REAL SALE)</span>
-          <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-950 font-extrabold">
+          <span>DEMO WORKSTATION — TRAINING SIMULATION ONLY (NO LIVE BILLING)</span>
+          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-amber-500/30 text-amber-950 font-black">
             SIMULATION
           </span>
         </div>
       )}
 
-      {/* ── Station & Order Type Subheader ──────────────────────────── */}
-      <div className="bg-pos-surface border-b border-pos-border px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
-        <div className="flex items-center gap-2 overflow-x-auto pos-scrollbar py-0.5">
-          {/* Order Type Pills */}
-          <div className="flex bg-pos-raised rounded-xl p-1 border border-pos-border shrink-0">
-            {ORDER_TYPES.map(type => (
-              <button
-                key={type.id}
-                type="button"
-                onClick={() => setOrderType(type.id)}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap min-h-[36px] touch-press ${
-                  orderType === type.id
-                    ? 'bg-pos-accent text-white shadow-sm'
-                    : 'text-pos-muted hover:text-pos-text'
-                }`}
-              >
-                {type.label}
-              </button>
-            ))}
+      {/* ── Three-Part Layout Body ─────────────────────────────────── */}
+      <div className="flex-1 flex min-h-0 overflow-hidden relative">
+        {/* PART 1: Left Navigation Sidebar (Desktop & Tablet) ──────── */}
+        <div className="hidden lg:flex shrink-0 h-full">
+          <POSSidebar
+            activeNav={activeNav}
+            onSelectNav={handleSelectNav}
+            heldOrdersCount={heldOrders.length}
+            isOnline={isOnline}
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+          />
+        </div>
+
+        {/* Mobile Navigation Sidebar Drawer (< 1024px) ─────────────── */}
+        {isMobileSidebarOpen && (
+          <div
+            className="lg:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          >
+            <div
+              className="w-[240px] h-full shadow-2xl animate-in slide-in-from-left duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <POSSidebar
+                activeNav={activeNav}
+                onSelectNav={handleSelectNav}
+                heldOrdersCount={heldOrders.length}
+                isOnline={isOnline}
+                isCollapsed={false}
+                onToggleCollapse={() => setIsMobileSidebarOpen(false)}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* PART 2: Main Menu & Product Browsing Workspace ──────────── */}
+        <div className="flex-1 flex flex-col min-w-0 bg-[#FAF8F3] overflow-hidden">
+          {/* Top Subheader: Order Mode Selector & Sync Badge ────────── */}
+          <div className="bg-white border-b border-[#EAE3D9] px-3.5 py-2.5 flex items-center justify-between gap-3 shrink-0 shadow-xs">
+            {/* 4 Order Mode Buttons (Section 5) */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pos-scrollbar py-0.5">
+              {ORDER_MODES.map((mode) => {
+                const Icon = mode.icon;
+                const isActive = orderType === mode.id;
+
+                return (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    onClick={() => handleSelectOrderMode(mode.id)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all touch-press min-h-[38px] ${
+                      isActive
+                        ? 'bg-[#105B43] text-white shadow-xs border border-[#20D99A]/40'
+                        : 'bg-[#FAF8F3] text-[#718078] hover:text-[#18251F] hover:bg-[#F4EFE6] border border-[#EAE3D9]'
+                    }`}
+                  >
+                    <Icon size={15} className={isActive ? 'text-[#20D99A]' : 'text-[#718078]'} />
+                    <span>{mode.label}</span>
+                  </button>
+                );
+              })}
+
+              {/* Table assignment badge if dine-in */}
+              {orderType === 'dine_in' && (
+                <button
+                  type="button"
+                  onClick={() => setShowTablesModal(true)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition min-h-[38px] touch-press ${
+                    tableNumber
+                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                      : 'bg-amber-50 text-amber-800 border border-amber-300 animate-pulse'
+                  }`}
+                >
+                  <UtensilsCrossed size={14} />
+                  <span>{tableNumber ? `Table ${tableNumber}` : 'Assign Table *'}</span>
+                </button>
+              )}
+            </div>
+
+            {/* Offline sync queue quick button if items are pending */}
+            <div className="flex items-center gap-2 text-xs shrink-0">
+              {pendingSyncCount > 0 ? (
+                <button
+                  type="button"
+                  onClick={syncPendingOfflineOrders}
+                  disabled={syncingOffline || !isOnline}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 transition min-h-[36px] touch-press"
+                >
+                  <RefreshCw size={13} className={syncingOffline ? 'animate-spin' : ''} />
+                  <span>{pendingSyncCount} queued (Sync)</span>
+                </button>
+              ) : !isOnline ? (
+                <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 animate-pulse">
+                  <WifiOff size={13} />
+                  <span>Offline</span>
+                </div>
+              ) : (
+                <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <Wifi size={13} />
+                  <span>Live</span>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Held Orders Quick Launcher */}
-          {heldOrders.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setShowHeldModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-pos-warning text-white shadow-sm hover:bg-pos-warning/90 transition min-h-[36px] touch-press shrink-0"
-            >
-              <PauseCircle size={15} />
-              <span>{heldOrders.length} Held</span>
-            </button>
-          )}
-        </div>
-
-        {/* Connectivity Status */}
-        <div className="flex items-center gap-2 text-xs shrink-0">
-          {pendingSyncCount > 0 ? (
-            <button
-              type="button"
-              onClick={syncPendingOfflineOrders}
-              disabled={syncingOffline || !isOnline}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-pos-warning/20 text-pos-warning border border-pos-warning/40 hover:bg-pos-warning/30 transition min-h-[36px] touch-press"
-            >
-              <RefreshCw size={13} className={syncingOffline ? 'animate-spin' : ''} />
-              <span>{pendingSyncCount} queued (Sync)</span>
-            </button>
-          ) : !isOnline ? (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-pos-danger/20 text-pos-danger border border-pos-danger/40 animate-pulse min-h-[36px]">
-              <WifiOff size={13} />
-              <span>OFFLINE</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-pos-success/20 text-pos-success border border-pos-success/40 min-h-[36px]">
-              <Wifi size={13} />
-              <span>ONLINE</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ── Main Two-Pane POS Shell ─────────────────────────────────── */}
-      <div className="flex-1 flex min-h-0 overflow-hidden relative">
-        {/* LEFT PANE: Search + Category Chips + Product Grid ────────── */}
-        <div className="flex-1 flex flex-col min-w-0 bg-pos-bg overflow-hidden">
-          {/* Search & Station Selector Header */}
-          <div className="p-3.5 bg-pos-surface border-b border-pos-border flex flex-col sm:flex-row gap-3 shrink-0">
+          {/* Search Bar & Station Filters (Section 6) ───────────────── */}
+          <div className="p-3.5 bg-white border-b border-[#EAE3D9] flex flex-col sm:flex-row gap-3 shrink-0">
             <div className="flex-1">
               <SearchInput
-                placeholder="Search dish, ingredients or SKU (e.g. Latte, Croissant)..."
+                ref={searchInputRef}
+                placeholder="Search dishes, ingredients or SKU... (Ctrl + K)"
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 onClear={() => setSearchQuery('')}
               />
             </div>
 
             {/* Station Filter Pills */}
             <div className="flex items-center gap-1 overflow-x-auto pos-scrollbar py-0.5 shrink-0">
-              {STATIONS.map(st => (
+              {STATIONS.map((st) => (
                 <button
                   key={st}
                   type="button"
                   onClick={() => setSelectedStation(st)}
                   className={`px-3 py-2 rounded-xl text-xs font-bold border transition-colors touch-press min-h-[44px] ${
                     selectedStation === st
-                      ? 'bg-pos-raised text-pos-accent border-pos-accent'
-                      : 'bg-pos-surface text-pos-muted border-pos-border hover:border-pos-muted'
+                      ? 'bg-[#105B43] text-white border-[#105B43] shadow-xs'
+                      : 'bg-white text-[#718078] border-[#EAE3D9] hover:border-[#718078]'
                   }`}
                 >
                   {st}
@@ -1037,10 +922,11 @@ export default function POSPage() {
             </div>
           </div>
 
-          {/* Horizontally Scrollable Category Chips */}
-          <div className="px-3.5 py-2.5 bg-pos-surface/60 border-b border-pos-border flex items-center gap-2 overflow-x-auto pos-scrollbar shrink-0">
+          {/* Horizontally Scrollable Categories (Section 7) ─────────── */}
+          <div className="px-3.5 py-2.5 bg-white/70 border-b border-[#EAE3D9] flex items-center gap-2 overflow-x-auto pos-scrollbar shrink-0">
             <CategoryChip
               name="All Menu"
+              icon="✨"
               count={products.length}
               isActive={selectedCategory === 'ALL'}
               onClick={() => setSelectedCategory('ALL')}
@@ -1052,14 +938,16 @@ export default function POSPage() {
                 <CategoryChipSkeleton />
               </>
             ) : (
-              categories.map(cat => {
+              categories.map((cat) => {
                 const catId = String(cat._id || cat.id || cat);
-                const count = products.filter(p => String(p?.category?._id || p?.category || '') === catId).length;
+                const count = products.filter(
+                  (p) => String(p?.category?._id || p?.category || '') === catId
+                ).length;
                 return (
                   <CategoryChip
                     key={catId}
                     name={cat.name || String(cat)}
-                    icon={cat.icon}
+                    icon={cat.icon || getCategoryIcon(cat.name)}
                     count={count}
                     isActive={selectedCategory === catId}
                     onClick={() => setSelectedCategory(catId)}
@@ -1069,14 +957,14 @@ export default function POSPage() {
             )}
           </div>
 
-          {/* Product Cards Responsive Grid (auto-fill, min 150px) */}
-          <div className="flex-1 overflow-y-auto p-4 grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(170px,1fr))] gap-3.5 auto-rows-max pos-scrollbar">
+          {/* Product Cards Grid (Section 8) ─────────────────────────── */}
+          <div className="flex-1 overflow-y-auto p-4 grid grid-cols-[repeat(auto-fill,minmax(155px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(175px,1fr))] gap-3.5 auto-rows-max pos-scrollbar">
             {loadingCatalog ? (
-              Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)
+              Array.from({ length: 10 }).map((_, i) => <ProductCardSkeleton key={i} />)
             ) : catalogError ? (
               <div className="col-span-full py-12">
                 <ErrorState
-                  title="Catalog could not be loaded"
+                  title="Menu catalog could not be loaded"
                   message={catalogError}
                   onRetry={loadInitialData}
                 />
@@ -1085,7 +973,7 @@ export default function POSPage() {
               <div className="col-span-full py-16">
                 <EmptyState
                   icon={UtensilsCrossed}
-                  title="No items found"
+                  title="No dishes found"
                   description="Try adjusting your search query or station filter."
                   actionLabel="Clear Filters"
                   onAction={() => {
@@ -1096,25 +984,25 @@ export default function POSPage() {
                 />
               </div>
             ) : (
-              filteredProducts.map(prod => (
+              filteredProducts.map((prod) => (
                 <ProductCard
                   key={prod._id}
                   product={prod}
                   currency={currency}
                   cartQuantity={cartQuantityByProduct[prod._id] || 0}
-                  onClick={() => handleProductClick(prod)}
+                  onClick={() => handleProductCardClick(prod)}
                 />
               ))
             )}
           </div>
 
-          {/* Mobile Bottom Summary Bar (< 768px) */}
-          <div className="md:hidden p-3 bg-pos-surface border-t border-pos-border flex items-center justify-between gap-3 shrink-0 shadow-elevation2">
+          {/* Mobile Bottom Order Bar (< 1024px) ─────────────────────── */}
+          <div className="lg:hidden p-3 bg-white border-t border-[#EAE3D9] flex items-center justify-between gap-3 shrink-0 shadow-elevation2">
             <div>
-              <span className="text-[11px] font-bold text-pos-muted uppercase block">
-                {cart.length} Item{cart.length === 1 ? '' : 's'}
+              <span className="text-[11px] font-bold text-[#718078] uppercase block">
+                {cart.length} Item{cart.length === 1 ? '' : 's'} in Ticket
               </span>
-              <span className="font-display font-extrabold text-xl text-pos-accent tabular-nums">
+              <span className="font-display font-black text-xl text-pos-accent tabular-nums font-mono">
                 {formatMoney(totalAmount, currency)}
               </span>
             </div>
@@ -1123,438 +1011,212 @@ export default function POSPage() {
               size="lg"
               onClick={() => setIsMobileCartOpen(true)}
               disabled={cart.length === 0}
-              className="flex-1 max-w-[200px]"
+              className="flex-1 max-w-[200px] font-bold"
             >
-              View Order →
+              View Ticket →
             </Button>
           </div>
         </div>
 
-        {/* RIGHT PANE: Persistent Order Panel (360-400px on desktop/tablet) */}
-        <aside className="hidden md:flex w-96 shrink-0 border-l border-pos-border bg-pos-surface flex-col h-full shadow-elevation1">
-          {renderOrderPanel()}
+        {/* PART 3: Right Current Ticket / Checkout Panel (Desktop) ─── */}
+        <aside className="hidden lg:flex w-96 shrink-0 border-l border-[#EAE3D9] bg-white flex-col h-full shadow-elevation1">
+          <CheckoutPanel
+            cart={cart}
+            orderType={orderType}
+            tableNumber={tableNumber}
+            tables={tables}
+            customerPhone={customerPhone}
+            customerName={customerName}
+            deliveryAddress={deliveryAddress}
+            orderNotes={orderNotes}
+            manualDiscount={manualDiscount}
+            subtotal={subtotal}
+            discountAmount={discountAmount}
+            taxRate={taxRate}
+            taxAmount={taxAmount}
+            totalAmount={totalAmount}
+            currency={currency}
+            processing={processingOrder}
+            checkoutError={checkoutError}
+            onClearCart={clearCart}
+            onUpdateCartQty={updateCartQty}
+            onRemoveCartItem={removeCartItem}
+            onSelectTable={setTableNumber}
+            onChangeCustomerPhone={handlePhoneChange}
+            onChangeDeliveryAddress={setDeliveryAddress}
+            onSetDiscount={setManualDiscount}
+            onHoldOrder={handleHoldOrder}
+            onPayCash={() => setShowCashModal(true)}
+            onPayUpi={() => handleCheckout('upi')}
+            onPayCard={() => handleCheckout('card')}
+            onPaySplit={() => setShowSplitModal(true)}
+            onRetryCheckout={() => handleCheckout('cash')}
+          />
         </aside>
       </div>
 
-      {/* ── Mobile Order Panel Bottom Sheet (< 768px) ─────────────── */}
+      {/* ── Mobile Ticket Panel Bottom Sheet (< 1024px) ────────────── */}
       <Modal
         isOpen={isMobileCartOpen}
         onClose={() => setIsMobileCartOpen(false)}
         title="Current Ticket"
         maxWidth="max-w-md"
-        className="h-[85vh]"
+        className="h-[88vh]"
       >
         <div className="h-full flex flex-col -m-5">
-          {renderOrderPanel()}
+          <CheckoutPanel
+            cart={cart}
+            orderType={orderType}
+            tableNumber={tableNumber}
+            tables={tables}
+            customerPhone={customerPhone}
+            customerName={customerName}
+            deliveryAddress={deliveryAddress}
+            orderNotes={orderNotes}
+            manualDiscount={manualDiscount}
+            subtotal={subtotal}
+            discountAmount={discountAmount}
+            taxRate={taxRate}
+            taxAmount={taxAmount}
+            totalAmount={totalAmount}
+            currency={currency}
+            processing={processingOrder}
+            checkoutError={checkoutError}
+            onClearCart={clearCart}
+            onUpdateCartQty={updateCartQty}
+            onRemoveCartItem={removeCartItem}
+            onSelectTable={setTableNumber}
+            onChangeCustomerPhone={handlePhoneChange}
+            onChangeDeliveryAddress={setDeliveryAddress}
+            onSetDiscount={setManualDiscount}
+            onHoldOrder={handleHoldOrder}
+            onPayCash={() => {
+              setIsMobileCartOpen(false);
+              setShowCashModal(true);
+            }}
+            onPayUpi={() => handleCheckout('upi')}
+            onPayCard={() => handleCheckout('card')}
+            onPaySplit={() => {
+              setIsMobileCartOpen(false);
+              setShowSplitModal(true);
+            }}
+            onRetryCheckout={() => handleCheckout('cash')}
+          />
         </div>
       </Modal>
 
-      {/* ── 1. Modifiers Bottom Sheet / Modal ──────────────────────── */}
-      <Modal
+      {/* ── Modals & Dialogs ───────────────────────────────────────── */}
+
+      {/* 1. Product Customization & Modifiers Modal (Section 9) */}
+      <ProductModifierModal
+        product={activeProductForModifier}
         isOpen={Boolean(activeProductForModifier)}
         onClose={() => setActiveProductForModifier(null)}
-        title={activeProductForModifier?.name}
-        subtitle="Choose variant and optional add-ons"
-        footer={
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <QuantityStepper
-                quantity={modifierQty}
-                onDecrease={() => setModifierQty(q => Math.max(1, q - 1))}
-                onIncrease={() => setModifierQty(q => q + 1)}
-              />
-            </div>
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={handleConfirmModifier}
-              className="flex-1"
-            >
-              Add to Ticket
-            </Button>
-          </div>
-        }
-      >
-        {activeProductForModifier && (
-          <div className="space-y-5">
-            {/* Variants */}
-            {activeProductForModifier.variants?.length > 0 && (
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-pos-muted block mb-2">
-                  Select Size / Variant
-                </span>
-                <div className="grid grid-cols-2 gap-2">
-                  {activeProductForModifier.variants.map((v) => {
-                    const isSelected = selectedVariant?._id === v._id;
-                    return (
-                      <button
-                        key={v._id || v.name}
-                        type="button"
-                        onClick={() => setSelectedVariant(v)}
-                        className={`p-3 rounded-xl border text-left transition-colors touch-press min-h-[50px] ${
-                          isSelected
-                            ? 'bg-pos-raised border-pos-accent text-pos-text shadow-xs'
-                            : 'bg-pos-surface border-pos-border text-pos-muted hover:border-pos-muted'
-                        }`}
-                      >
-                        <div className="font-bold text-sm text-pos-text">{v.name}</div>
-                        <div className="text-xs font-semibold text-pos-accent tabular-nums">
-                          {formatMoney(v.price, currency)}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+        onAddToCart={addToCartDirect}
+        currency={currency}
+      />
 
-            {/* Addons */}
-            {activeProductForModifier.addons?.length > 0 && (
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-pos-muted block mb-2">
-                  Extra Add-ons
-                </span>
-                <div className="space-y-1.5">
-                  {activeProductForModifier.addons.map((addon) => {
-                    const isChecked = selectedAddons.some(a => a._id === addon._id);
-                    return (
-                      <button
-                        key={addon._id || addon.name}
-                        type="button"
-                        onClick={() => {
-                          setSelectedAddons(prev =>
-                            isChecked ? prev.filter(a => a._id !== addon._id) : [...prev, addon]
-                          );
-                        }}
-                        className={`w-full flex items-center justify-between p-3 rounded-xl border transition-colors touch-press min-h-[48px] ${
-                          isChecked
-                            ? 'bg-pos-raised border-pos-accent text-pos-text'
-                            : 'bg-pos-surface border-pos-border text-pos-muted hover:border-pos-muted'
-                        }`}
-                      >
-                        <span className="font-semibold text-xs text-pos-text">{addon.name}</span>
-                        <span className="text-xs font-bold text-pos-accent tabular-nums">
-                          +{formatMoney(addon.price, currency)}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Special Instructions Note */}
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-pos-muted block mb-1.5">
-                Special Instructions
-              </label>
-              <Input
-                placeholder="e.g. Extra hot, oat milk, less ice..."
-                value={modifierNote}
-                onChange={e => setModifierNote(e.target.value)}
-              />
-            </div>
-          </div>
-        )}
-      </Modal>
-
-      {/* ── 2. Cash Payment Keypad Modal ───────────────────────────── */}
-      <Modal
+      {/* 2. Cash Payment Keypad Modal (Section 12) */}
+      <CashPaymentModal
         isOpen={showCashModal}
         onClose={() => setShowCashModal(false)}
-        title="Cash Payment Tender"
-        subtitle="Quick cash amounts & change calculation"
-        maxWidth="max-w-md"
-        footer={
-          <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() => setShowCashModal(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              size="lg"
-              disabled={tenderedNum < totalAmount || processingOrder}
-              onClick={() => handleCheckout('cash')}
-              className="flex-1 font-bold"
-            >
-              {processingOrder ? 'Processing...' : 'Complete Payment'}
-            </Button>
-          </div>
-        }
-      >
-        <div className="space-y-4">
-          {/* Due & Tendered Display */}
-          <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-pos-raised border border-pos-border">
-            <div>
-              <span className="text-[10px] uppercase font-bold text-pos-muted block">Total Due</span>
-              <span className="font-display font-extrabold text-2xl text-pos-accent tabular-nums">
-                {formatMoney(totalAmount, currency)}
-              </span>
-            </div>
-            <div className="text-right">
-              <span className="text-[10px] uppercase font-bold text-pos-muted block">Tendered</span>
-              <span className="font-display font-extrabold text-2xl text-pos-text tabular-nums">
-                {currency}{cashTendered || '0'}
-              </span>
-            </div>
-          </div>
+        totalAmount={totalAmount}
+        currency={currency}
+        processing={processingOrder}
+        onConfirmPayment={(method, tendered) => handleCheckout(method, [], tendered)}
+      />
 
-          {/* Change Calculation */}
-          <div className={`p-3.5 rounded-xl border flex items-center justify-between ${
-            tenderedNum >= totalAmount
-              ? 'bg-pos-success/10 border-pos-success/40 text-pos-success'
-              : 'bg-pos-surface border-pos-border text-pos-muted'
-          }`}>
-            <span className="font-bold text-xs uppercase tracking-wider">
-              {tenderedNum >= totalAmount ? 'Change Due to Customer' : 'Remaining Due'}
-            </span>
-            <span className="font-display font-extrabold text-xl tabular-nums">
-              {formatMoney(tenderedNum >= totalAmount ? changeDue : totalAmount - tenderedNum, currency)}
-            </span>
-          </div>
-
-          {/* Quick Amount Chips */}
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-pos-muted block mb-2">
-              Quick Cash Presets
-            </span>
-            <div className="grid grid-cols-4 gap-2">
-              <button
-                type="button"
-                onClick={() => setCashTendered(String(totalAmount))}
-                className="py-2.5 px-2 rounded-xl bg-pos-surface hover:bg-pos-raised border border-pos-border hover:border-pos-accent text-pos-text font-bold text-xs touch-press min-h-[44px]"
-              >
-                Exact
-              </button>
-              {[100, 200, 500, 1000, 2000].map(amt => (
-                <button
-                  key={amt}
-                  type="button"
-                  onClick={() => setCashTendered(String(amt))}
-                  className="py-2.5 px-2 rounded-xl bg-pos-surface hover:bg-pos-raised border border-pos-border hover:border-pos-accent text-pos-text font-bold text-xs touch-press min-h-[44px]"
-                >
-                  {currency}{amt}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* On-Screen Numeric Keypad */}
-          <div className="grid grid-cols-3 gap-2 pt-1">
-            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'BACK'].map(k => (
-              <button
-                key={k}
-                type="button"
-                onClick={() => handleKeypadPress(k)}
-                className="py-3 rounded-xl bg-pos-surface hover:bg-pos-raised border border-pos-border text-pos-text font-bold text-lg touch-press min-h-[48px] flex items-center justify-center transition-colors"
-              >
-                {k === 'BACK' ? <Delete size={20} className="text-pos-muted" /> : k}
-              </button>
-            ))}
-          </div>
-        </div>
-      </Modal>
-
-      {/* ── 3. Split Payment Modal ─────────────────────────────────── */}
-      <Modal
+      {/* 3. Split Payment Modal (Section 12) */}
+      <SplitPaymentModal
         isOpen={showSplitModal}
         onClose={() => setShowSplitModal(false)}
-        title="Split Payment"
-        subtitle={`Total to split: ${formatMoney(totalAmount, currency)}`}
-        footer={
-          <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() => setShowSplitModal(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={handleConfirmSplitPayment}
-              className="flex-1 font-bold"
-            >
-              Confirm Split
-            </Button>
-          </div>
-        }
-      >
-        <div className="space-y-4">
-          <div>
-            <label className="text-xs font-bold text-pos-muted block mb-1">Cash Amount ({currency})</label>
-            <Input
-              type="number"
-              placeholder="0.00"
-              value={splitCashAmount}
-              onChange={e => setSplitCashAmount(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-pos-muted block mb-1">UPI Amount ({currency})</label>
-            <Input
-              type="number"
-              placeholder="0.00"
-              value={splitUpiAmount}
-              onChange={e => setSplitUpiAmount(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-pos-muted block mb-1">Card Amount ({currency})</label>
-            <Input
-              type="number"
-              placeholder="0.00"
-              value={splitCardAmount}
-              onChange={e => setSplitCardAmount(e.target.value)}
-            />
-          </div>
+        totalAmount={totalAmount}
+        currency={currency}
+        processing={processingOrder}
+        onConfirmSplit={(splits) => handleCheckout('split', splits)}
+      />
 
-          <div className="p-3 rounded-xl bg-pos-raised border border-pos-border text-xs flex justify-between font-bold">
-            <span>Entered: {currency}{(Number(splitCashAmount) || 0) + (Number(splitUpiAmount) || 0) + (Number(splitCardAmount) || 0)}</span>
-            <span className="text-pos-accent">Remaining: {currency}{Math.max(0, totalAmount - ((Number(splitCashAmount) || 0) + (Number(splitUpiAmount) || 0) + (Number(splitCardAmount) || 0)))}</span>
-          </div>
-        </div>
-      </Modal>
-
-      {/* ── 4. Held Orders Modal ───────────────────────────────────── */}
-      <Modal
+      {/* 4. Held Orders Modal (Section 14) */}
+      <HeldOrdersModal
         isOpen={showHeldModal}
         onClose={() => setShowHeldModal(false)}
-        title="Held Orders"
-        subtitle={`${heldOrders.length} ticket(s) paused on station`}
-      >
-        <div className="space-y-2.5">
-          {heldOrders.length === 0 ? (
-            <EmptyState
-              icon={PauseCircle}
-              title="No held orders"
-              description="Orders held during checkout will show up here."
-            />
-          ) : (
-            heldOrders.map((held) => (
-              <div
-                key={held._id}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-pos-raised border border-pos-border"
-              >
-                <div>
-                  <div className="font-bold text-sm text-pos-text">
-                    Order #{held.orderNumber || held._id.slice(-4)}
-                  </div>
-                  <div className="text-xs text-pos-muted mt-0.5">
-                    {held.items?.length || 0} items • {held.orderType || 'counter'}
-                    {held.tableNumber ? ` • Table ${held.tableNumber}` : ''}
-                  </div>
-                  <div className="text-xs font-bold text-pos-accent tabular-nums mt-1">
-                    {formatMoney(held.totalAmount || held.total || 0, currency)}
-                  </div>
-                </div>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => handleResumeHeldOrder(held)}
-                >
-                  Resume Ticket
-                </Button>
-              </div>
-            ))
-          )}
-        </div>
-      </Modal>
+        heldOrders={heldOrders}
+        onResume={handleResumeHeldOrder}
+        onDiscard={handleDiscardHeldOrder}
+        currency={currency}
+      />
 
-      {/* ── 5. Receipt Confirmation Modal ──────────────────────────── */}
-      <Modal
+      {/* 5. Recent Station Orders Modal */}
+      <RecentOrdersModal
+        isOpen={showRecentOrdersModal}
+        onClose={() => setShowRecentOrdersModal(false)}
+        currency={currency}
+        onViewReceipt={(ord) => {
+          setLastReceipt({ isDemo: ord.isDemo, order: ord });
+          setShowReceiptModal(true);
+        }}
+      />
+
+      {/* 6. Tables & Floor Plan Modal */}
+      <TablesFloorModal
+        isOpen={showTablesModal}
+        onClose={() => setShowTablesModal(false)}
+        tables={tables}
+        selectedTableNumber={tableNumber}
+        onSelectTable={setTableNumber}
+      />
+
+      {/* 7. Customers Modal (Section 17) */}
+      <CustomersModal
+        isOpen={showCustomersModal}
+        onClose={() => setShowCustomersModal(false)}
+        onSelectCustomer={(name, phone) => {
+          setCustomerName(name);
+          setCustomerPhone(phone);
+        }}
+      />
+
+      {/* 8. Shift Reports Modal */}
+      <ShiftReportsModal
+        isOpen={showShiftReportsModal}
+        onClose={() => setShowShiftReportsModal(false)}
+        tenant={tenant}
+        currency={currency}
+      />
+
+      {/* 9. Station Preferences / Settings Modal */}
+      <StationSettingsModal
+        isOpen={showStationSettingsModal}
+        onClose={() => setShowStationSettingsModal(false)}
+        tenant={tenant}
+        user={user}
+      />
+
+      {/* 10. Scan QR Modal (Section 3) */}
+      <ScanQrModal
+        isOpen={showScanQrModal}
+        onClose={() => setShowScanQrModal(false)}
+        onApplyTable={(tbl) => {
+          setTableNumber(tbl);
+          setOrderType('dine_in');
+          setActiveNav('dine_in');
+        }}
+        onApplyCustomer={handlePhoneChange}
+      />
+
+      {/* 11. Customer Receipt Modal (Section 13) */}
+      <ReceiptModal
         isOpen={showReceiptModal && Boolean(lastReceipt)}
         onClose={() => setShowReceiptModal(false)}
-        title={lastReceipt?.isDemo || lastReceipt?.order?.isDemo ? 'Demo Simulation Ticket' : 'Order Confirmed'}
-        subtitle={lastReceipt?.isDemo || lastReceipt?.order?.isDemo ? 'DEMO — NOT A REAL SALE' : 'Receipt generated successfully'}
-        maxWidth="max-w-md"
-        showClose={false}
-        footer={
-          <div className="flex flex-col gap-2.5">
-            {/* One-Tap 56px "New Order" Button */}
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => {
-                setShowReceiptModal(false);
-                setLastReceipt(null);
-                clearCart();
-              }}
-              className="w-full text-base font-bold shadow-elevation1"
-            >
-              Start New Order →
-            </Button>
-
-            <Button
-              variant="secondary"
-              size="md"
-              icon={Printer}
-              onClick={() => window.print()}
-              className="w-full"
-            >
-              Print Receipt
-            </Button>
-          </div>
-        }
-      >
-        {lastReceipt && (
-          <div className="text-center space-y-4 py-2 relative">
-            {/* Highly Visible Watermark Badge for Demo Transactions */}
-            {(lastReceipt.isDemo || lastReceipt.order?.isDemo) && (
-              <div className="p-3 rounded-2xl bg-amber-500/15 border-2 border-dashed border-amber-500 text-amber-900 text-center space-y-1">
-                <div className="flex items-center justify-center gap-1.5 font-black text-sm uppercase tracking-wider text-amber-800">
-                  <AlertCircle size={16} className="text-amber-700 shrink-0" />
-                  <span>DEMO — NOT A REAL SALE</span>
-                </div>
-                <div className="text-[11px] font-semibold text-amber-900/80">
-                  Simulated training transaction. No live order was created & no payment was settled.
-                </div>
-              </div>
-            )}
-
-            <div className={`flex items-center justify-center w-16 h-16 rounded-full mx-auto border ${
-              lastReceipt.isDemo || lastReceipt.order?.isDemo
-                ? 'bg-amber-500/10 text-amber-700 border-amber-500/30'
-                : 'bg-pos-success/10 text-pos-success border-pos-success/30'
-            }`}>
-              <CheckCircle2 size={36} />
-            </div>
-
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-pos-muted">
-                {lastReceipt.isDemo || lastReceipt.order?.isDemo ? 'Demo Ticket (Simulation)' : 'Order Ticket'}
-              </span>
-              <h3 className="font-display font-extrabold text-3xl text-pos-text mt-1">
-                #{lastReceipt.order?.orderNumber}
-              </h3>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-pos-raised border border-pos-border text-left space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-pos-muted">Payment Method:</span>
-                <span className="font-bold text-pos-text uppercase">{lastReceipt.order?.paymentMethod || 'Paid'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-pos-muted">Order Type:</span>
-                <span className="font-bold text-pos-text capitalize">{lastReceipt.order?.orderType || 'Counter'}</span>
-              </div>
-              <div className="flex justify-between pt-2 border-t border-pos-border text-sm font-bold text-pos-text">
-                <span>{lastReceipt.isDemo || lastReceipt.order?.isDemo ? 'Simulated Total:' : 'Total Paid:'}</span>
-                <span className="text-pos-accent font-extrabold tabular-nums">
-                  {formatMoney(lastReceipt.order?.total || lastReceipt.order?.totalAmount || 0, currency)}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-      </Modal>
+        lastReceipt={lastReceipt}
+        tenant={tenant}
+        currency={currency}
+        onNewOrder={() => {
+          setShowReceiptModal(false);
+          setLastReceipt(null);
+          clearCart();
+        }}
+      />
     </div>
   );
 }

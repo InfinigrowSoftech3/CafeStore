@@ -22,7 +22,7 @@ export default function SearchInput({
         className="w-full min-h-[48px] rounded-xl bg-pos-surface border border-pos-border pl-11 pr-11 py-2.5 text-base text-pos-text placeholder-pos-muted/60 transition duration-140 outline-none focus:border-pos-accent focus:ring-2 focus:ring-pos-accent/20"
         {...props}
       />
-      {value && (
+      {value ? (
         <button
           type="button"
           onClick={onClear || (() => onChange({ target: { value: '' } }))}
@@ -31,6 +31,12 @@ export default function SearchInput({
         >
           <X size={16} />
         </button>
+      ) : (
+        <div className="absolute right-3 hidden sm:flex items-center pointer-events-none">
+          <kbd className="px-2 py-0.5 text-[10px] font-mono font-bold text-pos-muted bg-pos-raised border border-pos-border rounded-md shadow-xs">
+            Ctrl + K
+          </kbd>
+        </div>
       )}
     </div>
   );

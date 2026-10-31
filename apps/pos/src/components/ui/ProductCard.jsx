@@ -62,10 +62,10 @@ export default function ProductCard({
         )}
 
         {/* In-Cart Quantity Indicator Badge */}
-        {inCartQty > 0 && (
-          <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded-lg bg-pos-accent px-2 py-0.5 text-xs font-black text-[#14110F] shadow-elevation1">
+        {quantity > 0 && (
+          <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded-lg bg-pos-accent px-2 py-0.5 text-xs font-black text-white shadow-elevation1">
             <Check size={12} strokeWidth={3} />
-            <span className="font-mono tabular-nums">{inCartQty}</span>
+            <span className="font-mono tabular-nums">{quantity}</span>
           </div>
         )}
 
@@ -81,17 +81,24 @@ export default function ProductCard({
 
       {/* Product Information */}
       <div className="p-3 flex-1 flex flex-col justify-between gap-2">
-        <h4 className="font-semibold text-sm text-pos-text line-clamp-2 leading-tight">
-          {product?.name || 'Menu Item'}
-        </h4>
+        <div>
+          <h4 className="font-bold text-sm text-pos-text line-clamp-1 leading-snug">
+            {product?.name || 'Menu Item'}
+          </h4>
+          {product?.description && (
+            <p className="text-[11px] text-pos-muted line-clamp-1 mt-0.5 font-normal">
+              {product.description}
+            </p>
+          )}
+        </div>
 
-        <div className="flex items-center justify-between pt-1.5 border-t border-pos-border/60">
-          <span className="text-base sm:text-lg font-bold text-pos-accent font-mono tabular-nums">
+        <div className="flex items-center justify-between pt-1.5 border-t border-pos-border/70">
+          <span className="text-base font-extrabold text-pos-accent font-mono tabular-nums">
             {formatMoney(price, currency)}
           </span>
 
           <span
-            className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
+            className={`flex h-8 w-8 items-center justify-center rounded-xl transition ${
               quantity > 0
                 ? 'bg-pos-accent text-white shadow-xs'
                 : 'bg-pos-raised text-pos-muted group-hover:bg-pos-accent group-hover:text-white'

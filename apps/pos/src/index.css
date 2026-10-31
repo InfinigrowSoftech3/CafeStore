@@ -3,21 +3,28 @@
 @tailwind utilities;
 
 :root {
-  /* Premium Touch-First Café POS Design System Tokens - White-Based Theme */
-  --pos-bg: #F8F6F2;
+  /* Premium Touch-First Café POS Design System Tokens - Warm Cream & Dark Forest Green Theme */
+  --pos-bg: #FAF8F3;
   --pos-surface: #FFFFFF;
-  --pos-raised: #F2EDE4;
-  --pos-border: #E5DED5;
-  --pos-border-focus: #B87314;
-  --pos-text: #1C1815;
-  --pos-muted: #6E645B;
-  --pos-accent: #B87314;
-  --pos-accent-hover: #9C600E;
-  --pos-success: #16A34A;
-  --pos-warning: #D97706;
-  --pos-danger: #DC2626;
+  --pos-raised: #F4EFE6;
+  --pos-border: #EAE3D9;
+  --pos-border-focus: #E99308;
+  --pos-text: #18251F;
+  --pos-muted: #718078;
+  --pos-accent: #E99308;
+  --pos-accent-hover: #C97B00;
+  --pos-success: #059669;
+  --pos-warning: #F59E0B;
+  --pos-danger: #EF4444;
 
-  --focus-ring: #B87314;
+  --pos-dark: #062F25;
+  --pos-dark-secondary: #0B3B2E;
+  --pos-dark-active: #105B43;
+  --pos-dark-accent: #20D99A;
+  --pos-dark-border: #174B3C;
+  --pos-dark-hover: #104737;
+
+  --focus-ring: #E99308;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -28,7 +35,7 @@
 }
 
 :focus-visible {
-  outline: 2px solid var(--pos-accent, #B87314);
+  outline: 2px solid var(--pos-accent, #E99308);
   outline-offset: 2px;
 }
 
@@ -90,14 +97,28 @@ button, input, select, textarea {
   height: 6px;
 }
 .pos-scrollbar::-webkit-scrollbar-track {
-  background: #F8F6F2;
+  background: #FAF8F3;
 }
 .pos-scrollbar::-webkit-scrollbar-thumb {
-  background: #D5CCC0;
+  background: #DCD4C6;
   border-radius: 9999px;
 }
 .pos-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #B87314;
+  background: #E99308;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: #174B3C;
+  border-radius: 9999px;
+}
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #20D99A;
 }
 
 .no-scrollbar::-webkit-scrollbar {
