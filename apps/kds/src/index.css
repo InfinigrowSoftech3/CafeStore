@@ -723,3 +723,34 @@ html.light {
 html, body {
   visibility: visible !important;
 }
+
+/* Premium KDS Scrollbars */
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: #174B3C;
+  border-radius: 9999px;
+}
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #104737;
+}
+
+.kds-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.kds-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.kds-scrollbar::-webkit-scrollbar-thumb {
+  background: #EAE3D9;
+  border-radius: 9999px;
+}
+.kds-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #D8CEBE;
+}
