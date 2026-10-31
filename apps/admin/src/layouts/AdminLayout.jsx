@@ -30,10 +30,10 @@ const getAppHref = (href) => {
   return href;
 };
 
-// 5 Grouped Navigation Modules
+// Grouped Navigation Modules (Premium Dark Green SaaS)
 const NAV_GROUPS = [
   {
-    title: 'Operations',
+    title: 'OPERATIONS',
     items: [
       { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', access: 'any' },
       { href: env.posUrl, icon: Monitor, label: 'POS Terminal', access: 'pos', isExternal: true },
@@ -43,7 +43,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    title: 'Catalog',
+    title: 'CATALOG',
     items: [
       { to: '/products', icon: UtensilsCrossed, label: 'Products', access: 'menu' },
       { to: '/categories', icon: Tag, label: 'Categories', access: 'menu' },
@@ -51,7 +51,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    title: 'Growth',
+    title: 'GROWTH',
     items: [
       { to: '/customers', icon: Users, label: 'Customers CRM', access: 'menu' },
       { to: '/reviews', icon: Star, label: 'Reviews', access: 'menu' },
@@ -60,19 +60,19 @@ const NAV_GROUPS = [
     ],
   },
   {
-    title: 'Finance',
+    title: 'FINANCE',
     items: [
+      { to: '/analytics', icon: BarChart2, label: 'Sales & Reports', access: 'menu' },
+      { to: '/billing', icon: CreditCard, label: 'Payouts', access: 'owner' },
+      { to: '/expenses', icon: TrendingDown, label: 'Expenses', access: 'menu' },
       { to: '/purchases', icon: PackageCheck, label: 'Purchases / PO', access: 'menu' },
       { to: '/suppliers', icon: Truck, label: 'Suppliers', access: 'menu' },
-      { to: '/expenses', icon: TrendingDown, label: 'Expenses', access: 'menu' },
-      { to: '/analytics', icon: BarChart2, label: 'Analytics', access: 'menu' },
     ],
   },
   {
-    title: 'Administration',
+    title: 'ADMINISTRATION',
     items: [
       { to: '/team', icon: Shield, label: 'Team & Security', access: 'owner' },
-      { to: '/billing', icon: CreditCard, label: 'Plan & Billing', access: 'owner' },
       { to: '/settings', icon: Settings, label: 'Café Settings', access: 'owner' },
     ],
   },
@@ -191,6 +191,14 @@ export default function AdminLayout({ children, title }) {
     window.location.reload();
   };
 
+  // Active route detection
+  const isItemActive = (to) => {
+    if (!to) return false;
+    if (to === '/dashboard') return location.pathname === '/dashboard' || location.pathname === '/';
+    if (to === '/inventory') return location.pathname === '/inventory' || location.pathname.startsWith('/inventory/');
+    return location.pathname === to || location.pathname.startsWith(`${to}/`);
+  };
+
   // Role check helper
   const canAccessItem = (access) => {
     if (access === 'any') return true;
@@ -208,30 +216,33 @@ export default function AdminLayout({ children, title }) {
 
   return (
     <div className="flex h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] overflow-hidden font-body select-none" style={{ height: '100dvh' }}>
-      {/* ── Left Sidebar (Premium Dark Green Theme) ─────────────── */}
+      {/* ── Left Sidebar (Premium Dark Green SaaS Redesign) ─────── */}
       <aside
-        className={`hidden md:flex flex-col h-full shrink-0 border-r border-[#25483B] bg-[#102F26] transition-all duration-300 z-30 custom-scrollbar sidebar-scrollbar ${
-          isCollapsed ? 'w-20' : 'w-64'
+        className={`hidden md:flex flex-col h-full shrink-0 border-r border-[#174B3C] bg-[#062F25] transition-all duration-300 z-30 custom-scrollbar sidebar-scrollbar ${
+          isCollapsed ? 'w-20' : 'w-[280px]'
         }`}
       >
         {/* 1. Tenant Brand Header */}
-        <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-[#25483B] bg-[#102F26]">
+        <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-[#174B3C] bg-[#062F25]">
           <div className="flex items-center gap-3 min-w-0 overflow-hidden">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-none border border-[#25483B] bg-[#1D493A] font-display text-base font-extrabold text-[#FFFFFF] shadow-2xs overflow-hidden">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#174B3C] bg-gradient-to-br from-[#105B43] to-[#0B3B2E] font-display text-base font-extrabold text-[#FFFFFF] shadow-sm overflow-hidden">
               {tenant.logoUrl ? (
                 <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
               ) : (
-                ((tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'V').charAt(0).toUpperCase()
+                ((tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'VelvetRosiee').charAt(0).toUpperCase()
               )}
             </div>
 
             {!isCollapsed && (
               <div className="min-w-0 truncate">
-                <div className="truncate font-display text-sm font-extrabold text-[#FFFFFF] tracking-wide">
-                  {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'Café'}
+                <div className="truncate font-display text-[15px] font-bold text-[#F5FFF9] tracking-tight leading-tight">
+                  {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'VelvetRosiee'}
                 </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#B5C9BF]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#A3E8C0] animate-pulse" />
+                <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#A9C7B8] mt-0.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#20D99A] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#20D99A]" />
+                  </span>
                   <span className="truncate">Admin Console</span>
                 </div>
               </div>
@@ -240,15 +251,15 @@ export default function AdminLayout({ children, title }) {
 
           <button
             onClick={toggleCollapse}
-            className="p-1 rounded-md text-[#B5C9BF] hover:text-[#FFFFFF] hover:bg-[#193D31] transition"
+            className="p-1.5 rounded-lg text-[#A9CFC0] hover:text-[#FFFFFF] hover:bg-[#104737] transition-colors duration-200 cursor-pointer"
             title={isCollapsed ? 'Expand sidebar' : 'Collapse to icon rail'}
           >
-            {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
         </div>
 
         {/* 2. Grouped Navigation Modules (Scrollable independently) */}
-        <nav className="flex-1 overflow-y-auto p-3 space-y-4 custom-scrollbar sidebar-scrollbar min-h-0 bg-[#102F26]">
+        <nav className="flex-1 overflow-y-auto px-3 py-3.5 space-y-4 custom-scrollbar sidebar-scrollbar min-h-0 bg-[#062F25]">
           {NAV_GROUPS.map((group) => {
             const visibleItems = group.items.filter(item => canAccessItem(item.access));
             if (visibleItems.length === 0) return null;
@@ -256,7 +267,7 @@ export default function AdminLayout({ children, title }) {
             return (
               <div key={group.title} className="space-y-1">
                 {!isCollapsed && (
-                  <div className="px-3 pt-1 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-[#8EAA9B]">
+                  <div className="px-3 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-[#80AD98]">
                     {group.title}
                   </div>
                 )}
@@ -270,46 +281,49 @@ export default function AdminLayout({ children, title }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         title={isCollapsed ? label : undefined}
-                        className={`w-full flex items-center gap-3 rounded-none px-3 py-2 text-xs font-semibold transition group text-[#B5C9BF] hover:bg-[#193D31] hover:text-[#FFFFFF] border-l-4 border-transparent ${
-                          isCollapsed ? 'justify-center' : ''
+                        className={`relative w-full flex items-center gap-3 rounded-[13px] px-3.5 py-2.5 text-[14px] font-medium transition-all duration-200 group text-[#A9C7B8] hover:bg-[#104737] hover:text-[#F5FFF9] border border-transparent ${
+                          isCollapsed ? 'justify-center px-2.5' : ''
                         }`}
                       >
-                        <Icon size={17} className="shrink-0 text-[#B5C9BF] group-hover:text-[#FFFFFF] transition" />
+                        <Icon size={20} className="shrink-0 text-[#A9CFC0] group-hover:text-[#FFFFFF] transition-colors duration-200" />
                         {!isCollapsed && (
                           <div className="flex items-center justify-between flex-1 truncate">
                             <span className="truncate">{label}</span>
-                            <ExternalLink size={11} className="text-[#8EAA9B] group-hover:text-[#FFFFFF] ml-1.5 transition" />
+                            <ExternalLink size={13} className="text-[#80AD98] group-hover:text-[#FFFFFF] ml-1.5 transition-colors duration-200 shrink-0" />
                           </div>
                         )}
                       </a>
                     );
                   }
-                  const isActive = location.pathname === to || (to !== '/dashboard' && location.pathname.startsWith(to) && to !== '/orders');
+                  const active = isItemActive(to);
                   return (
                     <NavLink
                       key={to}
                       to={to}
                       title={isCollapsed ? label : undefined}
                       className={({ isActive: directActive }) => {
-                        const active = directActive || isActive;
-                        return `w-full flex items-center gap-3 rounded-none px-3 py-2 text-xs font-semibold transition group ${
-                          active
-                            ? 'bg-[#1D493A] text-[#FFFFFF] font-bold border-l-4 border-[#A3E8C0] shadow-2xs'
-                            : 'text-[#B5C9BF] hover:bg-[#193D31] hover:text-[#FFFFFF] border-l-4 border-transparent'
-                        } ${isCollapsed ? 'justify-center' : ''}`;
+                        const isRouteActive = directActive || active;
+                        return `relative w-full flex items-center gap-3 rounded-[13px] px-3.5 py-2.5 text-[14px] font-medium transition-all duration-200 group ${
+                          isRouteActive
+                            ? 'bg-gradient-to-r from-[#105B43] to-[#0B3B2E] text-[#F5FFF9] font-semibold shadow-[0_2px_10px_rgba(16,91,67,0.35)] border border-[#20D99A]/20'
+                            : 'text-[#A9C7B8] hover:bg-[#104737] hover:text-[#F5FFF9] border border-transparent'
+                        } ${isCollapsed ? 'justify-center px-2.5' : ''}`;
                       }}
                     >
                       {({ isActive: directActive }) => {
-                        const active = directActive || isActive;
+                        const isRouteActive = directActive || active;
                         return (
                           <>
+                            {isRouteActive && (
+                              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-r-full bg-[#20D99A] shadow-[0_0_8px_rgba(32,217,154,0.7)]" />
+                            )}
                             <Icon
-                              size={17}
-                              className={`shrink-0 transition ${
-                                active ? 'text-[#A3E8C0]' : 'text-[#B5C9BF] group-hover:text-[#FFFFFF]'
+                              size={20}
+                              className={`shrink-0 transition-colors duration-200 ${
+                                isRouteActive ? 'text-[#FFFFFF]' : 'text-[#A9CFC0] group-hover:text-[#FFFFFF]'
                               }`}
                             />
-                            {!isCollapsed && <span className="truncate">{label}</span>}
+                            {!isCollapsed && <span className="truncate flex-1 text-left">{label}</span>}
                           </>
                         );
                       }}
@@ -322,50 +336,53 @@ export default function AdminLayout({ children, title }) {
         </nav>
 
         {/* 3. Sticky User Profile & Sign Out Footer */}
-        <div className="border-t border-[#25483B] p-3 bg-[#102F26] shrink-0 space-y-2">
+        <div className="border-t border-[#174B3C] p-3.5 bg-[#062F25] shrink-0 space-y-3">
           <NavLink
             to="/profile"
-            title={isCollapsed ? `${user?.name} (${user?.role})` : undefined}
+            title={isCollapsed ? `${user?.name || 'Dhruvil Kyada'} (${user?.role?.toUpperCase() || 'OWNER'})` : undefined}
             className={({ isActive }) =>
-              `flex items-center gap-3 rounded-none p-2 transition ${
+              `flex items-center gap-3 rounded-[13px] p-2 transition-all duration-200 group ${
                 isActive
-                  ? 'bg-[#1D493A] text-[#FFFFFF] border-l-4 border-[#A3E8C0]'
-                  : 'hover:bg-[#193D31] text-[#B5C9BF] border-l-4 border-transparent'
-              } ${isCollapsed ? 'justify-center' : ''}`
+                  ? 'bg-[#105B43]/60 text-[#F5FFF9] border border-[#20D99A]/30'
+                  : 'hover:bg-[#104737] text-[#A9C7B8] border border-transparent'
+              } ${isCollapsed ? 'justify-center p-1' : ''}`
             }
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1D493A] border border-[#25483B] text-[#A3E8C0] font-bold text-xs shadow-2xs">
-              {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#087A55] border border-[#17664D] text-[#F5FFF9] font-bold text-sm shadow-sm">
+              {user?.name?.charAt(0)?.toUpperCase() || 'D'}
             </div>
             {!isCollapsed && (
               <div className="min-w-0 flex-1 truncate">
-                <div className="truncate text-xs font-bold text-[#FFFFFF] flex items-center gap-1.5">
-                  <span className="truncate">{user?.name || 'Staff Member'}</span>
-                  <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-full font-bold bg-[#1D493A] text-[#A3E8C0] border border-[#25483B] font-mono">
-                    {user?.role || 'staff'}
+                <div className="flex items-center justify-between gap-1 truncate">
+                  <span className="truncate text-[13.5px] font-bold text-[#F5FFF9]">{user?.name || 'Dhruvil Kyada'}</span>
+                  <span className="text-[9px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded-[5px] bg-[#0B3B2E] text-[#20D99A] border border-[#17664D] font-mono leading-none shrink-0">
+                    {user?.role?.toUpperCase() || 'OWNER'}
                   </span>
                 </div>
-                <div className="truncate text-[10px] text-[#B5C9BF] font-mono">
-                  {user?.email || ''}
+                <div className="truncate text-[11px] text-[#A9C7B8] font-mono mt-0.5">
+                  {user?.email || 'dhruvilkyada483@gmail.com'}
                 </div>
               </div>
+            )}
+            {!isCollapsed && (
+              <ChevronRight size={16} className="text-[#80AD98] group-hover:text-[#F5FFF9] transition-transform duration-200 group-hover:translate-x-0.5 shrink-0" />
             )}
           </NavLink>
 
           <button
             onClick={handleLogout}
             title={isCollapsed ? 'Sign out' : undefined}
-            className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold transition group bg-[#143B2E]/60 hover:bg-[#193D31] hover:text-[#FFFFFF] border border-[#25483B] text-[#B5C9BF] ${
-              isCollapsed ? 'justify-center' : ''
+            className={`w-full flex items-center justify-center gap-2.5 rounded-xl py-2.5 px-3 border border-[#17664D] bg-transparent hover:bg-[#104737] hover:border-[#20D99A]/40 text-[#F5FFF9] text-xs font-semibold transition-all duration-200 group cursor-pointer shadow-xs ${
+              isCollapsed ? 'justify-center px-0' : ''
             }`}
           >
-            <LogOut size={14} className="shrink-0 text-[#B5C9BF] group-hover:text-[#FFFFFF] transition" />
-            {!isCollapsed && <span>Sign out</span>}
+            <LogOut size={16} className="shrink-0 text-[#A9CFC0] group-hover:text-[#FFFFFF] transition-colors duration-200" />
+            {!isCollapsed && <span className="text-[#F5FFF9]">Sign Out</span>}
           </button>
         </div>
       </aside>
 
-      {/* ── Mobile Drawer (Premium Dark Green Theme) ─────────────── */}
+      {/* ── Mobile Drawer (Premium Dark Green SaaS Redesign) ──────── */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
@@ -377,44 +394,47 @@ export default function AdminLayout({ children, title }) {
               className="fixed inset-0 z-40 md:hidden bg-black/60 backdrop-blur-xs"
             />
             <motion.div
-              initial={{ x: -280 }}
+              initial={{ x: -285 }}
               animate={{ x: 0 }}
-              exit={{ x: -280 }}
+              exit={{ x: -285 }}
               transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-              className="fixed inset-y-0 left-0 z-50 w-[calc(100vw-2.5rem)] max-w-72 md:hidden flex flex-col bg-[#102F26] border-r border-[#25483B] text-[#B5C9BF] custom-scrollbar sidebar-scrollbar touch-scroll pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+              className="fixed inset-y-0 left-0 z-50 w-[calc(100vw-3rem)] max-w-[285px] md:hidden flex flex-col bg-[#062F25] border-r border-[#174B3C] text-[#A9C7B8] custom-scrollbar sidebar-scrollbar touch-scroll pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
             >
               {/* Mobile Header */}
-              <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-[#25483B] bg-[#102F26]">
+              <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-[#174B3C] bg-[#062F25]">
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-none bg-[#1D493A] border border-[#25483B] flex items-center justify-center font-bold text-[#FFFFFF] shadow-2xs">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#105B43] to-[#0B3B2E] border border-[#174B3C] flex items-center justify-center font-bold text-base text-[#FFFFFF] shadow-sm">
                     {tenant.logoUrl ? (
                       <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
-                      ((tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'V').charAt(0).toUpperCase()
+                      ((tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'VelvetRosiee').charAt(0).toUpperCase()
                     )}
                   </div>
                   <div>
-                    <div className="font-extrabold text-sm text-[#FFFFFF]">
-                      {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'Café'}
+                    <div className="font-bold text-[15px] text-[#F5FFF9]">
+                      {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'VelvetRosiee'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-[10px] text-[#A3E8C0] font-semibold">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#A3E8C0] animate-pulse" />
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#20D99A] font-medium">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#20D99A] opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#20D99A]" />
+                      </span>
                       <span>Admin Console</span>
                     </div>
                   </div>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-1 rounded-md text-[#B5C9BF] hover:text-[#FFFFFF] hover:bg-[#193D31] transition"
+                  className="p-1.5 rounded-lg text-[#A9CFC0] hover:text-[#FFFFFF] hover:bg-[#104737] transition-colors duration-200"
                   aria-label="Close sidebar"
                 >
-                  <ChevronLeft size={18} />
+                  <ChevronLeft size={20} />
                 </button>
               </div>
 
               {branches.length > 0 && (
-                <div className="shrink-0 border-b border-[#25483B] px-4 py-3 bg-[#102F26]">
-                  <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-[#8EAA9B]">
+                <div className="shrink-0 border-b border-[#174B3C] px-4 py-3 bg-[#062F25]">
+                  <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-[#80AD98]">
                     Current branch
                   </label>
                   <CustomSelect
@@ -426,24 +446,24 @@ export default function AdminLayout({ children, title }) {
                     options={branches.map((b) => ({
                       value: b._id,
                       label: `${b.name} (${b.code})${b.isMain ? ' ★' : ''}`,
-                      dot: b.isMain ? 'bg-amber-500' : 'bg-[#A3E8C0]',
+                      dot: b.isMain ? 'bg-amber-500' : 'bg-[#20D99A]',
                     }))}
                     icon={Store}
-                    className="w-full bg-[#1D493A] border-[#25483B] text-white hover:bg-[#193D31] hover:border-[#25483B]"
-                    dropdownClassName="bg-[#102F26] border-[#25483B] text-white"
+                    className="w-full bg-[#0B3B2E] border-[#174B3C] text-[#F5FFF9] hover:bg-[#104737] hover:border-[#20D99A]/30"
+                    dropdownClassName="bg-[#062F25] border-[#174B3C] text-[#F5FFF9]"
                   />
                 </div>
               )}
 
               {/* Mobile Nav */}
-              <nav className="flex-1 overflow-y-auto p-3 space-y-4 custom-scrollbar sidebar-scrollbar bg-[#102F26]">
+              <nav className="flex-1 overflow-y-auto px-3.5 py-4 space-y-4 custom-scrollbar sidebar-scrollbar bg-[#062F25]">
                 {NAV_GROUPS.map((group) => {
                   const visibleItems = group.items.filter(item => canAccessItem(item.access));
                   if (visibleItems.length === 0) return null;
 
                   return (
                     <div key={group.title} className="space-y-1">
-                      <div className="px-3 pt-1 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-[#8EAA9B]">
+                      <div className="px-3 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-[#80AD98]">
                         {group.title}
                       </div>
                       {visibleItems.map(({ to, href, icon: Icon, label, isExternal }) => {
@@ -455,42 +475,45 @@ export default function AdminLayout({ children, title }) {
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={() => setSidebarOpen(false)}
-                              className="flex items-center justify-between gap-3 rounded-none px-3 py-2.5 text-xs font-semibold transition group text-[#B5C9BF] hover:bg-[#193D31] hover:text-[#FFFFFF] border-l-4 border-transparent"
+                              className="relative flex items-center justify-between gap-3 rounded-[13px] px-3.5 py-2.5 text-[14px] font-medium transition-all duration-200 group text-[#A9C7B8] hover:bg-[#104737] hover:text-[#F5FFF9] border border-transparent"
                             >
                               <div className="flex items-center gap-3">
-                                <Icon size={16} className="text-[#B5C9BF] group-hover:text-[#FFFFFF] transition" />
+                                <Icon size={20} className="text-[#A9CFC0] group-hover:text-[#FFFFFF] transition-colors duration-200 shrink-0" />
                                 <span>{label}</span>
                               </div>
-                              <ExternalLink size={12} className="text-[#8EAA9B] group-hover:text-[#FFFFFF]" />
+                              <ExternalLink size={13} className="text-[#80AD98] group-hover:text-[#FFFFFF] transition-colors duration-200 shrink-0" />
                             </a>
                           );
                         }
-                        const isActive = location.pathname === to || (to !== '/dashboard' && location.pathname.startsWith(to) && to !== '/orders');
+                        const active = isItemActive(to);
                         return (
                           <NavLink
                             key={to}
                             to={to}
                             onClick={() => setSidebarOpen(false)}
                             className={({ isActive: directActive }) => {
-                              const active = directActive || isActive;
-                              return `flex items-center gap-3 rounded-none px-3 py-2.5 text-xs font-semibold transition group ${
-                                active
-                                  ? 'bg-[#1D493A] text-[#FFFFFF] font-bold border-l-4 border-[#A3E8C0]'
-                                  : 'text-[#B5C9BF] hover:bg-[#193D31] hover:text-[#FFFFFF] border-l-4 border-transparent'
+                              const isRouteActive = directActive || active;
+                              return `relative flex items-center gap-3 rounded-[13px] px-3.5 py-2.5 text-[14px] font-medium transition-all duration-200 group ${
+                                isRouteActive
+                                  ? 'bg-gradient-to-r from-[#105B43] to-[#0B3B2E] text-[#F5FFF9] font-semibold shadow-[0_2px_10px_rgba(16,91,67,0.35)] border border-[#20D99A]/20'
+                                  : 'text-[#A9C7B8] hover:bg-[#104737] hover:text-[#F5FFF9] border border-transparent'
                               }`;
                             }}
                           >
                             {({ isActive: directActive }) => {
-                              const active = directActive || isActive;
+                              const isRouteActive = directActive || active;
                               return (
                                 <>
+                                  {isRouteActive && (
+                                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-r-full bg-[#20D99A] shadow-[0_0_8px_rgba(32,217,154,0.7)]" />
+                                  )}
                                   <Icon
-                                    size={16}
-                                    className={`shrink-0 transition ${
-                                      active ? 'text-[#A3E8C0]' : 'text-[#B5C9BF] group-hover:text-[#FFFFFF]'
+                                    size={20}
+                                    className={`shrink-0 transition-colors duration-200 ${
+                                      isRouteActive ? 'text-[#FFFFFF]' : 'text-[#A9CFC0] group-hover:text-[#FFFFFF]'
                                     }`}
                                   />
-                                  <span className="truncate">{label}</span>
+                                  <span className="truncate flex-1 text-left">{label}</span>
                                 </>
                               );
                             }}
@@ -503,40 +526,41 @@ export default function AdminLayout({ children, title }) {
               </nav>
 
               {/* Mobile Footer */}
-              <div className="border-t border-[#25483B] p-3 bg-[#102F26] shrink-0 space-y-2">
+              <div className="border-t border-[#174B3C] p-3.5 bg-[#062F25] shrink-0 space-y-3">
                 <NavLink
                   to="/profile"
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-none p-2 transition ${
+                    `flex items-center gap-3 rounded-[13px] p-2 transition-all duration-200 group ${
                       isActive
-                        ? 'bg-[#1D493A] text-[#FFFFFF] border-l-4 border-[#A3E8C0]'
-                        : 'hover:bg-[#193D31] text-[#B5C9BF] border-l-4 border-transparent'
+                        ? 'bg-[#105B43]/60 text-[#F5FFF9] border border-[#20D99A]/30'
+                        : 'hover:bg-[#104737] text-[#A9C7B8] border border-transparent'
                     }`
                   }
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1D493A] border border-[#25483B] text-[#A3E8C0] font-bold text-xs shadow-2xs">
-                    {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#087A55] border border-[#17664D] text-[#F5FFF9] font-bold text-sm shadow-sm">
+                    {user?.name?.charAt(0)?.toUpperCase() || 'D'}
                   </div>
                   <div className="min-w-0 flex-1 truncate">
-                    <div className="truncate text-xs font-bold text-[#FFFFFF] flex items-center gap-1.5">
-                      <span className="truncate">{user?.name || 'Staff Member'}</span>
-                      <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-full font-bold bg-[#1D493A] text-[#A3E8C0] border border-[#25483B] font-mono">
-                        {user?.role || 'staff'}
+                    <div className="flex items-center justify-between gap-1 truncate">
+                      <span className="truncate text-[13.5px] font-bold text-[#F5FFF9]">{user?.name || 'Dhruvil Kyada'}</span>
+                      <span className="text-[9px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded-[5px] bg-[#0B3B2E] text-[#20D99A] border border-[#17664D] font-mono leading-none shrink-0">
+                        {user?.role?.toUpperCase() || 'OWNER'}
                       </span>
                     </div>
-                    <div className="truncate text-[10px] text-[#B5C9BF] font-mono">
-                      {user?.email || ''}
+                    <div className="truncate text-[11px] text-[#A9C7B8] font-mono mt-0.5">
+                      {user?.email || 'dhruvilkyada483@gmail.com'}
                     </div>
                   </div>
+                  <ChevronRight size={16} className="text-[#80AD98] group-hover:text-[#F5FFF9] transition-transform duration-200 shrink-0" />
                 </NavLink>
 
                 <button
                   onClick={handleLogout}
-                  className="flex w-full items-center justify-center gap-2 rounded-md p-2 text-xs font-semibold transition group bg-[#143B2E]/60 hover:bg-[#193D31] hover:text-[#FFFFFF] border border-[#25483B] text-[#B5C9BF]"
+                  className="w-full flex items-center justify-center gap-2.5 rounded-xl py-2.5 px-3 border border-[#17664D] bg-transparent hover:bg-[#104737] hover:border-[#20D99A]/40 text-[#F5FFF9] text-xs font-semibold transition-all duration-200 group cursor-pointer shadow-xs"
                 >
-                  <LogOut size={14} className="shrink-0 text-[#B5C9BF] group-hover:text-[#FFFFFF] transition" />
-                  <span>Sign out</span>
+                  <LogOut size={16} className="shrink-0 text-[#A9CFC0] group-hover:text-[#FFFFFF] transition-colors duration-200" />
+                  <span className="text-[#F5FFF9]">Sign Out</span>
                 </button>
               </div>
             </motion.div>

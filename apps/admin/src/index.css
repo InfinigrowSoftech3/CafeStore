@@ -53,17 +53,20 @@ html.light {
   --bg-card: #ffffff;
   --bg-overlay: rgba(15, 23, 42, 0.5);
 
-  /* Sidebar (Premium Dark Green Theme) */
-  --sidebar-bg: #102F26;
-  --sidebar-border: #25483B;
-  --sidebar-text: #FFFFFF;
-  --sidebar-text-muted: #B5C9BF;
-  --sidebar-heading: #8EAA9B;
-  --sidebar-active-bg: #1D493A;
-  --sidebar-active-border: #A3E8C0;
-  --sidebar-active-text: #FFFFFF;
-  --sidebar-active-icon: #A3E8C0;
-  --sidebar-hover-bg: #193D31;
+  /* Sidebar (Premium Dark Green Theme - Modern SaaS) */
+  --sidebar-bg: #062F25;
+  --sidebar-secondary-bg: #0B3B2E;
+  --sidebar-active-bg: #105B43;
+  --sidebar-active-border: #20D99A;
+  --sidebar-text: #F5FFF9;
+  --sidebar-text-muted: #A9C7B8;
+  --sidebar-icons: #A9CFC0;
+  --sidebar-icons-active: #FFFFFF;
+  --sidebar-heading: #80AD98;
+  --sidebar-border: #174B3C;
+  --sidebar-hover-bg: #104737;
+  --sidebar-profile-avatar: #087A55;
+  --sidebar-signout-border: #17664D;
 
   /* Header */
   --header-bg: rgba(255, 255, 255, 0.95);
@@ -408,11 +411,11 @@ html.light {
     background: transparent;
   }
   .sidebar-scrollbar::-webkit-scrollbar-thumb {
-    background: #25483B;
+    background: #174B3C;
     border-radius: 9999px;
   }
   .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #325e4e;
+    background: #104737;
   }
 
   /* Badge Base */
