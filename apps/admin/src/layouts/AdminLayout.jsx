@@ -208,16 +208,16 @@ export default function AdminLayout({ children, title }) {
 
   return (
     <div className="flex h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] overflow-hidden font-body select-none" style={{ height: '100dvh' }}>
-      {/* ── Left Sidebar ────────────────────────────────────────── */}
+      {/* ── Left Sidebar (Premium Dark Green Theme) ─────────────── */}
       <aside
-        className={`hidden md:flex flex-col h-full shrink-0 border-r border-slate-200 bg-white transition-all duration-300 z-30 custom-scrollbar ${
+        className={`hidden md:flex flex-col h-full shrink-0 border-r border-[#25483B] bg-[#102F26] transition-all duration-300 z-30 custom-scrollbar sidebar-scrollbar ${
           isCollapsed ? 'w-20' : 'w-64'
         }`}
       >
         {/* 1. Tenant Brand Header */}
-        <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-slate-200 bg-white">
+        <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-[#25483B] bg-[#102F26]">
           <div className="flex items-center gap-3 min-w-0 overflow-hidden">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-none border border-slate-200 bg-[#0F3D2E] font-display text-base font-extrabold text-white shadow-2xs overflow-hidden">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-none border border-[#25483B] bg-[#1D493A] font-display text-base font-extrabold text-[#FFFFFF] shadow-2xs overflow-hidden">
               {tenant.logoUrl ? (
                 <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
               ) : (
@@ -227,11 +227,11 @@ export default function AdminLayout({ children, title }) {
 
             {!isCollapsed && (
               <div className="min-w-0 truncate">
-                <div className="truncate font-display text-sm font-extrabold text-slate-900 tracking-wide">
+                <div className="truncate font-display text-sm font-extrabold text-[#FFFFFF] tracking-wide">
                   {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'Café'}
                 </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#B5C9BF]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#A3E8C0] animate-pulse" />
                   <span className="truncate">Admin Console</span>
                 </div>
               </div>
@@ -240,7 +240,7 @@ export default function AdminLayout({ children, title }) {
 
           <button
             onClick={toggleCollapse}
-            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+            className="p-1 rounded-md text-[#B5C9BF] hover:text-[#FFFFFF] hover:bg-[#193D31] transition"
             title={isCollapsed ? 'Expand sidebar' : 'Collapse to icon rail'}
           >
             {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
@@ -248,7 +248,7 @@ export default function AdminLayout({ children, title }) {
         </div>
 
         {/* 2. Grouped Navigation Modules (Scrollable independently) */}
-        <nav className="flex-1 overflow-y-auto p-3 space-y-4 custom-scrollbar min-h-0">
+        <nav className="flex-1 overflow-y-auto p-3 space-y-4 custom-scrollbar sidebar-scrollbar min-h-0 bg-[#102F26]">
           {NAV_GROUPS.map((group) => {
             const visibleItems = group.items.filter(item => canAccessItem(item.access));
             if (visibleItems.length === 0) return null;
@@ -256,7 +256,7 @@ export default function AdminLayout({ children, title }) {
             return (
               <div key={group.title} className="space-y-1">
                 {!isCollapsed && (
-                  <div className="px-3 pt-1 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                  <div className="px-3 pt-1 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-[#8EAA9B]">
                     {group.title}
                   </div>
                 )}
@@ -270,15 +270,15 @@ export default function AdminLayout({ children, title }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         title={isCollapsed ? label : undefined}
-                        className={`w-full flex items-center gap-3 rounded-none px-3 py-2 text-xs font-semibold transition group text-slate-600 hover:bg-slate-50 hover:text-slate-950 border-l-4 border-transparent ${
+                        className={`w-full flex items-center gap-3 rounded-none px-3 py-2 text-xs font-semibold transition group text-[#B5C9BF] hover:bg-[#193D31] hover:text-[#FFFFFF] border-l-4 border-transparent ${
                           isCollapsed ? 'justify-center' : ''
                         }`}
                       >
-                        <Icon size={17} className="shrink-0 text-slate-400 group-hover:text-slate-700 transition" />
+                        <Icon size={17} className="shrink-0 text-[#B5C9BF] group-hover:text-[#FFFFFF] transition" />
                         {!isCollapsed && (
                           <div className="flex items-center justify-between flex-1 truncate">
                             <span className="truncate">{label}</span>
-                            <ExternalLink size={11} className="text-slate-400 group-hover:text-slate-600 ml-1.5" />
+                            <ExternalLink size={11} className="text-[#8EAA9B] group-hover:text-[#FFFFFF] ml-1.5 transition" />
                           </div>
                         )}
                       </a>
@@ -294,18 +294,25 @@ export default function AdminLayout({ children, title }) {
                         const active = directActive || isActive;
                         return `w-full flex items-center gap-3 rounded-none px-3 py-2 text-xs font-semibold transition group ${
                           active
-                            ? 'bg-emerald-50 text-emerald-950 font-bold border-l-4 border-[#0F3D2E] shadow-2xs'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950 border-l-4 border-transparent'
+                            ? 'bg-[#1D493A] text-[#FFFFFF] font-bold border-l-4 border-[#A3E8C0] shadow-2xs'
+                            : 'text-[#B5C9BF] hover:bg-[#193D31] hover:text-[#FFFFFF] border-l-4 border-transparent'
                         } ${isCollapsed ? 'justify-center' : ''}`;
                       }}
                     >
-                      <Icon
-                        size={17}
-                        className={`shrink-0 transition ${
-                          isActive ? 'text-[#0F3D2E]' : 'text-slate-400 group-hover:text-slate-700'
-                        }`}
-                      />
-                      {!isCollapsed && <span className="truncate">{label}</span>}
+                      {({ isActive: directActive }) => {
+                        const active = directActive || isActive;
+                        return (
+                          <>
+                            <Icon
+                              size={17}
+                              className={`shrink-0 transition ${
+                                active ? 'text-[#A3E8C0]' : 'text-[#B5C9BF] group-hover:text-[#FFFFFF]'
+                              }`}
+                            />
+                            {!isCollapsed && <span className="truncate">{label}</span>}
+                          </>
+                        );
+                      }}
                     </NavLink>
                   );
                 })}
@@ -315,26 +322,30 @@ export default function AdminLayout({ children, title }) {
         </nav>
 
         {/* 3. Sticky User Profile & Sign Out Footer */}
-        <div className="border-t border-slate-200 p-3 bg-slate-50/80 shrink-0 space-y-2">
+        <div className="border-t border-[#25483B] p-3 bg-[#102F26] shrink-0 space-y-2">
           <NavLink
             to="/profile"
             title={isCollapsed ? `${user?.name} (${user?.role})` : undefined}
-            className={`flex items-center gap-3 rounded-none p-2 transition hover:bg-slate-100 ${
-              isCollapsed ? 'justify-center' : ''
-            }`}
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-none p-2 transition ${
+                isActive
+                  ? 'bg-[#1D493A] text-[#FFFFFF] border-l-4 border-[#A3E8C0]'
+                  : 'hover:bg-[#193D31] text-[#B5C9BF] border-l-4 border-transparent'
+              } ${isCollapsed ? 'justify-center' : ''}`
+            }
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0F3D2E] text-white font-bold text-xs shadow-2xs">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1D493A] border border-[#25483B] text-[#A3E8C0] font-bold text-xs shadow-2xs">
               {user?.name?.charAt(0)?.toUpperCase() || 'A'}
             </div>
             {!isCollapsed && (
               <div className="min-w-0 flex-1 truncate">
-                <div className="truncate text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <div className="truncate text-xs font-bold text-[#FFFFFF] flex items-center gap-1.5">
                   <span className="truncate">{user?.name || 'Staff Member'}</span>
-                  <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-full font-bold bg-slate-200 text-slate-700 font-mono">
+                  <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-full font-bold bg-[#1D493A] text-[#A3E8C0] border border-[#25483B] font-mono">
                     {user?.role || 'staff'}
                   </span>
                 </div>
-                <div className="truncate text-[10px] text-slate-500 font-mono">
+                <div className="truncate text-[10px] text-[#B5C9BF] font-mono">
                   {user?.email || ''}
                 </div>
               </div>
@@ -344,17 +355,17 @@ export default function AdminLayout({ children, title }) {
           <button
             onClick={handleLogout}
             title={isCollapsed ? 'Sign out' : undefined}
-            className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold transition bg-white hover:bg-red-50 hover:text-red-700 hover:border-red-200 border border-slate-200 text-slate-600 ${
+            className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold transition group bg-[#143B2E]/60 hover:bg-[#193D31] hover:text-[#FFFFFF] border border-[#25483B] text-[#B5C9BF] ${
               isCollapsed ? 'justify-center' : ''
             }`}
           >
-            <LogOut size={14} className="shrink-0" />
+            <LogOut size={14} className="shrink-0 text-[#B5C9BF] group-hover:text-[#FFFFFF] transition" />
             {!isCollapsed && <span>Sign out</span>}
           </button>
         </div>
       </aside>
 
-      {/* ── Mobile Drawer ───────────────────────────────────────── */}
+      {/* ── Mobile Drawer (Premium Dark Green Theme) ─────────────── */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
@@ -363,19 +374,19 @@ export default function AdminLayout({ children, title }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 z-40 md:hidden bg-slate-900/50 backdrop-blur-xs"
+              className="fixed inset-0 z-40 md:hidden bg-black/60 backdrop-blur-xs"
             />
             <motion.div
               initial={{ x: -280 }}
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-              className="fixed inset-y-0 left-0 z-50 w-[calc(100vw-2.5rem)] max-w-72 md:hidden flex flex-col bg-white border-r border-slate-200 text-slate-800 custom-scrollbar touch-scroll pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+              className="fixed inset-y-0 left-0 z-50 w-[calc(100vw-2.5rem)] max-w-72 md:hidden flex flex-col bg-[#102F26] border-r border-[#25483B] text-[#B5C9BF] custom-scrollbar sidebar-scrollbar touch-scroll pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
             >
               {/* Mobile Header */}
-              <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-slate-200">
+              <div className="h-16 shrink-0 flex items-center justify-between px-4 border-b border-[#25483B] bg-[#102F26]">
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-none bg-[#0F3D2E] border border-slate-200 flex items-center justify-center font-bold text-white shadow-2xs">
+                  <div className="h-9 w-9 rounded-none bg-[#1D493A] border border-[#25483B] flex items-center justify-center font-bold text-[#FFFFFF] shadow-2xs">
                     {tenant.logoUrl ? (
                       <img src={tenant.logoUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
@@ -383,23 +394,27 @@ export default function AdminLayout({ children, title }) {
                     )}
                   </div>
                   <div>
-                    <div className="font-extrabold text-sm text-slate-900">
+                    <div className="font-extrabold text-sm text-[#FFFFFF]">
                       {(tenant.name && tenant.name !== 'Café') ? tenant.name : user?.tenantName || tenant.name || 'Café'}
                     </div>
-                    <div className="text-[10px] text-emerald-700 font-semibold">Admin Console</div>
+                    <div className="flex items-center gap-1.5 text-[10px] text-[#A3E8C0] font-semibold">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#A3E8C0] animate-pulse" />
+                      <span>Admin Console</span>
+                    </div>
                   </div>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-1 rounded-md text-slate-400 hover:text-slate-700"
+                  className="p-1 rounded-md text-[#B5C9BF] hover:text-[#FFFFFF] hover:bg-[#193D31] transition"
+                  aria-label="Close sidebar"
                 >
                   <ChevronLeft size={18} />
                 </button>
               </div>
 
               {branches.length > 0 && (
-                <div className="shrink-0 border-b border-slate-200 px-4 py-3 bg-slate-50">
-                  <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <div className="shrink-0 border-b border-[#25483B] px-4 py-3 bg-[#102F26]">
+                  <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-[#8EAA9B]">
                     Current branch
                   </label>
                   <CustomSelect
@@ -411,69 +426,117 @@ export default function AdminLayout({ children, title }) {
                     options={branches.map((b) => ({
                       value: b._id,
                       label: `${b.name} (${b.code})${b.isMain ? ' ★' : ''}`,
-                      dot: b.isMain ? 'bg-amber-500' : 'bg-emerald-500',
+                      dot: b.isMain ? 'bg-amber-500' : 'bg-[#A3E8C0]',
                     }))}
                     icon={Store}
-                    className="w-full bg-white border-slate-300"
+                    className="w-full bg-[#1D493A] border-[#25483B] text-white hover:bg-[#193D31] hover:border-[#25483B]"
+                    dropdownClassName="bg-[#102F26] border-[#25483B] text-white"
                   />
                 </div>
               )}
 
               {/* Mobile Nav */}
-              <nav className="flex-1 overflow-y-auto p-3 space-y-4">
-                {NAV_GROUPS.map((group) => (
-                  <div key={group.title} className="space-y-1">
-                    <div className="px-3 pt-1 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                      {group.title}
-                    </div>
-                    {group.items.filter(item => canAccessItem(item.access)).map(({ to, href, icon: Icon, label, isExternal }) => {
-                      if (isExternal && href) {
+              <nav className="flex-1 overflow-y-auto p-3 space-y-4 custom-scrollbar sidebar-scrollbar bg-[#102F26]">
+                {NAV_GROUPS.map((group) => {
+                  const visibleItems = group.items.filter(item => canAccessItem(item.access));
+                  if (visibleItems.length === 0) return null;
+
+                  return (
+                    <div key={group.title} className="space-y-1">
+                      <div className="px-3 pt-1 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-[#8EAA9B]">
+                        {group.title}
+                      </div>
+                      {visibleItems.map(({ to, href, icon: Icon, label, isExternal }) => {
+                        if (isExternal && href) {
+                          return (
+                            <a
+                              key={label}
+                              href={getAppHref(href)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setSidebarOpen(false)}
+                              className="flex items-center justify-between gap-3 rounded-none px-3 py-2.5 text-xs font-semibold transition group text-[#B5C9BF] hover:bg-[#193D31] hover:text-[#FFFFFF] border-l-4 border-transparent"
+                            >
+                              <div className="flex items-center gap-3">
+                                <Icon size={16} className="text-[#B5C9BF] group-hover:text-[#FFFFFF] transition" />
+                                <span>{label}</span>
+                              </div>
+                              <ExternalLink size={12} className="text-[#8EAA9B] group-hover:text-[#FFFFFF]" />
+                            </a>
+                          );
+                        }
+                        const isActive = location.pathname === to || (to !== '/dashboard' && location.pathname.startsWith(to) && to !== '/orders');
                         return (
-                          <a
-                            key={label}
-                            href={getAppHref(href)}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <NavLink
+                            key={to}
+                            to={to}
                             onClick={() => setSidebarOpen(false)}
-                            className="flex items-center justify-between gap-3 rounded-none px-3 py-2.5 text-xs font-semibold transition text-slate-600 hover:bg-slate-50 hover:text-slate-950 border-l-4 border-transparent"
+                            className={({ isActive: directActive }) => {
+                              const active = directActive || isActive;
+                              return `flex items-center gap-3 rounded-none px-3 py-2.5 text-xs font-semibold transition group ${
+                                active
+                                  ? 'bg-[#1D493A] text-[#FFFFFF] font-bold border-l-4 border-[#A3E8C0]'
+                                  : 'text-[#B5C9BF] hover:bg-[#193D31] hover:text-[#FFFFFF] border-l-4 border-transparent'
+                              }`;
+                            }}
                           >
-                            <div className="flex items-center gap-3">
-                              <Icon size={16} />
-                              <span>{label}</span>
-                            </div>
-                            <ExternalLink size={12} className="text-slate-400" />
-                          </a>
+                            {({ isActive: directActive }) => {
+                              const active = directActive || isActive;
+                              return (
+                                <>
+                                  <Icon
+                                    size={16}
+                                    className={`shrink-0 transition ${
+                                      active ? 'text-[#A3E8C0]' : 'text-[#B5C9BF] group-hover:text-[#FFFFFF]'
+                                    }`}
+                                  />
+                                  <span className="truncate">{label}</span>
+                                </>
+                              );
+                            }}
+                          </NavLink>
                         );
-                      }
-                      return (
-                        <NavLink
-                          key={to}
-                          to={to}
-                          onClick={() => setSidebarOpen(false)}
-                          className={({ isActive }) =>
-                            `flex items-center gap-3 rounded-none px-3 py-2.5 text-xs font-semibold transition ${
-                              isActive
-                                ? 'bg-emerald-50 text-emerald-950 font-bold border-l-4 border-[#0F3D2E]'
-                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950 border-l-4 border-transparent'
-                            }`
-                          }
-                        >
-                          <Icon size={16} />
-                          <span>{label}</span>
-                        </NavLink>
-                      );
-                    })}
-                  </div>
-                ))}
+                      })}
+                    </div>
+                  );
+                })}
               </nav>
 
               {/* Mobile Footer */}
-              <div className="border-t border-slate-200 p-3 bg-slate-50">
+              <div className="border-t border-[#25483B] p-3 bg-[#102F26] shrink-0 space-y-2">
+                <NavLink
+                  to="/profile"
+                  onClick={() => setSidebarOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-none p-2 transition ${
+                      isActive
+                        ? 'bg-[#1D493A] text-[#FFFFFF] border-l-4 border-[#A3E8C0]'
+                        : 'hover:bg-[#193D31] text-[#B5C9BF] border-l-4 border-transparent'
+                    }`
+                  }
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1D493A] border border-[#25483B] text-[#A3E8C0] font-bold text-xs shadow-2xs">
+                    {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+                  </div>
+                  <div className="min-w-0 flex-1 truncate">
+                    <div className="truncate text-xs font-bold text-[#FFFFFF] flex items-center gap-1.5">
+                      <span className="truncate">{user?.name || 'Staff Member'}</span>
+                      <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-full font-bold bg-[#1D493A] text-[#A3E8C0] border border-[#25483B] font-mono">
+                        {user?.role || 'staff'}
+                      </span>
+                    </div>
+                    <div className="truncate text-[10px] text-[#B5C9BF] font-mono">
+                      {user?.email || ''}
+                    </div>
+                  </div>
+                </NavLink>
+
                 <button
                   onClick={handleLogout}
-                  className="flex w-full items-center justify-center gap-2 rounded-md p-2 text-xs font-semibold text-red-600 bg-white border border-slate-200 hover:bg-red-50"
+                  className="flex w-full items-center justify-center gap-2 rounded-md p-2 text-xs font-semibold transition group bg-[#143B2E]/60 hover:bg-[#193D31] hover:text-[#FFFFFF] border border-[#25483B] text-[#B5C9BF]"
                 >
-                  <LogOut size={14} /> Sign out
+                  <LogOut size={14} className="shrink-0 text-[#B5C9BF] group-hover:text-[#FFFFFF] transition" />
+                  <span>Sign out</span>
                 </button>
               </div>
             </motion.div>
