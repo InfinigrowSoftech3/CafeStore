@@ -17,6 +17,9 @@ import {
   REFRESH_TOKEN_TTL_MS,
   generateTotpSecret,
   verifyTotpCode,
+  verifyTotpCodeWithStep,
+  generateRecoveryCodes,
+  verifyRecoveryCode,
 } from '../utils/authTokens.js';
 import { sendPasswordResetEmail } from '../services/emailService.js';
 import { sendSms } from '../services/smsService.js';
@@ -62,6 +65,8 @@ const publicUser = (user, tenant = null) => ({
   name: user.name,
   email: user.email,
   role: user.role,
+  twoFactorEnabled: Boolean(user.twoFactorEnabled),
+  twoFactorStatus: user.twoFactorEnabled ? 'enabled' : (user.twoFactorSecretEncrypted ? 'disabled' : 'not_configured'),
   tenantId: user.tenantId,
   tenantName: tenant ? (tenant.settings?.cafeName || tenant.name) : undefined,
   tenantSlug: tenant?.slug,
@@ -92,7 +97,7 @@ router.post('/login', async (req, res) => {
     }
 
     const user = await runWithSystemTenantAccess(async () => {
-      return User.findOne({ email: normalizedEmail }).select('+password +failedLoginAttempts +loginLockUntil +twoFactorSecretEncrypted');
+      return User.findOne({ email: normalizedEmail }).select('+password +failedLoginAttempts +loginLockUntil +twoFactorSecretEncrypted +twoFactorLastCodeStep +recoveryCodes');
     });
     if (!user) {
       logLoginFailure(req, 'user_not_found');
@@ -151,9 +156,27 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
-    if (user.twoFactorEnabled && effectiveRole(user) === 'owner') {
+    if (user.twoFactorEnabled) {
       const secret = decryptTwoFactorSecret(user.twoFactorSecretEncrypted);
-      if (!verifyTotpCode(secret, req.body?.twoFactorCode)) {
+      const code = req.body?.twoFactorCode;
+      let valid = false;
+      let matchedStep = null;
+      const verification = verifyTotpCodeWithStep(secret, code, user.twoFactorLastCodeStep || 0);
+      if (verification.valid) {
+        valid = true;
+        matchedStep = verification.step;
+      } else if (code && Array.isArray(user.recoveryCodes) && user.recoveryCodes.length > 0) {
+        const recoveryCheck = verifyRecoveryCode(user.recoveryCodes, code);
+        if (recoveryCheck.valid) {
+          valid = true;
+          user.recoveryCodes[recoveryCheck.index].used = true;
+          user.recoveryCodes[recoveryCheck.index].usedAt = new Date();
+        }
+      }
+      if (matchedStep) {
+        user.twoFactorLastCodeStep = matchedStep;
+      }
+      if (!valid) {
         logLoginFailure(req, 'invalid_2fa');
         recordLoginFailure(user).catch((err) => console.error('[Auth] Record login failure error:', err.message));
         await recordLoginAttemptForIp(clientIp, false, normalizedEmail).catch((err) => console.error('[Auth] Lockout record error:', err.message));
@@ -169,7 +192,13 @@ router.post('/login', async (req, res) => {
             details: { ip: clientIp, reason: 'invalid_2fa' },
           });
         }).catch((err) => console.error('[Audit] Log error:', err.message));
-        return res.status(401).json({ error: 'A valid authenticator code is required.', code: 'TWO_FACTOR_REQUIRED' });
+        if (!code) {
+          return res.status(401).json({ error: 'Two-factor authentication code required.', code: 'TWO_FACTOR_REQUIRED', requiresTwoFactor: true });
+        }
+        if (verification.replayed) {
+          return res.status(401).json({ error: 'Two-factor authentication code already used. Please wait for a new code.', code: 'TWO_FACTOR_REPLAYED', requiresTwoFactor: true });
+        }
+        return res.status(401).json({ error: 'Invalid or expired two-factor authentication code.', code: 'INVALID_TWO_FACTOR_CODE', requiresTwoFactor: true });
       }
     }
 
@@ -365,36 +394,334 @@ router.put('/password', protect, async (req, res) => {
   }
 });
 
-router.post('/2fa/setup', protect, authorizeRoles('owner'), async (req, res) => {
-  const user = await User.findById(req.user._id).select('+twoFactorSecretEncrypted');
-  if (user.twoFactorEnabled) return res.status(409).json({ error: 'Disable two-factor authentication before replacing its authenticator.' });
-  const secret = generateTotpSecret();
-  user.twoFactorSecretEncrypted = encryptTwoFactorSecret(secret);
-  await user.save();
-  const label = encodeURIComponent(`${user.email} (${req.tenant.name})`);
-  const issuer = encodeURIComponent(req.tenant.name);
-  const otpauthUrl = `otpauth://totp/${label}?secret=${secret}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`;
-  const qrCode = await QRCode.toDataURL(otpauthUrl, { width: 260, margin: 1 });
-  return res.json({ secret, otpauthUrl, qrCode, enabled: Boolean(user.twoFactorEnabled) });
+// ─── Two-Factor Authentication (2FA) API Endpoints ─────────────────────────
+
+// GET /api/auth/2fa/status
+router.get('/2fa/status', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('+twoFactorSecretEncrypted +twoFactorPendingSecretEncrypted');
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    const hasAuthenticator = Boolean(user.twoFactorSecretEncrypted);
+    let status = 'not_configured';
+    if (user.twoFactorEnabled) {
+      status = 'enabled';
+    } else if (hasAuthenticator) {
+      status = 'disabled';
+    }
+
+    res.json({
+      success: true,
+      status, // 'enabled' | 'disabled' | 'not_configured'
+      enabled: Boolean(user.twoFactorEnabled),
+      hasAuthenticator,
+      hasPendingSetup: Boolean(user.twoFactorPendingSecretEncrypted),
+      verifiedAt: user.twoFactorVerifiedAt || null,
+      disabledAt: user.twoFactorDisabledAt || null,
+    });
+  } catch (err) {
+    console.error('[Auth 2FA Status] Error:', err);
+    res.status(500).json({ error: 'Failed to retrieve 2FA status.' });
+  }
 });
 
-router.post('/2fa/enable', protect, authorizeRoles('owner'), async (req, res) => {
-  const user = await User.findById(req.user._id).select('+twoFactorSecretEncrypted');
-  if (!user.twoFactorSecretEncrypted) return res.status(409).json({ error: 'Set up an authenticator before enabling two-factor authentication.' });
-  if (!verifyTotpCode(decryptTwoFactorSecret(user.twoFactorSecretEncrypted), req.body?.code)) return res.status(400).json({ error: 'Authenticator code is invalid.' });
-  user.twoFactorEnabled = true;
-  await user.save();
-  return res.json({ enabled: true });
+// POST /api/auth/2fa/setup
+router.post('/2fa/setup', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('+twoFactorSecretEncrypted +twoFactorPendingSecretEncrypted');
+    if (user.twoFactorEnabled) {
+      return res.status(409).json({ error: 'Disable two-factor authentication before replacing its authenticator.' });
+    }
+    if (user.twoFactorSecretEncrypted) {
+      return res.status(409).json({ error: 'Remove the existing authenticator before setting up a new one.' });
+    }
+
+    const secret = generateTotpSecret();
+    user.twoFactorPendingSecretEncrypted = encryptTwoFactorSecret(secret);
+    await user.save();
+
+    const tenantName = req.tenant?.name || 'CafeStore';
+    const label = encodeURIComponent(`${user.email} (${tenantName})`);
+    const issuer = encodeURIComponent(tenantName);
+    const otpauthUrl = `otpauth://totp/${label}?secret=${secret}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`;
+    const qrCode = await QRCode.toDataURL(otpauthUrl, { width: 260, margin: 1 });
+
+    res.json({
+      success: true,
+      secret,
+      otpauthUrl,
+      qrCode,
+      enabled: false,
+      status: 'not_configured',
+    });
+  } catch (err) {
+    console.error('[Auth 2FA Setup] Error:', err);
+    res.status(500).json({ error: 'Failed to initiate 2FA setup.' });
+  }
 });
 
-router.post('/2fa/disable', protect, authorizeRoles('owner'), async (req, res) => {
-  const user = await User.findById(req.user._id).select('+twoFactorSecretEncrypted');
-  if (!user.twoFactorEnabled || !verifyTotpCode(decryptTwoFactorSecret(user.twoFactorSecretEncrypted), req.body?.code)) return res.status(400).json({ error: 'Authenticator code is invalid.' });
-  user.twoFactorEnabled = false;
-  user.twoFactorSecretEncrypted = '';
-  await user.save();
-  return res.json({ enabled: false });
+// Shared verification handler for setup
+const handleVerifySetup = async (req, res) => {
+  try {
+    const { code } = req.body || {};
+    const sanitizedCode = String(code || '').trim();
+    if (!sanitizedCode || sanitizedCode.length !== 6) {
+      return res.status(400).json({ error: 'Please enter a valid 6-digit authenticator code.' });
+    }
+
+    const user = await User.findById(req.user._id).select('+twoFactorPendingSecretEncrypted +twoFactorSecretEncrypted +twoFactorLastCodeStep +recoveryCodes');
+    if (!user.twoFactorPendingSecretEncrypted) {
+      if (user.twoFactorSecretEncrypted && !user.twoFactorEnabled) {
+        return res.status(400).json({ error: 'Authenticator is already configured. Use the Enable 2FA action to reactivate it.' });
+      }
+      return res.status(400).json({ error: 'No authenticator setup in progress. Please start setup first.' });
+    }
+
+    const secret = decryptTwoFactorSecret(user.twoFactorPendingSecretEncrypted);
+    const verification = verifyTotpCodeWithStep(secret, sanitizedCode, user.twoFactorLastCodeStep || 0);
+    if (!verification.valid) {
+      return res.status(400).json({ error: 'Invalid or expired verification code. Please check your authenticator app and try again.' });
+    }
+
+    const { plainCodes, hashedCodes } = generateRecoveryCodes(8);
+
+    user.twoFactorSecretEncrypted = user.twoFactorPendingSecretEncrypted;
+    user.twoFactorPendingSecretEncrypted = '';
+    user.twoFactorEnabled = true;
+    user.twoFactorVerifiedAt = new Date();
+    user.twoFactorDisabledAt = null;
+    user.twoFactorLastCodeStep = 0;
+    user.recoveryCodes = hashedCodes;
+    await user.save();
+
+    runWithSystemTenantAccess(async () => {
+      await AuditEvent.create({
+        tenantId: user.tenantId,
+        actorId: user._id,
+        actorEmail: user.email,
+        actorRole: user.role,
+        action: 'auth.2fa_enabled',
+        targetType: 'User',
+        targetId: user._id,
+        details: { ip: req.ip },
+      }).catch(() => {});
+    });
+
+    res.json({
+      success: true,
+      enabled: true,
+      status: 'enabled',
+      verifiedAt: user.twoFactorVerifiedAt,
+      recoveryCodes: plainCodes,
+      message: 'Two-factor authentication configured and activated successfully.',
+    });
+  } catch (err) {
+    console.error('[Auth 2FA Verify Setup] Error:', err);
+    res.status(500).json({ error: 'Failed to verify authenticator setup.' });
+  }
+};
+
+// POST /api/auth/2fa/verify-setup and legacy POST /api/auth/2fa/verify
+router.post('/2fa/verify-setup', protect, handleVerifySetup);
+router.post('/2fa/verify', protect, handleVerifySetup);
+
+// POST /api/auth/2fa/enable (Reactivate disabled 2FA, or complete setup)
+router.post('/2fa/enable', protect, async (req, res) => {
+  try {
+    const { password, code } = req.body || {};
+    const sanitizedCode = String(code || '').trim();
+
+    const user = await User.findById(req.user._id).select('+password +twoFactorSecretEncrypted +twoFactorPendingSecretEncrypted +twoFactorLastCodeStep');
+    if (user.twoFactorEnabled) {
+      return res.status(400).json({ error: 'Two-factor authentication is already enabled.' });
+    }
+
+    // If request is from an initial setup verification without password:
+    if (!user.twoFactorSecretEncrypted && user.twoFactorPendingSecretEncrypted) {
+      return handleVerifySetup(req, res);
+    }
+
+    if (!user.twoFactorSecretEncrypted) {
+      return res.status(400).json({ error: 'No authenticator configured. Please set up an authenticator first.' });
+    }
+
+    if (!password) {
+      return res.status(400).json({ error: 'Account password is required to enable 2FA.' });
+    }
+    if (!sanitizedCode || sanitizedCode.length !== 6) {
+      return res.status(400).json({ error: 'Current 6-digit authenticator verification code is required.' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Incorrect account password.' });
+    }
+
+    const secret = decryptTwoFactorSecret(user.twoFactorSecretEncrypted);
+    const isValid = verifyTotpCode(secret, sanitizedCode);
+    if (!isValid) {
+      return res.status(400).json({ error: 'Invalid or expired authenticator code.' });
+    }
+
+    user.twoFactorEnabled = true;
+    user.twoFactorVerifiedAt = new Date();
+    user.twoFactorDisabledAt = null;
+    await user.save();
+
+    runWithSystemTenantAccess(async () => {
+      await AuditEvent.create({
+        tenantId: user.tenantId,
+        actorId: user._id,
+        actorEmail: user.email,
+        actorRole: user.role,
+        action: 'auth.2fa_enabled',
+        targetType: 'User',
+        targetId: user._id,
+        details: { ip: req.ip },
+      }).catch(() => {});
+    });
+
+    res.json({
+      success: true,
+      enabled: true,
+      status: 'enabled',
+      verifiedAt: user.twoFactorVerifiedAt,
+      message: 'Two-factor authentication has been enabled.',
+    });
+  } catch (err) {
+    console.error('[Auth 2FA Enable] Error:', err);
+    res.status(500).json({ error: 'Failed to enable two-factor authentication.' });
+  }
 });
+
+// POST /api/auth/2fa/disable
+router.post('/2fa/disable', protect, async (req, res) => {
+  try {
+    const { password, code } = req.body || {};
+    const sanitizedCode = String(code || '').trim();
+
+    if (!password) {
+      return res.status(400).json({ error: 'Account password is required to disable 2FA.' });
+    }
+    if (!sanitizedCode || sanitizedCode.length !== 6) {
+      return res.status(400).json({ error: 'Current 6-digit authenticator verification code is required.' });
+    }
+
+    const user = await User.findById(req.user._id).select('+password +twoFactorSecretEncrypted +twoFactorLastCodeStep');
+    if (!user.twoFactorEnabled) {
+      return res.status(400).json({ error: 'Two-factor authentication is not currently enabled.' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Incorrect account password.' });
+    }
+
+    const secret = decryptTwoFactorSecret(user.twoFactorSecretEncrypted);
+    const isValid = verifyTotpCode(secret, sanitizedCode);
+    if (!isValid) {
+      return res.status(400).json({ error: 'Invalid or expired authenticator code.' });
+    }
+
+    user.twoFactorEnabled = false;
+    user.twoFactorDisabledAt = new Date();
+    await user.save();
+
+    runWithSystemTenantAccess(async () => {
+      await AuditEvent.create({
+        tenantId: user.tenantId,
+        actorId: user._id,
+        actorEmail: user.email,
+        actorRole: user.role,
+        action: 'auth.2fa_disabled',
+        targetType: 'User',
+        targetId: user._id,
+        details: { ip: req.ip },
+      }).catch(() => {});
+    });
+
+    res.json({
+      success: true,
+      enabled: false,
+      status: 'disabled',
+      disabledAt: user.twoFactorDisabledAt,
+      message: 'Two-factor authentication has been disabled.',
+    });
+  } catch (err) {
+    console.error('[Auth 2FA Disable] Error:', err);
+    res.status(500).json({ error: 'Failed to disable two-factor authentication.' });
+  }
+});
+
+// Shared removal handler
+const handleRemoveAuthenticator = async (req, res) => {
+  try {
+    const { password, code } = req.body || {};
+    const sanitizedCode = String(code || '').trim();
+
+    if (!password) {
+      return res.status(400).json({ error: 'Account password is required to remove your authenticator.' });
+    }
+
+    const user = await User.findById(req.user._id).select('+password +twoFactorSecretEncrypted +twoFactorPendingSecretEncrypted +twoFactorLastCodeStep +recoveryCodes');
+    if (!user.twoFactorSecretEncrypted && !user.twoFactorPendingSecretEncrypted) {
+      return res.status(400).json({ error: 'No authenticator is configured on this account.' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Incorrect account password.' });
+    }
+
+    // Require and verify the OTP code if authenticator is configured
+    if (user.twoFactorSecretEncrypted) {
+      if (!sanitizedCode || sanitizedCode.length !== 6) {
+        return res.status(400).json({ error: 'Current 6-digit authenticator verification code is required.' });
+      }
+      const secret = decryptTwoFactorSecret(user.twoFactorSecretEncrypted);
+      const isValid = verifyTotpCode(secret, sanitizedCode);
+      if (!isValid) {
+        return res.status(400).json({ error: 'Invalid or expired authenticator code.' });
+      }
+    }
+
+    user.twoFactorEnabled = false;
+    user.twoFactorSecretEncrypted = '';
+    user.twoFactorPendingSecretEncrypted = '';
+    user.twoFactorVerifiedAt = null;
+    user.twoFactorDisabledAt = null;
+    user.recoveryCodes = [];
+    await user.save();
+
+    runWithSystemTenantAccess(async () => {
+      await AuditEvent.create({
+        tenantId: user.tenantId,
+        actorId: user._id,
+        actorEmail: user.email,
+        actorRole: user.role,
+        action: 'auth.2fa_removed',
+        targetType: 'User',
+        targetId: user._id,
+        details: { ip: req.ip },
+      }).catch(() => {});
+    });
+
+    res.json({
+      success: true,
+      enabled: false,
+      status: 'not_configured',
+      hasAuthenticator: false,
+      message: 'Authenticator and recovery codes have been completely removed.',
+    });
+  } catch (err) {
+    console.error('[Auth 2FA Remove] Error:', err);
+    res.status(500).json({ error: 'Failed to remove authenticator.' });
+  }
+};
+
+// DELETE /api/auth/2fa/authenticator and POST /api/auth/2fa/remove
+router.delete('/2fa/authenticator', protect, handleRemoveAuthenticator);
+router.post('/2fa/remove', protect, handleRemoveAuthenticator);
 
 // POST /api/auth/setup (first-time admin setup)
 // SECURITY: Requires ADMIN_SETUP_SECRET to prevent unauthorized admin creation

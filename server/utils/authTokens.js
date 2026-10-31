@@ -58,7 +58,7 @@ const decodeBase32 = (secret) => {
   return Buffer.from(bytes);
 };
 
-const totpAt = (secret, time) => {
+export const totpAt = (secret, time) => {
   const counter = Math.floor(time / 30000);
   const buffer = Buffer.alloc(8);
   buffer.writeBigUInt64BE(BigInt(counter));
@@ -68,13 +68,53 @@ const totpAt = (secret, time) => {
   return String(value).padStart(6, '0');
 };
 
-export const verifyTotpCode = (secret, code, now = Date.now()) => {
+export const verifyTotpCodeWithStep = (secret, code, lastUsedStep = 0, now = Date.now()) => {
   const supplied = String(code || '').trim();
-  if (!/^\d{6}$/.test(supplied) || !secret) return false;
+  if (!/^\d{6}$/.test(supplied) || !secret) return { valid: false, replayed: false };
   const suppliedBytes = Buffer.from(supplied);
-  for (const step of [-1, 0, 1]) {
-    const expected = Buffer.from(totpAt(secret, now + step * 30000));
-    if (crypto.timingSafeEqual(expected, suppliedBytes)) return true;
+  const currentStep = Math.floor(now / 30000);
+  let replayed = false;
+  for (const offset of [0, -1, 1]) {
+    const targetStep = currentStep + offset;
+    const expected = Buffer.from(totpAt(secret, targetStep * 30000));
+    if (crypto.timingSafeEqual(expected, suppliedBytes)) {
+      if (lastUsedStep && targetStep <= lastUsedStep) {
+        replayed = true;
+        continue; // Prevent replay of already-used code step
+      }
+      return { valid: true, step: targetStep, replayed: false };
+    }
   }
-  return false;
+  return { valid: false, replayed };
+};
+
+export const verifyTotpCode = (secret, code, now = Date.now()) => {
+  return verifyTotpCodeWithStep(secret, code, 0, now).valid;
+};
+
+export const generateRecoveryCodes = (count = 8) => {
+  const plainCodes = [];
+  const hashedCodes = [];
+  for (let i = 0; i < count; i++) {
+    const raw = crypto.randomBytes(4).toString('hex').toUpperCase();
+    const formatted = `${raw.slice(0, 4)}-${raw.slice(4)}`;
+    plainCodes.push(formatted);
+    hashedCodes.push({
+      codeHash: crypto.createHash('sha256').update(formatted).digest('hex'),
+      used: false,
+      usedAt: null,
+    });
+  }
+  return { plainCodes, hashedCodes };
+};
+
+export const verifyRecoveryCode = (recoveryCodes = [], code) => {
+  if (!code || !Array.isArray(recoveryCodes)) return { valid: false };
+  const normalized = String(code).trim().toUpperCase();
+  const hash = crypto.createHash('sha256').update(normalized).digest('hex');
+  const index = recoveryCodes.findIndex((rc) => rc.codeHash === hash && !rc.used);
+  if (index !== -1) {
+    return { valid: true, index };
+  }
+  return { valid: false };
 };

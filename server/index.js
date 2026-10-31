@@ -357,11 +357,17 @@ export const createApp = ({ razorpayFactory, errorTracker } = {}) => {
       '/api/auth/reset-password',
       '/api/auth/send-otp',
       '/api/auth/verify-otp',
+      '/api/auth/2fa/verify',
+      '/api/auth/2fa/verify-setup',
+      '/api/auth/2fa/disable',
+      '/api/auth/2fa/enable',
+      '/api/auth/2fa/authenticator',
+      '/api/auth/2fa/remove',
       '/api/platform/auth',
     ], authLimiter);
 
     // Session validation, refresh token and logout use the generous public limiter
-    app.use(['/api/auth/refresh', '/api/auth/me', '/api/auth/logout'], publicLimiter);
+    app.use(['/api/auth/refresh', '/api/auth/me', '/api/auth/logout', '/api/auth/2fa/status'], publicLimiter);
 
     // Sensitive mutation endpoints
     app.use(['/api/payment', '/api/contact', '/api/ai'], sensitiveLimiter);

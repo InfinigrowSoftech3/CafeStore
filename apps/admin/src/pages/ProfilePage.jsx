@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   User, Mail, Lock, Shield, CheckCircle2, AlertCircle,
   Eye, EyeOff, Save, KeyRound, CalendarDays, Crown,
-  Smartphone, Laptop, Tablet, LogOut, Clock, Wifi, ShieldCheck
+  Smartphone, Laptop, Tablet, LogOut, Clock, Wifi, ShieldCheck,
+  Trash2, Copy, Check, AlertTriangle, X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
@@ -75,11 +76,25 @@ export default function ProfilePage() {
   const [pwSaving, setPwSaving] = useState(false);
   const [pwMsg, setPwMsg] = useState(null);
 
-  /* 2FA */
-  const [twoFactorCode, setTwoFactorCode] = useState('');
-  const [twoFactorSetup, setTwoFactorSetup] = useState(null);
-  const [twoFactorMsg, setTwoFactorMsg] = useState(null);
+  /* 2FA State */
+  const [twoFactorStatus, setTwoFactorStatus] = useState(
+    user?.twoFactorEnabled ? 'enabled' : (user?.twoFactorStatus || 'not_configured')
+  );
+  const [twoFactorLoading, setTwoFactorLoading] = useState(true);
   const [twoFactorBusy, setTwoFactorBusy] = useState(false);
+  const [twoFactorSetup, setTwoFactorSetup] = useState(null);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [twoFactorMsg, setTwoFactorMsg] = useState(null);
+  const [copiedSecret, setCopiedSecret] = useState(false);
+  const [recoveryCodes, setRecoveryCodes] = useState(null);
+  const [copiedRecovery, setCopiedRecovery] = useState(false);
+
+  /* Modal state */
+  const [modalType, setModalType] = useState(null); // 'disable' | 'remove' | 'enable' | null
+  const [modalPassword, setModalPassword] = useState('');
+  const [modalCode, setModalCode] = useState('');
+  const [modalBusy, setModalBusy] = useState(false);
+  const [modalError, setModalError] = useState('');
 
   /* Sessions state */
   const [revokingSessions, setRevokingSessions] = useState(false);
@@ -174,6 +189,29 @@ export default function ProfilePage() {
     }
   };
 
+  const fetch2FaStatus = async () => {
+    try {
+      setTwoFactorLoading(true);
+      const { data } = await api.get('/auth/2fa/status');
+      if (data && data.status) {
+        setTwoFactorStatus(data.status);
+        updateUser({
+          ...user,
+          twoFactorEnabled: data.enabled,
+          twoFactorStatus: data.status,
+        });
+      }
+    } catch (err) {
+      console.error('[ProfilePage] Failed to fetch 2FA status:', err);
+    } finally {
+      setTwoFactorLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetch2FaStatus();
+  }, []);
+
   const startTwoFactorSetup = async () => {
     setTwoFactorBusy(true);
     setTwoFactorMsg(null);
@@ -181,35 +219,128 @@ export default function ProfilePage() {
       const { data } = await api.post('/auth/2fa/setup');
       setTwoFactorSetup(data);
     } catch (error) {
-      setTwoFactorMsg({ type: 'error', text: error.message });
+      const msg = error.response?.data?.error || error.message || 'Failed to start authenticator setup.';
+      setTwoFactorMsg({ type: 'error', text: msg });
+      toast.error(msg);
+      fetch2FaStatus();
     } finally {
       setTwoFactorBusy(false);
     }
   };
 
-  const updateTwoFactor = async () => {
+  const verifyAndActivate2FA = async () => {
+    if (twoFactorCode.length !== 6) return;
     setTwoFactorBusy(true);
     setTwoFactorMsg(null);
     try {
-      const { data } = await api.post(
-        user?.twoFactorEnabled ? '/auth/2fa/disable' : '/auth/2fa/enable',
-        { code: twoFactorCode }
-      );
-      updateUser({ ...user, twoFactorEnabled: data.enabled });
+      const { data } = await api.post('/auth/2fa/verify-setup', { code: twoFactorCode });
       setTwoFactorSetup(null);
       setTwoFactorCode('');
+      setTwoFactorStatus('enabled');
+      updateUser({ ...user, twoFactorEnabled: true, twoFactorStatus: 'enabled' });
+      if (data.recoveryCodes && data.recoveryCodes.length > 0) {
+        setRecoveryCodes(data.recoveryCodes);
+      }
       setTwoFactorMsg({
         type: 'success',
-        text: data.enabled
-          ? 'Two-factor authentication is now active.'
-          : 'Two-factor authentication has been disabled.',
+        text: 'Two-factor authentication is now active on your account.',
       });
-      toast.success(data.enabled ? '2FA Enabled' : '2FA Disabled');
+      toast.success('Two-factor authentication enabled!');
     } catch (error) {
-      setTwoFactorMsg({ type: 'error', text: error.message });
-      toast.error(error.message || 'Failed to update 2FA');
+      const msg = error.response?.data?.error || error.message || 'Verification failed.';
+      setTwoFactorMsg({ type: 'error', text: msg });
+      toast.error(msg);
     } finally {
       setTwoFactorBusy(false);
+    }
+  };
+
+  const copySecretToClipboard = (text) => {
+    navigator.clipboard?.writeText(text);
+    setCopiedSecret(true);
+    setTimeout(() => setCopiedSecret(false), 2000);
+    toast.success('Secret key copied to clipboard');
+  };
+
+  const copyRecoveryCodes = (codes) => {
+    navigator.clipboard?.writeText(codes.join('\n'));
+    setCopiedRecovery(true);
+    setTimeout(() => setCopiedRecovery(false), 2000);
+    toast.success('Recovery codes copied to clipboard');
+  };
+
+  const openActionModal = (type) => {
+    setModalType(type);
+    setModalPassword('');
+    setModalCode('');
+    setModalError('');
+    setTwoFactorMsg(null);
+  };
+
+  const closeActionModal = () => {
+    setModalType(null);
+    setModalPassword('');
+    setModalCode('');
+    setModalError('');
+    setModalBusy(false);
+  };
+
+  const handleModalSubmit = async (e) => {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    if (modalBusy) return;
+
+    if (!modalPassword) {
+      setModalError('Account password is required.');
+      return;
+    }
+
+    if (modalType === 'disable' || modalType === 'enable' || modalType === 'remove') {
+      if (!modalCode || modalCode.length !== 6) {
+        setModalError('Please enter the 6-digit authenticator code.');
+        return;
+      }
+    }
+
+    setModalBusy(true);
+    setModalError('');
+
+    try {
+      if (modalType === 'disable') {
+        const { data } = await api.post('/auth/2fa/disable', {
+          password: modalPassword,
+          code: modalCode,
+        });
+        setTwoFactorStatus('disabled');
+        updateUser({ ...user, twoFactorEnabled: false, twoFactorStatus: 'disabled' });
+        toast.success(data.message || 'Two-factor authentication disabled.');
+        closeActionModal();
+      } else if (modalType === 'enable') {
+        const { data } = await api.post('/auth/2fa/enable', {
+          password: modalPassword,
+          code: modalCode,
+        });
+        setTwoFactorStatus('enabled');
+        updateUser({ ...user, twoFactorEnabled: true, twoFactorStatus: 'enabled' });
+        toast.success(data.message || 'Two-factor authentication enabled.');
+        closeActionModal();
+      } else if (modalType === 'remove') {
+        const { data } = await api.delete('/auth/2fa/authenticator', {
+          data: {
+            password: modalPassword,
+            code: modalCode,
+          },
+        });
+        setTwoFactorStatus('not_configured');
+        updateUser({ ...user, twoFactorEnabled: false, twoFactorStatus: 'not_configured' });
+        toast.success(data.message || 'Authenticator removed successfully.');
+        closeActionModal();
+      }
+    } catch (error) {
+      const msg = error.response?.data?.error || error.message || 'Operation failed. Please check your credentials.';
+      setModalError(msg);
+      toast.error(msg);
+    } finally {
+      setModalBusy(false);
     }
   };
 
@@ -457,23 +588,30 @@ export default function ProfilePage() {
           </div>
           <span
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${
-              user?.twoFactorEnabled
+              twoFactorStatus === 'enabled'
                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : twoFactorStatus === 'disabled'
+                ? 'bg-amber-50 text-amber-700 border-amber-200'
                 : 'bg-stone-100 text-stone-600 border-stone-200'
             }`}
           >
             <span
               className={`h-1.5 w-1.5 rounded-full ${
-                user?.twoFactorEnabled ? 'bg-emerald-500' : 'bg-stone-400'
+                twoFactorStatus === 'enabled'
+                  ? 'bg-emerald-500'
+                  : twoFactorStatus === 'disabled'
+                  ? 'bg-amber-500'
+                  : 'bg-stone-400'
               }`}
             />
-            {user?.twoFactorEnabled ? '2FA Active' : 'Not Configured'}
+            {twoFactorStatus === 'enabled' ? 'Configured' : twoFactorStatus === 'disabled' ? 'Disabled' : 'Not Configured'}
           </span>
         </div>
 
         {twoFactorMsg && <div className="mb-4"><Alert type={twoFactorMsg.type} message={twoFactorMsg.text} /></div>}
 
-        {!user?.twoFactorEnabled && !twoFactorSetup && (
+        {/* State A: Not Configured */}
+        {twoFactorStatus === 'not_configured' && !twoFactorSetup && (
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-stone-50 border border-stone-200/80">
             <p className="text-xs text-stone-600 max-w-lg">
               Add a second verification code during login. Recommended for Owner and Manager accounts to prevent unauthorized access to payouts and billing.
@@ -481,18 +619,19 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={startTwoFactorSetup}
-              disabled={twoFactorBusy}
-              className="btn-primary rounded-xl px-4 py-2.5 text-xs font-semibold shrink-0"
+              disabled={twoFactorBusy || twoFactorLoading}
+              className="btn-primary rounded-xl px-4 py-2.5 text-xs font-semibold shrink-0 cursor-pointer disabled:opacity-50"
             >
               {twoFactorBusy ? 'Generating Keys…' : 'Set Up Authenticator'}
             </button>
           </div>
         )}
 
-        {twoFactorSetup && !user?.twoFactorEnabled && (
-          <div className="space-y-4 rounded-2xl bg-stone-50 border border-stone-200/80 p-5">
-            <p className="text-xs text-stone-700">
-              1. Scan this QR code in Google Authenticator or 1Password, then enter the generated 6-digit verification code below:
+        {/* Setup flow in progress */}
+        {twoFactorSetup && twoFactorStatus === 'not_configured' && (
+          <div className="space-y-4 rounded-2xl bg-stone-50 border border-stone-200/80 p-5 animate-in fade-in duration-200">
+            <p className="text-xs text-stone-700 font-medium">
+              1. Scan this QR code in Google Authenticator or Authy, then enter the generated 6-digit verification code below:
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <img
@@ -503,8 +642,16 @@ export default function ProfilePage() {
               <div className="space-y-3 flex-1 w-full">
                 <div>
                   <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider">Manual Secret Key:</span>
-                  <div className="mt-1 break-all rounded-xl bg-white p-2.5 font-mono text-xs text-stone-800 border border-stone-200">
-                    {twoFactorSetup.secret}
+                  <div className="mt-1 flex items-center justify-between gap-2 rounded-xl bg-white p-2.5 font-mono text-xs text-stone-800 border border-stone-200">
+                    <span className="break-all">{twoFactorSetup.secret}</span>
+                    <button
+                      type="button"
+                      onClick={() => copySecretToClipboard(twoFactorSetup.secret)}
+                      className="shrink-0 p-1 rounded-md text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition"
+                      title="Copy Secret"
+                    >
+                      {copiedSecret ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                    </button>
                   </div>
                 </div>
                 <div>
@@ -516,23 +663,28 @@ export default function ProfilePage() {
                     inputMode="numeric"
                     value={twoFactorCode}
                     onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="000 000"
-                    className="w-full max-w-xs rounded-xl border border-stone-200 px-3 py-2 text-sm font-mono tracking-widest focus:outline-none focus:border-brew-500"
+                    placeholder="000000"
+                    className="w-full max-w-xs rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm font-mono tracking-widest focus:outline-none focus:border-brew-500"
+                    maxLength={6}
                   />
                 </div>
                 <div className="flex flex-wrap gap-2 pt-1">
                   <button
                     type="button"
-                    onClick={updateTwoFactor}
+                    onClick={verifyAndActivate2FA}
                     disabled={twoFactorBusy || twoFactorCode.length !== 6}
-                    className="btn-primary rounded-xl px-4 py-2 text-xs font-semibold"
+                    className="btn-primary rounded-xl px-4 py-2 text-xs font-semibold cursor-pointer disabled:opacity-50"
                   >
-                    Verify & Activate 2FA
+                    {twoFactorBusy ? 'Verifying…' : 'Verify & Activate 2FA'}
                   </button>
                   <button
                     type="button"
-                    onClick={() => setTwoFactorSetup(null)}
-                    className="btn-secondary rounded-xl px-4 py-2 text-xs font-semibold"
+                    onClick={() => {
+                      setTwoFactorSetup(null);
+                      setTwoFactorCode('');
+                      setTwoFactorMsg(null);
+                    }}
+                    className="btn-secondary rounded-xl px-4 py-2 text-xs font-semibold cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -542,35 +694,237 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {user?.twoFactorEnabled && (
+        {/* State B: Configured / Enabled */}
+        {twoFactorStatus === 'enabled' && (
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200/80">
             <div className="flex items-center gap-3">
               <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
-              <p className="text-xs text-emerald-900 font-medium">
-                Your account is protected with TOTP Two-Factor Authentication. A code is required on every new device login.
-              </p>
+              <div>
+                <p className="text-xs text-emerald-950 font-bold">
+                  Authenticator configured successfully.
+                </p>
+                <p className="text-xs text-emerald-800">
+                  Your account is protected with TOTP Two-Factor Authentication. A code is required on every login.
+                </p>
+              </div>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
-              <input
-                aria-label="Authenticator code"
-                inputMode="numeric"
-                value={twoFactorCode}
-                onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="Code to disable"
-                className="w-36 rounded-xl border border-stone-200 px-3 py-1.5 text-xs font-mono tracking-wider focus:outline-none"
-              />
               <button
                 type="button"
-                onClick={updateTwoFactor}
-                disabled={twoFactorBusy || twoFactorCode.length !== 6}
-                className="rounded-xl border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 transition"
+                onClick={() => openActionModal('disable')}
+                className="rounded-xl border border-amber-200 bg-white px-3.5 py-2 text-xs font-semibold text-amber-800 hover:bg-amber-50 transition cursor-pointer shadow-2xs"
               >
-                {twoFactorBusy ? 'Saving…' : 'Disable 2FA'}
+                Disable 2FA
+              </button>
+              <button
+                type="button"
+                onClick={() => openActionModal('remove')}
+                className="rounded-xl border border-red-200 bg-white px-3.5 py-2 text-xs font-semibold text-red-700 hover:bg-red-50 transition cursor-pointer shadow-2xs"
+              >
+                Remove Authenticator
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* State C: Disabled */}
+        {twoFactorStatus === 'disabled' && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-amber-50/50 border border-amber-200/80">
+            <div className="flex items-center gap-3">
+              <AlertTriangle size={18} className="text-amber-600 shrink-0" />
+              <div>
+                <p className="text-xs text-amber-950 font-bold">
+                  Two-factor authentication is currently disabled.
+                </p>
+                <p className="text-xs text-amber-800">
+                  You can re-enable 2FA using your existing authenticator app or remove it to configure a new one.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+              <button
+                type="button"
+                onClick={() => openActionModal('enable')}
+                className="btn-primary rounded-xl px-3.5 py-2 text-xs font-semibold cursor-pointer shadow-2xs"
+              >
+                Enable 2FA
+              </button>
+              <button
+                type="button"
+                onClick={() => openActionModal('remove')}
+                className="rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition cursor-pointer shadow-2xs"
+              >
+                Remove Authenticator
               </button>
             </div>
           </div>
         )}
       </motion.section>
+
+      {/* ── 2FA Action Confirmation Modal (Disable / Remove / Enable) ──────── */}
+      {modalType && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                    modalType === 'remove'
+                      ? 'bg-red-100 text-red-600'
+                      : modalType === 'disable'
+                      ? 'bg-amber-100 text-amber-600'
+                      : 'bg-emerald-100 text-emerald-700'
+                  }`}
+                >
+                  {modalType === 'remove' ? <Trash2 size={20} /> : modalType === 'disable' ? <AlertTriangle size={20} /> : <ShieldCheck size={20} />}
+                </div>
+                <div>
+                  <h3 className="font-display text-base sm:text-lg font-bold text-stone-900">
+                    {modalType === 'disable' && 'Disable Two-Factor Authentication'}
+                    {modalType === 'remove' && 'Remove Authenticator'}
+                    {modalType === 'enable' && 'Enable Two-Factor Authentication'}
+                  </h3>
+                  <p className="text-xs text-stone-500 mt-0.5">
+                    {modalType === 'disable' && 'Enter your password and current 6-digit code to turn off 2FA.'}
+                    {modalType === 'remove' && 'Detaches authenticator, wipes stored secret, and invalidates recovery codes.'}
+                    {modalType === 'enable' && 'Enter your password and current 6-digit code to reactivate 2FA.'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={closeActionModal}
+                className="p-1 rounded-md text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {modalError && (
+              <div className="p-3 rounded-xl border border-red-200 bg-red-50 text-red-700 text-xs font-medium">
+                {modalError}
+              </div>
+            )}
+
+            <form onSubmit={handleModalSubmit} className="space-y-3.5 pt-1">
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  Account Password:
+                </label>
+                <input
+                  type="password"
+                  value={modalPassword}
+                  onChange={(e) => setModalPassword(e.target.value)}
+                  placeholder="Enter your current password"
+                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2 text-sm text-stone-900 outline-none focus:border-brew-500 focus:bg-white"
+                  autoFocus
+                />
+              </div>
+
+              {(modalType === 'disable' || modalType === 'enable' || modalType === 'remove') && (
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    6-digit Authenticator Code:
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={modalCode}
+                    onChange={(e) => setModalCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="000000"
+                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2 text-sm font-mono tracking-widest text-center text-stone-900 outline-none focus:border-brew-500 focus:bg-white"
+                  />
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={closeActionModal}
+                  disabled={modalBusy}
+                  className="rounded-xl border border-stone-200 px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={modalBusy}
+                  className={`rounded-xl px-4 py-2 text-xs font-semibold text-white shadow-2xs transition disabled:opacity-50 cursor-pointer ${
+                    modalType === 'remove'
+                      ? 'bg-red-600 hover:bg-red-700'
+                      : modalType === 'disable'
+                      ? 'bg-amber-600 hover:bg-amber-700'
+                      : 'bg-[#0F3D2E] hover:bg-[#15503d]'
+                  }`}
+                >
+                  {modalBusy
+                    ? 'Processing…'
+                    : modalType === 'disable'
+                    ? 'Confirm & Disable 2FA'
+                    : modalType === 'remove'
+                    ? 'Confirm & Remove'
+                    : 'Confirm & Enable 2FA'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Recovery Codes Modal (After Initial Setup) ─────────────── */}
+      {recoveryCodes && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                  <KeyRound size={20} />
+                </div>
+                <div>
+                  <h3 className="font-display text-base sm:text-lg font-bold text-stone-900">
+                    Save Your Recovery Codes
+                  </h3>
+                  <p className="text-xs text-stone-500 mt-0.5">
+                    Store these emergency backup codes in a safe place. Each code can be used once if you lose access to your authenticator app.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setRecoveryCodes(null)}
+                className="p-1 rounded-md text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-stone-50 border border-stone-200">
+              {recoveryCodes.map((c, i) => (
+                <div key={i} className="font-mono text-xs font-bold text-stone-800 bg-white p-2 rounded-lg border border-stone-200/80 text-center select-all">
+                  {c}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => copyRecoveryCodes(recoveryCodes)}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition cursor-pointer"
+              >
+                {copiedRecovery ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                <span>{copiedRecovery ? 'Copied!' : 'Copy Codes'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setRecoveryCodes(null)}
+                className="btn-primary rounded-xl px-4 py-2 text-xs font-semibold cursor-pointer"
+              >
+                I have saved my codes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Active Sessions & Registered Devices ─────── */}
       <motion.div

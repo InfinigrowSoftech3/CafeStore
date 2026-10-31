@@ -21,6 +21,15 @@ const userSchema = new mongoose.Schema({
   refreshTokenExpiresAt: { type: Date, default: null, select: false },
   twoFactorEnabled: { type: Boolean, default: false },
   twoFactorSecretEncrypted: { type: String, default: '', select: false },
+  twoFactorPendingSecretEncrypted: { type: String, default: '', select: false },
+  twoFactorVerifiedAt: { type: Date, default: null },
+  twoFactorDisabledAt: { type: Date, default: null },
+  twoFactorLastCodeStep: { type: Number, default: 0, select: false },
+  recoveryCodes: [{
+    codeHash: { type: String, required: true },
+    used: { type: Boolean, default: false },
+    usedAt: { type: Date, default: null },
+  }],
   // Password reset
   resetPasswordToken: { type: String, default: '', select: false },
   resetPasswordExpiresAt: { type: Date, default: null, select: false },
@@ -39,6 +48,10 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
+  delete obj.twoFactorSecretEncrypted;
+  delete obj.twoFactorPendingSecretEncrypted;
+  delete obj.twoFactorLastCodeStep;
+  delete obj.recoveryCodes;
   return obj;
 };
 
