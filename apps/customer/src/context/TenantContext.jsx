@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import api from '../services/api';
+import useCartStore from './cartStore';
 import { TenantNotFoundScreen, TenantSuspendedScreen } from '../components/ui/TenantErrorState';
 import {
   getResolvedTenantSlug,
@@ -46,50 +47,34 @@ export function TenantProvider({ children }) {
     setTenantState({ status: 'loading', message: '' });
 
     const resolveEndpoint = async () => {
-      // 1. If token is present, attempt QR resolve passing all parameters for maximum reliability
+      // 1. If token is present, attempt QR resolve directly. NEVER fall back on failure.
       if (token) {
-        try {
-          const res = await api.get('/public/cafes/resolve', {
-            params: {
-              token,
-              ...(resolvedSlug && { cafeSlug: resolvedSlug }),
-              ...(tableSlug && { tableSlug }),
-            },
-          });
-          if (res.data?.data?.cafe || res.data?.data) return res;
-        } catch (tokenErr) {
-          console.warn('QR token resolution failed, trying cafe+table fallback...', tokenErr);
-        }
+        return api.get('/public/cafes/resolve', {
+          params: {
+            token,
+            ...(cafeSlug && { cafeSlug }),
+            ...(tableSlug && { tableSlug }),
+          },
+        });
       }
 
       // 2. If cafeSlug (or resolvedSlug) and tableSlug exist, resolve by table and cafe
       if (resolvedSlug && tableSlug) {
-        try {
-          const res = await api.get('/public/cafes/resolve', {
-            params: { cafeSlug: resolvedSlug, tableSlug },
-          });
-          if (res.data?.data?.cafe || res.data?.data) return res;
-        } catch (slugTableErr) {
-          console.warn('Cafe+table resolution failed, trying cafe slug...', slugTableErr);
-        }
+        return api.get('/public/cafes/resolve', {
+          params: { cafeSlug: resolvedSlug, tableSlug },
+        });
       }
 
-      // 3. Try resolving by cafe slug alone
+      // 3. Try resolving by cafe slug alone (URL parameter or verified subdomain)
       if (resolvedSlug) {
-        try {
-          const res = await api.get(`/public/cafes/${encodeURIComponent(resolvedSlug)}`);
-          if (res.data?.data || res.data?.tenant) return res;
-        } catch (slugErr) {
-          console.warn(`Cafe slug "${resolvedSlug}" not found, clearing storage and resolving default...`, slugErr);
-          sessionStorage.removeItem('active_cafe_slug');
-          sessionStorage.removeItem('active_tenant_id');
-          localStorage.removeItem('active_cafe_slug');
-          localStorage.removeItem('active_tenant_id');
-        }
+        return api.get(`/public/cafes/${encodeURIComponent(resolvedSlug)}`);
       }
 
-      // 4. Default active cafe fallback - guarantees customer never gets blocked by 404
-      return api.get('/public/cafes/default');
+      // 4. No tenant context: throw 404 (NEVER fall back to /public/cafes/default!)
+      const notFoundErr = new Error('Cafe not found. Please scan your table QR code or check the URL.');
+      notFoundErr.status = 404;
+      notFoundErr.code = 'CAFE_NOT_FOUND';
+      throw notFoundErr;
     };
 
     resolveEndpoint()
@@ -110,6 +95,19 @@ export function TenantProvider({ children }) {
         // Clean up previous cafe storage when switching tenants
         clearClientCache();
         cleanupPreviousTenantStorage(cafeData.slug);
+
+        // Namespace and isolate cart store by cafe slug
+        const cartState = useCartStore.getState?.();
+        if (cartState) {
+          const currentCartSlug = cartState.currentSlug;
+          if (currentCartSlug && currentCartSlug.toLowerCase() !== cafeData.slug.toLowerCase()) {
+            cartState.resetTable?.();
+            cartState.clearCart?.();
+            useCartStore.setState({ items: [], currentSlug: cafeData.slug, tableNumber: null, tableToken: null });
+          } else {
+            useCartStore.setState({ currentSlug: cafeData.slug });
+          }
+        }
 
         const rawPrimary = cafeData.branding?.primaryColor || cafeData.settings?.primaryColor;
         const rawAccent = cafeData.branding?.secondaryColor || cafeData.settings?.accentColor;
@@ -143,18 +141,15 @@ export function TenantProvider({ children }) {
 
         setTenant(normalizedTenant);
 
-        // Store active tenant slug and ID so checkout and cart requests retain cafe context
+        // Store active tenant in tab-scoped sessionStorage so page reloads / in-tab nav retain cafe context
         if (cafeData.slug) {
           sessionStorage.setItem('active_cafe_slug', cafeData.slug);
           sessionStorage.setItem('active_tenant_id', String(cafeData.id || cafeData._id));
-          localStorage.setItem('active_cafe_slug', cafeData.slug);
-          localStorage.setItem('active_tenant_id', String(cafeData.id || cafeData._id));
         }
 
         const effectiveToken = qrData?.token || token;
         if (effectiveToken) {
           sessionStorage.setItem('active_table_token', effectiveToken);
-          localStorage.setItem('active_table_token', effectiveToken);
         }
 
         // Store table info under customer namespaced keys
@@ -184,13 +179,24 @@ export function TenantProvider({ children }) {
       .catch((error) => {
         if (!active) return;
         clearClientCache();
-        const statusCode = error.response?.status;
+        try {
+          sessionStorage.removeItem('active_cafe_slug');
+          sessionStorage.removeItem('active_tenant_id');
+          sessionStorage.removeItem('active_table_token');
+          localStorage.removeItem('active_cafe_slug');
+          localStorage.removeItem('active_tenant_id');
+          localStorage.removeItem('active_table_token');
+        } catch { /* ignore storage errors */ }
+
+        const statusCode = error.response?.status || error.status;
         const errObj = error.response?.data?.error;
-        const errorCode = typeof errObj === 'object' ? errObj?.code : error.response?.data?.code;
+        const errorCode = typeof errObj === 'object' ? errObj?.code : error.response?.data?.code || error.code;
         const errorMessage =
           typeof errObj === 'object'
             ? errObj?.message
-            : error.response?.data?.error || 'Cafe not found. Please scan your table QR code.';
+            : typeof error.response?.data?.error === 'string'
+              ? error.response.data.error
+              : error.message || 'Cafe not found. Please scan your table QR code or check the URL.';
 
         if (statusCode === 410 || errorCode === 'QR_EXPIRED' || statusCode === 423 || errorCode === 'TENANT_SUSPENDED') {
           setTenantState({ status: 'suspended', message: errorMessage });

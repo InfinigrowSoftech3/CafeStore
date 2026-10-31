@@ -36,15 +36,22 @@ const EXCLUDED_PLATFORM_DOMAINS = [
 
 /**
  * Authoritative customer tenant slug resolver.
- * On customer routes, the cafe comes from URL query params, table QR tokens,
- * active session storage, or verified custom tenant subdomains.
+ * Strictly adheres to priority:
+ * 1. Valid explicit cafe URL parameter.
+ * 2. Signed QR token resolved and verified by backend.
+ * 3. Verified custom cafe subdomain.
+ * 4. No tenant context: show an error (returns empty string).
+ * 
+ * NEVER uses an old localStorage tenant slug to override a different cafe URL.
  */
 export function getResolvedTenantSlug() {
   if (typeof window === 'undefined') return '';
 
   try {
     const params = new URLSearchParams(window.location.search);
-    let urlTenant = (
+
+    // 1. Valid explicit cafe URL parameter
+    const urlTenant = (
       params.get('cafeSlug') ||
       params.get('cafe') ||
       params.get('cafeId') ||
@@ -53,44 +60,42 @@ export function getResolvedTenantSlug() {
       ''
     ).trim();
 
-    if (!urlTenant) {
-      const token = params.get('tableToken') || params.get('token');
-      if (token) {
-        const extracted = extractTenantFromTableToken(token);
-        if (extracted) urlTenant = extracted;
-      }
-    }
-
-    if (urlTenant) {
+    if (urlTenant && urlTenant.toLowerCase() !== 'default') {
       return urlTenant.toLowerCase();
     }
 
-    // Check persistent active cafe slug in sessionStorage/localStorage
-    const storedSlug =
-      sessionStorage.getItem('active_cafe_slug') ||
-      localStorage.getItem('active_cafe_slug');
-    if (storedSlug && typeof storedSlug === 'string') {
-      const cleanStored = storedSlug.trim().toLowerCase();
-      if (cleanStored && !EXCLUDED_PLATFORM_DOMAINS.some((d) => cleanStored.includes(d))) {
-        return cleanStored;
-      }
-    }
-
-    // Check table token stored in session/local storage
-    const storedToken =
-      sessionStorage.getItem('active_table_token') ||
-      localStorage.getItem('active_table_token');
-    if (storedToken) {
-      const extracted = extractTenantFromTableToken(storedToken);
+    // 2. Signed QR token resolved and verified by backend
+    const token = params.get('tableToken') || params.get('token');
+    if (token) {
+      const extracted = extractTenantFromTableToken(token);
       if (extracted) return extracted.toLowerCase();
     }
 
+    // 3. Verified custom cafe subdomain
     const host = window.location.hostname.toLowerCase();
+    const baseDomain = String(
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_TENANT_BASE_DOMAIN) ||
+      'cafestore.infinigrowsoftech.com'
+    ).toLowerCase().replace(/^\.+|\.+$/g, '');
+
     if (host.endsWith('.localhost')) {
       const prefix = host.slice(0, -'.localhost'.length);
       if (prefix && prefix !== 'admin' && prefix !== 'www' && prefix !== 'cafe' && !prefix.includes('.')) {
         return prefix;
       }
+    }
+
+    // Check against TENANT_BASE_DOMAIN (e.g. cafestore.infinigrowsoftech.com)
+    if (baseDomain && host.endsWith(`.${baseDomain}`)) {
+      const prefix = host.slice(0, -(baseDomain.length + 1));
+      if (prefix && prefix !== 'admin' && prefix !== 'www' && prefix !== 'cafe' && !prefix.includes('.')) {
+        return prefix;
+      }
+      return '';
+    }
+
+    if (baseDomain && host === baseDomain) {
+      return '';
     }
 
     // DO NOT treat deployment platforms (e.g. cafe-client-app.vercel.app) as custom tenant subdomains!
@@ -101,11 +106,22 @@ export function getResolvedTenantSlug() {
         return parts[0];
       }
     }
-  } catch {
-    // ignore
-  }
 
-  return '';
+    // Tab-scoped active session (supports client-side in-app routing when search params are omitted)
+    const sessionSlug = sessionStorage.getItem('active_cafe_slug');
+    if (sessionSlug && !urlTenant) {
+      const cleanSession = sessionSlug.trim().toLowerCase();
+      if (cleanSession && cleanSession !== 'default' && !EXCLUDED_PLATFORM_DOMAINS.some((d) => cleanSession.includes(d))) {
+        return cleanSession;
+      }
+    }
+
+    // 4. No tenant context: return empty string (show an error)
+    // NEVER fall back to an old localStorage tenant slug!
+    return '';
+  } catch {
+    return '';
+  }
 }
 
 export const getTenantSlug = getResolvedTenantSlug;
@@ -150,18 +166,26 @@ export function removeCustomerSessionItem(slug, key) {
 export function cleanupPreviousTenantStorage(newSlug) {
   if (typeof window === 'undefined') return;
   try {
-    // Remove un-namespaced legacy keys
+    const normalizedNew = String(newSlug || '').toLowerCase().trim();
+
+    // Remove un-namespaced legacy and active keys
     sessionStorage.removeItem('cafe_tenant_slug');
     sessionStorage.removeItem('cafe_tenant_id');
     sessionStorage.removeItem('cafe_table_token');
     sessionStorage.removeItem('cafe_table_number');
     sessionStorage.removeItem('cafe_table_id');
+    sessionStorage.removeItem('active_cafe_slug');
+    sessionStorage.removeItem('active_tenant_id');
+    sessionStorage.removeItem('active_table_token');
     localStorage.removeItem('cafe_tenant_slug');
     localStorage.removeItem('cafe_tenant_id');
+    localStorage.removeItem('active_cafe_slug');
+    localStorage.removeItem('active_tenant_id');
+    localStorage.removeItem('active_table_token');
     localStorage.removeItem('brewhaus-cart');
+    localStorage.removeItem('customer-cart');
 
-    // Remove legacy cache keys and customer keys that belong to other slugs
-    const normalizedNew = String(newSlug || '').toLowerCase().trim();
+    // Remove legacy cache keys and customer keys that belong to other slugs from sessionStorage
     for (let i = sessionStorage.length - 1; i >= 0; i--) {
       const k = sessionStorage.key(i);
       if (k) {
@@ -169,6 +193,18 @@ export function cleanupPreviousTenantStorage(newSlug) {
           sessionStorage.removeItem(k);
         } else if (normalizedNew && k.startsWith('customer:') && !k.startsWith(`customer:${normalizedNew}:`)) {
           sessionStorage.removeItem(k);
+        }
+      }
+    }
+
+    // Remove legacy cache keys and customer keys that belong to other slugs from localStorage
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k) {
+        if (k.startsWith('cafe_cache_') || k.startsWith('brewhaus_cache_') || k === 'brewhaus-cart' || k === 'customer-cart') {
+          localStorage.removeItem(k);
+        } else if (normalizedNew && k.startsWith('customer:') && !k.startsWith(`customer:${normalizedNew}:`)) {
+          localStorage.removeItem(k);
         }
       }
     }

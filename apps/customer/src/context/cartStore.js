@@ -169,7 +169,7 @@ const useCartStore = create(
       merge: (persistedState, currentState) => {
         const slug = getTenantSlug();
         // If persisted cart belongs to a DIFFERENT café slug, do NOT carry items over!
-        if (persistedState?.currentSlug && slug && persistedState.currentSlug !== slug) {
+        if (persistedState?.currentSlug && slug && persistedState.currentSlug.toLowerCase() !== slug.toLowerCase()) {
           return {
             ...currentState,
             items: [],

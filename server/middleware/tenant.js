@@ -1,14 +1,13 @@
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import Tenant from '../models/Tenant.js';
-import { findDefaultTenant } from '../utils/defaultTenant.js';
 import { runWithTenant } from '../utils/tenantContext.js';
-import { verifyTableQrToken } from '../utils/tableQr.js';
+import { verifyTableQrToken, verifyTableQrTokenDetailed } from '../utils/tableQr.js';
 
 const cleanHost = (value) => String(value || '').split(',')[0].trim().split(':')[0].toLowerCase();
 
 const getSlugFromHost = (host) => {
-  const baseDomain = String(process.env.TENANT_BASE_DOMAIN || '').toLowerCase().replace(/^\.+|\.+$/g, '');
+  const baseDomain = String(process.env.TENANT_BASE_DOMAIN || 'cafestore.infinigrowsoftech.com').toLowerCase().replace(/^\.+|\.+$/g, '');
   if (baseDomain && host.endsWith(`.${baseDomain}`)) {
     const prefix = host.slice(0, -(baseDomain.length + 1));
     if (prefix && !prefix.includes('.') && prefix !== 'admin' && prefix !== 'www' && prefix !== 'cafe') return prefix;
@@ -25,7 +24,7 @@ const isCustomerTenantHost = (host) => {
     const prefix = host.slice(0, -'.localhost'.length);
     return Boolean(prefix) && !prefix.includes('.') && prefix !== 'admin' && prefix !== 'www' && prefix !== 'cafe';
   }
-  const baseDomain = String(process.env.TENANT_BASE_DOMAIN || '').toLowerCase().replace(/^\.+|\.+$/g, '');
+  const baseDomain = String(process.env.TENANT_BASE_DOMAIN || 'cafestore.infinigrowsoftech.com').toLowerCase().replace(/^\.+|\.+$/g, '');
   return Boolean(baseDomain && host.endsWith(`.${baseDomain}`) && !host.slice(0, -(baseDomain.length + 1)).startsWith('admin.'));
 };
 
@@ -36,7 +35,7 @@ const isAllowedTenantHost = (host) => {
   if (['development', 'test'].includes(process.env.NODE_ENV) || !process.env.NODE_ENV) {
     if (clean === 'localhost' || clean.endsWith('.localhost') || clean === '127.0.0.1') return true;
   }
-  const baseDomain = String(process.env.TENANT_BASE_DOMAIN || '').toLowerCase().replace(/^\.+|\.+$/g, '');
+  const baseDomain = String(process.env.TENANT_BASE_DOMAIN || 'cafestore.infinigrowsoftech.com').toLowerCase().replace(/^\.+|\.+$/g, '');
   if (baseDomain && (clean === baseDomain || clean.endsWith(`.${baseDomain}`))) return true;
 
   // Explicit allowed frontend hosts
@@ -167,6 +166,8 @@ export const tenantResolver = async (req, res, next) => {
         }
         if (tenant) {
           tenantId = tenant._id;
+        } else {
+          return cleanTenantError(res, 404, 'Café not found. Please scan a table QR code or specify a valid café.');
         }
       }
     }
@@ -174,9 +175,14 @@ export const tenantResolver = async (req, res, next) => {
     // 3. Explicit X-Tenant-Id header or body tenantId
     if (!tenant) {
       const headerTenantId = req.headers['x-tenant-id'] || req.headers['x-cafe-id'] || req.body?.tenantId;
-      if (headerTenantId && mongoose.isValidObjectId(headerTenantId)) {
-        tenant = await Tenant.findById(headerTenantId).lean();
-        if (tenant) tenantId = tenant._id;
+      if (headerTenantId) {
+        if (mongoose.isValidObjectId(headerTenantId)) {
+          tenant = await Tenant.findById(headerTenantId).lean();
+          if (tenant) tenantId = tenant._id;
+        }
+        if (!tenant) {
+          return cleanTenantError(res, 404, 'Café not found. Please scan a table QR code or specify a valid café.');
+        }
       }
     }
 
@@ -229,7 +235,7 @@ export const tenantResolver = async (req, res, next) => {
           const prefix = h.slice(0, -'.localhost'.length);
           return Boolean(prefix) && !prefix.includes('.') && prefix !== 'admin' && prefix !== 'www' && prefix !== 'cafe' ? prefix : null;
         }
-        const baseDomain = String(process.env.TENANT_BASE_DOMAIN || '').toLowerCase().replace(/^\.+|\.+$/g, '');
+        const baseDomain = String(process.env.TENANT_BASE_DOMAIN || 'cafestore.infinigrowsoftech.com').toLowerCase().replace(/^\.+|\.+$/g, '');
         if (!baseDomain || !h.endsWith(`.${baseDomain}`)) return null;
         const prefix = h.slice(0, -(baseDomain.length + 1));
         return Boolean(prefix) && !prefix.includes('.') && prefix !== 'admin' && prefix !== 'www' && prefix !== 'cafe' ? prefix : null;
@@ -264,10 +270,15 @@ export const tenantResolver = async (req, res, next) => {
     if (!tenant && req.path !== '/api/tables/qr/validate') {
       const queryTableToken = req.query?.tableToken || req.headers['x-table-token'] || req.headers['x-qr-token'] || req.body?.tableToken || req.body?.qrToken;
       if (queryTableToken) {
-        const claims = verifyTableQrToken(queryTableToken);
-        if (claims?.tenantId && mongoose.isValidObjectId(claims.tenantId)) {
-          tenant = await Tenant.findById(claims.tenantId).lean();
+        const result = verifyTableQrTokenDetailed(queryTableToken);
+        if (result?.valid && result.tenantId && mongoose.isValidObjectId(result.tenantId)) {
+          tenant = await Tenant.findById(result.tenantId).lean();
           if (tenant) tenantId = tenant._id;
+        } else if (isCustomerPublicRoute(req)) {
+          if (result?.reason === 'EXPIRED') {
+            return res.status(410).json({ error: 'This QR code has expired or has been disabled.', code: 'QR_EXPIRED' });
+          }
+          return cleanTenantError(res, 404, 'QR code was not found or is no longer valid.');
         }
       }
     }
@@ -285,22 +296,6 @@ export const tenantResolver = async (req, res, next) => {
       tenantId = tenant._id;
     }
 
-    // 7. Test fallback for localhost test runs ONLY if no explicit query slug was given
-    if (!tenant && process.env.NODE_ENV === 'test') {
-      const rawRequestHost = cleanHost(req.get('x-forwarded-host') || req.get('host'));
-      if (rawRequestHost === 'localhost' || rawRequestHost === '127.0.0.1' || !rawRequestHost) {
-        const defaultSlug = String(process.env.TENANT_DEFAULT_SLUG || 'brewhaus').toLowerCase();
-        tenant = await Tenant.findOne({ slug: defaultSlug }).lean();
-        if (tenant) tenantId = tenant._id;
-      }
-    }
-
-    // 7b. Customer route fallback to the configured default café when no explicit query slug was requested
-    if (!tenant && !querySlug && isCustomerPublicRoute(req)) {
-      tenant = await findDefaultTenant();
-      if (tenant) tenantId = tenant._id;
-    }
-
     if (!tenant) {
       if (
         req.path.startsWith('/api/public') ||
@@ -308,6 +303,9 @@ export const tenantResolver = async (req, res, next) => {
         req.path.startsWith('/api/admin')
       ) {
         return next();
+      }
+      if (isCustomerPublicRoute(req)) {
+        return cleanTenantError(res, 404, 'Café not found. Please scan a table QR code or specify a valid café.');
       }
       // No café could be resolved. If the client provided no auth credentials, the
       // route's own auth middleware (protect) is responsible for the response, so

@@ -37,33 +37,49 @@ const isTimeoutOrNetworkError = (error) => {
 };
 
 api.interceptors.request.use((config) => {
-  // Single source of truth: strictly scoped by the URL slug or active session
+  // Authoritative tenant context: strictly scoped by the resolved tenant slug
   const tenantSlug = getResolvedTenantSlug();
   if (tenantSlug) {
     config.headers['X-Tenant-Slug'] = tenantSlug;
+  } else {
+    delete config.headers['X-Tenant-Slug'];
+    delete config.headers['x-tenant-slug'];
   }
 
   // Strictly remove any stale Authorization on customer calls
   delete config.headers['Authorization'];
   delete config.headers['authorization'];
 
-  const storedTenantId =
-    sessionStorage.getItem('active_tenant_id') ||
-    localStorage.getItem('active_tenant_id');
-  if (storedTenantId && !config.headers['X-Tenant-Id'] && !config.headers['x-tenant-id']) {
-    config.headers['X-Tenant-Id'] = storedTenantId;
+  // Only attach X-Tenant-Id if it strictly belongs to the current tenantSlug in active session
+  const activeSlug = sessionStorage.getItem('active_cafe_slug');
+  const activeTenantId = sessionStorage.getItem('active_tenant_id');
+
+  if (
+    tenantSlug &&
+    activeSlug &&
+    tenantSlug.toLowerCase() === activeSlug.toLowerCase() &&
+    activeTenantId
+  ) {
+    config.headers['X-Tenant-Id'] = activeTenantId;
+  } else {
+    // Never attach an unrelated stored tenant ID as fallback
+    delete config.headers['X-Tenant-Id'];
+    delete config.headers['x-tenant-id'];
   }
 
   try {
-    const tableToken =
-      new URLSearchParams(window.location.search).get('tableToken') ||
-      new URLSearchParams(window.location.search).get('token') ||
-      useCartStore.getState()?.tableToken ||
-      sessionStorage.getItem('active_table_token') ||
-      localStorage.getItem('active_table_token') ||
-      sessionStorage.getItem(getCustomerStorageKey(tenantSlug, 'table_token'));
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get('tableToken') || params.get('token');
+    const storeToken = useCartStore.getState()?.tableToken;
+    const sessionToken = tenantSlug
+      ? sessionStorage.getItem(getCustomerStorageKey(tenantSlug, 'table_token'))
+      : null;
+    const activeTableToken = sessionStorage.getItem('active_table_token');
+
+    const tableToken = urlToken || storeToken || sessionToken || activeTableToken;
     if (tableToken && !config.headers['X-Table-Token'] && !config.headers['x-table-token']) {
       config.headers['X-Table-Token'] = tableToken;
+      config.headers['X-QR-Token'] = tableToken;
     }
   } catch {
     // Ignore storage and URL query parsing errors

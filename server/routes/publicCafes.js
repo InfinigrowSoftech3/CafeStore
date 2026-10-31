@@ -5,7 +5,6 @@ import Table from '../models/Table.js';
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import Order from '../models/Order.js';
-import { findDefaultTenant } from '../utils/defaultTenant.js';
 import { createTableQrToken, verifyTableQrTokenDetailed } from '../utils/tableQr.js';
 import { generateOrderAccessToken, hashAccessToken } from '../utils/orderSecurity.js';
 import { runWithTenant, runWithSystemTenantAccess } from '../utils/tenantContext.js';
@@ -21,23 +20,14 @@ const SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 const resolveCafe = async (cafeIdOrSlug) => {
   if (!cafeIdOrSlug) return { error: 'INVALID_ID' };
   const trimmed = String(cafeIdOrSlug).trim();
-  if (trimmed.toLowerCase() === 'default') {
-    const cafe = await findDefaultTenant();
-    if (!cafe) return { error: 'NOT_FOUND' };
-    return { cafe };
-  }
   if (mongoose.isValidObjectId(trimmed)) {
     const cafe = await Tenant.findById(trimmed).lean();
     if (!cafe) return { error: 'NOT_FOUND' };
     return { cafe };
   }
-  // Try slug lookup
+  // Try slug lookup - strictly require exact slug match without fallback to default
   if (SLUG_REGEX.test(trimmed.toLowerCase())) {
-    let cafe = await Tenant.findOne({ slug: trimmed.toLowerCase() }).lean();
-    // Graceful fallback: If slug is 'brewhaus' or if only 1 active tenant exists, resolve the primary active cafe
-    if (!cafe && (trimmed.toLowerCase() === 'brewhaus' || trimmed.toLowerCase() === 'default')) {
-      cafe = await Tenant.findOne({ status: 'active' }).sort({ createdAt: 1 }).lean();
-    }
+    const cafe = await Tenant.findOne({ slug: trimmed.toLowerCase() }).lean();
     if (!cafe) return { error: 'NOT_FOUND' };
     return { cafe };
   }
@@ -83,6 +73,24 @@ router.get('/cafes/resolve', async (req, res, next) => {
       }
       if (!table.active) {
         return sendApiError(res, 410, 'QR_EXPIRED', 'This QR code has expired or has been disabled.');
+      }
+
+      // Reject mismatched cafe/table combinations if explicit parameters were supplied alongside token
+      if (cafeSlugParam) {
+        const matchesSlug = cafeSlugParam.toLowerCase() === cafe.slug.toLowerCase();
+        const matchesId = String(cafe._id) === cafeSlugParam;
+        if (!matchesSlug && !matchesId) {
+          return sendApiError(res, 409, 'TABLE_CAFE_MISMATCH', 'The table does not belong to the specified cafe.');
+        }
+      }
+
+      if (tableSlugParam) {
+        const matchesId = String(table._id) === tableSlugParam;
+        const matchesNum = String(table.tableNumber) === tableSlugParam;
+        const matchesLabel = table.label && table.label.toLowerCase() === tableSlugParam.toLowerCase();
+        if (!matchesId && !matchesNum && !matchesLabel) {
+          return sendApiError(res, 409, 'TABLE_CAFE_MISMATCH', 'The table does not belong to the specified cafe.');
+        }
       }
 
       return sendApiSuccess(res, 200, {
